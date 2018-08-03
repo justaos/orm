@@ -1,15 +1,10 @@
 const Query = require('./query');
-const dummyInterceptor = new (require('./dummy-interceptor'))();
 const Q = require('q');
 
 let privateData = new WeakMap();
 
 function _getModel(context) {
     return privateData.get(context).model;
-}
-
-function _getUser(context) {
-    return privateData.get(context).user;
 }
 
 function _populateReferenceFields(context, query, options) {
@@ -24,24 +19,27 @@ function _populateReferenceFields(context, query, options) {
     return query;
 }
 
+async function _intercept(context, operation, when, docs) {
+    let interceptors = privateData.get(context).interceptors;
+    if (interceptors) {
+        let i;
+        for (i = 0; i < interceptors.length; i++) {
+            docs = await interceptors[i].intercept(operation, when, docs);
+        }
+    }
+    return docs;
+}
+
 class Model {
 
-    constructor(mongooseModel, user) {
+    constructor(mongooseModel, ...interceptors) {
         privateData.set(this, {});
         privateData.get(this).model = mongooseModel;
-        privateData.get(this).user = user;
+        privateData.get(this).interceptors = interceptors;
     }
 
     getDefinition() {
         return privateData.get(this).model.definition;
-    }
-
-    getInterceptor() {
-        let that = this;
-        /*
-         * To be over written in ModelSession class.
-         */
-        return dummyInterceptor;
     }
 
     skipPopulation() {
@@ -54,36 +52,12 @@ class Model {
      * @param {Object} [options] Options passed down to `save()`. To specify `options`, `docs` **must** be an array, not a spread.
      * @return {Promise}
      */
-    create(docs, options) {
+    async create(docs, options) {
         let that = this;
-        let user = _getUser(this);
-        if (user) {
-            if (Array.isArray(docs))
-                docs.forEach(function (doc) {
-                    doc.created_by = user.id;
-                    doc.updated_by = user.id;
-                });
-            else {
-                docs.created_by = user.id;
-                docs.updated_by = user.id;
-            }
-        }
-        let dfd = Q.defer();
-        that.getInterceptor().intercept('create', 'before', docs).then(function (docs) {
-            _getModel(that).create(docs, options).then(function (docs) {
-                let args = arguments;
-                that.getInterceptor().intercept('create', 'after', docs).then(function () {
-                    dfd.resolve.apply(null, args);
-                }).catch(function (err) {
-                    dfd.reject(err);
-                });
-            }).catch(function (err) {
-                dfd.reject(err);
-            });
-        }).catch(function (err) {
-            dfd.reject(err);
-        });
-        return dfd.promise;
+        docs = await _intercept(that, 'create', 'before', docs);
+        docs = await _getModel(that).create(docs, options);
+        await _intercept(that, 'create', 'after', docs);
+        return docs;
     }
 
     /**
@@ -161,14 +135,21 @@ class Model {
      * @param {Object} [options] optional see [`Query.prototype.setOptions()`](http://mongoosejs.com/docs/api.html#query_Query-setOptions)
      * @return {Query}
      */
-    update(conditions, doc, options) {
-        let user = _getUser(this);
-        if (user) {
-            delete doc.created_by;
-            doc.updated_by = user.id;
-        }
+    async update(conditions, doc, options) {
+        let that = this;
+        doc = await _intercept(that, 'update', 'before', doc);
         let mongooseQuery = _getModel(this).update(conditions, doc, options);
-        return new Query(mongooseQuery);
+        return new Query(mongooseQuery, function (when, docs) {
+            return new Promise((resolve, reject) => {
+                if (when === 'after') {
+                    _intercept(that, 'update', when, docs).then(function () {
+                        resolve();
+                    });
+                } else {
+                    resolve();
+                }
+            })
+        }).exec();
     }
 
 }

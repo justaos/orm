@@ -1,26 +1,18 @@
 class Query {
 
-    constructor(mongooseQuery) {
+    constructor(mongooseQuery, intercept) {
         this.query = mongooseQuery;
+        this.intercept = intercept || function(){
+
+        }
     }
 
-    exec(cb) {
+    async exec() {
         let that = this;
-        if (cb)
-            this.query.exec(function (err, docs) {
-                // intercept here
-                cb(err, docs);
-            });
-        else {
-            return new Promise((resolve, reject) => {
-                that.query.exec().then(function (docs) {
-                    // intercept here
-                    resolve(docs);
-                }).catch(function (err) {
-                    reject(err);
-                });
-            });
-        }
+        await that.intercept('before', null);
+        let docs = await this.query.exec();
+        await that.intercept('after', docs);
+        return docs;
     }
 
     populate() {
