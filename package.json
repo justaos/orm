@@ -4,11 +4,8 @@
   "description": "Mongoose wrapper with intercepts",
   "main": "./index.js",
   "scripts": {
-    "start": "node src/app.js",
-    "mongod": "bin\\mongod.cmd",
     "test": "nyc mocha --recursive",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
-    "objectid": "node bin/objectid.js"
   },
   "repository": {
     "type": "git",
