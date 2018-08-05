@@ -1,3 +1,4 @@
-const Model = require('./src/model');
-const Query = require('./src/query');
-module.exports = {Model, Query};
+const DatabaseConnector = require('./src/database-connector');
+const ModelBuilder = require('./src/model-builder');
+const ModelInterceptorProvider = require('./src/model-interceptor-provider');
+module.exports = {DatabaseConnector, ModelBuilder, ModelInterceptorProvider};

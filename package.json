@@ -22,6 +22,8 @@
   },
   "homepage": "https://anysols.com",
   "dependencies": {
+    "lodash": "^4.17.10",
+    "mongoose": "^5.2.6",
     "q": "^1.5.1"
   },
   "devDependencies": {}
