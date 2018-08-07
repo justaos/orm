@@ -5,7 +5,30 @@
   "main": "./index.js",
   "scripts": {
     "test": "nyc mocha --recursive",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
+  "nyc": {
+    "check-coverage": false,
+    "all": true,
+    "extension": [
+      ".js"
+    ],
+    "include": [
+      "**/!(*.spec.*).js"
+    ],
+    "exclude": [
+      "docs/",
+      "**/gulpfile.js",
+      "test/",
+      "playground.js"
+    ],
+    "reporter": [
+      "html",
+      "lcov",
+      "text",
+      "text-summary"
+    ],
+    "report-dir": "docs/reports/coverage"
   },
   "repository": {
     "type": "git",
@@ -20,8 +43,11 @@
   "homepage": "https://anysols.com",
   "dependencies": {
     "lodash": "^4.17.10",
-    "mongoose": "^5.2.6",
-    "q": "^1.5.1"
+    "mongoose": "^5.2.6"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "mocha": "^5.1.0",
+    "nyc": "^11.6.0"
+  }
 }
