@@ -6,7 +6,7 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test": "nyc mocha --recursive",
+    "test": "nyc mocha --recursive test/init.test.js test/unit/**/*test.js test/end.test.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "files": [

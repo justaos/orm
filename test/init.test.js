@@ -1,7 +1,7 @@
-let DatabaseConnector = require('../../index').DatabaseConnector;
+let DatabaseConnector = require('../lib/index').DatabaseConnector;
 const {assert} = require('chai');
 
-describe('ds-utils', function () {
+describe('database-connector', function () {
 
     it('#connect()', function (done) {
         let db = new DatabaseConnector({
@@ -12,11 +12,10 @@ describe('ds-utils', function () {
             "password": "root",
             "dialect": "mongodb"
         });
-        db.connect().then(function(){
+        db.connect().then(function () {
             assert.isOk(true, 'connection established');
-            db.getConnection().close();
             done()
-        }, function(){
+        }, function () {
             assert.isOk(false, 'connection failed');
             done();
         });

@@ -1,11 +1,14 @@
-class QueryBuilder {
+export default class QueryBuilder {
 
-    setModel(Model) {
+    Model: any;
+    intercept: any;
+
+    setModel(Model: any) {
         this.Model = Model;
         return this;
     }
 
-    setIntercept(intercept) {
+    setIntercept(intercept: any) {
         this.intercept = intercept;
         return this;
     }
@@ -14,11 +17,14 @@ class QueryBuilder {
         let queryBuild = this;
         return class Query {
 
-            constructor(mongooseQuery) {
+            query: any;
+
+            constructor(mongooseQuery: any) {
                 this.query = mongooseQuery;
             }
 
             async exec() {
+                // @ts-ignore
                 await queryBuild.intercept('read', 'before', null);
                 let docs = await this.query.exec();
                 if (docs) {
@@ -27,6 +33,7 @@ class QueryBuilder {
                     else
                         docs = new queryBuild.Model(docs);
                 }
+                // @ts-ignore
                 return await queryBuild.intercept('read', 'after', docs);
             }
 
@@ -35,7 +42,7 @@ class QueryBuilder {
                 return this;
             }
 
-            remove(filter) {
+            remove(filter: any) {
                 this.query = this.query.remove(filter);
                 return this;
             }
@@ -44,5 +51,3 @@ class QueryBuilder {
 
     }
 }
-
-module.exports = QueryBuilder;

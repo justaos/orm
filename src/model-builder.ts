@@ -1,26 +1,33 @@
-const DatabaseConnector = require('./database-connector');
-const QueryBuilder = require('./query-builder');
-const ModelInterceptorProvider = require('./model-interceptor-provider');
+import DatabaseConnector from "./database-connector";
 
-class ModelBuilder {
+import ModelInterceptorProvider from "./model-interceptor-provider";
 
-    setInterceptProvider(interceptProvider) {
+import QueryBuilder from "./query-builder";
+
+export default class ModelBuilder {
+
+    interceptProvider: any;
+
+    setInterceptProvider(interceptProvider: ModelInterceptorProvider) {
         this.interceptProvider = interceptProvider;
         return this;
     }
 
-    build() {
+    build(): any {
         let modelBuilder = this;
         if (!this.interceptProvider) {
             this.interceptProvider = new ModelInterceptorProvider();
         }
-        return function model(modelName) {
+        return function model(modelName: string) {
             let MongooseModel = DatabaseConnector.getInstance().getConnection().model(modelName);
-            let inactiveIntercepts = [];
+            let inactiveIntercepts: string[] = [];
 
             class Model {
 
-                constructor(plainRecord) {
+                record: any;
+                static isPopulate: boolean;
+
+                constructor(plainRecord: any) {
                     this.record = new MongooseModel(plainRecord);
                 }
 
@@ -28,24 +35,28 @@ class ModelBuilder {
                     return this.record._id;
                 }
 
-                set(key, value) {
+                set(key: string, value: any) {
                     this.record[key] = value;
                 }
 
-                get(key) {
+                get(key: string) {
                     return this.record[key];
                 }
 
-                async save(options) {
+                async save(options: any) {
                     let operation = this.record.isNew ? 'create' : 'update';
+                    // @ts-ignore
                     let that = await modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, 'before', this);
                     that.record = await that.record.save(options);
+                    // @ts-ignore
                     return await modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, 'after', that);
                 }
 
-                async remove(options) {
+                async remove(options: any) {
+                    // @ts-ignore
                     let that = await modelBuilder.interceptProvider.intercept(Model.getModelName(), 'delete', 'before', this);
                     that.record = await that.record.remove(options);
+                    // @ts-ignore
                     return await modelBuilder.interceptProvider.intercept(Model.getModelName(), 'delete', 'after', that);
                 }
 
@@ -55,7 +66,7 @@ class ModelBuilder {
                  * @param {Object} [options] optional
                  * @return {Query}
                  */
-                static find(conditions, projection, options) {
+                static find(conditions: any, projection: any, options: any) {
                     let mongooseQuery = MongooseModel.find(conditions, projection, options);
                     let query = new Query(mongooseQuery);
                     return populateReferenceFields(query, options);
@@ -67,7 +78,7 @@ class ModelBuilder {
                  * @param {Object} [options] optional
                  * @return {Query}
                  */
-                static findOne(conditions, projection, options) {
+                static findOne(conditions: any, projection: any, options: any) {
                     let mongooseQuery = MongooseModel.findOne(conditions, projection, options);
                     let query = new Query(mongooseQuery);
                     return populateReferenceFields(query, options);
@@ -79,7 +90,7 @@ class ModelBuilder {
                  * @param {Object} [options] optional
                  * @return {Query}
                  */
-                static findById(id, projection, options) {
+                static findById(id: any, projection: any, options: any) {
                     if (typeof id === 'undefined') {
                         id = null;
                     }
@@ -88,13 +99,13 @@ class ModelBuilder {
                     }, projection, options);
                 }
 
-                static findOneAndUpdate(conditions, update, options) {
+                static findOneAndUpdate(conditions: any, update: any, options: any) {
                     let mongooseQuery = MongooseModel.findOneAndUpdate(conditions, update, options);
                     let query = new Query(mongooseQuery);
                     return populateReferenceFields(query, options);
                 }
 
-                static upsert(conditions, update) {
+                static upsert(conditions: any, update: any) {
                     return Model.findOneAndUpdate(conditions, update, {upsert: true, new: true});
                 }
 
@@ -106,7 +117,7 @@ class ModelBuilder {
                     return modelName;
                 }
 
-                static deactivateIntercept(name) {
+                static deactivateIntercept(name: string) {
                     inactiveIntercepts.push(name);
                 }
 
@@ -119,21 +130,22 @@ class ModelBuilder {
                     return this.record.toObject();
                 }
 
-                toObject(options) {
+                toObject(options: any) {
                     return this.record.toObject(options);
                 }
             }
 
             let Query = new QueryBuilder().setModel(Model).setIntercept(intercept).build();
 
-            function intercept(operation, when, docs) {
+            function intercept(operation: string, when: string, docs: any) {
+                // @ts-ignore
                 return modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, when, docs, inactiveIntercepts);
             }
 
-            function populateReferenceFields(query, options) {
+            function populateReferenceFields(query: any, options: any) {
                 if (Model.isPopulate) {
                     let def = Model.getDefinition();
-                    def.fields.forEach(function (field) {
+                    def.fields.forEach(function (field: any) {
                         if (field.type === 'reference' && field.ref) {
                             query = query.populate({path: field.name});
                         }
@@ -147,5 +159,3 @@ class ModelBuilder {
         }
     }
 }
-
-module.exports = ModelBuilder;
