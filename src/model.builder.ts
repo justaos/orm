@@ -2,7 +2,7 @@ import DatabaseConnector from "./database-connector";
 
 import ModelInterceptorProvider from "./model-interceptor-provider";
 
-import QueryBuilder from "./query-builder";
+import QueryBuilder from "./query.builder";
 
 export default class ModelBuilder {
 

@@ -10,10 +10,10 @@ let instance: DatabaseConnector;
 export default class DatabaseConnector {
 
     config: any;
-    _connection: any;
+    private conn: any;
 
-    constructor(config: any) {
-        this.config = new DatabaseConfiguration(config);
+    constructor(config: DatabaseConfiguration) {
+        this.config = config;
         instance = this;
     }
 
@@ -21,34 +21,34 @@ export default class DatabaseConnector {
         let that = this;
         return new Promise((resolve, reject) => {
 
-            that._connection = mongoose.createConnection(this.config.getUri(), {useNewUrlParser: true});
+            that.conn = mongoose.createConnection(this.config.getUri(), {useNewUrlParser: true});
 
-            that._connection.on('connecting', () => {
+            that.conn.on('connecting', () => {
                 console.log('trying to establish a connection to mongo');
             });
 
-            that._connection.on('connected', () => {
+            that.conn.on('connected', () => {
                 console.log('connection established successfully');
             });
 
-            that._connection.on('error', (err: Error) => {
+            that.conn.on('error', (err: Error) => {
                 console.error('connection to mongo failed \n' + err);
                 reject(err);
             });
 
-            that._connection.on('open', () => {
+            that.conn.on('open', () => {
                 console.log('mongo db connection open');
-                resolve(that._connection);
+                resolve();
             });
 
         });
     }
 
-    async checkDatabase() {
+    async databaseExists() {
         let that = this;
 
         // @ts-ignore
-        let response = await new mongoose.mongo.Admin(this._connection.db).listDatabases();
+        let response = await new mongoose.mongo.Admin(this.conn.db).listDatabases();
         let index = _.findIndex(response['databases'], function (db: any) {
             return db.name === that.config.name;
         });
@@ -62,15 +62,15 @@ export default class DatabaseConnector {
     }
 
     dropDatabase() {
-        return this._connection.db.dropDatabase();
+        return this.conn.db.dropDatabase();
     }
 
     closeConnection() {
-        this._connection.close();
+        this.conn.close();
     }
 
     getConnection() {
-        return this._connection;
+        return this.conn;
     }
 
     static getInstance() {
