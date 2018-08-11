@@ -1,22 +1,27 @@
-const mongoose = require('mongoose');
-const _ = require('lodash');
-const Admin = mongoose.mongo.Admin;
+import * as mongoose from "mongoose";
+import DatabaseConfiguration from "./database-configuration";
+import * as _ from "lodash";
+
+// @ts-ignore
 mongoose.Promise = Promise;
 
-let instance;
+let instance: DatabaseConnector;
 
-class DatabaseConnector {
+export default class DatabaseConnector {
 
-    constructor(dbConfig) {
+    config: any;
+    _connection: any;
+
+    constructor(config: any) {
+        this.config = new DatabaseConfiguration(config);
         instance = this;
-        this.config = dbConfig;
     }
 
     connect() {
         let that = this;
         return new Promise((resolve, reject) => {
-            that._connection =
-                mongoose.createConnection(`${this.config.dialect}://${this.config.host}:${this.config.port}/${this.config.name}`, {useNewUrlParser: true});
+
+            that._connection = mongoose.createConnection(this.config.getUri(), {useNewUrlParser: true});
 
             that._connection.on('connecting', () => {
                 console.log('trying to establish a connection to mongo');
@@ -26,7 +31,7 @@ class DatabaseConnector {
                 console.log('connection established successfully');
             });
 
-            that._connection.on('error', (err) => {
+            that._connection.on('error', (err: Error) => {
                 console.error('connection to mongo failed \n' + err);
                 reject(err);
             });
@@ -35,13 +40,16 @@ class DatabaseConnector {
                 console.log('mongo db connection open');
                 resolve(that._connection);
             });
+
         });
     }
 
     async checkDatabase() {
         let that = this;
-        let response = await new Admin(this._connection.db).listDatabases();
-        let index = _.findIndex(response['databases'], function (db) {
+
+        // @ts-ignore
+        let response = await new mongoose.mongo.Admin(this._connection.db).listDatabases();
+        let index = _.findIndex(response['databases'], function (db: any) {
             return db.name === that.config.name;
         });
         if (index !== -1) {
@@ -70,5 +78,3 @@ class DatabaseConnector {
     }
 
 }
-
-module.exports = DatabaseConnector;

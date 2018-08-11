@@ -1,16 +1,18 @@
-const _ = require('lodash');
+import * as _ from 'lodash';
 
-class ModelInterceptorProvider {
+export default class ModelInterceptorProvider {
+
+    interceptors: Array<any>;
 
     constructor() {
         this.interceptors = [];
     }
 
-    register(name, interceptor) {
+    register(name: string, interceptor: any) {
         this.interceptors.push({name, interceptor});
     }
 
-    deregister(name) {
+    deregister(name: string) {
         _.remove(this.interceptors, function (interceptor) {
             return name === interceptor.name;
         })
@@ -20,8 +22,8 @@ class ModelInterceptorProvider {
 
     }
 
-    async intercept(modelName, operation, when, records /* single or array of records */, inactiveIntercepts) {
-      //  console.log(modelName + ' :: ' + operation + ' : ' + when);
+    async intercept(modelName: string, operation: string, when: string, records: any /* single or array of records */, inactiveIntercepts: Array<string>) {
+        //  console.log(modelName + ' :: ' + operation + ' : ' + when);
         if (this.interceptors) {
             let i;
             for (i = 0; i < this.interceptors.length; i++) {
@@ -35,5 +37,3 @@ class ModelInterceptorProvider {
         return records;
     }
 }
-
-module.exports = ModelInterceptorProvider;
