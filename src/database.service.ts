@@ -2,7 +2,7 @@ import DatabaseConnector from "./database-connector";
 import DatabaseConfiguration from "./database-configuration";
 
 
-export default class DatabaseService {
+export class DatabaseService {
 
     static connect(config: any): Promise<any> {
         let dbConfig = new DatabaseConfiguration(config);
@@ -14,7 +14,7 @@ export default class DatabaseService {
         return DatabaseConnector.getInstance().databaseExists();
     }
 
-    static dropDatabase(){
+    static dropDatabase() {
         return DatabaseConnector.getInstance().dropDatabase();
     }
 

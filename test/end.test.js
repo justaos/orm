@@ -1,10 +1,8 @@
-let DatabaseConnector = require('../lib/index').DatabaseConnector;
+let {DatabaseService} = require('../lib/index');
 const {assert} = require('chai');
 
 describe('database-connector', function () {
 
-    it('#close()', function () {
-        DatabaseConnector.getInstance().getConnection().close();
-    });
+
 
 });

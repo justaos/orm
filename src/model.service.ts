@@ -2,7 +2,7 @@ import DatabaseConnector from "./database-connector";
 
 import * as mongoose from "mongoose";
 
-export default class ModelService {
+export class ModelService {
 
     private conn: any;
 

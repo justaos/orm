@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 
-export default class ModelInterceptorProvider {
+export class ModelInterceptorProvider {
 
     interceptors: Array<any>;
 

@@ -1,18 +1,17 @@
-let DatabaseConnector = require('../lib/index').DatabaseConnector;
+let {DatabaseService} = require('../lib/index');
 const {assert} = require('chai');
 
-describe('database-connector', function () {
+describe('database.service', function () {
 
     it('#connect()', function (done) {
-        let db = new DatabaseConnector({
+        DatabaseService.connect({
             "host": "localhost",
             "port": "27017",
             "name": "anysols",
             "user": "root",
             "password": "root",
             "dialect": "mongodb"
-        });
-        db.connect().then(function () {
+        }).then(function () {
             assert.isOk(true, 'connection established');
             done()
         }, function () {
