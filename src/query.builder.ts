@@ -37,13 +37,25 @@ export default class QueryBuilder {
                 return await queryBuild.intercept('read', 'after', docs);
             }
 
-            populate() {
+            populate(props: any) {
                 this.query = this.query.populate.apply(this.query, arguments);
                 return this;
             }
 
+            populateRefs() {
+                let that = this;
+                let def = queryBuild.Model.getDefinition();
+                def.fields.forEach(function (field: any) {
+                    if (field.type === 'reference' && field.ref) {
+                        that.populate({path: field.name});
+                    }
+                });
+                return this;
+            }
+
+
             remove(filter: any) {
-                this.query = this.query.remove(filter);
+                this.query = this.query.remove.apply(this.query, arguments);
                 return this;
             }
 

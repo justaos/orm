@@ -25,7 +25,6 @@ export class ModelBuilder {
             class Model {
 
                 record: any;
-                static isPopulate: boolean;
 
                 constructor(plainRecord: any) {
                     this.record = new MongooseModel(plainRecord);
@@ -68,8 +67,7 @@ export class ModelBuilder {
                  */
                 static find(conditions: any, projection: any, options: any) {
                     let mongooseQuery = MongooseModel.find(conditions, projection, options);
-                    let query = new Query(mongooseQuery);
-                    return populateReferenceFields(query, options);
+                    return new Query(mongooseQuery);
                 }
 
                 /**
@@ -80,8 +78,7 @@ export class ModelBuilder {
                  */
                 static findOne(conditions: any, projection: any, options: any) {
                     let mongooseQuery = MongooseModel.findOne(conditions, projection, options);
-                    let query = new Query(mongooseQuery);
-                    return populateReferenceFields(query, options);
+                    return new Query(mongooseQuery);
                 }
 
                 /**
@@ -101,8 +98,7 @@ export class ModelBuilder {
 
                 static findOneAndUpdate(conditions: any, update: any, options: any) {
                     let mongooseQuery = MongooseModel.findOneAndUpdate(conditions, update, options);
-                    let query = new Query(mongooseQuery);
-                    return populateReferenceFields(query, options);
+                    return new Query(mongooseQuery);
                 }
 
                 static upsert(conditions: any, update: any) {
@@ -121,11 +117,6 @@ export class ModelBuilder {
                     inactiveIntercepts.push(name);
                 }
 
-                static populateReferences() {
-                    Model.isPopulate = true;
-                    return this;
-                }
-
                 toJSON() {
                     return this.record.toObject();
                 }
@@ -141,19 +132,6 @@ export class ModelBuilder {
                 // @ts-ignore
                 return modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, when, docs, inactiveIntercepts);
             }
-
-            function populateReferenceFields(query: any, options: any) {
-                if (Model.isPopulate) {
-                    let def = Model.getDefinition();
-                    def.fields.forEach(function (field: any) {
-                        if (field.type === 'reference' && field.ref) {
-                            query = query.populate({path: field.name});
-                        }
-                    });
-                }
-                return query;
-            }
-
 
             return Model;
         }
