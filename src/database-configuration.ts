@@ -7,13 +7,13 @@ export default class DatabaseConfiguration {
     password: string;
     dialect: string;
 
-    constructor(config: any){
-        this.host = config.host;
-        this.port = config.port;
-        this.name = config.name;
-        this.user = config.user;
-        this.password = config.password;
-        this.dialect = config.dialect;
+    constructor(host: string, port: string, name: string, user: string, password: string, dialect: string){
+        this.host = host;
+        this.port = port;
+        this.name = name;
+        this.user = user;
+        this.password = password;
+        this.dialect = dialect;
     }
 
     getUri(){
