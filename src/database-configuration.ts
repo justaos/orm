@@ -7,7 +7,7 @@ export default class DatabaseConfiguration {
     password: string;
     dialect: string;
 
-    constructor(host: string, port: string, name: string, user: string, password: string, dialect: string){
+    constructor(host: string, port: string, name: string, user: string, password: string, dialect: string) {
         this.host = host;
         this.port = port;
         this.name = name;
@@ -16,7 +16,7 @@ export default class DatabaseConfiguration {
         this.dialect = dialect;
     }
 
-    getUri(){
+    getUri() {
         return `${this.dialect}://${this.host}:${this.port}/${this.name}`;
     }
 
