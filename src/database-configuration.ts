@@ -7,7 +7,7 @@ export default class DatabaseConfiguration {
     password: string;
     dialect: string;
 
-    constructor(host: string, port: string, name: string, user: string, password: string, dialect: string) {
+    constructor(host: string, port: number, name: string, user: string, password: string, dialect: string) {
         this.host = host;
         this.port = port;
         this.name = name;

@@ -50,7 +50,7 @@ export default class DatabaseConnector {
 
         // @ts-ignore
         let response = await new mongoose.mongo.Admin(this.conn.db).listDatabases();
-        let index = response['databases'].findIndex(function(db: any) {
+        let index = response['databases'].findIndex(function (db: any) {
             return db.name === that.config.name;
         });
         if (index !== -1) {
