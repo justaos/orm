@@ -16,6 +16,10 @@ export default class DatabaseConnector {
         instance = this;
     }
 
+    static getInstance() {
+        return instance;
+    }
+
     connect() {
         let that = this;
         return new Promise((resolve, reject) => {
@@ -71,10 +75,6 @@ export default class DatabaseConnector {
 
     getConnection() {
         return this.conn;
-    }
-
-    static getInstance() {
-        return instance;
     }
 
 }
