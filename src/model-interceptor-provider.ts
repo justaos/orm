@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 export class ModelInterceptorProvider {
 
     interceptors: Array<any>;
@@ -13,7 +11,7 @@ export class ModelInterceptorProvider {
     }
 
     deregister(name: string) {
-        _.remove(this.interceptors, function (interceptor) {
+        this.interceptors = this.interceptors.filter(function (interceptor) {
             return name === interceptor.name;
         })
     }
@@ -27,7 +25,7 @@ export class ModelInterceptorProvider {
         if (this.interceptors) {
             let i;
             for (i = 0; i < this.interceptors.length; i++) {
-                if (!inactiveIntercepts || !_.includes(inactiveIntercepts, this.interceptors[i].name)) {
+                if (!inactiveIntercepts || !inactiveIntercepts.includes(this.interceptors[i].name)) {
                     records = await this.interceptors[i].interceptor.intercept(modelName, operation, when, records);
                     if (!records)
                         break;

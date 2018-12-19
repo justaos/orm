@@ -1,68 +1,66 @@
 {
-  "name": "anysols-model",
-  "version": "0.7.1",
-  "description": "Mongoose wrapper with intercepts",
-  "main": "./lib/index.js",
-  "scripts": {
-    "prepare": "npm run build",
-    "build": "tsc",
-    "test": "nyc mocha --recursive test/init.test.js test/unit/**/*test.js test/end.test.js",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
-  },
-  "files": [
-    "lib"
-  ],
-  "keywords": [
-    "anysols",
-    "mongoose wrapper",
-    "anysols-model"
-  ],
-  "nyc": {
-    "check-coverage": false,
-    "all": true,
-    "extension": [
-      ".js"
+    "name": "anysols-model",
+    "version": "0.7.2",
+    "description": "Mongoose wrapper with intercepts",
+    "main": "./lib/index.js",
+    "scripts": {
+        "prepare": "npm run build",
+        "build": "tsc",
+        "test": "nyc mocha --recursive test/init.test.js test/unit/**/*test.js test/end.test.js",
+        "coverage": "nyc report --reporter=text-lcov | coveralls"
+    },
+    "files": [
+        "lib"
     ],
-    "include": [
-      "**/!(*.spec.*).js"
+    "keywords": [
+        "anysols",
+        "mongoose wrapper",
+        "anysols-model"
     ],
-    "exclude": [
-      "src/",
-      "docs/",
-      "**/gulpfile.js",
-      "test/",
-      "playground.js"
-    ],
-    "reporter": [
-      "html",
-      "lcov",
-      "text",
-      "text-summary"
-    ],
-    "report-dir": "docs/reports/coverage"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/anysols/anysols-model.git"
-  },
-  "author": "Shivaji Varma <contact@shivajivarma.com>",
-  "contributors": [],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://gitlab.com/anysols/anysols-model/issues"
-  },
-  "homepage": "https://anysols.com",
-  "dependencies": {
-    "lodash": "^4.17.10",
-    "mongoose": "^5.2.6"
-  },
-  "devDependencies": {
-    "@types/lodash": "^4.14.116",
-    "@types/mongodb": "^3.1.3",
-    "@types/mongoose": "^5.2.4",
-    "chai": "^4.1.2",
-    "mocha": "^5.1.0",
-    "nyc": "^11.6.0",
-    "typescript": "^2.6.1"
-  }
+    "nyc": {
+        "check-coverage": false,
+        "all": true,
+        "extension": [
+            ".js"
+        ],
+        "include": [
+            "**/!(*.spec.*).js"
+        ],
+        "exclude": [
+            "src/",
+            "docs/",
+            "**/gulpfile.js",
+            "test/",
+            "playground.js"
+        ],
+        "reporter": [
+            "html",
+            "lcov",
+            "text",
+            "text-summary"
+        ],
+        "report-dir": "docs/reports/coverage"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/anysols/anysols-model.git"
+    },
+    "author": "Shivaji Varma <contact@shivajivarma.com>",
+    "contributors": [],
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://gitlab.com/anysols/anysols-model/issues"
+    },
+    "homepage": "https://anysols.com",
+    "dependencies": {
+        "mongoose": "^5.2.6"
+    },
+    "devDependencies": {
+        "@types/mongodb": "^3.1.3",
+        "@types/mongoose": "^5.2.4",
+        "chai": "^4.1.2",
+        "mocha": "^5.1.0",
+        "nyc": "^11.6.0",
+        "typescript": "^2.6.1"
+    }
 }

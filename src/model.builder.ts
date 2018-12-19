@@ -30,35 +30,6 @@ export class ModelBuilder {
                     this.record = new MongooseModel(plainRecord);
                 }
 
-                getID() {
-                    return this.record._id;
-                }
-
-                set(key: string, value: any) {
-                    this.record[key] = value;
-                }
-
-                get(key: string) {
-                    return this.record[key];
-                }
-
-                async save(options: any) {
-                    let operation = this.record.isNew ? 'create' : 'update';
-                    // @ts-ignore
-                    let that = await modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, 'before', this);
-                    that.record = await that.record.save(options);
-                    // @ts-ignore
-                    return await modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, 'after', that);
-                }
-
-                async remove(options: any) {
-                    // @ts-ignore
-                    let that = await modelBuilder.interceptProvider.intercept(Model.getModelName(), 'delete', 'before', this);
-                    that.record = await that.record.remove(options);
-                    // @ts-ignore
-                    return await modelBuilder.interceptProvider.intercept(Model.getModelName(), 'delete', 'after', that);
-                }
-
                 /**
                  * @param {Object} [conditions]
                  * @param {Object|String} [projection] optional fields to return
@@ -115,6 +86,35 @@ export class ModelBuilder {
 
                 static deactivateIntercept(name: string) {
                     inactiveIntercepts.push(name);
+                }
+
+                getID() {
+                    return this.record._id;
+                }
+
+                set(key: string, value: any) {
+                    this.record[key] = value;
+                }
+
+                get(key: string) {
+                    return this.record[key];
+                }
+
+                async save(options: any) {
+                    let operation = this.record.isNew ? 'create' : 'update';
+                    // @ts-ignore
+                    let that = await modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, 'before', this);
+                    that.record = await that.record.save(options);
+                    // @ts-ignore
+                    return await modelBuilder.interceptProvider.intercept(Model.getModelName(), operation, 'after', that);
+                }
+
+                async remove(options: any) {
+                    // @ts-ignore
+                    let that = await modelBuilder.interceptProvider.intercept(Model.getModelName(), 'delete', 'before', this);
+                    that.record = await that.record.remove(options);
+                    // @ts-ignore
+                    return await modelBuilder.interceptProvider.intercept(Model.getModelName(), 'delete', 'after', that);
                 }
 
                 toJSON() {

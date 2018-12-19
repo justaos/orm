@@ -10,17 +10,6 @@ export class ModelService {
         this.conn = DatabaseConnector.getInstance().getConnection();
     }
 
-    isModelDefined(modelName: string) {
-        return this.conn.models[modelName];
-    }
-
-    define(schemaDefinition: any) {
-        let modelName = schemaDefinition.name;
-        let schema = ModelService.converterToSchema(schemaDefinition);
-        this.conn.model(modelName, schema, modelName);
-        this.conn.models[modelName].definition = schemaDefinition;
-    }
-
     static converterToSchema(definition: any): mongoose.Schema {
         let mongooseSchemaDefinition = <any>{};
         if (definition.fields) {
@@ -64,5 +53,16 @@ export class ModelService {
             this._id = new mongoose.Types.ObjectId(id);
         });
         return mongooseSchema;
+    }
+
+    isModelDefined(modelName: string) {
+        return this.conn.models[modelName];
+    }
+
+    define(schemaDefinition: any) {
+        let modelName = schemaDefinition.name;
+        let schema = ModelService.converterToSchema(schemaDefinition);
+        this.conn.model(modelName, schema, modelName);
+        this.conn.models[modelName].definition = schemaDefinition;
     }
 }

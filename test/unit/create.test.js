@@ -1,16 +1,23 @@
-let ModelBuilder = require('../../lib').ModelBuilder;
+let DatabaseService = require('../../lib').DatabaseService;
 const {assert} = require('chai');
 
-describe('ModelBuilder', function () {
+describe('DatabaseService', function () {
 
     let model;
 
-    before(function(){
-        model = new ModelBuilder().build();
+    before(function () {
+
     });
 
-    it('#create()', function () {
-
+    it('#Connection test', function () {
+        DatabaseService.connect({
+            "host": "localhost",
+            "port": "27017",
+            "name": "anysols",
+            "user": "**USERNAME**",
+            "password": "**PASSWORD**",
+            "dialect": "mongodb"
+        });
     });
 
 });
