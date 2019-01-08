@@ -1,8 +1,7 @@
 import * as mongoose from "mongoose";
 import DatabaseConfiguration from "./database-configuration";
 
-// @ts-ignore
-mongoose.Promise = Promise;
+(<any>mongoose).Promise = global.Promise;
 
 let instance: DatabaseConnector;
 

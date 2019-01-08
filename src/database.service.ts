@@ -18,4 +18,8 @@ export class DatabaseService {
         return DatabaseConnector.getInstance().dropDatabase();
     }
 
+    static closeConnection() {
+        DatabaseConnector.getInstance().closeConnection();
+    }
+
 }

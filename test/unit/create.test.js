@@ -3,8 +3,6 @@ const {assert} = require('chai');
 
 describe('DatabaseService', function () {
 
-    let model;
-
     before(function () {
 
     });
@@ -17,7 +15,14 @@ describe('DatabaseService', function () {
             "user": "**USERNAME**",
             "password": "**PASSWORD**",
             "dialect": "mongodb"
+        }).then(function() {
+            DatabaseService.databaseExists();
         });
+    });
+
+
+    after(function() {
+        DatabaseService.closeConnection();
     });
 
 });
