@@ -1,28 +1,34 @@
-let DatabaseService = require('../../lib').DatabaseService;
+const {AnysolsModel} = require('../../lib');
 const {assert} = require('chai');
 
-describe('DatabaseService', function () {
+describe('AnysolsModel', function () {
+
+    let anysolsModel;
 
     before(function () {
 
     });
 
-    it('#Connection test', function () {
-        DatabaseService.connect({
+    it('#Connection test', function (cb) {
+        anysolsModel = new AnysolsModel({
             "host": "localhost",
             "port": "27017",
             "name": "anysols",
-            "user": "**USERNAME**",
-            "password": "**PASSWORD**",
             "dialect": "mongodb"
-        }).then(function() {
-            DatabaseService.databaseExists();
+        });
+        anysolsModel.connect().then(function () {
+            anysolsModel.databaseExists().then(function(){
+                cb();
+            });
+        }, function () {
+            cb();
         });
     });
 
 
-    after(function() {
-        DatabaseService.closeConnection();
+    after(function () {
+        if (anysolsModel)
+            anysolsModel.closeConnection();
     });
 
 });

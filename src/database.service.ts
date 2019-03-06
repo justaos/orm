@@ -1,5 +1,5 @@
 import DatabaseConnector from "./database-connector";
-import DatabaseConfiguration from "./database-configuration";
+import DatabaseConfiguration from "./model/database-configuration";
 
 
 export class DatabaseService {
