@@ -1,5 +1,8 @@
 import DatabaseConfiguration from "./database-configuration";
-import DatabaseConnector from "./database-connector";
+import DatabaseConnection from "./database-connection";
+import DatabaseService from "./database-service";
+
+const dbService = new DatabaseService();
 
 export default class AnysolsModel {
 
@@ -11,11 +14,12 @@ export default class AnysolsModel {
     }
 
     async connect() {
-        this.conn = await new DatabaseConnection(this.dbConfig).connect();
+        this.conn = await dbService.connect(this.dbConfig);
         return this.conn;
     }
 
-    async databaseExists() {
+    databaseExists() {
+        return dbService.databaseExists(this.conn, this.dbConfig.name);
     }
 
 }
