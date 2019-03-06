@@ -1,0 +1,9 @@
+language: node_js
+node_js:
+- "8.9.4"
+install:
+- npm install -g coveralls istanbul
+- npm install mocha
+script:
+- npm run test
+after_success: npm run coverage
