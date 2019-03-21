@@ -1,16 +1,26 @@
-import DatabaseConnector from "./database-connector";
-
 import * as mongoose from "mongoose";
+import DatabaseConnection from "../model/database-connection";
 
-export class ModelService {
+export default class ModelService {
 
     private conn: any;
 
-    constructor() {
-        this.conn = DatabaseConnector.getInstance().getConnection();
+    constructor(conn: DatabaseConnection) {
+        this.conn = conn;
     }
 
-    static converterToSchema(definition: any): mongoose.Schema {
+    isModelDefined(modelName: string) {
+        return this.conn.isModelDefined(modelName);
+    }
+
+    defineModel(schemaDefinition: any) {
+        let modelName = schemaDefinition.name;
+        let schema = this.converterToSchema(schemaDefinition);
+        let model = this.conn.defineModel(modelName, schema);
+        model.definition = schemaDefinition;
+    }
+
+    private converterToSchema(definition: any): mongoose.Schema {
         let mongooseSchemaDefinition = <any>{};
         if (definition.fields) {
             definition.fields.forEach(function (fieldDef: any) {
@@ -45,24 +55,18 @@ export class ModelService {
             });
         }
         let mongooseSchema = new mongoose.Schema(mongooseSchemaDefinition, {
-            toObject: {virtuals: true},
-            timestamps: {createdAt: 'created_at', updatedAt: 'updated_at'}
+            "toObject": {
+                "virtuals": true
+            },
+            "timestamps": {
+                "createdAt": "created_at",
+                "updatedAt": "updated_at"
+            }
         });
         mongooseSchema.virtual('id').set((id: string) => {
             // @ts-ignore
             this._id = new mongoose.Types.ObjectId(id);
         });
         return mongooseSchema;
-    }
-
-    isModelDefined(modelName: string) {
-        return this.conn.models[modelName];
-    }
-
-    define(schemaDefinition: any) {
-        let modelName = schemaDefinition.name;
-        let schema = ModelService.converterToSchema(schemaDefinition);
-        this.conn.model(modelName, schema, modelName);
-        this.conn.models[modelName].definition = schemaDefinition;
     }
 }

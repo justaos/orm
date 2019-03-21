@@ -27,4 +27,22 @@ export default class DatabaseConnection {
         this.conn.close();
     }
 
+    dropDatabase() {
+        return this.conn.db.dropDatabase();
+    }
+
+    isModelDefined(modelName: string) {
+        return this.conn.models[modelName];
+    }
+
+    defineModel(modelName: string, schema: mongoose.Schema) {
+        this.conn.model(modelName, schema, modelName);
+        return this.conn.models[modelName];
+    }
+
+    model(modelName: string) {
+        return this.conn.model(modelName);
+    }
+
+
 }

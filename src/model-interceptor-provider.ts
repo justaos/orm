@@ -1,4 +1,6 @@
-export class ModelInterceptorProvider {
+import ModelInterceptor from "./model/model-interceptor";
+
+export default class ModelInterceptorProvider {
 
     interceptors: Array<any>;
 
@@ -6,14 +8,18 @@ export class ModelInterceptorProvider {
         this.interceptors = [];
     }
 
-    register(name: string, interceptor: any) {
+    addInterceptor(name: string, interceptor: ModelInterceptor) {
         this.interceptors.push({name, interceptor});
     }
 
-    deregister(name: string) {
+    removeInterceptor(name: string) {
         this.interceptors = this.interceptors.filter(function (interceptor) {
             return name === interceptor.name;
         })
+    }
+
+    reset() {
+        this.interceptors = [];
     }
 
     deactivate() {
