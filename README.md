@@ -13,9 +13,11 @@ var config = {
 	"dialect": "mongodb"
 };
 
-DatabaseService.connect(config).then(() => {
+var anysolsModel = new AnysolsModel(config);
+
+anysolsModel.connect(config).then(() => {
     console.log('connection success');
-    DatabaseService.databaseExists().then(() => {
+    anysolsModel.databaseExists().then(() => {
         console.log('database "anysols" exists');
     }, () => {
         console.log('no such database "anysols" exists');
