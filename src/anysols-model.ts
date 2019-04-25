@@ -1,12 +1,9 @@
 import DatabaseConfiguration from "./model/database-configuration";
-import DatabaseConnection from "./model/database-connection";
-import DatabaseService from "./service/database-service";
+import DatabaseConnection from "./service/database-connection";
 import ModelService from "./service/model-service";
-import ModelInterceptorProvider from "./model-interceptor-provider";
-import QueryBuilder from "./query.builder";
+import ModelInterceptorProvider from "./service/model-interceptor-provider";
+import QueryBuilder from "./service/query-builder";
 import ModelInterceptor from "./model/model-interceptor";
-
-const dbService = new DatabaseService();
 
 export class AnysolsModel {
 
@@ -20,7 +17,7 @@ export class AnysolsModel {
     }
 
     async connect() {
-        this.conn = await dbService.connect(this.dbConfig);
+        this.conn = await DatabaseConnection.connect(this.dbConfig);
         return this.conn;
     }
 

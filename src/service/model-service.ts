@@ -1,5 +1,5 @@
 import * as mongoose from "mongoose";
-import DatabaseConnection from "../model/database-connection";
+import DatabaseConnection from "./database-connection";
 
 export default class ModelService {
 

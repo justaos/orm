@@ -1,5 +1,6 @@
 import * as mongoose from "mongoose";
 import {Connection} from "mongoose";
+import DatabaseConfiguration from "../model/database-configuration";
 
 export default class DatabaseConnection {
 
@@ -7,6 +8,33 @@ export default class DatabaseConnection {
 
     constructor(conn: Connection) {
         this.conn = conn;
+    }
+
+    static connect(dbConfig: DatabaseConfiguration): Promise<any> {
+        return new Promise((resolve, reject) => {
+
+            let conn = mongoose.createConnection(dbConfig.getUri(), {
+                useNewUrlParser: true
+            });
+
+            conn.on('connecting', () => {
+                console.log('trying to establish a connection to mongo');
+            });
+
+            conn.on('connected', () => {
+                console.log('connection established successfully');
+            });
+
+            conn.on('error', (err: Error) => {
+                console.error('connection to mongo failed \n' + err);
+                reject(err);
+            });
+
+            conn.on('open', () => {
+                console.log('mongo db connection open');
+                resolve(new DatabaseConnection(conn));
+            });
+        });
     }
 
     async databaseExists(databaseName: string) {

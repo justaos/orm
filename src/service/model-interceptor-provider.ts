@@ -1,4 +1,4 @@
-import ModelInterceptor from "./model/model-interceptor";
+import ModelInterceptor from "../model/model-interceptor";
 
 export default class ModelInterceptorProvider {
 
