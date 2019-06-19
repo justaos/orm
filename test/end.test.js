@@ -4,7 +4,7 @@ const {assert} = require('chai');
 describe('database-connector', function () {
 
 
-    after(function() {
+    it("disconnect check", function() {
         if (testSession.anysolsModel)
             testSession.anysolsModel.closeConnection();
     });

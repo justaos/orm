@@ -5,6 +5,7 @@ import ModelInterceptorProvider from "./service/model-interceptor-provider";
 import QueryBuilder from "./service/query-builder";
 import ModelInterceptor from "./model/model-interceptor";
 
+
 export class AnysolsModel {
 
     private readonly dbConfig: DatabaseConfiguration;
@@ -27,17 +28,17 @@ export class AnysolsModel {
         this.conn.closeConnection();
     }
 
-    databaseExists() {
+    /*databaseExists() {
         if (!this.conn)
             throw new Error("AnysolsModel::databaseExists -> There is no active connection");
         return this.conn.databaseExists(this.dbConfig.getDatabaseName());
-    }
+    }*/
 
-    dropDatabase() {
+   /* dropDatabase() {
         if (!this.conn)
             throw new Error("AnysolsModel::dropDatabase -> There is no active connection");
         return this.conn.dropDatabase();
-    }
+    }*/
 
     isModelDefined(modelName: string) {
         if (!this.conn)
@@ -63,7 +64,7 @@ export class AnysolsModel {
             record: any;
 
             constructor(plainRecord: any) {
-                this.record = new MongooseModel(plainRecord);
+              //  this.record = new MongooseModel(plainRecord);
             }
 
             /**
@@ -73,8 +74,8 @@ export class AnysolsModel {
              * @return {Query}
              */
             static find(conditions: any, projection: any, options: any) {
-                let mongooseQuery = MongooseModel.find(conditions, projection, options);
-                return new Query(mongooseQuery);
+             //   let mongooseQuery = MongooseModel.find(conditions, projection, options);
+               // return new Query(mongooseQuery);
             }
 
             /**
@@ -84,8 +85,8 @@ export class AnysolsModel {
              * @return {Query}
              */
             static findOne(conditions: any, projection: any, options: any) {
-                let mongooseQuery = MongooseModel.findOne(conditions, projection, options);
-                return new Query(mongooseQuery);
+            //    let mongooseQuery = MongooseModel.findOne(conditions, projection, options);
+              //  return new Query(mongooseQuery);
             }
 
             /**
@@ -104,8 +105,8 @@ export class AnysolsModel {
             }
 
             static findOneAndUpdate(conditions: any, update: any, options: any) {
-                let mongooseQuery = MongooseModel.findOneAndUpdate(conditions, update, options);
-                return new Query(mongooseQuery);
+             //   let mongooseQuery = MongooseModel.findOneAndUpdate(conditions, update, options);
+               // return new Query(mongooseQuery);
             }
 
             static upsert(conditions: any, update: any) {

@@ -7,9 +7,4 @@ describe('model', function () {
         assert.isOk(!testSession.anysolsModel.isModelDefined('test'), 'model defined');
     });
 
-
-    after(function () {
-
-    });
-
 });
