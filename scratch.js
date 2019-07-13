@@ -1,15 +1,15 @@
-let DatabaseConnection = require('./lib/service/database-connection').default;
-let DatabaseConfiguration = require("./lib/model/database-configuration").default;
+let AnysolsModel = require('./lib').AnysolsModel;
 
-var config = new DatabaseConfiguration("localhost", 3306, 'testing', "root", "root", "mysql");
-DatabaseConnection.connect(config).then(function (dbConn) {
-    var Foo = dbConn.defineModel();
-    Foo.sync({force: true}).then(function () {
-        Foo.create({
-            firstname: 'John',
-            lastname: 'Hancock'
-        });
-    })
+let am = new AnysolsModel();
+
+am.connect({
+    "host": "localhost",
+    "port": "27017",
+    "database": "anysols",
+    "dialect": "mongodb",
+}).then(function (dbConn) {
+
+    am.databaseExists();
 
 }, (err) => {
     console.log("##############################" + err.name);

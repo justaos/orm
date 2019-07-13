@@ -1,3 +1,4 @@
+/*
 export default class QueryBuilder {
 
     Model: any;
@@ -62,3 +63,4 @@ export default class QueryBuilder {
         }
     }
 }
+*/

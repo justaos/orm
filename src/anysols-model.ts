@@ -1,46 +1,23 @@
-import DatabaseConfiguration from "./model/database-configuration";
-import DatabaseConnection from "./service/database-connection";
-import ModelService from "./service/model-service";
+import DatabaseModel from "./database/database-model";
+
+/*import ModelService from "./service/model-service";
 import ModelInterceptorProvider from "./service/model-interceptor-provider";
 import QueryBuilder from "./service/query-builder";
 import ModelInterceptor from "./model/model-interceptor";
+*/
 
+export class AnysolsModel extends DatabaseModel {
 
-export class AnysolsModel {
+    // private interceptProvider: ModelInterceptorProvider;
 
-    private readonly dbConfig: DatabaseConfiguration;
-    private conn: DatabaseConnection | undefined;
-    private interceptProvider: ModelInterceptorProvider;
-
-    constructor(config: any) {
-        this.dbConfig = new DatabaseConfiguration(config.host, config.port, config.name, config.user, config.password, config.dialect);
-        this.interceptProvider = new ModelInterceptorProvider();
+    constructor() {
+        super();
+        //this.interceptProvider = new ModelInterceptorProvider();
     }
 
-    async connect() {
-        this.conn = await DatabaseConnection.connect(this.dbConfig);
-        return this.conn;
-    }
 
-    closeConnection() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::closeConnection -> There is no active connection");
-        this.conn.closeConnection();
-    }
 
-    /*databaseExists() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::databaseExists -> There is no active connection");
-        return this.conn.databaseExists(this.dbConfig.getDatabaseName());
-    }*/
-
-   /* dropDatabase() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::dropDatabase -> There is no active connection");
-        return this.conn.dropDatabase();
-    }*/
-
-    isModelDefined(modelName: string) {
+    /*isModelDefined(modelName: string) {
         if (!this.conn)
             throw new Error("AnysolsModel::isModelDefined -> There is no active connection");
         return new ModelService(this.conn).isModelDefined(modelName);
@@ -67,34 +44,34 @@ export class AnysolsModel {
               //  this.record = new MongooseModel(plainRecord);
             }
 
-            /**
+            /!**
              * @param {Object} [conditions]
              * @param {Object|String} [projection] optional fields to return
              * @param {Object} [options] optional
              * @return {Query}
-             */
+             *!/
             static find(conditions: any, projection: any, options: any) {
              //   let mongooseQuery = MongooseModel.find(conditions, projection, options);
                // return new Query(mongooseQuery);
             }
 
-            /**
+            /!**
              * @param {Object} [conditions]
              * @param {Object|String} [projection] optional fields to return
              * @param {Object} [options] optional
              * @return {Query}
-             */
+             *!/
             static findOne(conditions: any, projection: any, options: any) {
             //    let mongooseQuery = MongooseModel.findOne(conditions, projection, options);
               //  return new Query(mongooseQuery);
             }
 
-            /**
+            /!**
              * @param {Object|String|Number} id value of `_id` to query by
              * @param {Object|String} [projection] optional fields to return
              * @param {Object} [options] optional
              * @return {Query}
-             */
+             *!/
             static findById(id: any, projection: any, options: any) {
                 if (typeof id === 'undefined') {
                     id = null;
@@ -176,6 +153,6 @@ export class AnysolsModel {
 
     addInterceptor(name: string, interceptor: ModelInterceptor) {
         this.interceptProvider.addInterceptor(name, interceptor);
-    }
+    }*/
 
 }

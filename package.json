@@ -53,12 +53,7 @@
     },
     "homepage": "https://anysols.com",
     "dependencies": {
-        "@types/bluebird": "^3.5.27",
-        "@types/sequelize": "^4.28.3",
-        "@types/validator": "^10.11.1",
-        "mongoose": "^5.4.2",
-        "mysql2": "^1.6.5",
-        "sequelize": "^5.8.10"
+        "mongoose": "^5.4.2"
     },
     "devDependencies": {
         "@types/mongodb": "^3.1.3",

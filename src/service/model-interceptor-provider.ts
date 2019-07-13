@@ -1,3 +1,4 @@
+/*
 import ModelInterceptor from "../model/model-interceptor";
 
 export default class ModelInterceptorProvider {
@@ -26,7 +27,7 @@ export default class ModelInterceptorProvider {
 
     }
 
-    async intercept(modelName: string, operation: string, when: string, records: any /* single or array of records */, inactiveIntercepts: Array<string>) {
+    async intercept(modelName: string, operation: string, when: string, records: any /!* single or array of records *!/, inactiveIntercepts: Array<string>) {
         //  console.log(modelName + ' :: ' + operation + ' : ' + when);
         if (this.interceptors) {
             let i;
@@ -41,3 +42,4 @@ export default class ModelInterceptorProvider {
         return records;
     }
 }
+*/
