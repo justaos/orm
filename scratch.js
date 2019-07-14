@@ -9,7 +9,25 @@ am.connect({
     "dialect": "mongodb",
 }).then(function (dbConn) {
 
-    am.databaseExists();
+    am.databaseExists().then(function () {
+        am.defineModel({
+            name: 'student',
+            fields: [{
+                name: 'name',
+                type: 'string'
+            }]
+        });
+
+        console.log(am.isModelDefined('student'));
+
+        let Student = am.model("student");
+
+        let s = new Student();
+        s.set("name", "testing");
+        s.save();
+
+
+    });
 
 }, (err) => {
     console.log("##############################" + err.name);

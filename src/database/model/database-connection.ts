@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 import {Connection} from "mongoose";
-import DatabaseConfiguration from "../database/model/database-configuration";
+import DatabaseConfiguration from "./database-configuration";
 
 
 export default class DatabaseConnection {
@@ -9,14 +9,6 @@ export default class DatabaseConnection {
 
     constructor(conn: Connection) {
         this.conn = conn;
-    }
-
-    getDatabaseName() {
-        return this.conn.name;
-    }
-
-    getConfig() {
-        return this.conn.config;
     }
 
     static createConnectionByUri(uri: string) {
@@ -50,6 +42,26 @@ export default class DatabaseConnection {
         });
     }
 
+    static dropDatabase(dbConfig: DatabaseConfiguration): Promise<any> {
+        return new Promise((resolve, reject) => {
+
+            let conn = DatabaseConnection.createConnectionByUri(dbConfig.getUri());
+
+            conn.db.dropDatabase().then(function () {
+                resolve();
+            });
+        });
+    }
+
+    getDatabaseName(): string {
+        // @ts-ignore
+        return this.conn['name'];
+    }
+
+    getConfig() {
+        return this.conn.config;
+    }
+
     async databaseExists(databaseName: string) {
         // @ts-ignore
         let response = await new mongoose.mongo.Admin(this.conn.db).listDatabases();
@@ -62,17 +74,6 @@ export default class DatabaseConnection {
             console.log("database \"" + databaseName + "\" don't exists");
             throw new Error("database \"" + databaseName + "\" don't exists");
         }
-    }
-
-    static dropDatabase(dbConfig: DatabaseConfiguration): Promise<any> {
-        return new Promise((resolve, reject) => {
-
-            let conn = DatabaseConnection.createConnectionByUri(dbConfig.getUri());
-
-            conn.db.dropDatabase().then(function () {
-                resolve();
-            });
-        });
     }
 
     closeConnection() {

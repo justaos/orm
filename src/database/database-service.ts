@@ -1,7 +1,7 @@
-import DatabaseConnection from "../service/database-connection";
+import DatabaseConnection from "./model/database-connection";
 import DatabaseConfiguration from "./model/database-configuration";
 
-export default class DatabaseModel {
+export default class DatabaseService {
 
     protected conn: DatabaseConnection | undefined;
 

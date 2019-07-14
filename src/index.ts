@@ -1,2 +1,2 @@
 export * from "./anysols-model";
-export * from "./interceptor/model-interceptor";
+export * from "./model-handler/model/model-interceptor";

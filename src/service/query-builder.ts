@@ -1,4 +1,3 @@
-/*
 export default class QueryBuilder {
 
     Model: any;
@@ -25,7 +24,6 @@ export default class QueryBuilder {
             }
 
             async exec() {
-                // @ts-ignore
                 await queryBuild.intercept('read', 'before', null);
                 let docs = await this.query.exec();
                 if (docs) {
@@ -34,7 +32,6 @@ export default class QueryBuilder {
                     else
                         docs = new queryBuild.Model(docs);
                 }
-                // @ts-ignore
                 return await queryBuild.intercept('read', 'after', docs);
             }
 
@@ -63,4 +60,3 @@ export default class QueryBuilder {
         }
     }
 }
-*/
