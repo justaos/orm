@@ -13,9 +13,4 @@ describe('AnysolsModel', function () {
         });
     });
 
-
-    after(function () {
-
-    });
-
 });

@@ -1,62 +1,36 @@
-import DatabaseConfiguration from "./model/database-configuration";
-import DatabaseConnection from "./service/database-connection";
-import ModelService from "./service/model-service";
-import ModelInterceptorProvider from "./service/model-interceptor-provider";
+import DatabaseService from "./database/database-service";
+import ModelInterceptorProvider from "./model-handler/model-interceptor-provider";
+import ModelInterceptor from "./model-handler/model/model-interceptor";
+import ModelService from "./model-handler/model-service";
 import QueryBuilder from "./service/query-builder";
-import ModelInterceptor from "./model/model-interceptor";
 
-export class AnysolsModel {
+export class AnysolsModel extends DatabaseService {
 
-    private readonly dbConfig: DatabaseConfiguration;
-    private conn: DatabaseConnection | undefined;
     private interceptProvider: ModelInterceptorProvider;
 
-    constructor(config: any) {
-        this.dbConfig = new DatabaseConfiguration(config.host, config.port, config.name, config.user, config.password, config.dialect);
+    constructor() {
+        super();
         this.interceptProvider = new ModelInterceptorProvider();
     }
 
-    async connect() {
-        this.conn = await DatabaseConnection.connect(this.dbConfig);
-        return this.conn;
-    }
-
-    closeConnection() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::closeConnection -> There is no active connection");
-        this.conn.closeConnection();
-    }
-
-    databaseExists() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::databaseExists -> There is no active connection");
-        return this.conn.databaseExists(this.dbConfig.getDatabaseName());
-    }
-
-    dropDatabase() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::dropDatabase -> There is no active connection");
-        return this.conn.dropDatabase();
-    }
-
     isModelDefined(modelName: string) {
-        if (!this.conn)
-            throw new Error("AnysolsModel::isModelDefined -> There is no active connection");
-        return new ModelService(this.conn).isModelDefined(modelName);
+        this.getModelService().isModelDefined(modelName);
     }
 
     defineModel(schemaDefinition: any) {
-        if (!this.conn)
-            throw new Error("AnysolsModel::isModelDefined -> There is no active connection");
-        return new ModelService(this.conn).defineModel(schemaDefinition);
+        this.getModelService().defineModel(schemaDefinition);
     }
+
+    addInterceptor(name: string, interceptor: ModelInterceptor) {
+        this.interceptProvider.addInterceptor(name, interceptor);
+    }
+
 
     model(modelName: string): any {
         let modelBuilder = this;
-
-        // @ts-ignore
-        let MongooseModel = this.conn.model(modelName);
+        let MongooseModel = this.getModelService().model(modelName);
         let inactiveIntercepts: string[] = [];
+        let Query: any;
 
         class Model {
 
@@ -113,7 +87,6 @@ export class AnysolsModel {
             }
 
             static getDefinition() {
-                // @ts-ignore
                 return MongooseModel.definition;
             }
 
@@ -139,18 +112,14 @@ export class AnysolsModel {
 
             async save(options: any) {
                 let operation = this.record.isNew ? 'create' : 'update';
-                // @ts-ignore
                 let that = await intercept(operation, 'before', this);
                 that.record = await that.record.save(options);
-                // @ts-ignore
                 return await intercept(operation, 'after', that);
             }
 
             async remove(options: any) {
-                // @ts-ignore
                 let that = await intercept('delete', 'before', this);
                 that.record = await that.record.remove(options);
-                // @ts-ignore
                 return await intercept('delete', 'after', that);
             }
 
@@ -163,18 +132,19 @@ export class AnysolsModel {
             }
         }
 
-        let Query = new QueryBuilder().setModel(Model).setIntercept(intercept).build();
+        Query = new QueryBuilder().setModel(Model).setIntercept(intercept).build();
 
         function intercept(operation: string, when: string, docs: any) {
-            // @ts-ignore
             return modelBuilder.interceptProvider.intercept(modelName, operation, when, docs, inactiveIntercepts);
         }
 
         return Model;
     }
 
-    addInterceptor(name: string, interceptor: ModelInterceptor) {
-        this.interceptProvider.addInterceptor(name, interceptor);
+    private getModelService() {
+        if (!this.conn)
+            throw new Error("AnysolsModel::isModelDefined -> There is no active connection");
+        return new ModelService(this.conn);
     }
 
 }

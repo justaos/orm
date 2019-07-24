@@ -1,6 +1,7 @@
 import * as mongoose from "mongoose";
 import {Connection} from "mongoose";
-import DatabaseConfiguration from "../model/database-configuration";
+import DatabaseConfiguration from "./database-configuration";
+
 
 export default class DatabaseConnection {
 
@@ -10,12 +11,16 @@ export default class DatabaseConnection {
         this.conn = conn;
     }
 
+    static createConnectionByUri(uri: string) {
+        return mongoose.createConnection(uri, {
+            useNewUrlParser: true
+        });
+    }
+
     static connect(dbConfig: DatabaseConfiguration): Promise<any> {
         return new Promise((resolve, reject) => {
 
-            let conn = mongoose.createConnection(dbConfig.getUri(), {
-                useNewUrlParser: true
-            });
+            let conn = DatabaseConnection.createConnectionByUri(dbConfig.getUri());
 
             conn.on('connecting', () => {
                 console.log('trying to establish a connection to mongo');
@@ -37,6 +42,26 @@ export default class DatabaseConnection {
         });
     }
 
+    static dropDatabase(dbConfig: DatabaseConfiguration): Promise<any> {
+        return new Promise((resolve, reject) => {
+
+            let conn = DatabaseConnection.createConnectionByUri(dbConfig.getUri());
+
+            conn.db.dropDatabase().then(function () {
+                resolve();
+            });
+        });
+    }
+
+    getDatabaseName(): string {
+        // @ts-ignore
+        return this.conn['name'];
+    }
+
+    getConfig() {
+        return this.conn.config;
+    }
+
     async databaseExists(databaseName: string) {
         // @ts-ignore
         let response = await new mongoose.mongo.Admin(this.conn.db).listDatabases();
@@ -55,15 +80,11 @@ export default class DatabaseConnection {
         this.conn.close();
     }
 
-    dropDatabase() {
-        return this.conn.db.dropDatabase();
-    }
-
     isModelDefined(modelName: string) {
-        return this.conn.models[modelName];
+        return !!this.conn.models[modelName];
     }
 
-    defineModel(modelName: string, schema: mongoose.Schema) {
+    defineModel(modelName: string, schema: any) {
         this.conn.model(modelName, schema, modelName);
         return this.conn.models[modelName];
     }
