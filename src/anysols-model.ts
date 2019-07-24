@@ -14,7 +14,7 @@ export class AnysolsModel extends DatabaseService {
     }
 
     isModelDefined(modelName: string) {
-        this.getModelService().isModelDefined(modelName);
+        return this.getModelService().isModelDefined(modelName);
     }
 
     defineModel(schemaDefinition: any) {
@@ -87,6 +87,7 @@ export class AnysolsModel extends DatabaseService {
             }
 
             static getDefinition() {
+                // @ts-ignore
                 return MongooseModel.definition;
             }
 

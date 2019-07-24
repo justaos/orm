@@ -22,7 +22,7 @@ const fieldTypes = Object.values(fieldTypesMap);
 
 export default class ModelService {
 
-    private conn: any;
+    private conn: DatabaseConnection;
 
     constructor(conn: DatabaseConnection) {
         this.conn = conn;
@@ -42,7 +42,8 @@ export default class ModelService {
     }
 
     isModelDefined(modelName: string) {
-        return this.conn.isModelDefined(modelName);
+        let ans =  this.conn.isModelDefined(modelName);
+        return ans;
     }
 
     defineModel(schemaDefinition: any) {
@@ -53,7 +54,8 @@ export default class ModelService {
             throw new Error("Invalid Schema definition :: " + modelName);
         let schema = this.converterToSchema(schemaDefinition);
         let model = this.conn.defineModel(modelName, schema);
-        model.definition = schemaDefinition;
+        // @ts-ignore
+        model['definition'] = schemaDefinition;
     }
 
     model(modelName: any) {
