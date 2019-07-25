@@ -12,6 +12,8 @@ export default class DatabaseService {
     }
 
     async connect(config: any) {
+        if (!config)
+            throw new Error("AnysolsModel::connect -> There is no config provided");
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
         this.conn = await DatabaseConnection.connect(dbConfig);
         return this.conn;
