@@ -10,7 +10,7 @@ describe('AnysolsModel.connect', function () {
         testSession.anysolsModel.connect({
             "host": "localhost",
             "port": "27017",
-            "database": "anysols",
+            "database": "anysols-model-test",
             "dialect": "mongodb",
         }).then(function () {
             assert.isOk(true, 'connection established');
@@ -19,6 +19,21 @@ describe('AnysolsModel.connect', function () {
             assert.isOk(false, 'connection failed');
             done();
         });
+    });
+
+    it('#dropdatabase if exists', function (done) {
+        this.timeout(5000);
+        testSession.anysolsModel.databaseExists().then(() => {
+            testSession.anysolsModel.dropDatabase().then(() => {
+                assert.isOk(true, 'dropped successfully');
+                done()
+            }, () => {
+                assert.isOk(false, 'dropping failed');
+                done()
+            })
+        }, () => {
+            done();
+        })
     });
 
 });

@@ -3,6 +3,12 @@ import {Connection} from "mongoose";
 import DatabaseConfiguration from "./database-configuration";
 
 
+function createConnectionByUri(uri: string) {
+    return mongoose.createConnection(uri, {
+        useNewUrlParser: true
+    });
+}
+
 export default class DatabaseConnection {
 
     private readonly conn: Connection;
@@ -11,16 +17,10 @@ export default class DatabaseConnection {
         this.conn = conn;
     }
 
-    static createConnectionByUri(uri: string) {
-        return mongoose.createConnection(uri, {
-            useNewUrlParser: true
-        });
-    }
-
     static connect(dbConfig: DatabaseConfiguration): Promise<any> {
         return new Promise((resolve, reject) => {
 
-            let conn = DatabaseConnection.createConnectionByUri(dbConfig.getUri());
+            let conn = createConnectionByUri(dbConfig.getUri());
 
             conn.on('connecting', () => {
                 console.log('trying to establish a connection to mongo');
@@ -44,11 +44,13 @@ export default class DatabaseConnection {
 
     static dropDatabase(dbConfig: DatabaseConfiguration): Promise<any> {
         return new Promise((resolve, reject) => {
-
-            let conn = DatabaseConnection.createConnectionByUri(dbConfig.getUri());
-
-            conn.db.dropDatabase().then(function () {
+            let conn = createConnectionByUri(dbConfig.getUri());
+            conn.dropDatabase().then(() => {
+                conn.close();
                 resolve();
+            }, () => {
+                conn.close();
+                reject();
             });
         });
     }
@@ -56,10 +58,6 @@ export default class DatabaseConnection {
     getDatabaseName(): string {
         // @ts-ignore
         return this.conn['name'];
-    }
-
-    getConfig() {
-        return this.conn.config;
     }
 
     async databaseExists(databaseName: string) {

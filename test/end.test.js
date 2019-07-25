@@ -7,6 +7,7 @@ describe('database-connector', function () {
     it("disconnect check", function() {
         if (testSession.anysolsModel)
             testSession.anysolsModel.closeConnection();
+        assert.isOk(true);
     });
 
 });

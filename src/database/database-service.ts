@@ -3,12 +3,18 @@ import DatabaseConfiguration from "./model/database-configuration";
 
 export default class DatabaseService {
 
-    protected conn: DatabaseConnection | undefined;
+    private conn: DatabaseConnection | undefined;
 
-    closeConnection() {
+    private config: any;
+
+    protected getConn(): DatabaseConnection {
         if (!this.conn)
             throw new Error("AnysolsModel::closeConnection -> There is no active connection");
-        this.conn.closeConnection();
+        return this.conn;
+    }
+
+    closeConnection() {
+        this.getConn().closeConnection();
     }
 
     async connect(config: any) {
@@ -16,20 +22,17 @@ export default class DatabaseService {
             throw new Error("AnysolsModel::connect -> There is no config provided");
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
         this.conn = await DatabaseConnection.connect(dbConfig);
+        this.config = config;
         return this.conn;
     }
 
     databaseExists() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::databaseExists -> There is no active connection");
-        return this.conn.databaseExists(this.conn.getDatabaseName());
+        return this.getConn().databaseExists(this.getConn().getDatabaseName());
     }
 
     dropDatabase() {
-        if (!this.conn)
-            throw new Error("AnysolsModel::dropDatabase -> There is no active connection");
-        let config = this.conn.getConfig();
-        let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.user, config.password, 'mysql');
+        let config = this.config;
+        let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password);
         return DatabaseConnection.dropDatabase(dbConfig);
     }
 }

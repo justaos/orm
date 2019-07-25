@@ -7,7 +7,7 @@ export default class DatabaseConfiguration {
     private readonly password: string | undefined;
     private readonly dialect: string;
 
-    constructor(host: string = "localhost", port: number = 27017, database: string | undefined, username: string | undefined, password: string | undefined, dialect: string) {
+    constructor(host: string = "localhost", port: number = 27017, database: string | undefined, username: string | undefined, password: string | undefined, dialect: string = 'mongodb') {
         this.host = host;
         this.port = port;
         this.database = database;
