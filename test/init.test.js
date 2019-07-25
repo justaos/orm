@@ -5,13 +5,14 @@ let testSession = require('./session.test');
 describe('AnysolsModel.connect', function () {
 
     it('#connect()', function (done) {
-        testSession.anysolsModel = new AnysolsModel({
+        this.timeout(5000);
+        testSession.anysolsModel = new AnysolsModel();
+        testSession.anysolsModel.connect({
             "host": "localhost",
             "port": "27017",
-            "name": "anysols",
-            "dialect": "mongodb"
-        });
-        testSession.anysolsModel.connect().then(function () {
+            "database": "anysols",
+            "dialect": "mongodb",
+        }).then(function () {
             assert.isOk(true, 'connection established');
             done()
         }, function () {

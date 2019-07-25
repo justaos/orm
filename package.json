@@ -24,15 +24,9 @@
             ".js"
         ],
         "include": [
-            "**/!(*.spec.*).js"
+            "lib/"
         ],
-        "exclude": [
-            "src/",
-            "docs/",
-            "**/gulpfile.js",
-            "test/",
-            "playground.js"
-        ],
+        "exclude": [],
         "reporter": [
             "html",
             "lcov",

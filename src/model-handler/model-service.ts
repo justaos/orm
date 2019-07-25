@@ -42,8 +42,7 @@ export default class ModelService {
     }
 
     isModelDefined(modelName: string) {
-        let ans =  this.conn.isModelDefined(modelName);
-        return ans;
+        return this.conn.isModelDefined(modelName);
     }
 
     defineModel(schemaDefinition: any) {
