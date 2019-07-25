@@ -1,5 +1,3 @@
-
-
 const {assert} = require('chai');
 let testSession = require('../session.test');
 

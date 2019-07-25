@@ -1,6 +1,13 @@
-let AnysolsModel = require('../lib').AnysolsModel;
+const AnysolsModel = require('../').AnysolsModel;
 
-let anysolsModel = new AnysolsModel();
+const anysolsModel = new AnysolsModel();
+
+const config = {
+    "host": "localhost",
+    "port": "27017",
+    "database": "anysols",
+    "dialect": "mongodb",
+};
 
 anysolsModel.connect({
     "host": "localhost",
@@ -8,31 +15,17 @@ anysolsModel.connect({
     "database": "anysols",
     "dialect": "mongodb",
 }).then(function (dbConn) {
-
-    anysolsModel.databaseExists().then(function () {
-        anysolsModel.defineModel({
-            name: 'student',
-            fields: [{
-                name: 'name',
-                type: 'string'
-            }]
-        });
-
-        if (anysolsModel.isModelDefined('student')) {
-
-            let Student = anysolsModel.model("student");
-            let s = new Student();
-            s.set("name", "John");
-            s.save().then(function () {
-                console.log("Student created successfully");
-                anysolsModel.closeConnection();
-            });
-        }
-
+    console.log('connection success');
+    anysolsModel.databaseExists().then( ()=> {
+        console.log('db exists');
+        anysolsModel.closeConnection();
+    }, () => {
+        console.log("db does not exists");
+        anysolsModel.closeConnection();
     });
-
 }, (err) => {
-    console.log("##############################" + err.name);
+    console.log('connection failed');
 });
 
 
+exports.default = anysolsModel;

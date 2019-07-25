@@ -1,4 +1,4 @@
-let {AnysolsModel} = require('../lib');
+let {AnysolsModel} = require('../');
 const {assert} = require('chai');
 let testSession = require('./session.test');
 

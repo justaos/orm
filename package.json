@@ -2,7 +2,7 @@
     "name": "anysols-model",
     "version": "0.9.0",
     "description": "Mongoose wrapper with intercepts",
-    "main": "./lib/index.js",
+    "main": "./index.js",
     "scripts": {
         "prepare": "npm run build",
         "build": "gulp | tsc",
