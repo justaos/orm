@@ -21,12 +21,6 @@ export default class ModelBuilder {
         this.MongooseModel = MongooseModel;
     }
 
-    intercept(operation: string, when: string, docs: any) {
-        if (!this.interceptProvider || !this.modelName)
-            throw new Error("AnysolsModel::ModelBuilder::intercept -> undefined variables");
-        return this.interceptProvider.intercept(this.modelName, operation, when, docs, this.inactiveIntercepts);
-    }
-
     build(): any {
         let modelBuilder = this;
         let Query: any;
@@ -112,15 +106,15 @@ export default class ModelBuilder {
 
             async save(options: any) {
                 let operation = this.record.isNew ? 'create' : 'update';
-                let that = await modelBuilder.intercept(operation, 'before', this);
+                let that = await intercept(operation, 'before', this);
                 that.record = await that.record.save(options);
-                return await modelBuilder.intercept(operation, 'after', that);
+                return await intercept(operation, 'after', that);
             }
 
             async remove(options: any) {
-                let that = await modelBuilder.intercept('delete', 'before', this);
+                let that = await intercept('delete', 'before', this);
                 that.record = await that.record.remove(options);
-                return await modelBuilder.intercept('delete', 'after', that);
+                return await intercept('delete', 'after', that);
             }
 
             toJSON() {
@@ -133,7 +127,13 @@ export default class ModelBuilder {
 
         }
 
-        Query = new QueryBuilder().setIntercept(modelBuilder.intercept).build();
+        Query = new QueryBuilder().setModel(Model).setIntercept(intercept).build();
+
+        function intercept(operation: string, when: string, docs: any) {
+            if (!modelBuilder.interceptProvider || !modelBuilder.modelName)
+                throw new Error("AnysolsModel::ModelBuilder::intercept -> " + modelBuilder.interceptProvider + " :: " + modelBuilder.modelName);
+            return modelBuilder.interceptProvider.intercept(modelBuilder.modelName, operation, when, docs, modelBuilder.inactiveIntercepts);
+        }
 
         return Model;
     }

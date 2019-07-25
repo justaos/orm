@@ -13,7 +13,7 @@ export default class ModelInterceptorProvider {
     }
 
     removeInterceptor(name: string) {
-        this.interceptors.get(name);
+        this.interceptors.delete(name);
     }
 
     reset() {

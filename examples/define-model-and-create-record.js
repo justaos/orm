@@ -1,6 +1,7 @@
 let getAnysolsModel = require("./getAnysolsModel").default;
 
-getAnysolsModel(function(anysolsModel) {
+getAnysolsModel(function (anysolsModel) {
+
     anysolsModel.defineModel({
         name: 'student',
         fields: [{
