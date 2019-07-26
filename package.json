@@ -10,7 +10,8 @@
         "coverage": "nyc report --reporter=text-lcov | coveralls"
     },
     "files": [
-        "lib"
+        "lib",
+        "index.js"
     ],
     "keywords": [
         "anysols",
@@ -24,8 +25,7 @@
             ".js"
         ],
         "include": [
-            "lib/",
-            "index.js"
+            "lib/"
         ],
         "exclude": [],
         "reporter": [
