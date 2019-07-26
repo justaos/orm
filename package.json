@@ -24,7 +24,8 @@
             ".js"
         ],
         "include": [
-            "lib/"
+            "lib/",
+            "index.js"
         ],
         "exclude": [],
         "reporter": [
