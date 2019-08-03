@@ -80,8 +80,7 @@ export default class ModelBuilder {
             }
 
             static getDefinition() {
-                // @ts-ignore
-                return MongooseModel.definition;
+                return modelBuilder.MongooseModel.definition;
             }
 
             static getModelName() {

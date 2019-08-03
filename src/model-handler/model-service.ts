@@ -1,24 +1,24 @@
 import * as mongoose from "mongoose";
 import DatabaseConnection from "../database/model/database-connection";
+import fieldDefinitions from "./field-definition-registory";
 
-class SchemaProperty {
-    type: any;
-    ref: string | undefined;
-
-    constructor() {
-    }
-
+function validateSchema(schemaDefinition: any) {
+    if (!schemaDefinition)
+        throw new Error("ModelService::validateSchema definition not provided");
+    if (!schemaDefinition.name)
+        throw new Error("ModelService::validateSchema invalid model name");
+    if (schemaDefinition.fields)
+        for (const field of schemaDefinition.fields) {
+            if (!field || !field.name || !field.type)
+                throw new Error("ModelService::validateSchema field name or type are provided");
+            let fieldDefinition = fieldDefinitions.get(field.type);
+            if (!fieldDefinition)
+                throw new Error("ModelService::validateSchema no such field type");
+            if (!fieldDefinition.validate(field))
+                throw new Error("ModelService::validateSchema invalid field definition :: " + schemaDefinition.name + " :: " + field.name);
+        }
+    return false;
 }
-
-const fieldTypesMap = {
-    STRING: 'string',
-    INTEGER: 'integer',
-    ID: 'id',
-    BOOLEAN: 'boolean',
-    REFERENCE: 'reference'
-};
-
-const fieldTypes = Object.values(fieldTypesMap);
 
 export default class ModelService {
 
@@ -28,31 +28,16 @@ export default class ModelService {
         this.conn = conn;
     }
 
-    private static validateSchema(def: any) {
-        if (!def)
-            return false;
-        if (def.fields)
-            for (const field of def.fields) {
-                if (!field || !field.name || !field.type || !fieldTypes.includes(field.type))
-                    return false;
-                if (field.type === 'reference' && !field.ref)
-                    return false;
-            }
-        return true;
-    }
+
 
     isModelDefined(modelName: string) {
         return this.conn.isModelDefined(modelName);
     }
 
     defineModel(schemaDefinition: any) {
-        if (!schemaDefinition)
-            return;
-        let {name: modelName} = schemaDefinition;
-        if (!ModelService.validateSchema(schemaDefinition))
-            throw new Error("Invalid Schema definition :: " + modelName);
+        validateSchema(schemaDefinition);
         let schema = this.converterToSchema(schemaDefinition);
-        let model = this.conn.defineModel(modelName, schema);
+        let model = this.conn.defineModel(schemaDefinition.name, schema);
         // @ts-ignore
         model['definition'] = schemaDefinition;
     }
@@ -65,34 +50,10 @@ export default class ModelService {
         let mongooseSchemaDefinition = <any>{};
         if (definition.fields) {
             definition.fields.forEach(function (fieldDef: any) {
-                let property = new SchemaProperty();
                 if (fieldDef.name === 'id' || fieldDef.name === 'created_at' || fieldDef.name === 'updated_at')
                     return;
-
-                switch (fieldDef.type) {
-                    case fieldTypesMap.STRING :
-                        property.type = mongoose.Schema.Types.String;
-                        break;
-                    case fieldTypesMap.INTEGER :
-                        property.type = mongoose.Schema.Types.Number;
-                        break;
-                    case fieldTypesMap.ID :
-                        property.type = mongoose.Schema.Types.ObjectId;
-                        break;
-                    case fieldTypesMap.BOOLEAN :
-                        property.type = mongoose.Schema.Types.Boolean;
-                        break;
-                    case fieldTypesMap.REFERENCE :
-                        if (fieldDef.ref) {
-                            property.type = mongoose.Schema.Types.ObjectId;
-                            property.ref = fieldDef.ref;
-                        } else
-                            property.type = mongoose.Schema.Types.String;
-                        break;
-                    default:
-                        property.type = mongoose.Schema.Types.String;
-                }
-                mongooseSchemaDefinition[fieldDef.name] = property;
+                // @ts-ignore
+                mongooseSchemaDefinition[fieldDef.name] = fieldDefinitions.get(fieldDef.type).getProperties(fieldDef);
             });
         }
         let mongooseSchema = new mongoose.Schema(mongooseSchemaDefinition, {

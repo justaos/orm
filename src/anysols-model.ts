@@ -14,11 +14,11 @@ export class AnysolsModel extends DatabaseService {
     }
 
     isModelDefined(modelName: string) {
-        return this._getModelService().isModelDefined(modelName);
+        return this.getModelService().isModelDefined(modelName);
     }
 
     defineModel(schemaDefinition: any) {
-        this._getModelService().defineModel(schemaDefinition);
+        this.getModelService().defineModel(schemaDefinition);
     }
 
     addInterceptor(name: string, interceptor: ModelInterceptor) {
@@ -30,12 +30,12 @@ export class AnysolsModel extends DatabaseService {
         let modelBuilder = new ModelBuilder();
         modelBuilder.setModelName(modelName);
         modelBuilder.setInterceptProvider(this.interceptProvider);
-        modelBuilder.setMongooseModel(this._getModelService().model(modelName));
+        modelBuilder.setMongooseModel(this.getModelService().model(modelName));
         return modelBuilder.build();
     }
 
-    private _getModelService() {
-        return new ModelService(this.getConn());
+    registerFieldDefinition(): any {
+
     }
 
 }

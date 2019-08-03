@@ -1,16 +1,25 @@
 import DatabaseConnection from "./model/database-connection";
 import DatabaseConfiguration from "./model/database-configuration";
+import ModelService from "../model-handler/model-service";
 
 export default class DatabaseService {
 
     private conn: DatabaseConnection | undefined;
 
+    private modelService: ModelService | undefined;
+
     private config: any;
 
     protected getConn(): DatabaseConnection {
         if (!this.conn)
-            throw new Error("AnysolsModel::closeConnection -> There is no active connection");
+            throw new Error("AnysolsModel::getConn -> There is no active connection");
         return this.conn;
+    }
+
+    protected getModelService(): ModelService {
+        if (!this.modelService)
+            throw new Error("AnysolsModel::modelService -> There is no modelService");
+        return this.modelService;
     }
 
     closeConnection() {
@@ -23,6 +32,7 @@ export default class DatabaseService {
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
         this.conn = await DatabaseConnection.connect(dbConfig);
         this.config = config;
+        this.modelService = new ModelService(this.getConn());
         return this.conn;
     }
 

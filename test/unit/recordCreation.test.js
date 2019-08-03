@@ -9,6 +9,9 @@ describe('record operations', function () {
             fields: [{
                 name: 'name',
                 type: 'string'
+            }, {
+                name: 'roll_no',
+                type: 'integer'
             }]
         });
         assert.isOk(testSession.anysolsModel.isModelDefined('student'), 'model not defined');
@@ -19,6 +22,7 @@ describe('record operations', function () {
         let Student = testSession.anysolsModel.model("student");
         let s = new Student();
         s.set("name", "John");
+        s.set("roll_no", 200);
         s.save().then(function () {
             assert.isOk(true, 'record created');
             done();
