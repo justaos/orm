@@ -10,18 +10,6 @@ export default class DatabaseService {
 
     private config: any;
 
-    protected getConn(): DatabaseConnection {
-        if (!this.conn)
-            throw new Error("AnysolsModel::getConn -> There is no active connection");
-        return this.conn;
-    }
-
-    protected getModelService(): ModelService {
-        if (!this.modelService)
-            throw new Error("AnysolsModel::modelService -> There is no modelService");
-        return this.modelService;
-    }
-
     closeConnection() {
         this.getConn().closeConnection();
     }
@@ -44,5 +32,17 @@ export default class DatabaseService {
         let config = this.config;
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password);
         return DatabaseConnection.dropDatabase(dbConfig);
+    }
+
+    protected getConn(): DatabaseConnection {
+        if (!this.conn)
+            throw new Error("AnysolsModel::getConn -> There is no active connection");
+        return this.conn;
+    }
+
+    protected getModelService(): ModelService {
+        if (!this.modelService)
+            throw new Error("AnysolsModel::modelService -> There is no modelService");
+        return this.modelService;
     }
 }

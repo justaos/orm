@@ -29,7 +29,6 @@ export default class ModelService {
     }
 
 
-
     isModelDefined(modelName: string) {
         return this.conn.isModelDefined(modelName);
     }
