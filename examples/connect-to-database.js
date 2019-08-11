@@ -1,20 +1,15 @@
-const AnysolsModel = require('../').AnysolsModel;
+const {AnysolsModel} = require('../');
 
 const anysolsModel = new AnysolsModel();
 
 const config = {
     "host": "localhost",
     "port": "27017",
-    "database": "anysols",
+    "database": "anysols-model",
     "dialect": "mongodb",
 };
 
-anysolsModel.connect({
-    "host": "localhost",
-    "port": "27017",
-    "database": "anysols",
-    "dialect": "mongodb",
-}).then(function (dbConn) {
+anysolsModel.connect(config).then(function () {
     console.log('connection success');
     anysolsModel.databaseExists().then( ()=> {
         console.log('db exists');

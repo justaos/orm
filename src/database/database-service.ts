@@ -21,7 +21,6 @@ export default class DatabaseService {
         this.conn = await DatabaseConnection.connect(dbConfig);
         this.config = config;
         this.modelService = new ModelService(this.getConn());
-        return this.conn;
     }
 
     databaseExists() {
