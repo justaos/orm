@@ -1,13 +1,13 @@
+let ModelInterceptor = require("../../lib/model-handler/model/model-interceptor").default;
 const {assert} = require('chai');
 let testSession = require('../session.test');
 
-describe('intercept.test.js', function () {
+describe('intercept.test.js', () => {
 
     it('#model define check', function (done) {
 
-
-        testSession.anysolsModel.addInterceptor("my-intercept", {
-            intercept: (modelName, operation, when, records) => {
+        class MyIntercept {
+            intercept(modelName, operation, when, records) {
                 return new Promise((resolve, reject) => {
                     if (modelName === 'intecepttest') {
                         if (operation === 'create') {
@@ -16,10 +16,13 @@ describe('intercept.test.js', function () {
                             }
                         }
                     }
+
                     resolve(records);
                 });
             }
-        });
+        }
+
+        testSession.anysolsModel.addInterceptor("my-intercept", new MyIntercept());
 
         testSession.anysolsModel.defineModel({
             name: 'intecepttest',

@@ -1,8 +1,7 @@
 let testSession = require('./session.test');
 const {assert} = require('chai');
 
-describe('database-connector', function () {
-
+describe('database-connector', () => {
 
     it("disconnect check", function() {
         if (testSession.anysolsModel)

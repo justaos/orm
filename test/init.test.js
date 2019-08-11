@@ -2,7 +2,7 @@ let {AnysolsModel} = require('../');
 const {assert} = require('chai');
 let testSession = require('./session.test');
 
-describe('AnysolsModel.connect', function () {
+describe('AnysolsModel.connect', () => {
 
     it('#connect()', function (done) {
         this.timeout(5000);
@@ -12,10 +12,10 @@ describe('AnysolsModel.connect', function () {
             "port": "27017",
             "database": "anysols-model-test",
             "dialect": "mongodb",
-        }).then(function () {
+        }).then(() => {
             assert.isOk(true, 'connection established');
             done()
-        }, function () {
+        }, () => {
             assert.isOk(false, 'connection failed');
             done();
         });
