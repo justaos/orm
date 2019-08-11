@@ -1,6 +1,6 @@
 {
     "name": "anysols-model",
-    "version": "1.0.0-beta-3",
+    "version": "1.0.0-rc",
     "description": "Mongoose wrapper with intercepts",
     "main": "./index.js",
     "scripts": {
