@@ -1,4 +1,4 @@
-let getAnysolsModel = require("./getAnysolsModel").default;
+let getAnysolsModel = require("./getAnysolsModel");
 
 getAnysolsModel(function (anysolsModel) {
 

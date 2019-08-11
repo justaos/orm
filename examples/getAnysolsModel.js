@@ -1,7 +1,7 @@
 const {AnysolsModel} = require('../');
 
 
-exports.default = (cb) => {
+module.exports = (cb) => {
 
     const anysolsModel = new AnysolsModel();
 
