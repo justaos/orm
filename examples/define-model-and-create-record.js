@@ -14,6 +14,7 @@ getAnysolsModel(function (anysolsModel) {
     let s = new Student();
     s.set("name", "John");
     s.save().then(function () {
-        console.log("Student created")
+        console.log("Student created");
+        anysolsModel.closeConnection();
     });
 });

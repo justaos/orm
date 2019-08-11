@@ -39,6 +39,7 @@ getAnysolsModel(function (anysolsModel) {
     s.save().then(function () {
         Student.find().exec().then(function (students) {
             console.log(JSON.stringify(students, null, 4));
+            anysolsModel.closeConnection();
         });
     });
 
