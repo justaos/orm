@@ -10,10 +10,10 @@ function validateSchema(schemaDefinition: any) {
     if (schemaDefinition.fields)
         for (const field of schemaDefinition.fields) {
             if (!field || !field.name || !field.type)
-                throw new Error("ModelService::validateSchema field name or type are provided");
+                throw new Error("ModelService::validateSchema field name or type are provided - " + schemaDefinition.name);
             let fieldDefinition = fieldDefinitions.get(field.type);
             if (!fieldDefinition)
-                throw new Error("ModelService::validateSchema no such field type");
+                throw new Error("ModelService::validateSchema no such field type :: " + schemaDefinition.name + " :: " + field.name);
             if (!fieldDefinition.validate(field))
                 throw new Error("ModelService::validateSchema invalid field definition :: " + schemaDefinition.name + " :: " + field.name);
         }
