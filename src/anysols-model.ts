@@ -33,8 +33,4 @@ export class AnysolsModel extends DatabaseService {
         return modelBuilder.build();
     }
 
-    registerFieldDefinition(): any {
-
-    }
-
 }

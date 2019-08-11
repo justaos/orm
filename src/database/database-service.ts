@@ -1,6 +1,8 @@
 import DatabaseConnection from "./model/database-connection";
 import DatabaseConfiguration from "./model/database-configuration";
 import ModelService from "../model-handler/model-service";
+import FieldDefinitionRegistry from "../model-handler/field-definition-registry";
+import FieldDefinition from "../model-handler/model/field-definition";
 
 export default class DatabaseService {
 
@@ -8,7 +10,13 @@ export default class DatabaseService {
 
     private modelService: ModelService | undefined;
 
+    private readonly fieldDefinitionRegistry: FieldDefinitionRegistry;
+
     private config: any;
+
+    constructor() {
+        this.fieldDefinitionRegistry = new FieldDefinitionRegistry();
+    }
 
     closeConnection() {
         this.getConn().closeConnection();
@@ -20,7 +28,11 @@ export default class DatabaseService {
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
         this.conn = await DatabaseConnection.connect(dbConfig);
         this.config = config;
-        this.modelService = new ModelService(this.getConn());
+        this.modelService = new ModelService(this.getConn(), this.fieldDefinitionRegistry);
+    }
+
+    registerFieldDefinition(fieldDefinition: FieldDefinition) {
+        this.fieldDefinitionRegistry.registerFieldDefinition(fieldDefinition);
     }
 
     databaseExists() {

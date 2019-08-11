@@ -1,6 +1,6 @@
 {
     "name": "anysols-model",
-    "version": "1.0.0-beta-2",
+    "version": "1.0.0-beta-3",
     "description": "Mongoose wrapper with intercepts",
     "main": "./index.js",
     "scripts": {
@@ -49,9 +49,9 @@
     },
     "homepage": "https://anysols.com",
     "dependencies": {
-        "mongoose": "^5.6.4",
         "@types/mongodb": "^3.1.28",
-        "@types/mongoose": "^5.5.8"
+        "@types/mongoose": "^5.5.8",
+        "mongoose": "^5.6.4"
     },
     "devDependencies": {
         "chai": "^4.1.2",
