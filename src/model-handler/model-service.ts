@@ -44,6 +44,10 @@ export default class ModelService {
         model['definition'] = schemaDefinition;
     }
 
+    removeModel(modelName: string) {
+        this.conn.removeModel(modelName);
+    }
+
     model(modelName: any) {
         return this.conn.model(modelName);
     }

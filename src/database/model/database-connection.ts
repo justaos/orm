@@ -87,6 +87,10 @@ export default class DatabaseConnection {
         return this.conn.models[modelName];
     }
 
+    removeModel(modelName: string) {
+        delete this.conn.models[modelName];
+    }
+
     model(modelName: string) {
         return this.conn.model(modelName);
     }

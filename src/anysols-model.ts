@@ -16,8 +16,11 @@ export class AnysolsModel extends DatabaseService {
         return this.getModelService().isModelDefined(modelName);
     }
 
-    defineModel(schemaDefinition: any) {
-        this.getModelService().defineModel(schemaDefinition);
+    defineModel(schemaDefinition: any, force: boolean) {
+        let modelService = this.getModelService();
+        if (force)
+            modelService.removeModel(schemaDefinition.name);
+        modelService.defineModel(schemaDefinition);
     }
 
     addInterceptor(name: string, interceptor: ModelInterceptor) {
