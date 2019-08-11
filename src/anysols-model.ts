@@ -16,7 +16,7 @@ export class AnysolsModel extends DatabaseService {
         return this.getModelService().isModelDefined(modelName);
     }
 
-    defineModel(schemaDefinition: any, force: boolean) {
+    defineModel(schemaDefinition: any, force: boolean = false) {
         let modelService = this.getModelService();
         if (force)
             modelService.removeModel(schemaDefinition.name);
