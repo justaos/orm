@@ -1,6 +1,6 @@
 {
     "name": "anysols-model",
-    "version": "1.0.0-alpha",
+    "version": "1.0.0-alpha-2",
     "description": "Mongoose wrapper with intercepts",
     "main": "./index.js",
     "scripts": {
@@ -11,7 +11,8 @@
     },
     "files": [
         "lib",
-        "index.js"
+        "index.js",
+        "index.ts"
     ],
     "keywords": [
         "anysols",
