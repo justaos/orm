@@ -1,6 +1,5 @@
-import FieldDefinition from "./model/field-definition";
-import * as mongoose from "mongoose";
-import {FIELDS_TYPES, MONGOOSE_TYPES} from "./constants";
+import {FieldDefinition} from "./model/field-definition";
+import {FIELDS_TYPES, MONGOOSE_TYPES} from "../constants";
 
 
 export default class FieldDefinitionRegistry {

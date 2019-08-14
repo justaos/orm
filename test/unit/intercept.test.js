@@ -1,6 +1,6 @@
-let ModelInterceptor = require("../../lib/model-handler/model/model-interceptor").default;
+const ModelInterceptor = require("../../lib/model-handler/model/model-interceptor").default;
 const {assert} = require('chai');
-let testSession = require('../session.test');
+const testSession = require('../session.test');
 
 describe('intercept.test.js', () => {
 

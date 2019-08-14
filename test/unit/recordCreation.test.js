@@ -1,5 +1,5 @@
 const {assert} = require('chai');
-let testSession = require('../session.test');
+const testSession = require('../session.test');
 
 describe('record operations', () => {
 
@@ -12,6 +12,12 @@ describe('record operations', () => {
             }, {
                 name: 'roll_no',
                 type: 'integer'
+            }, {
+                name: 'dob',
+                type: 'date'
+            },  {
+                name: 'graduated',
+                type: 'boolean'
             }]
         });
         assert.isOk(testSession.anysolsModel.isModelDefined('student'), 'model not defined');

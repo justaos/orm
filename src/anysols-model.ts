@@ -1,6 +1,6 @@
 import DatabaseService from "./database/database-service";
 import ModelInterceptorProvider from "./model-handler/model-interceptor-provider";
-import ModelInterceptor from "./model-handler/model/model-interceptor";
+import {ModelInterceptor} from "./model-handler/model/model-interceptor";
 import ModelBuilder from "./service/model-builder";
 
 export class AnysolsModel extends DatabaseService {

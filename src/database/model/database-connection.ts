@@ -2,10 +2,11 @@ import * as mongoose from "mongoose";
 import {Connection} from "mongoose";
 import DatabaseConfiguration from "./database-configuration";
 
-
 function createConnectionByUri(uri: string) {
     return mongoose.createConnection(uri, {
-        useNewUrlParser: true
+        useNewUrlParser: true,
+        useFindAndModify: false,
+        useCreateIndex: true
     });
 }
 

@@ -1,4 +1,4 @@
-import ModelInterceptor from "./model/model-interceptor";
+import {ModelInterceptor} from "./model/model-interceptor";
 
 export default class ModelInterceptorProvider {
 
@@ -18,10 +18,6 @@ export default class ModelInterceptorProvider {
 
     reset() {
         this.interceptors = new Map<string, ModelInterceptor>();
-    }
-
-    deactivate() {
-
     }
 
     async intercept(modelName: string, operation: string, when: string, records: any /* single or array of records */, inactiveIntercepts: Array<string>) {

@@ -1,4 +1,4 @@
-export default class FieldDefinition {
+export class FieldDefinition {
 
     private readonly type: string;
 

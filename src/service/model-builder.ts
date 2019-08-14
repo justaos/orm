@@ -1,7 +1,6 @@
 import ModelInterceptorProvider from "../model-handler/model-interceptor-provider";
 import QueryBuilder from "./query-builder";
 
-
 export default class ModelBuilder {
 
     private modelName: string | undefined;
@@ -77,6 +76,18 @@ export default class ModelBuilder {
 
             static upsert(conditions: any, update: any) {
                 return Model.findOneAndUpdate(conditions, update, {upsert: true, new: true});
+            }
+
+            static async deleteOne(filter: any, options: any, callback: any) {
+                let that = await intercept('delete', 'before', this);
+                that.record = await modelBuilder.MongooseModel.deleteOne(filter, options, callback);
+                return await intercept('delete', 'after', that);
+            }
+
+            static async deleteMany(filter: any, options: any, callback: any) {
+                let that = await intercept('delete', 'before', this);
+                that.record = await modelBuilder.MongooseModel.deleteMany(options);
+                return await intercept('delete', 'after', that);
             }
 
             static getDefinition() {
