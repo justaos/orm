@@ -111,6 +111,7 @@ s.save().then(function () {
  });
 ```
 
+Check the examples >> [here](./examples) <<
 
 ## Code of Conduct
 [Contributor Covenant](/CODE_OF_CONDUCT.md)
