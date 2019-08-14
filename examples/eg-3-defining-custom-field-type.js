@@ -1,5 +1,4 @@
-let FieldDefinition = require("../lib/model-handler/model/field-definition").default;
-let {MONGOOSE_TYPES} = require("../lib/model-handler/constants");
+let {FieldDefinition, MONGOOSE_TYPES} = require("../");
 
 let getAnysolsModel = require("./getAnysolsModel");
 

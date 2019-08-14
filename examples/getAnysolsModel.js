@@ -1,6 +1,5 @@
 const {AnysolsModel} = require('../');
 
-
 module.exports = (cb) => {
 
     const anysolsModel = new AnysolsModel();
@@ -13,7 +12,15 @@ module.exports = (cb) => {
     };
 
     anysolsModel.connect(config).then(() => {
-        cb(anysolsModel)
+        console.log('connection success');
+        anysolsModel.databaseExists().then(() => {
+            console.log('db exists');
+            cb(anysolsModel);
+        }, () => {
+            console.log("db does not exists");
+        });
+    }, (err) => {
+        console.log('connection failed');
     });
 
 };

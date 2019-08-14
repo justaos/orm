@@ -9,18 +9,13 @@ const config = {
     "dialect": "mongodb",
 };
 
-anysolsModel.connect(config).then(function () {
+anysolsModel.connect(config).then(() => {
     console.log('connection success');
-    anysolsModel.databaseExists().then( ()=> {
+    anysolsModel.databaseExists().then(() => {
         console.log('db exists');
-        anysolsModel.closeConnection();
     }, () => {
         console.log("db does not exists");
-        anysolsModel.closeConnection();
     });
 }, (err) => {
     console.log('connection failed');
 });
-
-
-exports.default = anysolsModel;

@@ -43,5 +43,4 @@ getAnysolsModel(function (anysolsModel) {
         });
     });
 
-
 });
