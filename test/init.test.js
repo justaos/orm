@@ -1,13 +1,13 @@
-let {AnysolsModel} = require('../');
 const {assert} = require('chai');
-let testSession = require('./session.test');
+const {AnysolsModel} = require('../');
+const {session} = require('./test.utils');
 
-describe('AnysolsModel.connect', () => {
+describe('Initial test setup', () => {
 
     it('#connect()', function (done) {
         this.timeout(5000);
-        testSession.anysolsModel = new AnysolsModel();
-        testSession.anysolsModel.connect({
+        session.anysolsModel = new AnysolsModel();
+        session.anysolsModel.connect({
             "host": "localhost",
             "port": "27017",
             "database": "anysols-model-test",
@@ -21,10 +21,10 @@ describe('AnysolsModel.connect', () => {
         });
     });
 
-    it('#dropdatabase if exists', function (done) {
+    it('#clear existing database', function (done) {
         this.timeout(5000);
-        testSession.anysolsModel.databaseExists().then(() => {
-            testSession.anysolsModel.dropDatabase().then(() => {
+        session.anysolsModel.databaseExists().then(() => {
+            session.anysolsModel.dropDatabase().then(() => {
                 assert.isOk(true, 'dropped successfully');
                 done()
             }, () => {

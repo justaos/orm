@@ -1,7 +1,7 @@
 import DatabaseConnection from "./model/database-connection";
 import DatabaseConfiguration from "./model/database-configuration";
 import ModelService from "../model-handler/model-service";
-import FieldDefinitionRegistry from "../model-handler/field-definition-registry";
+import FieldDefinitionRegistry from "./field-definition-registry";
 import {FieldDefinition} from "..";
 
 export default class DatabaseService {
@@ -19,7 +19,7 @@ export default class DatabaseService {
     }
 
     closeConnection() {
-        this.getConn().closeConnection();
+        return this.getConn().closeConnection();
     }
 
     async connect(config: any) {

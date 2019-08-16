@@ -76,7 +76,7 @@ export default class DatabaseConnection {
     }
 
     closeConnection() {
-        this.conn.close();
+        return this.conn.close();
     }
 
     isModelDefined(modelName: string) {

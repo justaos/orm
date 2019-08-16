@@ -16,10 +16,6 @@ export default class ModelInterceptorProvider {
         this.interceptors.delete(name);
     }
 
-    reset() {
-        this.interceptors = new Map<string, ModelInterceptor>();
-    }
-
     async intercept(modelName: string, operation: string, when: string, records: any /* single or array of records */, inactiveIntercepts: Array<string>) {
         if (this.interceptors) {
             let i;

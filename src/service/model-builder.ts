@@ -70,11 +70,12 @@ export default class ModelBuilder {
             }
 
             static findOneAndUpdate(conditions: any, update: any, options: any) {
-                let mongooseQuery = modelBuilder.MongooseModel.findOneAndUpdate(conditions, update, options);
-                return new Query(mongooseQuery);
+                // TODO: handle intercept
+                return modelBuilder.MongooseModel.findOneAndUpdate(conditions, update, options);
             }
 
             static upsert(conditions: any, update: any) {
+                // TODO: handle intercept
                 return Model.findOneAndUpdate(conditions, update, {upsert: true, new: true});
             }
 

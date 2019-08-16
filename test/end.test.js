@@ -1,12 +1,16 @@
-let testSession = require('./session.test');
 const {assert} = require('chai');
+const {session} = require('./test.utils');
 
-describe('database-connector', () => {
+describe('End test cleanup', () => {
 
-    it("disconnect check", function() {
-        if (testSession.anysolsModel)
-            testSession.anysolsModel.closeConnection();
-        assert.isOk(true);
+    it("disconnect check", function () {
+        session.anysolsModel.closeConnection(() => {
+            assert.isOk(true, 'close connection success');
+            done()
+        }, () => {
+            assert.isOk(false, 'close connection failed');
+            done();
+        });
     });
 
 });

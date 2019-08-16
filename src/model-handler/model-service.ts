@@ -1,6 +1,17 @@
 import * as mongoose from "mongoose";
 import DatabaseConnection from "../database/model/database-connection";
-import FieldDefinitionRegistry from "./field-definition-registry";
+import FieldDefinitionRegistry from "../database/field-definition-registry";
+
+function areDuplicatesPresent(a: []) {
+    for (let i = 0; i <= a.length; i++) {
+        for (let j = i; j <= a.length; j++) {
+            if (i != j && a[i] == a[j]) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 export default class ModelService {
 
@@ -18,7 +29,7 @@ export default class ModelService {
             throw new Error("ModelService::validateSchema definition not provided");
         if (!schemaDefinition.name)
             throw new Error("ModelService::validateSchema invalid model name");
-        if (schemaDefinition.fields)
+        if (schemaDefinition.fields) {
             for (const field of schemaDefinition.fields) {
                 if (!field || !field.name || !field.type)
                     throw new Error("ModelService::validateSchema field name or type are provided - " + schemaDefinition.name);
@@ -28,6 +39,10 @@ export default class ModelService {
                 if (!fieldDefinition.validate(field))
                     throw new Error("ModelService::validateSchema invalid field definition :: " + schemaDefinition.name + " :: " + field.name);
             }
+            const fieldNames = schemaDefinition.fields.map((f:any) => f.name);
+            if(areDuplicatesPresent(fieldNames))
+                throw new Error("ModelService::validateSchema duplicate field name" + fieldNames);
+        }
         return false;
     }
 
