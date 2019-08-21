@@ -1,4 +1,3 @@
-import * as mongoose from "mongoose";
 import DatabaseConnection from "../database/model/database-connection";
 import FieldDefinitionRegistry from "../database/field-definition-registry";
 
@@ -67,7 +66,7 @@ export default class ModelService {
         return this.conn.model(modelName);
     }
 
-    private converterToSchema(definition: any): mongoose.Schema {
+    private converterToSchema(definition: any): any {
         let that = this;
         let mongooseSchemaDefinition = <any>{};
         if (definition.fields) {
@@ -78,7 +77,7 @@ export default class ModelService {
                 mongooseSchemaDefinition[fieldDef.name] = that.fieldDefinitionRegistry.getFieldDefinition(fieldDef.type).getProperties(fieldDef);
             });
         }
-        let mongooseSchema = new mongoose.Schema(mongooseSchemaDefinition, {
+        let mongooseSchema = null; /*new mongoose.Schema(mongooseSchemaDefinition, {
             "toObject": {
                 "virtuals": true
             },
@@ -86,11 +85,11 @@ export default class ModelService {
                 "createdAt": "created_at",
                 "updatedAt": "updated_at"
             }
-        });
-        mongooseSchema.virtual('id').set((id: string) => {
+        });*/
+       /* mongooseSchema.virtual('id').set((id: string) => {
             // @ts-ignore
-            this._id = new mongoose.Types.ObjectId(id);
-        });
+            this._id = 'test';//new mongoose.Types.ObjectId(id);
+        });*/
         return mongooseSchema;
     }
 }

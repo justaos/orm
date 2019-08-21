@@ -1,5 +1,5 @@
 import {FieldDefinition} from "./model/field-definition";
-import {FIELDS_TYPES, MONGOOSE_TYPES} from "../constants";
+import {FIELDS_TYPES, MONGOOSE_TYPES} from "../../src/constants";
 
 
 export default class FieldDefinitionRegistry {
