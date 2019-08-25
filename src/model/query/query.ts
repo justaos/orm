@@ -1,4 +1,4 @@
-import {ObjectId} from "bson";
+import Record from "../record/record";
 
 const privates = new WeakMap();
 
@@ -22,11 +22,12 @@ export default class Query {
     }
 
     execute(): Promise<any> {
+        const that = this;
         return new Promise((resolve, reject) => {
             _getCollection(this).find(this.query).toArray(function (err: any, docs: any) {
                 if (err)
                     reject(err);
-                resolve(docs);
+                resolve(docs.map((doc: any) => new Record(doc, () => _getCollection(that))));
             });
         });
     }

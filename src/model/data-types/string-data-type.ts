@@ -2,16 +2,16 @@ import DataType from "./data-type";
 
 export default class StringDataType implements DataType {
 
-    pattern: any;
+    config: any | undefined;
 
-    constructor({pattern}: { pattern: any }) {
-        this.pattern = pattern;
+    constructor(config: any = {}) {
+        this.config = config;
     }
 
     transform() {
         return {
             bsonType: "string",
-            pattern: this.pattern,
+            pattern: this.config.pattern,
         }
     }
 

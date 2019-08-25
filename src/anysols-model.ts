@@ -29,7 +29,7 @@ export default class AnysolsModel {
 
     dropDatabase() {
         let conn = _getConnection(this);
-        conn.dropDatabase();
+        return conn.dropDatabase();
     }
 
     defineModel(schemaDefinition: any) {

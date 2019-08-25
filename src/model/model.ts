@@ -1,4 +1,5 @@
 import Query from "./query/query";
+import Record from "./record/record";
 
 const privates = new WeakMap();
 
@@ -11,6 +12,10 @@ export default class Model {
 
     getName() {
         return privates.get(this).definition.name;
+    }
+
+    initializeRecord() {
+        return new Record(null, () => _getCollection(this)).initilize();
     }
 
     findById(id: string) {

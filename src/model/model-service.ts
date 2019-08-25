@@ -3,6 +3,7 @@ import FieldTypeRegistry from "./field-types/field-type-registry";
 import ModelRegistry from "./model-registry";
 import Model from "./model";
 import FieldType from "./field-types/field-type";
+import StringFieldType from "./field-types/string-field-type";
 
 const privates = new WeakMap();
 
@@ -14,6 +15,7 @@ export default class ModelService {
         const fieldTypeRegistry = new FieldTypeRegistry();
         const modelRegistry = new ModelRegistry();
         privates.set(this, {fieldTypeRegistry, modelRegistry});
+        _loadBuildInFieldTypes(this);
     }
 
     setConnection(conn: DatabaseConnection) {
@@ -52,6 +54,10 @@ function _getConnection(that: ModelService) {
     if (!conn)
         throw new Error("ModelService::_getConnection -> There is no connection");
     return conn;
+}
+
+function _loadBuildInFieldTypes(that: ModelService) {
+    that.addFieldType(new StringFieldType());
 }
 
 function _getModelRegistry(that: ModelService): ModelRegistry {

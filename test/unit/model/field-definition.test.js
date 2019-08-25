@@ -1,4 +1,5 @@
-const {DataTypeString} = require("../../../lib/model");
+const {StringDataType, DataType} = require("../../../lib/model");
+
 const {assert} = require('chai');
 const {session} = require('../../test.utils');
 
@@ -10,10 +11,10 @@ describe('FieldType', () => {
 
     it('#FieldTypeRegistry::addFieldType Registering Custom field type', function () {
 
-        class StringType {
+        class EmailType {
 
             transform() {
-                return new DataTypeString()
+                return new StringDataType()
             }
 
             getType() {
@@ -21,14 +22,15 @@ describe('FieldType', () => {
             }
         }
 
-        session.anysolsModel.addFieldType(new StringType());
-
         try {
             session.anysolsModel.defineModel({
                 name: MODEL_NAME,
                 fields: [{
                     name: 'name',
                     type: 'string'
+                }, {
+                    name: 'email',
+                    type: 'email'
                 }]
             });
             assert.isOk(true, "Custom field defined as expected");
@@ -37,22 +39,21 @@ describe('FieldType', () => {
             assert.isOk(false, "Custom field not defined as expected");
         }
 
-
     });
 
 
-    /* it('#FieldTypeRegistry::registerFieldType creating record with custom field type', function (done) {
-         let CustomFieldTest = session.anysolsModel.model(MODEL_NAME);
-         let s = new CustomFieldTest();
-         s.set("name", "RAM");
-         s.set(CUSTOM_FIELD_NAME, "testing");
-         s.save().then(function () {
-             CustomFieldTest.findOne({"custom_field_name": "testing"}).exec().then(function (result) {
-                 if (result)
+    it('#FieldTypeRegistry::registerFieldType creating record with custom field type', function (done) {
+        let model = session.anysolsModel.model(MODEL_NAME);
+        let rec = model.initializeRecord();
+        rec.set("name", "RAM");
+        rec.set(CUSTOM_FIELD_NAME, "testing");
+        rec.insert().then(function (rec) {
+             model.find({"custom_field_name": "testing"}).execute().then(function (docs) {
+                 if (docs[0].get('name') === "RAM")
                      done();
              });
-         });
-     });*/
+        });
+    });
 
 
     /*it('#FieldTypeRegistry::registerFieldType trying create invalid field', function () {

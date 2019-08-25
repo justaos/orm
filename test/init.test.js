@@ -21,4 +21,19 @@ describe('Initial test setup', () => {
         });
     });
 
+    it('#clear existing database', function (done) {
+        this.timeout(5000);
+        session.anysolsModel.databaseExists().then(() => {
+            session.anysolsModel.dropDatabase().then(() => {
+                assert.isOk(true, 'dropped successfully');
+                done()
+            }, () => {
+                assert.isOk(false, 'dropping failed');
+                done()
+            })
+        }, () => {
+            done();
+        })
+    });
+
 });
