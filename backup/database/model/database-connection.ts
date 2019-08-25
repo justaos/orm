@@ -1,7 +1,7 @@
 import {MongoClient} from "mongodb";
 import DatabaseConfiguration from "./database-configuration";
 
-function createConnectionByUri(uri: string): Promise<MongoClient> {
+function createConnectionByUri(uri: string) {
     return new Promise((resolve, reject) => {
         MongoClient.connect(uri, (err, conn) => {
             if (err) reject(err);
@@ -24,29 +24,42 @@ export default class DatabaseConnection {
 
         return new Promise(async (resolve, reject) => {
 
-            try {
-                let conn = await createConnectionByUri(dbConfig.getUri());
-                console.log('mongo db connection open');
-                resolve(new DatabaseConnection(conn));
-            } catch (err) {
+            let conn = await createConnectionByUri(dbConfig.getUri());
+
+            resolve(new DatabaseConnection(conn));
+
+            conn.on('connecting', () => {
+                console.log('trying to establish a connection to mongo');
+            });
+
+            conn.on('connected', () => {
+                console.log('connection established successfully');
+            });
+
+            conn.on('error', (err: Error) => {
                 console.error('connection to mongo failed \n' + err);
                 reject(err);
-            }
+            });
+
+            conn.on('open', () => {
+                console.log('mongo db connection open');
+                resolve(new DatabaseConnection(conn));
+            });
         });
     }
 
-     static dropDatabase(dbConfig: DatabaseConfiguration): Promise<any> {
-         return new Promise((resolve, reject) => {
-            /* let conn = createConnectionByUri(dbConfig.getUri());
-             conn.dropDatabase().then(() => {
-                 conn.close();
-                 resolve();
-             }, () => {
-                 conn.close();
-                 reject();
-             });*/
-         });
-     }
+    static dropDatabase(dbConfig: DatabaseConfiguration): Promise<any> {
+        return new Promise((resolve, reject) => {
+            let conn = createConnectionByUri(dbConfig.getUri());
+            conn.dropDatabase().then(() => {
+                conn.close();
+                resolve();
+            }, () => {
+                conn.close();
+                reject();
+            });
+        });
+    }
 
     getDatabaseName(): string {
         // @ts-ignore
@@ -71,14 +84,14 @@ export default class DatabaseConnection {
         return this.conn.close();
     }
 
-
-    isModelDefined(modelName: string) {
-        return true;// !!this.models.get(modelName);
+    /*
+      isModelDefined(modelName: string) {
+        return !!this.models.get(modelName);
     }
 
     defineModel(modelName: string, schema: any) {
         this.models.set(modelName, schema);
-        return null; //this.conn.models[modelName];
+        return this.conn.models[modelName];
     }
 
     removeModel(modelName: string) {
@@ -86,8 +99,9 @@ export default class DatabaseConnection {
     }
 
     model(modelName: string) {
-        return null;// this.conn.model(modelName);
+        return this.conn.model(modelName);
     }
 
 
+     */
 }

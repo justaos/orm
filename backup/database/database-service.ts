@@ -2,7 +2,7 @@ import DatabaseConnection from "./model/database-connection";
 import DatabaseConfiguration from "./model/database-configuration";
 import ModelService from "../model-handler/model-service";
 import FieldDefinitionRegistry from "./field-definition-registry";
-import {FieldDefinition} from "../../src";
+import {FieldType} from "../../src";
 
 export default class DatabaseService {
 
@@ -31,7 +31,7 @@ export default class DatabaseService {
         this.modelService = new ModelService(this.getConn(), this.fieldDefinitionRegistry);
     }
 
-    registerFieldDefinition(fieldDefinition: FieldDefinition) {
+    registerFieldDefinition(fieldDefinition: FieldType) {
         this.fieldDefinitionRegistry.registerFieldDefinition(fieldDefinition);
     }
 

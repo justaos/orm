@@ -4,7 +4,7 @@ let getAnysolsModel = require("./getAnysolsModel");
 
 getAnysolsModel(function (anysolsModel) {
 
-    anysolsModel.registerFieldDefinition(new FieldDefinition("customType", field => {
+    anysolsModel.registerFieldType(new FieldDefinition("customType", field => {
         return true
     }, function (field, fieldDefinition) {
         return {

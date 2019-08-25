@@ -66,7 +66,7 @@ export default class DatabaseConnection {
     }
 
     getDBO(): any {
-        this.conn.db(this.getDatabaseName());
+        return this.conn.db(this.getDatabaseName());
     }
 
     getDatabaseName(): string {
