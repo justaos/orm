@@ -1,56 +1,70 @@
 import Query from "./query/query";
 import Record from "./record/record";
+import FieldTypeRegistry from "./field-types/field-type-registry";
 
 const privates = new WeakMap();
 
 export default class Model {
 
-    constructor(definition: any, getCollection: any, getFieldType: any) {
-        privates.set(this, {definition, getCollection, getFieldType});
-        _validate(this, definition);
+    constructor(schema: any, getCollection: any, fieldTypeRegistry: FieldTypeRegistry) {
+        privates.set(this, {schema});
+        _validateSchema(schema, fieldTypeRegistry);
+        privates.get(this).collection = getCollection(this);
     }
 
     getName() {
-        return privates.get(this).definition.name;
+        return this.getSchema().name;
+    }
+
+    getSchema() {
+        return privates.get(this).schema;
     }
 
     initializeRecord() {
-        return new Record(null, () => _getCollection(this)).initilize();
+        return new Record(null, this, _getCollection(this)).initialize();
     }
 
     findById(id: string) {
-        return new Query(_getCollection(this)).findById(id);
+        return this.initializeQuery().findById(id);
     }
 
     find(conditions: any) {
-        return new Query(_getCollection(this)).find(conditions);
+        return this.initializeQuery().find(conditions);
+    }
+
+    initializeQuery() {
+        return new Query(this, _getCollection(this));
     }
 
 }
 
-function _validate(that: Model, modelDefinition: any) {
-    if (!modelDefinition)
+function _validateSchemaError(mesg: string) {
+    return new Error("[ModelService::_validateSchema] " + mesg)
+}
+
+function _validateSchema(schema: any, fieldTypeRegistry: FieldTypeRegistry) {
+    if (!schema)
         throw new Error("Model::validate definition not provided");
-    if (!modelDefinition.name)
+    if (!schema.name)
         throw new Error("ModelService::validateSchema invalid model name");
-    if (modelDefinition.fields) {
-        for (const field of modelDefinition.fields) {
-            if (!field || !field.name || !field.type)
-                throw new Error("ModelService::validateSchema field name or type are provided - " + modelDefinition.name);
-            let fieldDefinition = _getFieldType(that, field.type);
-            if (!fieldDefinition)
-                throw new Error("ModelService::validateSchema no such field type :: " + modelDefinition.name + " :: " + field.name);
-            /*if (!fieldDefinition.validate(field))
-                throw new Error("ModelService::validateSchema invalid field definition :: " + modelDefinition.name + " :: " + field.name);*/
+    if (schema.fields) {
+        for (const field of schema.fields) {
+            if (!field || !field.type)
+                throw _validateSchemaError("field type provided - [modelName=" + schema.name + "]");
+            let fieldType = fieldTypeRegistry.getFieldType(field.type);
+            if (!fieldType)
+                throw _validateSchemaError("No such field type  - [modelName=" + schema.name + ", fieldName=" + field.name + ", fieldType=" + field.type + "]");
+            if (!fieldType.validateDefinition(field))
+                throw _validateSchemaError("Invalid field definition  [modelName=" + schema.name + ", fieldName=" + field.name + "]");
         }
-        const fieldNames = modelDefinition.fields.map((f: any) => f.name);
+        const fieldNames = schema.fields.map((f: any) => f.name);
         if (_areDuplicatesPresent(fieldNames))
-            throw new Error("ModelService::validateSchema duplicate field name" + fieldNames);
+            throw _validateSchemaError("Duplicate field name [modelName=" + schema.name + ", fieldNames=" + fieldNames + "]");
     }
     return false;
 }
 
-function _areDuplicatesPresent(a: []) {
+function _areDuplicatesPresent(a: []): boolean {
     for (let i = 0; i <= a.length; i++)
         for (let j = i; j <= a.length; j++)
             if (i != j && a[i] == a[j])
@@ -58,10 +72,6 @@ function _areDuplicatesPresent(a: []) {
     return false;
 }
 
-function _getFieldType(that: Model, type: string) {
-    return privates.get(that).getFieldType(type);
-}
-
 function _getCollection(that: Model) {
-    return privates.get(that).getCollection(that);
+    return privates.get(that).collection;
 }

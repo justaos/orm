@@ -4,6 +4,7 @@ import ModelRegistry from "./model-registry";
 import Model from "./model";
 import FieldType from "./field-types/field-type";
 import StringFieldType from "./field-types/string-field-type";
+import IntegerFieldType from "./field-types/integer-field-type";
 
 const privates = new WeakMap();
 
@@ -26,9 +27,9 @@ export default class ModelService {
         return _getModelRegistry(this).hasModel(modelName);
     }
 
-    defineModel(schemaDefinition: any) {
+    defineModel(schema: any) {
         let that = this;
-        let model = new Model(schemaDefinition, (model: Model) => _getConnection(that).getDBO().collection(model.getName()), () => _getFieldTypeRegistry(that));
+        let model = new Model(schema, (model: Model) => _getConnection(that).getDBO().collection(model.getName()),  _getFieldTypeRegistry(that));
         _getModelRegistry(this).addModel(model);
     }
 
@@ -58,6 +59,7 @@ function _getConnection(that: ModelService) {
 
 function _loadBuildInFieldTypes(that: ModelService) {
     that.addFieldType(new StringFieldType());
+    that.addFieldType(new IntegerFieldType());
 }
 
 function _getModelRegistry(that: ModelService): ModelRegistry {

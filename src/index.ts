@@ -1,9 +1,10 @@
 import AnysolsModel from "./anysols-model";
-import {FieldType} from "./model";
+import {FieldType, StringDataType} from "./model";
 // export * from "../backup/model-handler/model/model-interceptor";
 
 export {
     AnysolsModel,
-    FieldType
+    FieldType,
+    StringDataType
 }
 export * from "./constants";

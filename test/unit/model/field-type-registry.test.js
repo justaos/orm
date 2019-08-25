@@ -1,4 +1,4 @@
-const {StringDataType, DataType} = require("../../../lib/model");
+const {StringDataType, DataType} = require("../../../lib");
 
 const {assert} = require('chai');
 const {session} = require('../../test.utils');
@@ -6,8 +6,9 @@ const {session} = require('../../test.utils');
 describe('FieldType', () => {
 
     const MODEL_NAME = "field_definition_test";
-    const CUSTOM_FIELD_NAME = "custom_field_name";
-    const CUSTOM_FIELD_TYPE = "custom_field_type";
+    const EMAIL_TYPE = "email";
+    const EMAIL_FIELD = "email";
+    const EMAIL_VALUE = "test@example.com";
 
     it('#FieldTypeRegistry::addFieldType Registering Custom field type', function () {
 
@@ -18,9 +19,15 @@ describe('FieldType', () => {
             }
 
             getType() {
-                return "string"
+                return EMAIL_TYPE
+            }
+
+            validateDefinition(fieldDefinition) {
+                return !!fieldDefinition.name
             }
         }
+
+        session.anysolsModel.addFieldType(new EmailType());
 
         try {
             session.anysolsModel.defineModel({
@@ -29,8 +36,8 @@ describe('FieldType', () => {
                     name: 'name',
                     type: 'string'
                 }, {
-                    name: 'email',
-                    type: 'email'
+                    name: EMAIL_FIELD,
+                    type: EMAIL_TYPE
                 }]
             });
             assert.isOk(true, "Custom field defined as expected");
@@ -46,12 +53,12 @@ describe('FieldType', () => {
         let model = session.anysolsModel.model(MODEL_NAME);
         let rec = model.initializeRecord();
         rec.set("name", "RAM");
-        rec.set(CUSTOM_FIELD_NAME, "testing");
+        rec.set(EMAIL_FIELD, EMAIL_VALUE);
         rec.insert().then(function (rec) {
-             model.find({"custom_field_name": "testing"}).execute().then(function (docs) {
-                 if (docs[0].get('name') === "RAM")
-                     done();
-             });
+            model.find({[EMAIL_FIELD]: EMAIL_VALUE}).execute().then(function (docs) {
+                if (docs.length === 1 && docs[0].get(EMAIL_FIELD) === EMAIL_VALUE)
+                    done();
+            });
         });
     });
 

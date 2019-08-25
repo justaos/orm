@@ -1,15 +1,15 @@
 import DataType from "../data-types/data-type";
-import StringDataType from "../data-types/string-data-type";
 import FieldType from "./field-type";
+import IntegerDataType from "../data-types/integer-data-type";
 
-export default class StringFieldType implements FieldType{
+export default class IntegerFieldType implements FieldType {
 
     transform(): DataType {
-        return new StringDataType();
+        return new IntegerDataType();
     }
 
     getType(): string {
-        return "string"
+        return "integer"
     }
 
     validateDefinition(fieldDefinition: any): boolean {
