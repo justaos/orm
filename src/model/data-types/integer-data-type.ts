@@ -10,8 +10,8 @@ export default class IntegerDataType implements DataType {
 
     transform() {
         return {
-            bsonType: "int"
-        }
+            "type": "integer"
+        };
     }
 
 

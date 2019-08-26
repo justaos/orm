@@ -8,9 +8,9 @@ export default class Record {
 
     record: any;
 
-    constructor(record: any, model: Model, collection: any) {
+    constructor(record: any, model: Model) {
         this.record = record;
-        privates.set(this, {model, collection});
+        privates.set(this, {model});
     }
 
     initialize() {
@@ -32,7 +32,7 @@ export default class Record {
     }
 
     async insert() {
-        let response = await _getCollection(this).insertOne(this.toObject());
+        let response = await _getModel(this).insertOne(this.toObject());
         this.record = response.ops.find(() => true);
         this.isNew = false;
         return this;
@@ -48,10 +48,10 @@ export default class Record {
     }
 }
 
-function _getCollection(that: Record) {
-    return privates.get(that).collection;
+function _getSchema(that: Record) {
+    return _getModel(that).getSchema();
 }
 
-function _getSchema(that: Record) {
-    return privates.get(that).model.getSchema();
+function _getModel(that: Record) {
+    return privates.get(that).model;
 }

@@ -14,8 +14,8 @@ describe('FieldType', () => {
 
         class EmailType {
 
-            transform() {
-                return new StringDataType()
+            getDataType(fieldDefinition) {
+                return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
             }
 
             getType() {
@@ -42,7 +42,7 @@ describe('FieldType', () => {
             });
             assert.isOk(true, "Custom field defined as expected");
         } catch (e) {
-            console.error(e);
+            console.error(JSON.stringify(e));
             assert.isOk(false, "Custom field not defined as expected");
         }
 
@@ -59,11 +59,13 @@ describe('FieldType', () => {
                 if (docs.length === 1 && docs[0].get(EMAIL_FIELD) === EMAIL_VALUE)
                     done();
             });
+        }, function (e) {
+            console.error(JSON.stringify(e));
         });
     });
 
 
-    /*it('#FieldTypeRegistry::registerFieldType trying create invalid field', function () {
+    it('#FieldTypeRegistry::registerFieldType trying create invalid field', function () {
         try {
             session.anysolsModel.defineModel({
                 name: 'field_definition_invalid_test',
@@ -79,7 +81,7 @@ describe('FieldType', () => {
         } catch (e) {
             assert.isOk(true, "Invalid field type element not created as expected");
         }
-    });*/
+    });
 
 
 });

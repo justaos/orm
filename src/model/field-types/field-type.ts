@@ -2,7 +2,7 @@ import DataType from "../data-types/data-type";
 
 export default abstract class FieldType {
 
-    abstract transform(): DataType;
+    abstract getDataType(fieldDefinition: any): DataType;
 
     abstract getType(): string;
 

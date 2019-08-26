@@ -4,7 +4,7 @@ import IntegerDataType from "../data-types/integer-data-type";
 
 export default class IntegerFieldType implements FieldType {
 
-    transform(): DataType {
+    getDataType(fieldDefinition: any): DataType {
         return new IntegerDataType();
     }
 

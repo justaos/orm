@@ -10,8 +10,8 @@ export default class StringDataType implements DataType {
 
     transform() {
         return {
-            bsonType: "string",
-            pattern: this.config.pattern,
+            "type": "string",
+            "pattern": this.config.pattern
         }
     }
 

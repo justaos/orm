@@ -28,7 +28,7 @@ export default class Query {
             _getCollection(this).find(this.query).toArray(function (err: any, docs: any) {
                 if (err)
                     reject(err);
-                resolve(docs.map((doc: any) => new Record(doc, _getSchema(that), _getCollection(that))));
+                resolve(docs.map((doc: any) => new Record(doc, _getSchema(that))));
             });
         });
     }
