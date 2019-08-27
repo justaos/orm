@@ -32,8 +32,8 @@ export default class Record {
     }
 
     async insert() {
-        let response = await _getModel(this).insertOne(this.toObject());
-        this.record = response.ops.find(() => true);
+        let record = await _getModel(this).insertOne(this);
+        this.record = record.toObject();
         this.isNew = false;
         return this;
     }

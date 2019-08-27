@@ -1,5 +1,5 @@
 # Anysols Model
-Wrapper for mongodb with support for intercepts on operations (create, read, update and delete) and support for schemas with multi-level inhertience
+Wrapper for mongodb with support for intercepts on operations (create, read, update and delete) and support for schemas with multi-level inheritance
 
 [![Coverage Status](https://coveralls.io/repos/github/anysols/anysols-model/badge.svg?branch=master)](https://coveralls.io/github/anysols/anysols-model?branch=master)
 

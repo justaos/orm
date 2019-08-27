@@ -1,5 +1,5 @@
-export default interface DataType {
+export default abstract class DataType {
 
-    transform(): any;
+    abstract transform(): any;
 
 }

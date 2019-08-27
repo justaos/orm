@@ -1,6 +1,6 @@
 import DataType from "./data-type";
 
-export default class StringDataType implements DataType {
+export default class DateDataType implements DataType {
 
     config: any | undefined;
 
@@ -11,13 +11,14 @@ export default class StringDataType implements DataType {
     transform() {
         return {
             "type": "string",
-            "pattern": this.config.pattern
+            "format": "date-time"
         }
     }
 
-    format(value: string) {
+    format(value: any) {
+        if (value instanceof Date)
+            return value.toISOString();
         return value;
     }
-
 
 }

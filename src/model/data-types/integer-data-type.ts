@@ -14,5 +14,9 @@ export default class IntegerDataType implements DataType {
         };
     }
 
+    format(value: number) {
+        return value;
+    }
+
 
 }

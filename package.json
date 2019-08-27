@@ -1,7 +1,7 @@
 {
     "name": "anysols-model",
-    "version": "1.0.0",
-    "description": "Mongoose wrapper with intercepts",
+    "version": "1.1.0",
+    "description": "Wrapper for mongodb with support for intercepts on operations (create, read, update and delete) and support for schemas with multi-level inheritance",
     "main": "./index.js",
     "scripts": {
         "prepare": "npm run build",

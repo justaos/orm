@@ -2,17 +2,20 @@ let getAnysolsModel = require("./getAnysolsModel");
 
 getAnysolsModel(function (anysolsModel) {
 
-    anysolsModel.addInterceptor("my-intercept", {
+    anysolsModel.addInterceptor({
+
+        getName: function () {
+            return "my-intercept";
+        },
+
         intercept: (modelName, operation, when, records) => {
             return new Promise((resolve, reject) => {
                 if (modelName === 'student') {
                     if (operation === 'create') {
                         if (when === "before") {
                             console.log("Student before");
-                            if (!Array.isArray(records)) {
-                                let record = records;
-                                record.set("computed",  record.get("name") + " +++ computed");
-                            }
+                            for (let record of records)
+                                record.set("computed", record.get("name") + " +++ computed");
                         } else if (when === "after")
                             console.log("Student after");
                     }
@@ -33,12 +36,11 @@ getAnysolsModel(function (anysolsModel) {
         }]
     });
 
-    let Student = anysolsModel.model("student");
-    let s = new Student({});
+    let studentModel = anysolsModel.model("student");
+    let s = studentModel.initializeRecord();
     s.set("name", "John");
-    s.save().then(function () {
-        Student.find().exec().then(function (students) {
-            console.log(JSON.stringify(students, null, 4));
+    s.insert().then(function () {
+        studentModel.find().execute().then(function (students) {
             anysolsModel.closeConnection();
         });
     });

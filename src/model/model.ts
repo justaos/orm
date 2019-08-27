@@ -2,13 +2,14 @@ import Query from "./query/query";
 import Record from "./record/record";
 import FieldTypeRegistry from "./field-types/field-type-registry";
 import * as Ajv from "ajv";
+import OperationInterceptorService from "./operation-interceptor/operation-interceptor-service";
 
 const privates = new WeakMap();
 
 export default class Model {
 
-    constructor(schema: any, getCollection: any, fieldTypeRegistry: FieldTypeRegistry) {
-        privates.set(this, {schema, fieldTypeRegistry});
+    constructor(schema: any, getCollection: any, fieldTypeRegistry: FieldTypeRegistry, operationInterceptorService: OperationInterceptorService) {
+        privates.set(this, {schema, fieldTypeRegistry, operationInterceptorService});
         _validateSchema(this, schema);
         privates.get(this).collection = getCollection(this);
     }
@@ -33,24 +34,34 @@ export default class Model {
         return this.initializeQuery().find(conditions);
     }
 
-    async insertOne(recordObject: any) {
-        const errors = this.validate(recordObject);
+    async insertOne(record: Record): Promise<Record> {
+        record = await _getOperationInterceptorService(this).interceptRecord(this.getName(), 'create', 'before', record);
+        const errors = this.validate(record.toObject());
         if (errors)
             throw errors;
-        const response = await _getCollection(this).insertOne(recordObject);
-        const savedRecord = response.ops.find(() => true);
-        return response;
+        const response = await _getCollection(this).insertOne(record.toObject());
+        const savedRecord = new Record(response.ops.find(() => true), this);
+        return await _getOperationInterceptorService(this).interceptRecord(this.getName(), 'create', 'before', savedRecord);
     }
 
     validate(recordObject: any) {
         const jsonSchema = _getJsonSchema(this);
         const validate = new Ajv().compile(jsonSchema);
-        if (!validate(recordObject))
+        const schema = this.getSchema();
+        const formattedRecord: any = {};
+        for (let field of schema.fields) {
+            let fieldType = _getFieldTypeRegistry(this).getFieldType(field.type);
+            if (fieldType.getDataType(field).format)
+                formattedRecord[field.name] = fieldType.getDataType(field).format(recordObject[field.name]);
+            else
+                formattedRecord[field.name] = recordObject[field.name];
+        }
+        if (!validate(formattedRecord))
             return validate.errors;
     }
 
     initializeQuery() {
-        return new Query(this, _getCollection(this));
+        return new Query(this, _getCollection(this), _getOperationInterceptorService(this));
     }
 
 }
@@ -94,6 +105,10 @@ function _getCollection(that: Model) {
 
 function _getFieldTypeRegistry(that: Model) {
     return privates.get(that).fieldTypeRegistry;
+}
+
+function _getOperationInterceptorService(that: Model): OperationInterceptorService {
+    return privates.get(that).operationInterceptorService;
 }
 
 function _getJsonSchema(that: Model) {

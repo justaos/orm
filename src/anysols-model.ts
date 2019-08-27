@@ -1,5 +1,6 @@
 import {DatabaseConfiguration, DatabaseConnection} from "./connection";
 import {FieldType, ModelService} from "./model";
+import OperationInterceptor from "./model/operation-interceptor/operation-interceptor";
 
 const privates = new WeakMap();
 
@@ -45,6 +46,11 @@ export default class AnysolsModel {
     addFieldType(fieldType: FieldType) {
         let modelService = _getModelService(this);
         return modelService.addFieldType(fieldType);
+    }
+
+    addInterceptor(operationInterceptor: OperationInterceptor) {
+        let modelService = _getModelService(this);
+        return modelService.addInterceptor(operationInterceptor);
     }
 
 }

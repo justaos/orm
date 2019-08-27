@@ -7,7 +7,7 @@ export default class Query {
 
     query: any;
 
-    constructor(model: Model, collection: any) {
+    constructor(model: Model, collection: any, operationInterceptorService: any) {
         this.query = {};
         privates.set(this, {model, collection});
     }
