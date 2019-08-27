@@ -10,70 +10,79 @@ npm install --save anysols-model
 ```js
 const {AnysolsModel} = require('anysols-model');
 
- const anysolsModel = new AnysolsModel();
+const anysolsModel = new AnysolsModel();
 
-    const config = {
-        "host": "localhost",
-        "port": "27017",
-        "database": "anysols-model",
-        "dialect": "mongodb",
-    };
+const config = {
+ "host": "localhost",
+ "port": "27017",
+ "database": "anysols-model",
+ "dialect": "mongodb",
+};
 
-    anysolsModel.connect(config).then(() => {
-        console.log('connection success');
-        anysolsModel.databaseExists().then(() => {
-            console.log('db exists');
-            cb(anysolsModel);
-        }, () => {
-            console.log("db does not exists");
-        });
-    }, (err) => {
-        console.log('connection failed');
-    });
+anysolsModel.connect(config).then(() => {
+ console.log('connection success');
+ anysolsModel.databaseExists().then(() => {
+     console.log('db exists');
+ }, () => {
+     console.log("db does not exists");
+ });
+}, (err) => {
+ console.log('connection failed');
+});
 ```
 
 ## Intercepting database operations
 ```js
 // after establishing connection
 
- anysolsModel.addInterceptor("my-intercept", {
-    intercept: (modelName, operation, when, records) => {
-        return new Promise((resolve, reject) => {
-            if (modelName === 'student') {
-                if (operation === 'create') {
-                    if (when === "before") {
-                        console.log("Student before");
-                        if (!Array.isArray(records)) {
-                            let record = records;
-                            record.set("computed",  record.get("name") + " +++ computed");
-                        }
-                    } else if (when === "after")
-                        console.log("Student after");
-                }
-            }
-            resolve(records);
-        });
-    }
+anysolsModel.addInterceptor({
+     
+ getName: function () {
+     return "my-intercept";
+ },
+
+ intercept: (modelName, operation, when, records) => {
+     return new Promise((resolve, reject) => {
+         if (modelName === 'student') {
+             if (operation === 'create') {
+                 console.log("[modelName=" + modelName + ", operation=" + operation + ", when=" + when + "]");
+                 if (when === "before") {
+                     for (let record of records) {
+                         console.log("computed field updated for :: " + record.get('name'));
+                         record.set("computed", record.get("name") + " +++ computed");
+                     }
+                 }
+             }
+             if (operation === 'read') {
+                 console.log("[modelName=" + modelName + ", operation=" + operation + ", when=" + when + "]");
+                 for (let record of records) {
+                     console.log(record.toObject());
+                 }
+             }
+         }
+         resolve(records);
+     });
+ }
 });
 
 anysolsModel.defineModel({
-    name: 'student',
-    fields: [{
-        name: 'name',
-        type: 'string'
-    }, {
-        name: 'computed',
-        type: 'string'
-    }]
+ name: 'student',
+ fields: [{
+     name: 'name',
+     type: 'string'
+ }, {
+     name: 'computed',
+     type: 'string'
+ }]
 });
 
-let Student = anysolsModel.model("student");
-let s = new Student({});
-s.set("name", "John");
-s.save().then(function () {
-    Student.find().exec().then(function (students) {
-        console.log(JSON.stringify(students, null, 4));
-    });
+let studentModel = anysolsModel.model("student");
+let s = studentModel.initializeRecord();
+s.set("name", "John " + new Date().toISOString());
+s.insert().then(function () {
+ studentModel.find().execute().then(function (students) {
+     anysolsModel.closeConnection();
+ });
 });
 ```
 
@@ -81,37 +90,46 @@ s.save().then(function () {
 ```js
 // after establishing connection
 
- anysolsModel.registerFieldDefinition(new FieldDefinition("customType", field => {
-     return true
- }, function (field, fieldDefinition) {
-     return {
-         type: MONGOOSE_TYPES.STRING
-     }
- }));
+anysolsModel.addFieldType({
 
- anysolsModel.defineModel({
-     name: 'student',
-     fields: [{
-         name: 'name',
-         type: 'string'
-     }, {
-         name: 'dob',
-         type: 'date'
-     }, {
-         name: 'custom_field',
-         type: 'customType'
-     }]
- });
+ getDataType: function (fieldDefinition) {
+     return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
+ },
 
- let Student = anysolsModel.model("student");
- let s = new Student();
- s.set("name", "John");
- s.set("dob", new Date());
- s.set("custom_field", "testing");
- s.save().then(function () {
-     console.log("Student created");
-     anysolsModel.closeConnection();
- });
+ getType: function () {
+     return "email"
+ },
+
+ validateDefinition: function (fieldDefinition) {
+     return !!fieldDefinition.name
+ }
+});
+
+anysolsModel.defineModel({
+ name: 'student',
+ fields: [{
+     name: 'name',
+     type: 'string'
+ }, {
+     name: 'email',
+     type: 'email'
+ }, {
+     name: 'dob',
+     type: 'date'
+ }]
+});
+
+let studentModel = anysolsModel.model("student");
+let s = studentModel.initializeRecord();
+s.set("name", "John");
+s.set("email", "test@example.com");
+s.set("dob", new Date());
+s.insert().then(function () {
+ console.log("Student created");
+ anysolsModel.closeConnection();
+}, (err) => {
+ console.log(err);
+});
 ```
 
 Check the examples >> [here](./examples) <<

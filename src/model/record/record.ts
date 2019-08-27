@@ -38,9 +38,18 @@ export default class Record {
         return this;
     }
 
+    async delete() {
+        if (this.isNew)
+            throw Error('[Record::remove] Cannot remove unsaved record');
+        await _getModel(this).deleteOne(this);
+        return this;
+    }
+
     toObject() {
         const record = this.record;
         let obj: any = {};
+        // todo : Handle id
+        obj['_id'] = record['_id'];
         _getSchema(this).fields.map(function (field: any) {
             obj[field.name] = record[field.name];
         });

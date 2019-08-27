@@ -12,22 +12,20 @@ describe('FieldType', () => {
 
     it('#FieldTypeRegistry::addFieldType Registering Custom field type', function () {
 
-        class EmailType {
+        session.anysolsModel.addFieldType({
 
-            getDataType(fieldDefinition) {
+            getDataType: function (fieldDefinition) {
                 return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
-            }
+            },
 
-            getType() {
-                return EMAIL_TYPE
-            }
+            getType: function () {
+                return "email"
+            },
 
-            validateDefinition(fieldDefinition) {
+            validateDefinition: function (fieldDefinition) {
                 return !!fieldDefinition.name
             }
-        }
-
-        session.anysolsModel.addFieldType(new EmailType());
+        });
 
         try {
             session.anysolsModel.defineModel({

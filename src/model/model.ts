@@ -41,7 +41,21 @@ export default class Model {
             throw errors;
         const response = await _getCollection(this).insertOne(record.toObject());
         const savedRecord = new Record(response.ops.find(() => true), this);
-        return await _getOperationInterceptorService(this).interceptRecord(this.getName(), 'create', 'before', savedRecord);
+        return await _getOperationInterceptorService(this).interceptRecord(this.getName(), 'create', 'after', savedRecord);
+    }
+
+    async deleteOne(record: Record): Promise<any> {
+        record = await _getOperationInterceptorService(this).interceptRecord(this.getName(), 'delete', 'before', record);
+        const response = await _getCollection(this).deleteOne({_id: record.getID()});
+    }
+
+    async executeQuery(condition: any): Promise<Record[]> {
+        const that = this;
+        const docs = await _findDocuments(this, condition);
+        const records: Record[] = docs.map((doc: any) => {
+            return new Record(doc, that);
+        });
+        return await _getOperationInterceptorService(this).intercept(this.getName(), 'read', 'after', records);
     }
 
     validate(recordObject: any) {
@@ -61,7 +75,7 @@ export default class Model {
     }
 
     initializeQuery() {
-        return new Query(this, _getCollection(this), _getOperationInterceptorService(this));
+        return new Query(this);
     }
 
 }
@@ -109,6 +123,16 @@ function _getFieldTypeRegistry(that: Model) {
 
 function _getOperationInterceptorService(that: Model): OperationInterceptorService {
     return privates.get(that).operationInterceptorService;
+}
+
+function _findDocuments(that: Model, condition: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+        _getCollection(that).find(condition).toArray(function (err: any, docs: any) {
+            if (err)
+                reject(err);
+            resolve(docs);
+        });
+    })
 }
 
 function _getJsonSchema(that: Model) {

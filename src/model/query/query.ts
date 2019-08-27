@@ -1,4 +1,3 @@
-import Record from "../record/record";
 import Model from "../model";
 
 const privates = new WeakMap();
@@ -6,38 +5,38 @@ const privates = new WeakMap();
 export default class Query {
 
     query: any;
+    singleRecordOperation: boolean;
 
-    constructor(model: Model, collection: any, operationInterceptorService: any) {
+    constructor(model: Model) {
         this.query = {};
-        privates.set(this, {model, collection});
+        this.singleRecordOperation = false;
+        privates.set(this, {model});
     }
 
     findById(id: string): Query {
+        this.singleRecordOperation = true;
         this.query = {_id: id};
         return this;
     }
 
     find(condition: string): Query {
+        this.singleRecordOperation = false;
         this.query = condition;
         return this;
     }
 
-    execute(): Promise<any> {
-        const that = this;
-        return new Promise((resolve, reject) => {
-            _getCollection(this).find(this.query).toArray(function (err: any, docs: any) {
-                if (err)
-                    reject(err);
-                resolve(docs.map((doc: any) => new Record(doc, _getSchema(that))));
-            });
-        });
+    async execute(): Promise<any> {
+        const records = await _getModel(this).executeQuery(this.query);
+        if (this.singleRecordOperation) {
+            if (records.length)
+                return records[0];
+            else
+                return;
+        }
+        return records;
     }
 }
 
-function _getCollection(that: Query) {
-    return privates.get(that).collection;
-}
-
-function _getSchema(that: Query) {
-    return privates.get(that).model.getSchema();
+function _getModel(that: Query) {
+    return privates.get(that).model;
 }

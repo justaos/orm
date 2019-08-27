@@ -8,7 +8,7 @@ describe('Model', () => {
     let johnObject;
     let MODEL_NAME = "employee";
 
-    it('#Model::save', function (done) {
+    it('#Model::insert', function (done) {
         this.timeout(5000);
         session.anysolsModel.defineModel({
             name: MODEL_NAME,
@@ -21,8 +21,8 @@ describe('Model', () => {
             }]
         });
 
-        let employee = session.anysolsModel.model(MODEL_NAME);
-        let empRecord = employee.initializeRecord();
+        let employeeModel = session.anysolsModel.model(MODEL_NAME);
+        let empRecord = employeeModel.initializeRecord();
         empRecord.set("name", "John");
         empRecord.set("eid", 100);
         empRecord.insert().then((rec) => {
@@ -38,8 +38,8 @@ describe('Model', () => {
 
     it('#Model::getModelName', function () {
         this.timeout(MAX_TIMEOUT);
-        let employee = session.anysolsModel.model(MODEL_NAME);
-        assert.isOk(employee.getName() === MODEL_NAME, 'Invalid model name');
+        let employeeModel = session.anysolsModel.model(MODEL_NAME);
+        assert.isOk(employeeModel.getName() === MODEL_NAME, 'Invalid model name');
     });
 
     it('#Model::find', function (done) {
@@ -49,6 +49,26 @@ describe('Model', () => {
             if (employees.length === 1)
                 done();
         });
+    });
+
+    it('#Model::findById', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeModel = session.anysolsModel.model(MODEL_NAME);
+        employeeModel.findById(johnRecord.getID()).execute().then((employee) => {
+            if (employee.get('name') === "John")
+                done();
+        });
+    });
+
+    it('#record remove only selected', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeModel = session.anysolsModel.model(MODEL_NAME);
+        johnRecord.delete().then(() => {
+            employeeModel.findById(johnRecord.getID()).execute().then((record) => {
+                if (!record)
+                    done();
+            })
+        })
     });
 
     /*it('#Model::findOne', function (done) {
@@ -61,15 +81,7 @@ describe('Model', () => {
         });
     });
 
-    it('#Model::findById', function (done) {
-        this.timeout(MAX_TIMEOUT);
-        let Employee = session.anysolsModel.model(MODEL_NAME);
-        Employee.findById(johnObject.id).exec().then((employee) => {
-            if (employee.get('name') === "John")
-                done();
 
-        });
-    });
 
     it('#Model::findOneAndUpdate', function (done) {
         this.timeout(MAX_TIMEOUT);
@@ -83,15 +95,6 @@ describe('Model', () => {
         });
     });
 
-    it('#record remove only selected', function (done) {
-        this.timeout(5000);
-        let Employee = session.anysolsModel.model(MODEL_NAME);
-        johnRecord.remove().then(() => {
-            Employee.findById(johnObject.id).exec().then((record) => {
-                if (!record)
-                    done();
-            })
-        })
-    });*/
+   */
 });
 

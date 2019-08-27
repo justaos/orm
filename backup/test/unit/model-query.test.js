@@ -8,42 +8,6 @@ describe('Model', () => {
     let johnObject;
     let MODEL_NAME = "employee";
 
-    it('#Model::save', function (done) {
-        this.timeout(5000);
-        session.anysolsModel.defineModel({
-            name: MODEL_NAME,
-            fields: [{
-                name: 'id',
-                type: 'id'
-            }, {
-                name: 'name',
-                type: 'string'
-            }, {
-                name: "eid",
-                type: "integer"
-            }]
-        });
-
-        let Employee = session.anysolsModel.model(MODEL_NAME);
-        let e = new Employee();
-        e.set("name", "John");
-        e.set("eid", 100);
-        e.save().then((rec) => {
-            johnRecord = rec;
-            johnObject = rec.toObject();
-            if (johnObject.name === 'John') {
-                assert.isOk(true, 'record created');
-            } else
-                assert.isOk(false, 'record not created');
-            done();
-        });
-    });
-
-    it('#Model::getModelName', function () {
-        this.timeout(MAX_TIMEOUT);
-        let Employee = session.anysolsModel.model(MODEL_NAME);
-        assert.isOk(Employee.getModelName() === MODEL_NAME, 'Invalid model name');
-    });
 
     it('#Model::find', function (done) {
         this.timeout(MAX_TIMEOUT);
