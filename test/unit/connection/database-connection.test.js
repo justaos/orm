@@ -5,7 +5,7 @@ const {MAX_TIMEOUT} = require('../../test.utils');
 const defaultConfig = {
     host: "localhost",
     port: "27017",
-    database: "anysols-model-dbservice",
+    database: "anysols-collection-dbservice",
     dialect: "mongodb"
 };
 
@@ -15,7 +15,7 @@ describe('DatabaseConnection', () => {
     it('#DatabaseConfiguration::getUri with username/password', function () {
         const config = {...defaultConfig, username: "admin", password: "admin"};
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
-        assert.equal(dbConfig.getUri(), 'mongodb://admin:admin@localhost:27017/anysols-model-dbservice', "Unexpected uri generated");
+        assert.equal(dbConfig.getUri(), 'mongodb://admin:admin@localhost:27017/anysols-collection-dbservice', "Unexpected uri generated");
     });
 
     it('#DatabaseConfiguration::getUri without username/password', function () {
@@ -23,7 +23,7 @@ describe('DatabaseConnection', () => {
             ...defaultConfig
         };
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
-        assert.equal(dbConfig.getUri(), 'mongodb://localhost:27017/anysols-model-dbservice', "Unexpected uri generated");
+        assert.equal(dbConfig.getUri(), 'mongodb://localhost:27017/anysols-collection-dbservice', "Unexpected uri generated");
     });
 
     let dbConnection;

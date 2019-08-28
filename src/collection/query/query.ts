@@ -1,4 +1,4 @@
-import Model from "../model";
+import Collection from "../collection";
 
 const privates = new WeakMap();
 
@@ -7,10 +7,10 @@ export default class Query {
     query: any;
     singleRecordOperation: boolean;
 
-    constructor(model: Model) {
+    constructor(collection: Collection) {
         this.query = {};
         this.singleRecordOperation = false;
-        privates.set(this, {model});
+        privates.set(this, {collection});
     }
 
     findById(id: string): Query {
@@ -26,7 +26,7 @@ export default class Query {
     }
 
     async execute(): Promise<any> {
-        const records = await _getModel(this).executeQuery(this.query);
+        const records = await _getCollection(this).executeQuery(this.query);
         if (this.singleRecordOperation) {
             if (records.length)
                 return records[0];
@@ -37,6 +37,6 @@ export default class Query {
     }
 }
 
-function _getModel(that: Query) {
-    return privates.get(that).model;
+function _getCollection(that: Query) {
+    return privates.get(that).collection;
 }

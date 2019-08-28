@@ -1,9 +1,9 @@
 let {StringDataType} = require("../");
-let getAnysolsModel = require("./getAnysolsModel");
+let getanysolsODM = require("./getanysolsODM");
 
-getAnysolsModel(function (anysolsModel) {
+getanysolsODM(function (anysolsODM) {
 
-    anysolsModel.addFieldType({
+    anysolsODM.addFieldType({
 
         getDataType: function (fieldDefinition) {
             return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
@@ -18,7 +18,7 @@ getAnysolsModel(function (anysolsModel) {
         }
     });
 
-    anysolsModel.defineModel({
+    anysolsODM.defineCollection({
         name: 'student',
         fields: [{
             name: 'name',
@@ -32,14 +32,14 @@ getAnysolsModel(function (anysolsModel) {
         }]
     });
 
-    let studentModel = anysolsModel.model("student");
-    let s = studentModel.initializeRecord();
+    let studentCollection = anysolsODM.collection("student");
+    let s = studentCollection.initializeRecord();
     s.set("name", "John");
     s.set("email", "test@example.com");
     s.set("dob", new Date());
     s.insert().then(function () {
         console.log("Student created");
-        anysolsModel.closeConnection();
+        anysolsODM.closeConnection();
     }, (err) => {
         console.log(err);
     });

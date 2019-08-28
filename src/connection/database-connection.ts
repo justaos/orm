@@ -18,11 +18,11 @@ const privates = new WeakMap();
 export default class DatabaseConnection {
 
     private readonly conn: MongoClient;
-    private readonly models: Map<string, any>;
+    private readonly collections: Map<string, any>;
 
     constructor(conn: MongoClient, config: DatabaseConfiguration) {
         this.conn = conn;
-        this.models = new Map<string, any>();
+        this.collections = new Map<string, any>();
         privates.set(this, {config});
     }
 

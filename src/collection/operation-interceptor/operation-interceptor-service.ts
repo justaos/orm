@@ -19,12 +19,12 @@ export default class OperationInterceptorService {
         return (this.interceptors.size !== 0);
     }
 
-    async intercept(modelName: string, operation: string, when: string, records: Record[]): Promise<Record[]> {
+    async intercept(collectionName: string, operation: string, when: string, records: Record[]): Promise<Record[]> {
         const inactiveIntercepts: any = [];
         if (this.hasInterceptors())
             for (const [name, interceptor] of this.interceptors.entries())
                 if (!inactiveIntercepts || !inactiveIntercepts.includes(name)) {
-                    records = await interceptor.intercept(modelName, operation, when, records);
+                    records = await interceptor.intercept(collectionName, operation, when, records);
                     if (!records)
                         break;
                 }
@@ -32,8 +32,8 @@ export default class OperationInterceptorService {
     }
 
 
-    async interceptRecord(modelName: string, operation: string, when: string, record: Record): Promise<Record> {
-        const updatedRecords = await this.intercept(modelName, operation, when, [record]);
+    async interceptRecord(collectionName: string, operation: string, when: string, record: Record): Promise<Record> {
+        const updatedRecords = await this.intercept(collectionName, operation, when, [record]);
         return updatedRecords[0];
     }
 

@@ -1,16 +1,16 @@
 const {assert} = require('chai');
-const {AnysolsModel} = require('../');
+const {AnysolsODM} = require('../');
 const {session, MAX_TIMEOUT} = require('./test.utils');
 
 describe('Initial test setup', () => {
 
     it('#connect()', function (done) {
         this.timeout(MAX_TIMEOUT);
-        session.anysolsModel = new AnysolsModel();
-        session.anysolsModel.connect({
+        session.anysolsODM = new AnysolsODM();
+        session.anysolsODM.connect({
             "host": "localhost",
             "port": "27017",
-            "database": "anysols-model-test",
+            "database": "anysols-collection-test",
             "dialect": "mongodb",
         }).then(() => {
             assert.isOk(true, 'connection established');
@@ -23,8 +23,8 @@ describe('Initial test setup', () => {
 
     it('#clear existing database', function (done) {
         this.timeout(MAX_TIMEOUT);
-        session.anysolsModel.databaseExists().then(() => {
-            session.anysolsModel.dropDatabase().then(() => {
+        session.anysolsODM.databaseExists().then(() => {
+            session.anysolsODM.dropDatabase().then(() => {
                 assert.isOk(true, 'dropped successfully');
                 done()
             }, () => {

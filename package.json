@@ -1,7 +1,7 @@
 {
-    "name": "anysols-model",
+    "name": "anysols-odm",
     "version": "1.1.0",
-    "description": "Wrapper for mongodb with support for intercepts on operations (create, read, update and delete) and support for schemas with multi-level inheritance",
+    "description": "Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
     "main": "./index.js",
     "scripts": {
         "prepare": "npm run build",
@@ -40,13 +40,13 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/anysols/anysols-model.git"
+        "url": "git+https://github.com/anysols/anysols-odm.git"
     },
     "author": "Shivaji Varma <contact@shivajivarma.com>",
     "contributors": [],
     "license": "Apache-2.0",
     "bugs": {
-        "url": "https://gitlab.com/anysols/anysols-model/issues"
+        "url": "https://gitlab.com/anysols/anysols-odm/issues"
     },
     "homepage": "https://anysols.com",
     "dependencies": {

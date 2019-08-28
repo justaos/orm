@@ -1,17 +1,17 @@
-const {AnysolsModel} = require('../');
+const {anysolsODM} = require('../');
 
-const anysolsModel = new AnysolsModel();
+const anysolsODM = new anysolsODM();
 
 const config = {
     "host": "localhost",
     "port": "27017",
-    "database": "anysols-model",
+    "database": "anysols-collection",
     "dialect": "mongodb",
 };
 
-anysolsModel.connect(config).then(() => {
+anysolsODM.connect(config).then(() => {
     console.log('connection success');
-    anysolsModel.databaseExists().then(() => {
+    anysolsODM.databaseExists().then(() => {
         console.log('db exists');
     }, () => {
         console.log("db does not exists");

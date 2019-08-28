@@ -1,4 +1,4 @@
-# Anysols Model
+# Anysols Collection
 Wrapper for mongodb with support for intercepts on operations (create, read, update and delete) and support for schemas with multi-level inheritance
 
 [![Coverage Status](https://coveralls.io/repos/github/anysols/anysols-model/badge.svg?branch=master)](https://coveralls.io/github/anysols/anysols-model?branch=master)
@@ -8,20 +8,20 @@ npm install --save anysols-model
 ```
 ## Establishing database connection
 ```js
-const {AnysolsModel} = require('anysols-model');
+const {AnysolsODM} = require(collection);
 
-const anysolsModel = new AnysolsModel();
+const anysolsODM = new AnysolsODM();
 
 const config = {
  "host": "localhost",
  "port": "27017",
- "database": "anysols-model",
+ "database": collection,
  "dialect": "mongodb",
 };
 
-anysolsModel.connect(config).then(() => {
+anysolsODM.connect(config).then(() => {
  console.log('connection success');
- anysolsModel.databaseExists().then(() => {
+ anysolsODM.databaseExists().then(() => {
      console.log('db exists');
  }, () => {
      console.log("db does not exists");
@@ -35,7 +35,7 @@ anysolsModel.connect(config).then(() => {
 ```js
 // after establishing connection
 
-anysolsModel.addInterceptor({
+anysolsODM.addInterceptor({
      
  getName: function () {
      return "my-intercept";
@@ -65,7 +65,7 @@ anysolsModel.addInterceptor({
  }
 });
 
-anysolsModel.defineModel({
+anysolsODM.defineCollection({
  name: 'student',
  fields: [{
      name: 'name',
@@ -76,12 +76,12 @@ anysolsModel.defineModel({
  }]
 });
 
-let studentModel = anysolsModel.model("student");
+let studentModel = anysolsODM.model("student");
 let s = studentModel.initializeRecord();
 s.set("name", "John " + new Date().toISOString());
 s.insert().then(function () {
  studentModel.find().execute().then(function (students) {
-     anysolsModel.closeConnection();
+     anysolsODM.closeConnection();
  });
 });
 ```
@@ -90,7 +90,7 @@ s.insert().then(function () {
 ```js
 // after establishing connection
 
-anysolsModel.addFieldType({
+anysolsODM.addFieldType({
 
  getDataType: function (fieldDefinition) {
      return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
@@ -105,7 +105,7 @@ anysolsModel.addFieldType({
  }
 });
 
-anysolsModel.defineModel({
+anysolsODM.defineCollection({
  name: 'student',
  fields: [{
      name: 'name',
@@ -119,14 +119,14 @@ anysolsModel.defineModel({
  }]
 });
 
-let studentModel = anysolsModel.model("student");
+let studentModel = anysolsODM.model("student");
 let s = studentModel.initializeRecord();
 s.set("name", "John");
 s.set("email", "test@example.com");
 s.set("dob", new Date());
 s.insert().then(function () {
  console.log("Student created");
- anysolsModel.closeConnection();
+ anysolsODM.closeConnection();
 }, (err) => {
  console.log(err);
 });

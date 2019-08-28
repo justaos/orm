@@ -6,7 +6,7 @@ import OperationInterceptorService from "./operation-interceptor/operation-inter
 
 const privates = new WeakMap();
 
-export default class Model {
+export default class Collection {
 
     constructor(schema: any, getCollection: any, fieldTypeRegistry: FieldTypeRegistry, operationInterceptorService: OperationInterceptorService) {
         privates.set(this, {schema, fieldTypeRegistry, operationInterceptorService});
@@ -81,27 +81,27 @@ export default class Model {
 }
 
 function _validateSchemaError(mesg: string) {
-    return new Error("[ModelService::_validateSchema] " + mesg)
+    return new Error("[CollectionService::_validateSchema] " + mesg)
 }
 
-function _validateSchema(that: Model, schema: any) {
+function _validateSchema(that: Collection, schema: any) {
     if (!schema)
         throw _validateSchemaError("Definition not provided");
     if (!schema.name)
-        throw  _validateSchemaError("Invalid model name");
+        throw  _validateSchemaError("Invalid collection name");
     if (schema.fields) {
         for (const field of schema.fields) {
             if (!field || !field.type)
-                throw _validateSchemaError("field type provided - [modelName=" + schema.name + "]");
+                throw _validateSchemaError("field type provided - [collectionName=" + schema.name + "]");
             let fieldType = _getFieldTypeRegistry(that).getFieldType(field.type);
             if (!fieldType)
-                throw _validateSchemaError("No such field type  - [modelName=" + schema.name + ", fieldName=" + field.name + ", fieldType=" + field.type + "]");
+                throw _validateSchemaError("No such field type  - [collectionName=" + schema.name + ", fieldName=" + field.name + ", fieldType=" + field.type + "]");
             if (!fieldType.validateDefinition(field))
-                throw _validateSchemaError("Invalid field definition  [modelName=" + schema.name + ", fieldName=" + field.name + "]");
+                throw _validateSchemaError("Invalid field definition  [collectionName=" + schema.name + ", fieldName=" + field.name + "]");
         }
         const fieldNames = schema.fields.map((f: any) => f.name);
         if (_areDuplicatesPresent(fieldNames))
-            throw _validateSchemaError("Duplicate field name [modelName=" + schema.name + ", fieldNames=" + fieldNames + "]");
+            throw _validateSchemaError("Duplicate field name [collectionName=" + schema.name + ", fieldNames=" + fieldNames + "]");
     }
 }
 
@@ -113,19 +113,19 @@ function _areDuplicatesPresent(a: []): boolean {
     return false;
 }
 
-function _getCollection(that: Model) {
+function _getCollection(that: Collection) {
     return privates.get(that).collection;
 }
 
-function _getFieldTypeRegistry(that: Model) {
+function _getFieldTypeRegistry(that: Collection) {
     return privates.get(that).fieldTypeRegistry;
 }
 
-function _getOperationInterceptorService(that: Model): OperationInterceptorService {
+function _getOperationInterceptorService(that: Collection): OperationInterceptorService {
     return privates.get(that).operationInterceptorService;
 }
 
-function _findDocuments(that: Model, condition: any): Promise<any> {
+function _findDocuments(that: Collection, condition: any): Promise<any> {
     return new Promise((resolve, reject) => {
         _getCollection(that).find(condition).toArray(function (err: any, docs: any) {
             if (err)
@@ -135,7 +135,7 @@ function _findDocuments(that: Model, condition: any): Promise<any> {
     })
 }
 
-function _getJsonSchema(that: Model) {
+function _getJsonSchema(that: Collection) {
     const schema = that.getSchema();
 
     const jsonSchema: any = {

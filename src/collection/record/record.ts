@@ -1,4 +1,4 @@
-import Model from "../model";
+import Collection from "../collection";
 
 const privates = new WeakMap();
 
@@ -8,9 +8,9 @@ export default class Record {
 
     record: any;
 
-    constructor(record: any, model: Model) {
+    constructor(record: any, collection: Collection) {
         this.record = record;
-        privates.set(this, {model});
+        privates.set(this, {collection});
     }
 
     initialize() {
@@ -32,7 +32,7 @@ export default class Record {
     }
 
     async insert() {
-        let record = await _getModel(this).insertOne(this);
+        let record = await _getCollection(this).insertOne(this);
         this.record = record.toObject();
         this.isNew = false;
         return this;
@@ -41,7 +41,7 @@ export default class Record {
     async delete() {
         if (this.isNew)
             throw Error('[Record::remove] Cannot remove unsaved record');
-        await _getModel(this).deleteOne(this);
+        await _getCollection(this).deleteOne(this);
         return this;
     }
 
@@ -58,9 +58,9 @@ export default class Record {
 }
 
 function _getSchema(that: Record) {
-    return _getModel(that).getSchema();
+    return _getCollection(that).getSchema();
 }
 
-function _getModel(that: Record) {
-    return privates.get(that).model;
+function _getCollection(that: Record) {
+    return privates.get(that).collection;
 }

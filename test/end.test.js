@@ -5,7 +5,7 @@ describe('End test cleanup', () => {
 
     it("disconnect check", function (done) {
         this.timeout(MAX_TIMEOUT);
-        session.anysolsModel.closeConnection().then(() => {
+        session.anysolsODM.closeConnection().then(() => {
             assert.isOk(true, 'close connection success');
             done()
         }, () => {

@@ -1,7 +1,7 @@
 import {DatabaseConnection} from "../connection";
 import FieldTypeRegistry from "./field-types/field-type-registry";
-import ModelRegistry from "./model-registry";
-import Model from "./model";
+import CollectionRegistry from "./collectionRegistry";
+import Collection from "./collection";
 import FieldType from "./field-types/field-type";
 import StringFieldType from "./field-types/string-field-type";
 import IntegerFieldType from "./field-types/integer-field-type";
@@ -11,13 +11,13 @@ import OperationInterceptor from "./operation-interceptor/operation-interceptor"
 
 const privates = new WeakMap();
 
-export default class ModelService {
+export default class CollectionService {
 
     constructor() {
         const fieldTypeRegistry = new FieldTypeRegistry();
-        const modelRegistry = new ModelRegistry();
+        const collectionRegistry = new CollectionRegistry();
         const operationInterceptorService = new OperationInterceptorService();
-        privates.set(this, {fieldTypeRegistry, modelRegistry, operationInterceptorService});
+        privates.set(this, {fieldTypeRegistry, collectionRegistry, operationInterceptorService});
         _loadBuildInFieldTypes(this);
     }
 
@@ -25,25 +25,25 @@ export default class ModelService {
         privates.get(this).conn = conn;
     }
 
-    isModelDefined(modelName: string) {
-        return _getModelRegistry(this).hasModel(modelName);
+    isCollectionDefined(collectionName: string) {
+        return _getCollectionRegistry(this).hasCollection(collectionName);
     }
 
-    defineModel(schema: any) {
+    defineCollection(schema: any) {
         let that = this;
-        let model = new Model(schema,
-            (model: Model) => _getConnection(that).getDBO().collection(model.getName()),
+        let collection = new Collection(schema,
+            (collection: Collection) => _getConnection(that).getDBO().collection(collection.getName()),
             _getFieldTypeRegistry(that),
             _getOperationInterceptorService(that));
-        _getModelRegistry(this).addModel(model);
+        _getCollectionRegistry(this).addCollection(collection);
     }
 
-    removeModel(modelName: string) {
-        _getModelRegistry(this).deleteModel(modelName);
+    removeCollection(collectionName: string) {
+        _getCollectionRegistry(this).deleteCollection(collectionName);
     }
 
-    model(modelName: any) {
-        return _getModelRegistry(this).getModel(modelName);
+    collection(collectionName: any) {
+        return _getCollectionRegistry(this).getCollection(collectionName);
     }
 
     addFieldType(fieldType: FieldType) {
@@ -58,28 +58,28 @@ export default class ModelService {
 /**
  * PRIVATE METHODS
  */
-function _getConnection(that: ModelService) {
+function _getConnection(that: CollectionService) {
     let conn = privates.get(that).conn;
     if (!conn)
-        throw new Error("ModelService::_getConnection -> There is no connection");
+        throw new Error("CollectionService::_getConnection -> There is no connection");
     return conn;
 }
 
-function _loadBuildInFieldTypes(that: ModelService) {
+function _loadBuildInFieldTypes(that: CollectionService) {
     that.addFieldType(new StringFieldType());
     that.addFieldType(new IntegerFieldType());
     that.addFieldType(new DateFieldType());
 }
 
-function _getModelRegistry(that: ModelService): ModelRegistry {
-    return privates.get(that).modelRegistry;
+function _getCollectionRegistry(that: CollectionService): CollectionRegistry {
+    return privates.get(that).collectionRegistry;
 }
 
-function _getFieldTypeRegistry(that: ModelService): FieldTypeRegistry {
+function _getFieldTypeRegistry(that: CollectionService): FieldTypeRegistry {
     return privates.get(that).fieldTypeRegistry;
 }
 
-function _getOperationInterceptorService(that: ModelService): OperationInterceptorService {
+function _getOperationInterceptorService(that: CollectionService): OperationInterceptorService {
     return privates.get(that).operationInterceptorService;
 }
 

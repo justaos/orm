@@ -1,9 +1,9 @@
-import AnysolsModel from "./anysols-model";
-import {FieldType, StringDataType} from "./model";
-// export * from "../backup/model-handler/model/model-interceptor";
+import AnysolsODM from "./AnysolsODM";
+import {FieldType, StringDataType} from "./collection";
+// export * from "../backup/collection-handler/collection/collection-interceptor";
 
 export {
-    AnysolsModel,
+    AnysolsODM,
     FieldType,
     StringDataType
 }

@@ -1,16 +1,16 @@
 const {assert} = require('chai');
 const {session, MAX_TIMEOUT} = require('../../test.utils');
 
-describe('Model', () => {
+describe('Collection', () => {
 
 
     let johnRecord;
     let johnObject;
     let MODEL_NAME = "employee";
 
-    it('#Model::insert', function (done) {
+    it('#Collection::insert', function (done) {
         this.timeout(5000);
-        session.anysolsModel.defineModel({
+        session.anysolsODM.defineCollection({
             name: MODEL_NAME,
             fields: [{
                 name: 'name',
@@ -21,8 +21,8 @@ describe('Model', () => {
             }]
         });
 
-        let employeeModel = session.anysolsModel.model(MODEL_NAME);
-        let empRecord = employeeModel.initializeRecord();
+        let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
+        let empRecord = employeeCollection.initializeRecord();
         empRecord.set("name", "John");
         empRecord.set("eid", 100);
         empRecord.insert().then((rec) => {
@@ -36,25 +36,25 @@ describe('Model', () => {
         });
     });
 
-    it('#Model::getModelName', function () {
+    it('#Collection::getCollectionName', function () {
         this.timeout(MAX_TIMEOUT);
-        let employeeModel = session.anysolsModel.model(MODEL_NAME);
-        assert.isOk(employeeModel.getName() === MODEL_NAME, 'Invalid model name');
+        let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
+        assert.isOk(employeeCollection.getName() === MODEL_NAME, 'Invalid collection name');
     });
 
-    it('#Model::find', function (done) {
+    it('#Collection::find', function (done) {
         this.timeout(MAX_TIMEOUT);
-        let employee = session.anysolsModel.model(MODEL_NAME);
-        employee.find().execute().then((employees) => {
+        let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
+        employeeCollection.find().execute().then((employees) => {
             if (employees.length === 1)
                 done();
         });
     });
 
-    it('#Model::findById', function (done) {
+    it('#Collection::findById', function (done) {
         this.timeout(MAX_TIMEOUT);
-        let employeeModel = session.anysolsModel.model(MODEL_NAME);
-        employeeModel.findById(johnRecord.getID()).execute().then((employee) => {
+        let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
+        employeeCollection.findById(johnRecord.getID()).execute().then((employee) => {
             if (employee.get('name') === "John")
                 done();
         });
@@ -62,18 +62,18 @@ describe('Model', () => {
 
     it('#record remove only selected', function (done) {
         this.timeout(MAX_TIMEOUT);
-        let employeeModel = session.anysolsModel.model(MODEL_NAME);
+        let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
         johnRecord.delete().then(() => {
-            employeeModel.findById(johnRecord.getID()).execute().then((record) => {
+            employeeCollection.findById(johnRecord.getID()).execute().then((record) => {
                 if (!record)
                     done();
             })
         })
     });
 
-    /*it('#Model::findOne', function (done) {
+    /*it('#Collection::findOne', function (done) {
         this.timeout(MAX_TIMEOUT);
-        let Employee = session.anysolsModel.model(MODEL_NAME);
+        let Employee = session.anysolsODM.collection(MODEL_NAME);
         Employee.findOne({name: johnObject.name}).exec().then((employee) => {
             if (johnObject.id + "" === employee.getID() + "")
                 done();
@@ -83,9 +83,9 @@ describe('Model', () => {
 
 
 
-    it('#Model::findOneAndUpdate', function (done) {
+    it('#Collection::findOneAndUpdate', function (done) {
         this.timeout(MAX_TIMEOUT);
-        let Employee = session.anysolsModel.model(MODEL_NAME);
+        let Employee = session.anysolsODM.collection(MODEL_NAME);
         Employee.findOneAndUpdate({name: johnObject.name}, {eid: 200}).then((employee) => {
             Employee.findById(johnObject.id).exec().then((employee) => {
                 if (employee.get("eid") === 200)
