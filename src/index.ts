@@ -1,6 +1,6 @@
-import AnysolsODM from "./AnysolsODM";
-import {FieldType, StringDataType} from "./collection";
-// export * from "../backup/collection-handler/collection/collection-interceptor";
+import AnysolsODM from "./anysolsODM";
+import {FieldType, StringDataType} from "./collection-service";
+// export * from "../backup/collection-service-handler/collection-service/collection-service-interceptor";
 
 export {
     AnysolsODM,

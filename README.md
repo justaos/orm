@@ -15,7 +15,7 @@ const anysolsODM = new AnysolsODM();
 const config = {
  "host": "localhost",
  "port": "27017",
- "database": "anysols-collection",
+ "database": collection-service,
  "dialect": "mongodb",
 };
 
@@ -81,7 +81,7 @@ anysolsODM.defineCollection({
 });
 
 let studentCollection = anysolsODM.collection("student");
-let s = studentCollection.initializeRecord();
+let s = studentCollection.createNewRecord();
 s.set("name", "John " + new Date().toISOString());
 s.insert().then(function () {
     studentCollection.find().execute().then(function (students) {
@@ -124,7 +124,7 @@ anysolsODM.defineCollection({
 });
 
 let studentCollection = anysolsODM.collection("student");
-let s = studentCollection.initializeRecord();
+let s = studentCollection.createNewRecord();
 s.set("name", "John");
 s.set("email", "test@example.com");
 s.set("dob", new Date());

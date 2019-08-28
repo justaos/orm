@@ -1,8 +1,8 @@
-import Query from "./query/query";
-import Record from "./record/record";
-import FieldTypeRegistry from "./field-types/field-type-registry";
+import Query from "../query/query";
+import Record from "../record/record";
+import FieldTypeRegistry from "../field-types/fieldTypeRegistry";
 import * as Ajv from "ajv";
-import OperationInterceptorService from "./operation-interceptor/operation-interceptor-service";
+import OperationInterceptorService from "../operation-interceptor/operationInterceptorService";
 
 const privates = new WeakMap();
 
@@ -14,15 +14,15 @@ export default class Collection {
         privates.get(this).collection = getCollection(this);
     }
 
-    getName() {
+    getName(): string {
         return this.getSchema().name;
     }
 
-    getSchema() {
+    getSchema(): any {
         return privates.get(this).schema;
     }
 
-    initializeRecord() {
+    createNewRecord() {
         return new Record(null, this).initialize();
     }
 
@@ -88,7 +88,7 @@ function _validateSchema(that: Collection, schema: any) {
     if (!schema)
         throw _validateSchemaError("Definition not provided");
     if (!schema.name)
-        throw  _validateSchemaError("Invalid collection name");
+        throw  _validateSchemaError("Invalid collection-service name");
     if (schema.fields) {
         for (const field of schema.fields) {
             if (!field || !field.type)

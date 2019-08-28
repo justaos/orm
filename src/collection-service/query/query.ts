@@ -1,4 +1,4 @@
-import Collection from "../collection";
+import Collection from "../collection/collection";
 
 const privates = new WeakMap();
 

@@ -10,7 +10,7 @@ describe('Initial test setup', () => {
         session.anysolsODM.connect({
             "host": "localhost",
             "port": "27017",
-            "database": "anysols-collection-test",
+            "database": "anysols-collection-service-test",
             "dialect": "mongodb",
         }).then(() => {
             assert.isOk(true, 'connection established');

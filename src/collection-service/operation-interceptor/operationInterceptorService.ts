@@ -1,4 +1,4 @@
-import OperationInterceptor from "./operation-interceptor";
+import OperationInterceptor from "./operationInterceptor";
 import Record from "../record/record";
 
 export default class OperationInterceptorService {

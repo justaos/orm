@@ -33,7 +33,7 @@ getAnysolsODM(function (anysolsODM) {
     });
 
     let studentCollection = anysolsODM.collection("student");
-    let s = studentCollection.initializeRecord();
+    let s = studentCollection.createNewRecord();
     s.set("name", "John");
     s.set("email", "test@example.com");
     s.set("dob", new Date());

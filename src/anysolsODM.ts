@@ -1,6 +1,6 @@
 import {DatabaseConfiguration, DatabaseConnection} from "./connection";
-import {FieldType, CollectionService} from "./collection";
-import OperationInterceptor from "./collection/operation-interceptor/operation-interceptor";
+import {FieldType, CollectionService} from "./collection-service";
+import OperationInterceptor from "./collection-service/operation-interceptor/operationInterceptor";
 
 const privates = new WeakMap();
 

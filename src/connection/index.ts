@@ -1,5 +1,5 @@
-import DatabaseConfiguration from './database-configuration';
-import DatabaseConnection from './database-connection';
+import DatabaseConfiguration from './databaseConfiguration';
+import DatabaseConnection from './databaseConnection';
 
 export {
     DatabaseConfiguration,

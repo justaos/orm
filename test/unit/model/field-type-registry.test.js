@@ -1,7 +1,6 @@
-const {StringDataType, DataType} = require("../../../lib");
-
 const {assert} = require('chai');
 const {session} = require('../../test.utils');
+const {StringDataType} = require("../../../lib");
 
 describe('FieldType', () => {
 
@@ -49,7 +48,7 @@ describe('FieldType', () => {
 
     it('#FieldTypeRegistry::registerFieldType creating record with custom field type', function (done) {
         let collection = session.anysolsODM.collection(MODEL_NAME);
-        let rec = collection.initializeRecord();
+        let rec = collection.createNewRecord();
         rec.set("name", "RAM");
         rec.set(EMAIL_FIELD, EMAIL_VALUE);
         rec.insert().then(function (rec) {

@@ -1,5 +1,5 @@
 import {MongoClient} from "mongodb";
-import DatabaseConfiguration from "./database-configuration";
+import DatabaseConfiguration from "./databaseConfiguration";
 
 function createConnectionByUri(uri: string): Promise<MongoClient> {
     return new Promise((resolve, reject) => {

@@ -5,7 +5,7 @@ const anysolsODM = new AnysolsODM();
 const config = {
     "host": "localhost",
     "port": "27017",
-    "database": "anysols-collection",
+    "database": "anysols-collection-service",
     "dialect": "mongodb",
 };
 

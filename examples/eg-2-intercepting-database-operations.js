@@ -44,7 +44,7 @@ getAnysolsODM(function (anysolsODM) {
     });
 
     let studentCollection = anysolsODM.collection("student");
-    let s = studentCollection.initializeRecord();
+    let s = studentCollection.createNewRecord();
     s.set("name", "John " + new Date().toISOString());
     s.insert().then(function () {
         studentCollection.find().execute().then(function (students) {

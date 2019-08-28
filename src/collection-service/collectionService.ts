@@ -1,13 +1,13 @@
 import {DatabaseConnection} from "../connection";
-import FieldTypeRegistry from "./field-types/field-type-registry";
-import CollectionRegistry from "./collectionRegistry";
-import Collection from "./collection";
-import FieldType from "./field-types/field-type";
-import StringFieldType from "./field-types/string-field-type";
-import IntegerFieldType from "./field-types/integer-field-type";
-import DateFieldType from "./field-types/date-field-type";
-import OperationInterceptorService from "./operation-interceptor/operation-interceptor-service";
-import OperationInterceptor from "./operation-interceptor/operation-interceptor";
+import FieldTypeRegistry from "./field-types/fieldTypeRegistry";
+import CollectionRegistry from "./collection/collectionRegistry";
+import Collection from "./collection/collection";
+import FieldType from "./field-types/fieldType";
+import StringFieldType from "./field-types/stringFieldType";
+import IntegerFieldType from "./field-types/integerFieldType";
+import DateFieldType from "./field-types/dateFieldType";
+import OperationInterceptorService from "./operation-interceptor/operationInterceptorService";
+import OperationInterceptor from "./operation-interceptor/operationInterceptor";
 
 const privates = new WeakMap();
 

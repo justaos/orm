@@ -1,4 +1,4 @@
-import DataType from "./data-type";
+import DataType from "./dataType";
 
 export default class DateDataType implements DataType {
 

@@ -1,4 +1,4 @@
-import StringDataType from "./collection/data-types/string-data-type";
+import StringDataType from "./collection-service/data-types/stringDataType";
 
 export const DATA_TYPES = {
     STRING: StringDataType

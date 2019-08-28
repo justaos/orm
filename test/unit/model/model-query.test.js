@@ -22,7 +22,7 @@ describe('Collection', () => {
         });
 
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
-        let empRecord = employeeCollection.initializeRecord();
+        let empRecord = employeeCollection.createNewRecord();
         empRecord.set("name", "John");
         empRecord.set("eid", 100);
         empRecord.insert().then((rec) => {
@@ -39,7 +39,7 @@ describe('Collection', () => {
     it('#Collection::getCollectionName', function () {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
-        assert.isOk(employeeCollection.getName() === MODEL_NAME, 'Invalid collection name');
+        assert.isOk(employeeCollection.getName() === MODEL_NAME, 'Invalid collection-service name');
     });
 
     it('#Collection::find', function (done) {
@@ -73,7 +73,7 @@ describe('Collection', () => {
 
     /*it('#Collection::findOne', function (done) {
         this.timeout(MAX_TIMEOUT);
-        let Employee = session.anysolsODM.collection(MODEL_NAME);
+        let Employee = session.anysolsODM.collection-service(MODEL_NAME);
         Employee.findOne({name: johnObject.name}).exec().then((employee) => {
             if (johnObject.id + "" === employee.getID() + "")
                 done();
@@ -85,7 +85,7 @@ describe('Collection', () => {
 
     it('#Collection::findOneAndUpdate', function (done) {
         this.timeout(MAX_TIMEOUT);
-        let Employee = session.anysolsODM.collection(MODEL_NAME);
+        let Employee = session.anysolsODM.collection-service(MODEL_NAME);
         Employee.findOneAndUpdate({name: johnObject.name}, {eid: 200}).then((employee) => {
             Employee.findById(johnObject.id).exec().then((employee) => {
                 if (employee.get("eid") === 200)

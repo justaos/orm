@@ -8,13 +8,9 @@ export default class CollectionRegistry {
         this.collections = new Map<string, Collection>();
     }
 
-    hasCollection(collectionName: string) {
-        return this.collections.has(collectionName);
-    }
+    hasCollection = (collectionName: string) => this.collections.has(collectionName);
 
-    getCollection(collectionName: string) {
-        return this.collections.get(collectionName)
-    }
+    getCollection = (collectionName: string) => this.collections.get(collectionName);
 
     addCollection = (collection: Collection) => this.collections.set(collection.getName(), collection);
 
