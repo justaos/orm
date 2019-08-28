@@ -1,20 +1,30 @@
-let getAnysolsModel = require("./getAnysolsModel");
+let getanysolsODM = require("./getanysolsODM");
 
-getAnysolsModel(function (anysolsModel) {
+getanysolsODM(function (anysolsODM) {
 
-    anysolsModel.addInterceptor("my-intercept", {
-        intercept: (modelName, operation, when, records) => {
+    anysolsODM.addInterceptor({
+
+        getName: function () {
+            return "my-intercept";
+        },
+
+        intercept: (collectionName, operation, when, records) => {
             return new Promise((resolve, reject) => {
-                if (modelName === 'student') {
+                if (collectionName === 'student') {
                     if (operation === 'create') {
+                        console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
                         if (when === "before") {
-                            console.log("Student before");
-                            if (!Array.isArray(records)) {
-                                let record = records;
-                                record.set("computed",  record.get("name") + " +++ computed");
+                            for (let record of records) {
+                                console.log("computed field updated for :: " + record.get('name'));
+                                record.set("computed", record.get("name") + " +++ computed");
                             }
-                        } else if (when === "after")
-                            console.log("Student after");
+                        }
+                    }
+                    if (operation === 'read') {
+                        console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
+                        for (let record of records) {
+                            console.log(record.toObject());
+                        }
                     }
                 }
                 resolve(records);
@@ -22,7 +32,7 @@ getAnysolsModel(function (anysolsModel) {
         }
     });
 
-    anysolsModel.defineModel({
+    anysolsODM.defineCollection({
         name: 'student',
         fields: [{
             name: 'name',
@@ -33,13 +43,12 @@ getAnysolsModel(function (anysolsModel) {
         }]
     });
 
-    let Student = anysolsModel.model("student");
-    let s = new Student({});
-    s.set("name", "John");
-    s.save().then(function () {
-        Student.find().exec().then(function (students) {
-            console.log(JSON.stringify(students, null, 4));
-            anysolsModel.closeConnection();
+    let studentCollection = anysolsODM.collection("student");
+    let s = studentCollection.initializeRecord();
+    s.set("name", "John " + new Date().toISOString());
+    s.insert().then(function () {
+        studentCollection.find().execute().then(function (students) {
+            anysolsODM.closeConnection();
         });
     });
 

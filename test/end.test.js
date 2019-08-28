@@ -1,10 +1,11 @@
 const {assert} = require('chai');
-const {session} = require('./test.utils');
+const {session, MAX_TIMEOUT} = require('./test.utils');
 
 describe('End test cleanup', () => {
 
-    it("disconnect check", function () {
-        session.anysolsModel.closeConnection(() => {
+    it("disconnect check", function (done) {
+        this.timeout(MAX_TIMEOUT);
+        session.anysolsODM.closeConnection().then(() => {
             assert.isOk(true, 'close connection success');
             done()
         }, () => {

@@ -1,38 +1,46 @@
-let {FieldDefinition, MONGOOSE_TYPES} = require("../");
+let {StringDataType} = require("../");
+let getanysolsODM = require("./getanysolsODM");
 
-let getAnysolsModel = require("./getAnysolsModel");
+getanysolsODM(function (anysolsODM) {
 
-getAnysolsModel(function (anysolsModel) {
+    anysolsODM.addFieldType({
 
-    anysolsModel.registerFieldDefinition(new FieldDefinition("customType", field => {
-        return true
-    }, function (field, fieldDefinition) {
-        return {
-            type: MONGOOSE_TYPES.STRING
+        getDataType: function (fieldDefinition) {
+            return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
+        },
+
+        getType: function () {
+            return "email"
+        },
+
+        validateDefinition: function (fieldDefinition) {
+            return !!fieldDefinition.name
         }
-    }));
+    });
 
-    anysolsModel.defineModel({
+    anysolsODM.defineCollection({
         name: 'student',
         fields: [{
             name: 'name',
             type: 'string'
         }, {
+            name: 'email',
+            type: 'email'
+        }, {
             name: 'dob',
             type: 'date'
-        }, {
-            name: 'custom_field',
-            type: 'customType'
         }]
     });
 
-    let Student = anysolsModel.model("student");
-    let s = new Student();
+    let studentCollection = anysolsODM.collection("student");
+    let s = studentCollection.initializeRecord();
     s.set("name", "John");
+    s.set("email", "test@example.com");
     s.set("dob", new Date());
-    s.set("custom_field", "testing");
-    s.save().then(function () {
+    s.insert().then(function () {
         console.log("Student created");
-        anysolsModel.closeConnection();
+        anysolsODM.closeConnection();
+    }, (err) => {
+        console.log(err);
     });
 });
