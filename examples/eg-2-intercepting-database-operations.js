@@ -1,6 +1,6 @@
-let getanysolsODM = require("./getanysolsODM");
+let getAnysolsODM = require("./getAnysolsODM");
 
-getanysolsODM(function (anysolsODM) {
+getAnysolsODM(function (anysolsODM) {
 
     anysolsODM.addInterceptor({
 

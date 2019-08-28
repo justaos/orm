@@ -1,7 +1,7 @@
 let {StringDataType} = require("../");
-let getanysolsODM = require("./getanysolsODM");
+let getAnysolsODM = require("./getAnysolsODM");
 
-getanysolsODM(function (anysolsODM) {
+getAnysolsODM(function (anysolsODM) {
 
     anysolsODM.addFieldType({
 
@@ -42,5 +42,6 @@ getanysolsODM(function (anysolsODM) {
         anysolsODM.closeConnection();
     }, (err) => {
         console.log(err);
+        anysolsODM.closeConnection();
     });
 });
