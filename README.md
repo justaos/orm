@@ -4,7 +4,7 @@ Wrapper for mongodb with support for intercepts on operations (create, read, upd
 [![Coverage Status](https://coveralls.io/repos/github/anysols/anysols-odm/badge.svg?branch=master)](https://coveralls.io/github/anysols/anysols-model?branch=master)
 
 ```bash
-npm install --save anysols-model
+npm install --save anysols-odm
 ```
 ## Establishing database connection
 ```js
