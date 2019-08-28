@@ -1,8 +1,8 @@
-const {anysolsODM} = require('../');
+const {AnysolsODM} = require('../');
 
 module.exports = (cb) => {
 
-    const anysolsODM = new anysolsODM();
+    const anysolsODM = new AnysolsODM();
 
     const config = {
         "host": "localhost",
@@ -18,6 +18,7 @@ module.exports = (cb) => {
             cb(anysolsODM);
         }, () => {
             console.log("db does not exists");
+            cb(anysolsODM);
         });
     }, (err) => {
         console.log('connection failed');
