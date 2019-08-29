@@ -29,7 +29,9 @@
         "include": [
             "lib/"
         ],
-        "exclude": [],
+        "exclude": [
+            "**/**.interface.js"
+        ],
         "reporter": [
             "html",
             "lcov",

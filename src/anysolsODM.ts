@@ -8,7 +8,7 @@ import OperationInterceptor from "./operation-interceptor/operationInterceptor";
 
 import AnysolsSchema from "./schema/anysolsSchema";
 
-import FieldType from "./field-types/fieldType";
+import FieldType from "./field-types/fieldType.interface";
 import StringFieldType from "./field-types/stringFieldType";
 import IntegerFieldType from "./field-types/integerFieldType";
 import DateFieldType from "./field-types/dateFieldType";
@@ -77,6 +77,10 @@ export default class AnysolsODM {
 
     addInterceptor(operationInterceptor: OperationInterceptor): void {
         _getOperationInterceptorService(this).addInterceptor(operationInterceptor);
+    }
+
+    deleteInterceptor(operationInterceptorName: string): void {
+        _getOperationInterceptorService(this).deleteInterceptor(operationInterceptorName);
     }
 
 }

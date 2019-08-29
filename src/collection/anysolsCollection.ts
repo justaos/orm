@@ -2,7 +2,7 @@ import AnysolsCursor from "../cursor/anysolsCursor";
 import AnysolsRecord from "../record/anysolsRecord";
 import OperationInterceptorService from "../operation-interceptor/operationInterceptorService";
 import AnysolsSchema from "../schema/anysolsSchema";
-import {Collection, Cursor} from "mongodb";
+import {Collection, Cursor, FindOneOptions} from "mongodb";
 
 const privates = new WeakMap();
 
@@ -24,13 +24,15 @@ export default class AnysolsCollection {
         return new AnysolsRecord(null, this).initialize();
     }
 
-    findById(id: string): Promise<AnysolsRecord> {
-        return this.findOne({_id: id});
+    findById(id: string): Promise<AnysolsRecord | null> {
+        return this.findOne({_id: id}, {});
     }
 
-    async findOne(filter: any, options?: any): Promise<AnysolsRecord> {
+    async findOne(filter: any, options?: FindOneOptions): Promise<AnysolsRecord | null> {
         const doc = await _getCollection(this).findOne(filter, options);
-        return new AnysolsRecord(doc, this);
+        if (doc)
+            return new AnysolsRecord(doc, this);
+        return null;
     }
 
     find(filter: any): AnysolsCursor {
@@ -51,7 +53,8 @@ export default class AnysolsCollection {
 
     async deleteOne(record: AnysolsRecord): Promise<any> {
         record = await _interceptRecord(this, 'delete', 'before', record);
-        const response = await _getCollection(this).deleteOne({_id: record.getID()});
+        await _getCollection(this).deleteOne({_id: record.getID()});
+        await _interceptRecord(this, 'delete', 'after', record);
     }
 
 }
@@ -69,9 +72,13 @@ function _getOperationInterceptorService(that: AnysolsCollection): OperationInte
 }
 
 async function _interceptRecord(that: AnysolsCollection, operation: string, when: string, record: AnysolsRecord): Promise<AnysolsRecord> {
-    const operationInterceptorService = _getOperationInterceptorService(that);
-    const updatedPayload = await operationInterceptorService.intercept(that.getName(), operation, when, {records: [record]});
+    const updatedPayload = await _intercept(that, operation, when, {records: [record]});
     return updatedPayload.records[0];
+}
+
+async function _intercept(that: AnysolsCollection, operation: string, when: string, payload: any): Promise<any> {
+    const operationInterceptorService = _getOperationInterceptorService(that);
+    return await operationInterceptorService.intercept(that.getName(), operation, when, payload);
 }
 
 

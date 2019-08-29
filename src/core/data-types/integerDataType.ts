@@ -1,4 +1,4 @@
-import DataType from "./dataType";
+import DataType from "./dataType.interface";
 
 export default class IntegerDataType implements DataType {
 

@@ -1,6 +1,6 @@
 import FieldTypeRegistry from "../field-types/fieldTypeRegistry";
 import * as Ajv from "ajv";
-import FieldType from "../field-types/fieldType";
+import FieldType from "../field-types/fieldType.interface";
 
 const privates = new WeakMap();
 
