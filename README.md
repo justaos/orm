@@ -8,7 +8,7 @@ npm install --save anysols-odm
 ```
 ## Establishing database connection
 ```js
-const {AnysolsODM} = require(collection);
+const {AnysolsODM} = require("anysols-odm");
 
 const anysolsODM = new AnysolsODM();
  
