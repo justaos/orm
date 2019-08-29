@@ -1,6 +1,6 @@
-import DataType from "../data-types/dataType";
+import DataType from "../core/data-types/dataType";
 import FieldType from "./fieldType";
-import IntegerDataType from "../data-types/integerDataType";
+import IntegerDataType from "../core/data-types/integerDataType";
 
 export default class IntegerFieldType implements FieldType {
 

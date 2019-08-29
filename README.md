@@ -13,24 +13,24 @@ const {AnysolsODM} = require(collection);
 const anysolsODM = new AnysolsODM();
  
 const config = {
- "host": "localhost",
- "port": "27017",
- "database": collection-service,
- "dialect": "mongodb",
+    "host": "localhost",
+    "port": "27017",
+    "database": "anysols-collection-service",
+    "dialect": "mongodb",
 };
 
 anysolsODM.connect(config).then(() => {
- console.log('connection success');
- anysolsODM.databaseExists().then(() => {
-     console.log('db exists');
-     anysolsODM.closeConnection();
- }, () => {
-     console.log("db does not exists");
-     anysolsODM.closeConnection();
- });
+    console.log('connection success');
+    anysolsODM.databaseExists().then(() => {
+        console.log('db exists');
+        anysolsODM.closeConnection();
+    }, () => {
+        console.log("db does not exists");
+        anysolsODM.closeConnection();
+    });
 }, (err) => {
- console.log('connection failed');
- anysolsODM.closeConnection();
+    console.log('connection failed');
+    anysolsODM.closeConnection();
 });
 
 ```
@@ -45,13 +45,13 @@ anysolsODM.addInterceptor({
         return "my-intercept";
     },
 
-    intercept: (collectionName, operation, when, records) => {
+    intercept: (collectionName, operation, when, payload) => {
         return new Promise((resolve, reject) => {
             if (collectionName === 'student') {
                 if (operation === 'create') {
                     console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
                     if (when === "before") {
-                        for (let record of records) {
+                        for (let record of payload.records) {
                             console.log("computed field updated for :: " + record.get('name'));
                             record.set("computed", record.get("name") + " +++ computed");
                         }
@@ -59,12 +59,13 @@ anysolsODM.addInterceptor({
                 }
                 if (operation === 'read') {
                     console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
-                    for (let record of records) {
-                        console.log(record.toObject());
+                    if (when === "after") {
+                        for (let record of payload.records)
+                            console.log(JSON.stringify(record.toObject(), null, 4));
                     }
                 }
             }
-            resolve(records);
+            resolve(payload);
         });
     }
 });
@@ -84,7 +85,7 @@ let studentCollection = anysolsODM.collection("student");
 let s = studentCollection.createNewRecord();
 s.set("name", "John " + new Date().toISOString());
 s.insert().then(function () {
-    studentCollection.find().execute().then(function (students) {
+    studentCollection.find().toArray().then(function (students) {
         anysolsODM.closeConnection();
     });
 });

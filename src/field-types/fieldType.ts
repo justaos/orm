@@ -1,4 +1,4 @@
-import DataType from "../data-types/dataType";
+import DataType from "../core/data-types/dataType";
 
 export default abstract class FieldType {
 

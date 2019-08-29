@@ -1,5 +1,5 @@
 import OperationInterceptor from "./operationInterceptor";
-import Record from "../record/record";
+import AnysolsRecord from "../record/anysolsRecord";
 
 export default class OperationInterceptorService {
 
@@ -19,22 +19,16 @@ export default class OperationInterceptorService {
         return (this.interceptors.size !== 0);
     }
 
-    async intercept(collectionName: string, operation: string, when: string, records: Record[]): Promise<Record[]> {
+    async intercept(collectionName: string, operation: string, when: string, payload: any): Promise<any> {
         const inactiveIntercepts: any = [];
         if (this.hasInterceptors())
             for (const [name, interceptor] of this.interceptors.entries())
                 if (!inactiveIntercepts || !inactiveIntercepts.includes(name)) {
-                    records = await interceptor.intercept(collectionName, operation, when, records);
-                    if (!records)
+                    payload = await interceptor.intercept(collectionName, operation, when, payload);
+                    if (!payload)
                         break;
                 }
-        return records;
-    }
-
-
-    async interceptRecord(collectionName: string, operation: string, when: string, record: Record): Promise<Record> {
-        const updatedRecords = await this.intercept(collectionName, operation, when, [record]);
-        return updatedRecords[0];
+        return payload;
     }
 
 };

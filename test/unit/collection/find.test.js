@@ -1,14 +1,14 @@
 const {assert} = require('chai');
 const {session, MAX_TIMEOUT} = require('../../test.utils');
 
-describe('Collection', () => {
+describe('AnysolsCollection', () => {
 
 
     let johnRecord;
     let johnObject;
     let MODEL_NAME = "employee";
 
-    it('#Collection::insert', function (done) {
+    it('#AnysolsCollection::insert', function (done) {
         this.timeout(5000);
         session.anysolsODM.defineCollection({
             name: MODEL_NAME,
@@ -36,42 +36,51 @@ describe('Collection', () => {
         });
     });
 
-    it('#Collection::getCollectionName', function () {
+    it('#AnysolsCollection::getCollectionName', function () {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
         assert.isOk(employeeCollection.getName() === MODEL_NAME, 'Invalid collection-service name');
     });
 
-    it('#Collection::find', function (done) {
+    it('#AnysolsCollection::find', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
-        employeeCollection.find().execute().then((employees) => {
+        employeeCollection.find().toArray().then((employees) => {
             if (employees.length === 1)
                 done();
         });
     });
 
-    it('#Collection::findById', function (done) {
+    it('#AnysolsCollection::findById', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
-        employeeCollection.findById(johnRecord.getID()).execute().then((employee) => {
+        employeeCollection.findById(johnRecord.getID()).then((employee) => {
             if (employee.get('name') === "John")
                 done();
         });
     });
 
-    it('#record remove only selected', function (done) {
+    it('#AnysolsCollection::findOne', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
+        employeeCollection.findOne({"name" : "John"}).then((employee) => {
+            if (employee.getID().toString() === johnRecord.getID().toString())
+                done();
+        });
+    });
+
+  /*  it('#record remove only selected', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
         johnRecord.delete().then(() => {
-            employeeCollection.findById(johnRecord.getID()).execute().then((record) => {
+            employeeCollection.findById(johnRecord.getID()).then((record) => {
                 if (!record)
                     done();
             })
         })
-    });
+    });*/
 
-    /*it('#Collection::findOne', function (done) {
+    /*it('#AnysolsCollection::findOne', function (done) {
         this.timeout(MAX_TIMEOUT);
         let Employee = session.anysolsODM.collection-service(MODEL_NAME);
         Employee.findOne({name: johnObject.name}).exec().then((employee) => {
@@ -83,7 +92,7 @@ describe('Collection', () => {
 
 
 
-    it('#Collection::findOneAndUpdate', function (done) {
+    it('#AnysolsCollection::findOneAndUpdate', function (done) {
         this.timeout(MAX_TIMEOUT);
         let Employee = session.anysolsODM.collection-service(MODEL_NAME);
         Employee.findOneAndUpdate({name: johnObject.name}, {eid: 200}).then((employee) => {

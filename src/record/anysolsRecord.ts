@@ -1,15 +1,15 @@
-import Collection from "../collection/collection";
-import Schema from "../schema/schema";
+import AnysolsCollection from "../collection/anysolsCollection";
+import AnysolsSchema from "../schema/anysolsSchema";
 
 const privates = new WeakMap();
 
-export default class Record {
+export default class AnysolsRecord {
 
     isNew: any;
 
     record: any;
 
-    constructor(record: any, collection: Collection) {
+    constructor(record: any, collection: AnysolsCollection) {
         this.record = record;
         privates.set(this, {collection});
     }
@@ -58,10 +58,10 @@ export default class Record {
     }
 }
 
-function _getSchema(that: Record): Schema {
+function _getSchema(that: AnysolsRecord): AnysolsSchema {
     return _getCollection(that).getSchema();
 }
 
-function _getCollection(that: Record) {
+function _getCollection(that: AnysolsRecord) {
     return privates.get(that).collection;
 }

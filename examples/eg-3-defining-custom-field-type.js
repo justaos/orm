@@ -1,7 +1,7 @@
 let {StringDataType} = require("../");
 let getAnysolsODM = require("./getAnysolsODM");
 
-getAnysolsODM(function (anysolsODM) {
+getAnysolsODM().then(function (anysolsODM) {
 
     anysolsODM.addFieldType({
 

@@ -1,6 +1,6 @@
 const {assert} = require('chai');
-const {session} = require('../../test.utils');
-const {StringDataType} = require("../../../lib");
+const {session} = require('../test.utils');
+const {StringDataType} = require("../../lib");
 
 describe('FieldType', () => {
 
@@ -52,8 +52,8 @@ describe('FieldType', () => {
         rec.set("name", "RAM");
         rec.set(EMAIL_FIELD, EMAIL_VALUE);
         rec.insert().then(function (rec) {
-            collection.find({[EMAIL_FIELD]: EMAIL_VALUE}).execute().then(function (docs) {
-                if (docs.length === 1 && docs[0].get(EMAIL_FIELD) === EMAIL_VALUE)
+            collection.find({[EMAIL_FIELD]: EMAIL_VALUE}).toArray().then(function (records) {
+                if (records.length === 1 && records[0].get(EMAIL_FIELD) === EMAIL_VALUE)
                     done();
             });
         }, function (e) {

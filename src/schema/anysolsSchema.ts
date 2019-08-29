@@ -1,10 +1,10 @@
 import FieldTypeRegistry from "../field-types/fieldTypeRegistry";
 import * as Ajv from "ajv";
-import {FieldType} from "../index";
+import FieldType from "../field-types/fieldType";
 
 const privates = new WeakMap();
 
-export default class Schema {
+export default class AnysolsSchema {
 
     constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry) {
         privates.set(this, {fieldTypeRegistry});
@@ -40,7 +40,7 @@ export default class Schema {
 
 }
 
-function _getAVJJsonSchema(that: Schema) {
+function _getAVJJsonSchema(that: AnysolsSchema) {
     const jsonSchema: any = {
         "type": "object",
         "properties": {},
@@ -56,12 +56,12 @@ function _getAVJJsonSchema(that: Schema) {
 }
 
 function _validateSchemaError(message: string): Error {
-    return new Error("[Schema::_validateSchemaJSON] " + message)
+    return new Error("[AnysolsSchema::_validateSchemaJSON] " + message)
 }
 
-function _validateSchemaJSON(that: Schema, schemaJson: any) {
+function _validateSchemaJSON(that: AnysolsSchema, schemaJson: any) {
     if (!schemaJson)
-        throw _validateSchemaError("Schema not provided");
+        throw _validateSchemaError("AnysolsSchema not provided");
     if (!schemaJson.name)
         throw  _validateSchemaError("Invalid collection name");
     if (schemaJson.hasOwnProperty('fields') && !!schemaJson['fields']) {
@@ -88,10 +88,10 @@ function _areDuplicatesPresent(a: []): boolean {
     return false;
 }
 
-function _getFieldTypeRegistry(that: Schema): FieldTypeRegistry {
+function _getFieldTypeRegistry(that: AnysolsSchema): FieldTypeRegistry {
     return privates.get(that).fieldTypeRegistry;
 }
 
-function _getFieldType(that: Schema, type: string): FieldType | undefined {
+function _getFieldType(that: AnysolsSchema, type: string): FieldType | undefined {
     return _getFieldTypeRegistry(that).getFieldType(type);
 }

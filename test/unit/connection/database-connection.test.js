@@ -1,6 +1,6 @@
 const {assert} = require('chai');
 const {MAX_TIMEOUT} = require('../../test.utils');
-const {DatabaseConfiguration, DatabaseConnection} = require("../../../lib/connection");
+const {DatabaseConfiguration, DatabaseConnection} = require("../../../lib/core");
 
 const defaultConfig = {
     host: "localhost",

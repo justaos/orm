@@ -1,15 +1,30 @@
-import {DatabaseConfiguration, DatabaseConnection} from "./connection";
-import {FieldType, CollectionService} from "./collection-service";
-import OperationInterceptor from "./collection-service/operation-interceptor/operationInterceptor";
-import Collection from "./collection-service/collection/collection";
+import {DatabaseConfiguration, DatabaseConnection} from "./core";
+
+import AnysolsCollection from "./collection/anysolsCollection";
+import AnysolsCollectionRegistry from "./collection/anysolsCollectionRegistry";
+
+import OperationInterceptorService from "./operation-interceptor/operationInterceptorService";
+import OperationInterceptor from "./operation-interceptor/operationInterceptor";
+
+import AnysolsSchema from "./schema/anysolsSchema";
+
+import FieldType from "./field-types/fieldType";
+import StringFieldType from "./field-types/stringFieldType";
+import IntegerFieldType from "./field-types/integerFieldType";
+import DateFieldType from "./field-types/dateFieldType";
+import FieldTypeRegistry from "./field-types/fieldTypeRegistry";
+import {Collection} from "mongodb";
 
 const privates = new WeakMap();
 
 export default class AnysolsODM {
 
     constructor() {
-        const collectionService = new CollectionService();
-        privates.set(this, {collectionService});
+        const fieldTypeRegistry = new FieldTypeRegistry();
+        const collectionRegistry = new AnysolsCollectionRegistry();
+        const operationInterceptorService = new OperationInterceptorService();
+        privates.set(this, {fieldTypeRegistry, collectionRegistry, operationInterceptorService});
+        _loadBuildInFieldTypes(this);
     }
 
     async connect(config: any) {
@@ -35,23 +50,33 @@ export default class AnysolsODM {
     }
 
     defineCollection(schemaJson: any) {
-        const collectionService = _getCollectionService(this);
-        collectionService.defineCollection(schemaJson);
+        const that = this;
+        const schema = new AnysolsSchema(schemaJson, _getFieldTypeRegistry(that));
+        const anysolsCol = new AnysolsCollection(_getCollection(that, schema.getName()), schema, _getOperationInterceptorService(that));
+        _getAnysolsCollectionRegistry(this).addCollection(anysolsCol);
     }
 
-    collection(collectionName: string): Collection {
-        const collectionService = _getCollectionService(this);
-        return collectionService.collection(collectionName);
+    collection(colName: string): AnysolsCollection {
+        const anysolsCol = _getAnysolsCollectionRegistry(this).getCollection(colName);
+        if (!anysolsCol)
+            throw Error("[CollectionService::collection] collection with name '" + colName + "' does not exist");
+        return anysolsCol;
     }
 
-    addFieldType(fieldType: FieldType) {
-        const collectionService = _getCollectionService(this);
-        collectionService.addFieldType(fieldType);
+    removeCollection(collectionName: string): void {
+        _getAnysolsCollectionRegistry(this).deleteCollection(collectionName);
     }
 
-    addInterceptor(operationInterceptor: OperationInterceptor) {
-        const collectionService = _getCollectionService(this);
-        collectionService.addInterceptor(operationInterceptor);
+    isCollectionDefined(collectionName: string): boolean {
+        return _getAnysolsCollectionRegistry(this).hasCollection(collectionName);
+    }
+
+    addFieldType(fieldType: FieldType): void {
+        _getFieldTypeRegistry(this).addFieldType(fieldType);
+    }
+
+    addInterceptor(operationInterceptor: OperationInterceptor): void {
+        _getOperationInterceptorService(this).addInterceptor(operationInterceptor);
     }
 
 }
@@ -59,19 +84,36 @@ export default class AnysolsODM {
 /**
  * PRIVATE METHODS
  */
-function _setConnection(that: any, conn: DatabaseConnection) {
+function _setConnection(that: AnysolsODM, conn: DatabaseConnection) {
     privates.get(that).conn = conn;
-    _getCollectionService(that).setConnection(conn);
 }
 
-function _getConnection(that: any): DatabaseConnection {
+function _getCollection(that: AnysolsODM, collectionName: string): Collection {
+    return _getConnection(that).getDBO().collection(collectionName);
+}
+
+function _getConnection(that: AnysolsODM): DatabaseConnection {
     let conn = privates.get(that).conn;
     if (!conn)
         throw new Error("AnysolsODM::getConn -> There is no active connection");
     return conn;
 }
 
-function _getCollectionService(that: any): CollectionService {
-    privates.get(that).collectionService.setConnection(_getConnection(that));
-    return privates.get(that).collectionService;
+function _getAnysolsCollectionRegistry(that: AnysolsODM): AnysolsCollectionRegistry {
+    return privates.get(that).collectionRegistry;
 }
+
+function _getFieldTypeRegistry(that: AnysolsODM): FieldTypeRegistry {
+    return privates.get(that).fieldTypeRegistry;
+}
+
+function _getOperationInterceptorService(that: AnysolsODM): OperationInterceptorService {
+    return privates.get(that).operationInterceptorService;
+}
+
+function _loadBuildInFieldTypes(that: AnysolsODM) {
+    that.addFieldType(new StringFieldType());
+    that.addFieldType(new IntegerFieldType());
+    that.addFieldType(new DateFieldType());
+}
+
