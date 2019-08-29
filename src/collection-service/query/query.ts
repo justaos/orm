@@ -37,6 +37,6 @@ export default class Query {
     }
 }
 
-function _getCollection(that: Query) {
+function _getCollection(that: Query): Collection {
     return privates.get(that).collection;
 }

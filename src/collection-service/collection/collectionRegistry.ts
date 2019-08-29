@@ -10,7 +10,7 @@ export default class CollectionRegistry {
 
     hasCollection = (collectionName: string) => this.collections.has(collectionName);
 
-    getCollection = (collectionName: string) => this.collections.get(collectionName);
+    getCollection = (collectionName: string): Collection | undefined => this.collections.get(collectionName);
 
     addCollection = (collection: Collection) => this.collections.set(collection.getName(), collection);
 

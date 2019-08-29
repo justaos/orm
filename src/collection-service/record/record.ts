@@ -1,4 +1,5 @@
 import Collection from "../collection/collection";
+import Schema from "../schema/schema";
 
 const privates = new WeakMap();
 
@@ -50,14 +51,14 @@ export default class Record {
         let obj: any = {};
         // todo : Handle id
         obj['_id'] = record['_id'];
-        _getSchema(this).fields.map(function (field: any) {
-            obj[field.name] = record[field.name];
+        _getSchema(this).getFields().map(function (fieldDefinition: any) {
+            obj[fieldDefinition.name] = record[fieldDefinition.name];
         });
         return obj;
     }
 }
 
-function _getSchema(that: Record) {
+function _getSchema(that: Record): Schema {
     return _getCollection(that).getSchema();
 }
 

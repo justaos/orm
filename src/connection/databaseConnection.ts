@@ -1,4 +1,4 @@
-import {MongoClient} from "mongodb";
+import {Db, MongoClient} from "mongodb";
 import DatabaseConfiguration from "./databaseConfiguration";
 
 function createConnectionByUri(uri: string): Promise<MongoClient> {
@@ -65,7 +65,7 @@ export default class DatabaseConnection {
         });
     }
 
-    getDBO(): any {
+    getDBO(): Db {
         return this.conn.db(this.getDatabaseName());
     }
 
@@ -73,7 +73,7 @@ export default class DatabaseConnection {
         return privates.get(this).config.getDatabaseName();
     }
 
-    databaseExists() {
+    databaseExists(): Promise<any> {
         const that = this;
         return new Promise(async (resolve, reject) => {
             // Use the admin database for the operation

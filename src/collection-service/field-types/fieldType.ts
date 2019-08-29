@@ -7,5 +7,4 @@ export default abstract class FieldType {
     abstract getType(): string;
 
     abstract validateDefinition(fieldDefinition: any): boolean;
-
 }

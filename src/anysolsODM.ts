@@ -1,6 +1,7 @@
 import {DatabaseConfiguration, DatabaseConnection} from "./connection";
 import {FieldType, CollectionService} from "./collection-service";
 import OperationInterceptor from "./collection-service/operation-interceptor/operationInterceptor";
+import Collection from "./collection-service/collection/collection";
 
 const privates = new WeakMap();
 
@@ -14,16 +15,16 @@ export default class AnysolsODM {
     async connect(config: any) {
         if (!config)
             throw new Error("AnysolsODM::connect -> There is no config provided");
-        let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
+        const dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
         _setConnection(this, await DatabaseConnection.connect(dbConfig));
     }
 
-    closeConnection() {
-        let conn = _getConnection(this);
+    closeConnection(): Promise<void> {
+        const conn = _getConnection(this);
         return conn.closeConnection();
     }
 
-    databaseExists() {
+    databaseExists(): Promise<any> {
         let conn = _getConnection(this);
         return conn.databaseExists();
     }
@@ -33,24 +34,24 @@ export default class AnysolsODM {
         return conn.dropDatabase();
     }
 
-    defineCollection(schemaDefinition: any) {
-        let collectionService = _getCollectionService(this);
-        collectionService.defineCollection(schemaDefinition);
+    defineCollection(schemaJson: any) {
+        const collectionService = _getCollectionService(this);
+        collectionService.defineCollection(schemaJson);
     }
 
-    collection(collectionName: string) {
-        let collectionService = _getCollectionService(this);
+    collection(collectionName: string): Collection {
+        const collectionService = _getCollectionService(this);
         return collectionService.collection(collectionName);
     }
 
     addFieldType(fieldType: FieldType) {
-        let collectionService = _getCollectionService(this);
-        return collectionService.addFieldType(fieldType);
+        const collectionService = _getCollectionService(this);
+        collectionService.addFieldType(fieldType);
     }
 
     addInterceptor(operationInterceptor: OperationInterceptor) {
-        let collectionService = _getCollectionService(this);
-        return collectionService.addInterceptor(operationInterceptor);
+        const collectionService = _getCollectionService(this);
+        collectionService.addInterceptor(operationInterceptor);
     }
 
 }

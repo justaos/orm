@@ -2,7 +2,7 @@ import DataType from "./dataType";
 
 export default class StringDataType implements DataType {
 
-    config: any | undefined;
+    config: any;
 
     constructor(config: any = {}) {
         this.config = config;

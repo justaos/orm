@@ -12,6 +12,6 @@ export default class FieldTypeRegistry {
 
     deleteFieldType = (type: string) => this.fieldTypes.delete(type);
 
-    getFieldType = (type: string) => this.fieldTypes.get(type);
+    getFieldType = (type: string) : FieldType | undefined => this.fieldTypes.get(type);
 
 };

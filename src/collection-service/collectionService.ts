@@ -8,6 +8,7 @@ import IntegerFieldType from "./field-types/integerFieldType";
 import DateFieldType from "./field-types/dateFieldType";
 import OperationInterceptorService from "./operation-interceptor/operationInterceptorService";
 import OperationInterceptor from "./operation-interceptor/operationInterceptor";
+import Schema from "./schema/schema";
 
 const privates = new WeakMap();
 
@@ -29,21 +30,24 @@ export default class CollectionService {
         return _getCollectionRegistry(this).hasCollection(collectionName);
     }
 
-    defineCollection(schema: any) {
-        let that = this;
-        let collection = new Collection(schema,
-            (collection: Collection) => _getConnection(that).getDBO().collection(collection.getName()),
-            _getFieldTypeRegistry(that),
+    defineCollection(schemaJson: any) {
+        const that = this;
+        const schema = new Schema(schemaJson, _getFieldTypeRegistry(that));
+        const collection = new Collection(schema,
+            _getConnection(that).getDBO().collection(schema.getName()),
             _getOperationInterceptorService(that));
         _getCollectionRegistry(this).addCollection(collection);
     }
 
-    removeCollection(collectionName: string) {
+    removeCollection(collectionName: string): void {
         _getCollectionRegistry(this).deleteCollection(collectionName);
     }
 
-    collection(collectionName: any) {
-        return _getCollectionRegistry(this).getCollection(collectionName);
+    collection(collectionName: any): Collection {
+        const collection = _getCollectionRegistry(this).getCollection(collectionName);
+        if (!collection)
+            throw Error("[CollectionService::collection] collection with name '" + collectionName + "' does not exist");
+        return collection;
     }
 
     addFieldType(fieldType: FieldType) {
