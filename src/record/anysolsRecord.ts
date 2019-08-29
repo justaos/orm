@@ -9,9 +9,9 @@ export default class AnysolsRecord {
 
     record: any;
 
-    constructor(record: any, collection: AnysolsCollection) {
+    constructor(record: any, anysolsCollection: AnysolsCollection) {
         this.record = record;
-        privates.set(this, {collection});
+        privates.set(this, {anysolsCollection});
     }
 
     initialize() {
@@ -33,7 +33,14 @@ export default class AnysolsRecord {
     }
 
     async insert() {
-        let record = await _getCollection(this).insertOne(this);
+        let record = await _getAnysolsCollection(this).insertRecord(this);
+        this.record = record.toObject();
+        this.isNew = false;
+        return this;
+    }
+
+    async update() {
+        let record = await _getAnysolsCollection(this).updateRecord(this);
         this.record = record.toObject();
         this.isNew = false;
         return this;
@@ -42,7 +49,7 @@ export default class AnysolsRecord {
     async delete() {
         if (this.isNew)
             throw Error('[Record::remove] Cannot remove unsaved record');
-        await _getCollection(this).deleteOne(this);
+        await _getAnysolsCollection(this).deleteOne(this);
         return this;
     }
 
@@ -59,9 +66,9 @@ export default class AnysolsRecord {
 }
 
 function _getSchema(that: AnysolsRecord): AnysolsSchema {
-    return _getCollection(that).getSchema();
+    return _getAnysolsCollection(that).getSchema();
 }
 
-function _getCollection(that: AnysolsRecord) {
-    return privates.get(that).collection;
+function _getAnysolsCollection(that: AnysolsRecord): AnysolsCollection {
+    return privates.get(that).anysolsCollection;
 }

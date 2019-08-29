@@ -3,6 +3,7 @@ import AnysolsRecord from "../record/anysolsRecord";
 import OperationInterceptorService from "../operation-interceptor/operationInterceptorService";
 import AnysolsSchema from "../schema/anysolsSchema";
 import {Collection, Cursor, FindOneOptions} from "mongodb";
+import {OPERATION_WHEN, OPERATIONS} from "../constants";
 
 const privates = new WeakMap();
 
@@ -40,21 +41,30 @@ export default class AnysolsCollection {
         return _createAnysolsCursor(this, cursor);
     }
 
-    async insertOne(record: AnysolsRecord): Promise<AnysolsRecord> {
-        record = await _interceptRecord(this, 'create', 'before', record);
+    async insertRecord(record: AnysolsRecord): Promise<AnysolsRecord> {
+        record = await _interceptRecord(this, OPERATIONS.CREATE, OPERATION_WHEN.BEFORE, record);
         const errors = this.getSchema().validate(record.toObject());
         if (errors)
             throw errors;
         const response = await _getCollection(this).insertOne(record.toObject());
         const savedDoc = response.ops.find(() => true);
         const savedRecord = new AnysolsRecord(savedDoc, this);
-        return await _interceptRecord(this, 'create', 'after', savedRecord);
+        return await _interceptRecord(this, OPERATIONS.CREATE, OPERATION_WHEN.AFTER, savedRecord);
+    }
+
+    async updateRecord(record: AnysolsRecord): Promise<AnysolsRecord> {
+        record = await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.BEFORE, record);
+        const errors = this.getSchema().validate(record.toObject());
+        if (errors)
+            throw errors;
+        await _getCollection(this).updateOne({_id: record.getID()}, record.toObject());
+        return await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.AFTER, record);
     }
 
     async deleteOne(record: AnysolsRecord): Promise<any> {
-        record = await _interceptRecord(this, 'delete', 'before', record);
+        record = await _interceptRecord(this, OPERATIONS.DELETE, OPERATION_WHEN.BEFORE, record);
         await _getCollection(this).deleteOne({_id: record.getID()});
-        await _interceptRecord(this, 'delete', 'after', record);
+        await _interceptRecord(this, OPERATIONS.DELETE, 'after', record);
     }
 
 }

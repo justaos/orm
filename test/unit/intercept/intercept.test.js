@@ -1,3 +1,4 @@
+const {OPERATIONS, OPERATION_WHEN} = require("../../../lib");
 const {assert} = require('chai');
 const {session, MAX_TIMEOUT} = require('../../test.utils');
 
@@ -16,9 +17,9 @@ describe('intercept.test.js', () => {
             intercept: (collectionName, operation, when, payload) => {
                 return new Promise((resolve, reject) => {
                     if (collectionName === MODEL_NAME) {
-                        if (operation === 'create') {
+                        if (operation === OPERATIONS.CREATE) {
                             console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
-                            if (when === "before") {
+                            if (when === OPERATION_WHEN.BEFORE) {
                                 console.log("before");
                                 for (let record of payload.records)
                                     record.set("computed", "this is computed");
@@ -47,7 +48,7 @@ describe('intercept.test.js', () => {
         s.insert().then(function (rec) {
             assert.isOk(rec.get("computed") === "this is computed", "read interceptor not computed the value");
             done();
-        }, function(err) {
+        }, function (err) {
             console.log(err);
             done();
         });
@@ -64,7 +65,7 @@ describe('intercept.test.js', () => {
         s.insert().then(function (rec) {
             assert.isOk(rec.get("computed") !== "this is computed", "read interceptor computed the value");
             done();
-        }, function(err) {
+        }, function (err) {
             console.log(err);
             done();
         });

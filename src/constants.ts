@@ -1,5 +1,11 @@
-import StringDataType from "./core/data-types/stringDataType";
+export const OPERATIONS = {
+    CREATE: 'CREATE',
+    READ: 'READ',
+    UPDATE: 'UPDATE',
+    DELETE: 'DELETE'
+};
 
-export const DATA_TYPES = {
-    STRING: StringDataType
+export const OPERATION_WHEN = {
+    BEFORE: 'BEFORE',
+    AFTER: 'AFTER'
 };

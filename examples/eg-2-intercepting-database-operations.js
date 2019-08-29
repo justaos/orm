@@ -11,18 +11,18 @@ getAnysolsODM().then(function (anysolsODM) {
         intercept: (collectionName, operation, when, payload) => {
             return new Promise((resolve, reject) => {
                 if (collectionName === 'student') {
-                    if (operation === 'create') {
+                    if (operation === 'CREATE') {
                         console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
-                        if (when === "before") {
+                        if (when === "BEFORE") {
                             for (let record of payload.records) {
                                 console.log("computed field updated for :: " + record.get('name'));
                                 record.set("computed", record.get("name") + " +++ computed");
                             }
                         }
                     }
-                    if (operation === 'read') {
+                    if (operation === 'READ') {
                         console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
-                        if (when === "after") {
+                        if (when === "AFTER") {
                             for (let record of payload.records)
                                 console.log(JSON.stringify(record.toObject(), null, 4));
                         }

@@ -2,6 +2,7 @@ import AnysolsCollection from "../collection/anysolsCollection";
 import {Cursor} from "mongodb";
 import AnysolsRecord from "../record/anysolsRecord";
 import OperationInterceptorService from "../operation-interceptor/operationInterceptorService";
+import {OPERATION_WHEN, OPERATIONS} from "../constants";
 
 const privates = new WeakMap();
 
@@ -13,9 +14,9 @@ export default class AnysolsCursor {
 
     async toArray(): Promise<AnysolsRecord[]> {
         const docs = await _getCursor(this).toArray();
-        await _intercept(this, 'read', 'before', {});
+        await _intercept(this, OPERATIONS.READ, OPERATION_WHEN.BEFORE, {});
         let records = docs.map(doc => new AnysolsRecord(doc, _getAnysolsCollection(this)));
-        let updatedPayload = await _intercept(this, 'read', 'after', {records});
+        let updatedPayload = await _intercept(this, OPERATIONS.READ, OPERATION_WHEN.AFTER, {records});
         return updatedPayload.records;
     }
 
