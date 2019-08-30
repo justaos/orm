@@ -17,8 +17,9 @@
     ],
     "keywords": [
         "anysols",
-        "mongoose wrapper",
-        "anysols-model"
+        "anysols odm",
+        "mongodb wrapper",
+        "object document mapper"
     ],
     "nyc": {
         "check-coverage": false,

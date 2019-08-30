@@ -1,5 +1,5 @@
 # Anysols ODM
-Wrapper for mongodb with support for intercepts on operations (create, read, update and delete) and support for schemas with multi-level inheritance
+Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database. Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete). 
 
 [![Coverage Status](https://coveralls.io/repos/github/anysols/anysols-odm/badge.svg?branch=master)](https://coveralls.io/github/anysols/anysols-odm?branch=master)
 
