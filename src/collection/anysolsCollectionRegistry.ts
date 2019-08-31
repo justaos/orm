@@ -8,7 +8,7 @@ export default class AnysolsCollectionRegistry {
         this.collections = new Map<string, AnysolsCollection>();
     }
 
-    hasCollection = (collectionName: string) => this.collections.has(collectionName);
+    hasCollection = (collectionName: string): boolean => this.collections.has(collectionName);
 
     getCollection = (collectionName: string): AnysolsCollection | undefined => this.collections.get(collectionName);
 

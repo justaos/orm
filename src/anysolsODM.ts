@@ -51,7 +51,7 @@ export default class AnysolsODM {
 
     defineCollection(schemaJson: any) {
         const that = this;
-        const schema = new AnysolsSchema(schemaJson, _getFieldTypeRegistry(that));
+        const schema = new AnysolsSchema(schemaJson, _getFieldTypeRegistry(that), _getAnysolsCollectionRegistry(this));
         const anysolsCol = new AnysolsCollection(_getCollection(that, schema.getName()), schema, _getOperationInterceptorService(that));
         _getAnysolsCollectionRegistry(this).addCollection(anysolsCol);
     }

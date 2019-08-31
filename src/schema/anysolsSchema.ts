@@ -1,26 +1,32 @@
 import FieldTypeRegistry from "../field-types/fieldTypeRegistry";
 import * as Ajv from "ajv";
 import FieldType from "../field-types/fieldType.interface";
+import AnysolsCollectionRegistry from "../collection/anysolsCollectionRegistry";
+import AnysolsCollection from "../collection/anysolsCollection";
 
 const privates = new WeakMap();
 
 export default class AnysolsSchema {
 
-    constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry) {
-        privates.set(this, {fieldTypeRegistry});
-        _validateSchemaJSON(this, schemaObject);
-        privates.set(this, {
-            ...privates.get(this),
-            ...{name: schemaObject.name, fields: schemaObject.fields}
-        });
+    constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry, anysolsCollectionRegistry: AnysolsCollectionRegistry) {
+        privates.set(this, {fieldTypeRegistry, anysolsCollectionRegistry, schema: schemaObject});
+        _validateSchemaObject(this);
     }
 
-    getName() {
-        return privates.get(this).name;
+    getName(): string {
+        return _getSchemaObject(this).name;
     }
 
     getFields(): any[] {
-        return privates.get(this).fields;
+        const schemaObject: any = _getSchemaObject(this);
+        let allFields: any[] = [];
+        if (schemaObject.fields)
+            allFields = allFields.concat(schemaObject.fields);
+        if (schemaObject.extends) {
+            let extendedSchema = _getAnysolsCollection(this, schemaObject.extends).getSchema();
+            allFields = allFields.concat(extendedSchema.getFields());
+        }
+        return allFields;
     }
 
     validate(recordObject: any) {
@@ -59,33 +65,49 @@ function _validateSchemaError(message: string): Error {
     return new Error("[AnysolsSchema::_validateSchemaJSON] " + message)
 }
 
-function _validateSchemaJSON(that: AnysolsSchema, schemaJson: any) {
-    if (!schemaJson)
-        throw _validateSchemaError("AnysolsSchema not provided");
-    if (!schemaJson.name)
-        throw  _validateSchemaError("Invalid collection name");
-    if (schemaJson.hasOwnProperty('fields') && !!schemaJson['fields']) {
-        for (const fieldDef of schemaJson['fields']) {
-            if (!fieldDef || !fieldDef.type)
-                throw _validateSchemaError("field type provided - [collectionName=" + schemaJson.name + "]");
-            let fieldType = _getFieldType(that, fieldDef.type);
-            if (!fieldType)
-                throw _validateSchemaError("No such field type  - [collectionName=" + schemaJson.name + ", fieldName=" + fieldDef.name + ", fieldType=" + fieldDef.type + "]");
-            if (!fieldType.validateDefinition(fieldDef))
-                throw _validateSchemaError("Invalid field definition  [collectionName=" + schemaJson.name + ", fieldName=" + fieldDef.name + "]");
-        }
-        const fieldNames = schemaJson.fields.map((f: any) => f.name);
-        if (_areDuplicatesPresent(fieldNames))
-            throw _validateSchemaError("Duplicate field name [collectionName=" + schemaJson.name + ", fieldNames=" + fieldNames + "]");
+function _validateSchemaObject(that: AnysolsSchema) {
+    const schemaObject = _getSchemaObject(that);
+    if (!schemaObject)
+        throw _validateSchemaError("Schema not provided");
+    if (!schemaObject.name)
+        throw  _validateSchemaError("Collection name not provided");
+    if (typeof schemaObject.name !== 'string')
+        throw  _validateSchemaError("Collection name should be a string - [collectionName=" + schemaObject.name + "]");
+    if (!(/^[a-z0-9]+$/i.test(schemaObject.name)))
+        throw  _validateSchemaError("Collection name should be alphanumeric - [collectionName=" + schemaObject.name + "]");
+    if (_hasAnysolsCollection(that, schemaObject.name))
+        throw  _validateSchemaError("Collection name already exists");
+    if (schemaObject.extends) {
+        if (!_hasAnysolsCollection(that, schemaObject.extends))
+            throw _validateSchemaError("'" + schemaObject.name + "' cannot extend '" + schemaObject.extends + "'. '" + schemaObject.extends + "' does not exists.");
     }
+
+    const allFieldsObjects = that.getFields();
+    for (const fieldObject of allFieldsObjects) {
+        if (!fieldObject || !fieldObject.type)
+            throw _validateSchemaError("field type provided - [collectionName=" + schemaObject.name + "]");
+        const fieldType = _getFieldType(that, fieldObject.type);
+        if (!fieldType)
+            throw _validateSchemaError("No such field type  - [collectionName=" + schemaObject.name + ", fieldName=" + fieldObject.name + ", fieldType=" + fieldObject.type + "]");
+        if (!fieldType.validateDefinition(fieldObject))
+            throw _validateSchemaError("Invalid field definition  [collectionName=" + schemaObject.name + ", fieldName=" + fieldObject.name + "]");
+    }
+
+    const fieldNames: string[] = allFieldsObjects.map((f: any) => f.name);
+    if (_areDuplicatesPresent(fieldNames))
+        throw _validateSchemaError("Duplicate field name [collectionName=" + schemaObject.name + ", fieldNames=" + fieldNames + "]");
 }
 
-function _areDuplicatesPresent(a: []): boolean {
+function _areDuplicatesPresent(a: string[]): boolean {
     for (let i = 0; i <= a.length; i++)
         for (let j = i; j <= a.length; j++)
             if (i != j && a[i] == a[j])
                 return true;
     return false;
+}
+
+function _getSchemaObject(that: AnysolsSchema): any {
+    return privates.get(that).schema;
 }
 
 function _getFieldTypeRegistry(that: AnysolsSchema): FieldTypeRegistry {
@@ -94,4 +116,19 @@ function _getFieldTypeRegistry(that: AnysolsSchema): FieldTypeRegistry {
 
 function _getFieldType(that: AnysolsSchema, type: string): FieldType | undefined {
     return _getFieldTypeRegistry(that).getFieldType(type);
+}
+
+function _getAnysolsCollectionRegistry(that: AnysolsSchema): AnysolsCollectionRegistry {
+    return privates.get(that).anysolsCollectionRegistry;
+}
+
+function _getAnysolsCollection(that: AnysolsSchema, collectionName: string): AnysolsCollection {
+    const anysolsCollection = _getAnysolsCollectionRegistry(that).getCollection(collectionName);
+    if (!anysolsCollection)
+        throw Error("[AnysolsSchema::_getAnysolsCollection] Collection not found");
+    return anysolsCollection;
+}
+
+function _hasAnysolsCollection(that: AnysolsSchema, collectionName: string): boolean {
+    return _getAnysolsCollectionRegistry(that).hasCollection(collectionName);
 }
