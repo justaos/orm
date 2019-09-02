@@ -16,6 +16,7 @@ export default class AnysolsRecord {
 
     initialize() {
         this.record = {};
+        this.record["_collection"] = _getAnysolsCollection(this).getName();
         this.isNew = true;
         return this;
     }
@@ -56,9 +57,7 @@ export default class AnysolsRecord {
     toObject() {
         const record = this.record;
         let obj: any = {};
-        // todo : Handle id
-        obj['_id'] = record['_id'];
-        _getSchema(this).getFields().map(function (fieldDefinition: any) {
+       _getSchema(this).getFields().map(function (fieldDefinition: any) {
             obj[fieldDefinition.name] = record[fieldDefinition.name];
         });
         return obj;

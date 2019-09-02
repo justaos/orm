@@ -34,7 +34,7 @@ describe('AnysolsCollection', () => {
      * CREATE
      */
     it('#AnysolsCollection::insert', function (done) {
-        this.timeout(5000);
+        this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
         let empRecord = employeeCollection.createNewRecord();
         empRecord.set("name", "John");
@@ -43,12 +43,23 @@ describe('AnysolsCollection', () => {
         empRecord.insert().then((rec) => {
             johnRecord = rec;
             johnObject = rec.toObject();
-            if (johnObject.name === 'John') {
-                assert.isOk(true, 'record created');
-            } else
-                assert.isOk(false, 'record not created');
+            assert.isOk(johnObject.name === 'John', 'record not created');
             done();
         });
+    });
+
+    /**
+     * CREATE
+     */
+    it('#AnysolsCollection::update', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        johnRecord.set("eid", 200);
+        johnRecord.update().then((rec) => {
+            assert.isOk(rec.get("eid") === 200, 'record not updated');
+            done();
+        }, (err) => {
+            console.log(JSON.stringify(err, null, 4));
+        })
     });
 
 

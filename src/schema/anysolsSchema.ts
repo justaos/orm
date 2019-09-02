@@ -17,14 +17,29 @@ export default class AnysolsSchema {
         return _getSchemaObject(this).name;
     }
 
+    getHostName(): string {
+        let hostName = this.getName();
+        const schemaObject: any = _getSchemaObject(this);
+        if (schemaObject.extends) {
+            const extendedSchema = _getAnysolsCollection(this, schemaObject.extends).getSchema();
+            hostName = extendedSchema.getName();
+        }
+        return hostName;
+    }
+
     getFields(): any[] {
         const schemaObject: any = _getSchemaObject(this);
         let allFields: any[] = [];
         if (schemaObject.fields)
             allFields = allFields.concat(schemaObject.fields);
         if (schemaObject.extends) {
-            let extendedSchema = _getAnysolsCollection(this, schemaObject.extends).getSchema();
+            const extendedSchema = _getAnysolsCollection(this, schemaObject.extends).getSchema();
             allFields = allFields.concat(extendedSchema.getFields());
+        } else {
+            allFields.push({
+                name: '_id',
+                type: 'object'
+            });
         }
         return allFields;
     }
@@ -73,7 +88,7 @@ function _validateSchemaObject(that: AnysolsSchema) {
         throw  _validateSchemaError("Collection name not provided");
     if (typeof schemaObject.name !== 'string')
         throw  _validateSchemaError("Collection name should be a string - [collectionName=" + schemaObject.name + "]");
-    if (!(/^[a-z0-9]+$/i.test(schemaObject.name)))
+    if (!(/^[a-z0-9_]+$/i.test(schemaObject.name)))
         throw  _validateSchemaError("Collection name should be alphanumeric - [collectionName=" + schemaObject.name + "]");
     if (_hasAnysolsCollection(that, schemaObject.name))
         throw  _validateSchemaError("Collection name already exists");

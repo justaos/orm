@@ -57,7 +57,7 @@ export default class AnysolsCollection {
         const errors = this.getSchema().validate(record.toObject());
         if (errors)
             throw errors;
-        await _getCollection(this).updateOne({_id: record.getID()}, record.toObject());
+        await _getCollection(this).updateOne({_id: record.getID()}, {$set: {...record.toObject()}});
         return await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.AFTER, record);
     }
 

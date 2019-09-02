@@ -14,6 +14,7 @@ import IntegerFieldType from "./field-types/integerFieldType";
 import DateFieldType from "./field-types/dateFieldType";
 import FieldTypeRegistry from "./field-types/fieldTypeRegistry";
 import {Collection} from "mongodb";
+import ObjectFieldType from "./field-types/objectFieldType";
 
 const privates = new WeakMap();
 
@@ -52,7 +53,7 @@ export default class AnysolsODM {
     defineCollection(schemaJson: any) {
         const that = this;
         const schema = new AnysolsSchema(schemaJson, _getFieldTypeRegistry(that), _getAnysolsCollectionRegistry(this));
-        const anysolsCol = new AnysolsCollection(_getCollection(that, schema.getName()), schema, _getOperationInterceptorService(that));
+        const anysolsCol = new AnysolsCollection(_getCollection(that, schema.getHostName()), schema, _getOperationInterceptorService(that));
         _getAnysolsCollectionRegistry(this).addCollection(anysolsCol);
     }
 
@@ -119,5 +120,6 @@ function _loadBuildInFieldTypes(that: AnysolsODM) {
     that.addFieldType(new StringFieldType());
     that.addFieldType(new IntegerFieldType());
     that.addFieldType(new DateFieldType());
+    that.addFieldType(new ObjectFieldType());
 }
 

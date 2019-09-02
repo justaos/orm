@@ -1,6 +1,6 @@
 import DataType from "./dataType.interface";
 
-export default class StringDataType extends DataType {
+export default class ObjectDataType extends DataType {
 
     config: any;
 
@@ -9,11 +9,11 @@ export default class StringDataType extends DataType {
         this.config = config;
     }
 
-    transform() {
+    transform(): any {
         return {
-            "type": "string",
-            "pattern": this.config.pattern
+            "type": "object"
         }
     }
+
 
 }
