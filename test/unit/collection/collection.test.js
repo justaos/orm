@@ -20,6 +20,9 @@ describe('AnysolsCollection', () => {
             }, {
                 name: "dob",
                 type: "date"
+            }, {
+                name: "gender",
+                type: "boolean"
             }]
         });
     });
@@ -40,6 +43,7 @@ describe('AnysolsCollection', () => {
         empRecord.set("name", "John");
         empRecord.set("eid", 100);
         empRecord.set("dob", new Date());
+        empRecord.set("gender", true);
         empRecord.insert().then((rec) => {
             johnRecord = rec;
             johnObject = rec.toObject();

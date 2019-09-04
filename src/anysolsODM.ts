@@ -15,6 +15,7 @@ import DateFieldType from "./field-types/dateFieldType";
 import FieldTypeRegistry from "./field-types/fieldTypeRegistry";
 import {Collection} from "mongodb";
 import ObjectFieldType from "./field-types/objectFieldType";
+import BooleanFieldType from "./field-types/booleanFieldType";
 
 const privates = new WeakMap();
 
@@ -121,5 +122,6 @@ function _loadBuildInFieldTypes(that: AnysolsODM) {
     that.addFieldType(new IntegerFieldType());
     that.addFieldType(new DateFieldType());
     that.addFieldType(new ObjectFieldType());
+    that.addFieldType(new BooleanFieldType());
 }
 
