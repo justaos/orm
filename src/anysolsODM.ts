@@ -4,7 +4,7 @@ import AnysolsCollection from "./collection/anysolsCollection";
 import AnysolsCollectionRegistry from "./collection/anysolsCollectionRegistry";
 
 import OperationInterceptorService from "./operation-interceptor/operationInterceptorService";
-import OperationInterceptor from "./operation-interceptor/operationInterceptor";
+import OperationInterceptorInterface from "./operation-interceptor/operationInterceptor.interface";
 
 import AnysolsSchema from "./schema/anysolsSchema";
 
@@ -77,7 +77,7 @@ export default class AnysolsODM {
         _getFieldTypeRegistry(this).addFieldType(fieldType);
     }
 
-    addInterceptor(operationInterceptor: OperationInterceptor): void {
+    addInterceptor(operationInterceptor: OperationInterceptorInterface): void {
         _getOperationInterceptorService(this).addInterceptor(operationInterceptor);
     }
 

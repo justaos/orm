@@ -3,7 +3,7 @@ import AnysolsCursor from "./cursor/anysolsCursor";
 import AnysolsCollection from "./collection/anysolsCollection";
 import AnysolsRecord from "./record/anysolsRecord";
 import FieldType from "./field-types/fieldType.interface";
-import OperationInterceptor from "./operation-interceptor/operationInterceptor";
+import OperationInterceptorInterface from "./operation-interceptor/operationInterceptor.interface";
 import {DataType, DateDataType, IntegerDataType, ObjectDataType, StringDataType} from "./core";
 import {OPERATION_WHEN, OPERATIONS} from "./constants";
 
@@ -13,7 +13,7 @@ export {
     AnysolsRecord,
     AnysolsCursor,
     FieldType,
-    OperationInterceptor,
+    OperationInterceptorInterface,
     StringDataType,
     DataType,
     ObjectDataType,

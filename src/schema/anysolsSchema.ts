@@ -17,6 +17,14 @@ export default class AnysolsSchema {
         return _getSchemaObject(this).name;
     }
 
+    getExtends(): string {
+        return _getSchemaObject(this).extends;
+    }
+
+    isFinal(): boolean {
+        return !!_getSchemaObject(this).final;
+    }
+
     getHostName(): string {
         let hostName = this.getName();
         const schemaObject: any = _getSchemaObject(this);
@@ -93,8 +101,11 @@ function _validateSchemaObject(that: AnysolsSchema) {
     if (_hasAnysolsCollection(that, schemaObject.name))
         throw  _validateSchemaError("Collection name already exists");
     if (schemaObject.extends) {
-        if (!_hasAnysolsCollection(that, schemaObject.extends))
+       const extendsCol: AnysolsCollection | null = _getAnysolsCollection(that, schemaObject.extends);
+        if (!extendsCol)
             throw _validateSchemaError("'" + schemaObject.name + "' cannot extend '" + schemaObject.extends + "'. '" + schemaObject.extends + "' does not exists.");
+        if(extendsCol.getSchema().isFinal())
+            throw _validateSchemaError("'" + schemaObject.name + "' cannot extend '" + schemaObject.extends + "'. '" + schemaObject.extends + "' is final schema .");
     }
 
     const allFieldsObjects = that.getFields();

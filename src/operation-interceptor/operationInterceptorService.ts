@@ -1,19 +1,18 @@
-import OperationInterceptor from "./operationInterceptor";
-import AnysolsRecord from "../record/anysolsRecord";
+import OperationInterceptorInterface from "./operationInterceptor.interface";
 
 export default class OperationInterceptorService {
 
-    interceptors: Map<string, OperationInterceptor>;
+    interceptors: Map<string, OperationInterceptorInterface>;
 
     constructor() {
-        this.interceptors = new Map<string, OperationInterceptor>();
+        this.interceptors = new Map<string, OperationInterceptorInterface>();
     }
 
-    addInterceptor = (operationInterceptor: OperationInterceptor) => this.interceptors.set(operationInterceptor.getName(), operationInterceptor);
+    addInterceptor = (operationInterceptor: OperationInterceptorInterface) => this.interceptors.set(operationInterceptor.getName(), operationInterceptor);
 
     deleteInterceptor = (name: string) => this.interceptors.delete(name);
 
-    getInterceptor = (name: string): OperationInterceptor | undefined => this.interceptors.get(name);
+    getInterceptor = (name: string): OperationInterceptorInterface | undefined => this.interceptors.get(name);
 
     hasInterceptors(): boolean {
         return (this.interceptors.size !== 0);

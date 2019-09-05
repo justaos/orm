@@ -40,20 +40,44 @@ describe('DatabaseConnection', () => {
         });
     });
 
-    it('#DatabaseService::dropDatabase', function (done) {
+    it('#DatabaseService::databaseExists - without database', function (done) {
         this.timeout(MAX_TIMEOUT);
         dbConnection.databaseExists().then(() => {
-            let dbConfig = new DatabaseConfiguration(defaultConfig.host, defaultConfig.port, defaultConfig.database, defaultConfig.username, defaultConfig.password, defaultConfig.dialect);
-            DatabaseConnection.dropDatabase(dbConfig).then(() => {
-                assert.isOk(true, 'dropped successfully');
-                done()
-            }, () => {
-                assert.isOk(false, 'dropping failed');
-                done()
-            })
+            assert.isOk(false, "Database should not exists")
         }, (err) => {
             done();
         });
+    });
+
+    it('#DatabaseService::getDBO - create record', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        dbConnection.getDBO().collection('test').insertOne({"name": "hello"}).then(function (res) {
+            const savedDoc = res.ops.find(() => true);
+            if (savedDoc) {
+                done();
+            }
+        });
+    });
+
+    it('#DatabaseService::databaseExists - with database', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        dbConnection.databaseExists().then(() => {
+            done();
+        }, (err) => {
+            assert.isOk(false, "Database should exists")
+        });
+    });
+
+    it('#DatabaseService::dropDatabase', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let dbConfig = new DatabaseConfiguration(defaultConfig.host, defaultConfig.port, defaultConfig.database, defaultConfig.username, defaultConfig.password, defaultConfig.dialect);
+        DatabaseConnection.dropDatabase(dbConfig).then(() => {
+            assert.isOk(true, 'dropped successfully');
+            done()
+        }, () => {
+            assert.isOk(false, 'dropping failed');
+            done()
+        })
     });
 
     it('#DatabaseService::closeConnection', function (done) {

@@ -18,6 +18,7 @@ getAnysolsODM().then(async function (anysolsODM) {
     anysolsODM.defineCollection({
         name: 'dog',
         extends: 'animal',
+        final: true,
         fields: [{
             name: 'breed',
             type: 'string'

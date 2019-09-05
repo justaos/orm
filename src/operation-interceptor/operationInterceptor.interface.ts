@@ -1,4 +1,4 @@
-export default abstract class OperationInterceptor {
+export default abstract class OperationInterceptorInterface {
 
     abstract getName(): string;
 
