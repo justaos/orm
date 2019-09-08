@@ -15,4 +15,10 @@ export default class BooleanDataType extends DataType {
         }
     }
 
+    format(value: any) {
+        if (typeof value === "boolean")
+            return value;
+        return !!value;
+    }
+
 }
