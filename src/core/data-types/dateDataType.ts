@@ -9,17 +9,14 @@ export default class DateDataType extends DataType {
         this.config = config;
     }
 
-    transform(): any {
-        return {
-            "type": "string",
-            "format": "date-time"
+    validate(value: any): void {
+        if (value === null) {
+            if (this.config.required)
+                throw new Error("REQUIRED");
+        } else {
+            if (!(value instanceof Date))
+                throw new Error("NOT_VALID_TYPE");
         }
-    }
-
-    format(value: any) {
-        if (value instanceof Date)
-            return value.toISOString();
-        return value;
     }
 
 }

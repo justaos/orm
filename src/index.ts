@@ -4,7 +4,7 @@ import AnysolsCollection from "./collection/anysolsCollection";
 import AnysolsRecord from "./record/anysolsRecord";
 import FieldType from "./field-types/fieldType.interface";
 import OperationInterceptorInterface from "./operation-interceptor/operationInterceptor.interface";
-import {DataType, DateDataType, IntegerDataType, ObjectDataType, StringDataType} from "./core";
+import {DataType, DateDataType, IntegerDataType, ObjectDataType, StringDataType, ObjectIdDataType} from "./core";
 import {OPERATION_WHEN, OPERATIONS} from "./constants";
 
 export {
@@ -19,6 +19,7 @@ export {
     ObjectDataType,
     DateDataType,
     IntegerDataType,
+    ObjectIdDataType,
     OPERATION_WHEN,
     OPERATIONS,
 }

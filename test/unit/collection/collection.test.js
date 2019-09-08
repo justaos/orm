@@ -1,3 +1,4 @@
+const {ObjectId} = require('mongodb');
 const {assert} = require('chai');
 const {session, MAX_TIMEOUT} = require('../../test.utils');
 
@@ -15,14 +16,20 @@ describe('AnysolsCollection', () => {
                 name: 'name',
                 type: 'string'
             }, {
-                name: "eid",
+                name: "emp_no",
+                type: "objectId"
+            }, {
+                name: "salary",
                 type: "integer"
             }, {
-                name: "dob",
+                name: "birth_date",
                 type: "date"
             }, {
                 name: "gender",
                 type: "boolean"
+            }, {
+                name: "address",
+                type: "object"
             }]
         });
     });
@@ -41,9 +48,14 @@ describe('AnysolsCollection', () => {
         let employeeCollection = session.anysolsODM.collection(MODEL_NAME);
         let empRecord = employeeCollection.createNewRecord();
         empRecord.set("name", "John");
-        empRecord.set("eid", 100);
-        empRecord.set("dob", new Date());
+        empRecord.set("emp_no",  new ObjectId());
+        empRecord.set("birth_date", new Date());
         empRecord.set("gender", true);
+        empRecord.set("salary", 10000);
+        empRecord.set("address", {
+            "street": "test",
+            "zipcode": 500000
+        });
         empRecord.insert().then((rec) => {
             johnRecord = rec;
             johnObject = rec.toObject();
@@ -57,12 +69,12 @@ describe('AnysolsCollection', () => {
      */
     it('#AnysolsCollection::update', function (done) {
         this.timeout(MAX_TIMEOUT);
-        johnRecord.set("eid", 200);
+        johnRecord.set("salary", 200);
         johnRecord.update().then((rec) => {
-            assert.isOk(rec.get("eid") === 200, 'record not updated');
+            assert.isOk(rec.get("salary") === 200, 'record not updated');
             done();
         }, (err) => {
-            console.log(JSON.stringify(err, null, 4));
+            console.error(err);
         })
     });
 

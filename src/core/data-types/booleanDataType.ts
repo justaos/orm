@@ -9,16 +9,13 @@ export default class BooleanDataType extends DataType {
         this.config = config;
     }
 
-    transform() {
-        return {
-            "type": "boolean"
+    validate(value: any): void {
+        if (value === null) {
+            if (this.config.required)
+                throw new Error("REQUIRED");
+        } else {
+            if (typeof value !== 'boolean')
+                throw new Error("NOT_VALID_TYPE");
         }
     }
-
-    format(value: any) {
-        if (typeof value === "boolean")
-            return value;
-        return !!value;
-    }
-
 }

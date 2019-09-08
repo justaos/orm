@@ -49,7 +49,7 @@ describe('intercept.test.js', () => {
             assert.isOk(rec.get("computed") === "this is computed", "read interceptor not computed the value");
             done();
         }, function (err) {
-            console.log(err);
+            console.error(err);
             done();
         });
 
@@ -66,7 +66,7 @@ describe('intercept.test.js', () => {
             assert.isOk(rec.get("computed") !== "this is computed", "read interceptor computed the value");
             done();
         }, function (err) {
-            console.log(err);
+            console.error(err);
             done();
         });
 

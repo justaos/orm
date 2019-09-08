@@ -38,8 +38,8 @@ describe('FieldType', () => {
                 }]
             });
             assert.isOk(true, "Custom field defined as expected");
-        } catch (e) {
-            console.log(e.message);
+        } catch (err) {
+            console.error(err);
             assert.isOk(false, "Custom field not defined as expected");
         }
 

@@ -2,6 +2,10 @@ const {AnysolsODM} = require('../');
 
 async function getAnysolsODM() {
 
+    process.on('unhandledRejection', function onError(err) {
+        console.error(err);
+    });
+
     return new Promise((resolve, reject) => {
         const anysolsODM = new AnysolsODM();
 

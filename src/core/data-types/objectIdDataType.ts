@@ -1,6 +1,7 @@
 import DataType from "./dataType.interface";
+import {ObjectId} from "mongodb";
 
-export default class IntegerDataType extends DataType {
+export default class ObjectIdDataType extends DataType {
 
     config: any;
 
@@ -14,7 +15,7 @@ export default class IntegerDataType extends DataType {
             if (this.config.required)
                 throw new Error("REQUIRED");
         } else {
-            if (typeof value !== 'number' || !Number.isInteger(value))
+            if (!(value instanceof ObjectId))
                 throw new Error("NOT_VALID_TYPE");
         }
     }

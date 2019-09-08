@@ -24,22 +24,40 @@ getAnysolsODM().then(function (anysolsODM) {
             name: 'name',
             type: 'string'
         }, {
-            name: 'email',
-            type: 'email'
+            name: "personal_contact",
+            type: "email"
         }, {
-            name: 'dob',
-            type: 'date'
+            name: "emp_no",
+            type: "objectId"
+        }, {
+            name: "salary",
+            type: "integer"
+        }, {
+            name: "birth_date",
+            type: "date"
+        }, {
+            name: "gender",
+            type: "boolean"
+        }, {
+            name: "address",
+            type: "object"
         }]
     });
 
     let studentCollection = anysolsODM.collection("student");
     let s = studentCollection.createNewRecord();
-    s.set("name", "John");
-    s.set("email", "test@example.com");
-    s.set("dob", new Date());
+    s.set("personal_contact", "test@example.com");
+    s.set("birth_date", new Date());
     s.insert().then(function () {
         console.log("Student created");
-        anysolsODM.closeConnection();
+        studentCollection.find({}).toArray().then(function (res) {
+            console.log(JSON.stringify(res));
+            s.set("graduated", null);
+            s.update().then(function () {
+                anysolsODM.closeConnection();
+            });
+        });
+
     }, (err) => {
         console.log(err);
         anysolsODM.closeConnection();

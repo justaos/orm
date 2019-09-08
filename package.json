@@ -1,6 +1,6 @@
 {
     "name": "anysols-odm",
-    "version": "1.5.6",
+    "version": "1.6.0",
     "description": "Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
     "main": "./index.js",
     "scripts": {
@@ -54,7 +54,6 @@
     "homepage": "https://anysols.com",
     "dependencies": {
         "@types/mongodb": "^3.3.1",
-        "ajv": "^6.10.2",
         "mongodb": "^3.3.2"
     },
     "devDependencies": {

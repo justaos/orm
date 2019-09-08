@@ -9,9 +9,15 @@ export default class ObjectDataType extends DataType {
         this.config = config;
     }
 
-    transform(): any {
-        return {
-            "type": "object"
+    validate(value: any): void {
+        if (value === null) {
+            if (this.config.required)
+                throw new Error("REQUIRED");
+        } else {
+            if (typeof value !== 'object')
+                throw new Error("NOT_VALID_TYPE");
+            if (this.config.class && !(value instanceof this.config.class))
+                throw new Error("NOT_VALID_CLASS");
         }
     }
 

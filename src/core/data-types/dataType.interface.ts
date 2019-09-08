@@ -1,9 +1,5 @@
 export default abstract class DataType {
 
-    abstract transform(): any;
-
-    format(value: any): any {
-        return value;
-    }
+    abstract validate(value: any): void;
 
 }

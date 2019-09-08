@@ -5,6 +5,7 @@ import StringDataType from './data-types/stringDataType';
 import IntegerDataType from './data-types/integerDataType';
 import DateDataType from './data-types/dateDataType';
 import ObjectDataType from './data-types/objectDataType';
+import ObjectIdDataType from './data-types/objectIdDataType';
 
 export {
     DatabaseConfiguration,
@@ -13,5 +14,6 @@ export {
     StringDataType,
     IntegerDataType,
     DateDataType,
-    ObjectDataType
+    ObjectDataType,
+    ObjectIdDataType
 }

@@ -58,7 +58,7 @@ export default class AnysolsRecord {
         const record = this.record;
         let obj: any = {};
        _getSchema(this).getFields().map(function (fieldDefinition: any) {
-            obj[fieldDefinition.name] = record[fieldDefinition.name];
+            obj[fieldDefinition.name] =  typeof record[fieldDefinition.name] === "undefined" ? null : record[fieldDefinition.name];
         });
         return obj;
     }

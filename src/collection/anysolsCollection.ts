@@ -43,9 +43,7 @@ export default class AnysolsCollection {
 
     async insertRecord(record: AnysolsRecord): Promise<AnysolsRecord> {
         record = await _interceptRecord(this, OPERATIONS.CREATE, OPERATION_WHEN.BEFORE, record);
-        const errors = this.getSchema().validate(record.toObject());
-        if (errors)
-            throw errors;
+        this.getSchema().validate(record.toObject());
         const response = await _getCollection(this).insertOne(record.toObject());
         const savedDoc = response.ops.find(() => true);
         const savedRecord = new AnysolsRecord(savedDoc, this);
@@ -54,9 +52,7 @@ export default class AnysolsCollection {
 
     async updateRecord(record: AnysolsRecord): Promise<AnysolsRecord> {
         record = await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.BEFORE, record);
-        const errors = this.getSchema().validate(record.toObject());
-        if (errors)
-            throw errors;
+        this.getSchema().validate(record.toObject());
         await _getCollection(this).updateOne({_id: record.getID()}, {$set: {...record.toObject()}});
         return await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.AFTER, record);
     }
