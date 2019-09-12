@@ -1,6 +1,6 @@
 const {ObjectId} = require('mongodb');
 const {assert} = require('chai');
-const {session, MAX_TIMEOUT} = require('../../test.utils');
+const {session, MAX_TIMEOUT, logger} = require('../../test.utils');
 
 describe('AnysolsCollection', () => {
 
@@ -74,7 +74,7 @@ describe('AnysolsCollection', () => {
             assert.isOk(rec.get("salary") === 200, 'record not updated');
             done();
         }, (err) => {
-            console.error(err);
+            logger.logError(err);
         })
     });
 

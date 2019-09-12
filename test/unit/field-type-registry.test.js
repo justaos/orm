@@ -39,7 +39,7 @@ describe('FieldType', () => {
             });
             assert.isOk(true, "Custom field defined as expected");
         } catch (err) {
-            console.error(err);
+            logger.logError(err);
             assert.isOk(false, "Custom field not defined as expected");
         }
 
@@ -56,8 +56,8 @@ describe('FieldType', () => {
                 if (records.length === 1 && records[0].get(EMAIL_FIELD) === EMAIL_VALUE)
                     done();
             });
-        }, function (e) {
-            console.error(JSON.stringify(e));
+        }, function (err) {
+            logger.logError(err);
         });
     });
 
@@ -75,7 +75,7 @@ describe('FieldType', () => {
                 }]
             });
             assert.isOk(false, "Able to create, not defined field type element");
-        } catch (e) {
+        } catch (err) {
             assert.isOk(true, "Invalid field type element not created as expected");
         }
     });

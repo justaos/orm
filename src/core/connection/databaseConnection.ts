@@ -1,8 +1,6 @@
 import {Db, MongoClient} from "mongodb";
 import DatabaseConfiguration from "./databaseConfiguration";
-import {Logger} from "../../utils";
-
-const logger = new Logger("DatabaseConnection");
+import {getLoggerInstance} from "../../utils";
 
 function createConnectionByUri(uri: string): Promise<MongoClient> {
     return new Promise((resolve, reject) => {
@@ -30,14 +28,13 @@ export default class DatabaseConnection {
     }
 
     static connect(dbConfig: DatabaseConfiguration): Promise<any> {
-        logger.setCaller('connect');
         return new Promise(async (resolve, reject) => {
             try {
                 let conn = await createConnectionByUri(dbConfig.getUri());
-                logger.log('mongo db connection open');
+                logger.info('mongo db connection open');
                 resolve(new DatabaseConnection(conn, dbConfig));
             } catch (err) {
-                logger.error('connection to mongo failed \n' + err);
+                logger.error(err.message + "");
                 reject(err);
             }
         });
@@ -76,7 +73,6 @@ export default class DatabaseConnection {
     }
 
     databaseExists(): Promise<any> {
-        logger.setCaller('databaseExists');
         const that = this;
         return new Promise(async (resolve, reject) => {
             // Use the admin database for the operation
@@ -87,11 +83,12 @@ export default class DatabaseConnection {
 
             let index = dbs.databases.findIndex((db: any) => db.name === that.getDatabaseName());
             if (index !== -1) {
-                logger.log("database \"" + that.getDatabaseName() + "\" exists");
+                logger.info(`database "${that.getDatabaseName()}" exists`);
                 resolve();
             } else {
-                logger.log("database \"" + that.getDatabaseName() + "\" don't exists");
-                reject(new Error("database \"" + that.getDatabaseName() + "\" don't exists"));
+                const err = new Error(`database "${that.getDatabaseName()}" don't exists`);
+                logger.error(err.message + "");
+                reject(err);
             }
         });
 
@@ -101,5 +98,6 @@ export default class DatabaseConnection {
         return this.conn.close();
     }
 
-
 }
+
+const logger = getLoggerInstance(DatabaseConnection.name);
