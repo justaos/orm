@@ -12,6 +12,10 @@ export default class AnysolsCursor {
         privates.set(this, {cursor, anysolsCollection, operationInterceptorService});
     }
 
+    sort(keyOrList: string | object[] | object, direction?: number) {
+        return _getCursor(this).sort(keyOrList, direction);
+    }
+
     async toArray(): Promise<AnysolsRecord[]> {
         const docs = await _getCursor(this).toArray();
         await _intercept(this, OPERATIONS.READ, OPERATION_WHEN.BEFORE, {});

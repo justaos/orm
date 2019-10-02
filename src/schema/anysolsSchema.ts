@@ -1,5 +1,4 @@
 import FieldTypeRegistry from "../field-types/fieldTypeRegistry";
-import * as Ajv from "ajv";
 import FieldType from "../field-types/fieldType.interface";
 import AnysolsCollectionRegistry from "../collection/anysolsCollectionRegistry";
 import AnysolsCollection from "../collection/anysolsCollection";

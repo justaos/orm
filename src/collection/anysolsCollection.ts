@@ -36,8 +36,8 @@ export default class AnysolsCollection {
         return null;
     }
 
-    find(filter: any): AnysolsCursor {
-        const cursor = _getCollection(this).find(filter);
+    find(filter: any, options?: any): AnysolsCursor {
+        const cursor = _getCollection(this).find(filter, options);
         return _createAnysolsCursor(this, cursor);
     }
 

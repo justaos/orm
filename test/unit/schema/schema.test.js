@@ -7,6 +7,10 @@ describe('AnysolsCollection', () => {
     let MODEL_NAME = "schema_test";
     let MODEL_EXTENDS = "schema_test_extends";
 
+    it('#AnysolsCollection::collection - negative check', function () {
+        assert.isOk(session.anysolsODM.collection('unknown_collection') === undefined, "Collection should not exists");
+    });
+
     it('#AnysolsCollection::defineCollection - simple', function () {
         this.timeout(MAX_TIMEOUT);
         session.anysolsODM.defineCollection({

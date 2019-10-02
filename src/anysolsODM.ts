@@ -34,7 +34,9 @@ export default class AnysolsODM {
         if (!config)
             throw new Error("AnysolsODM::connect -> There is no config provided");
         const dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
-        _setConnection(this, await DatabaseConnection.connect(dbConfig));
+        const conn = await DatabaseConnection.connect(dbConfig);
+        await conn.deleteAllIndexes();
+        _setConnection(this, conn);
     }
 
     closeConnection(): Promise<void> {
@@ -59,11 +61,8 @@ export default class AnysolsODM {
         _getAnysolsCollectionRegistry(this).addCollection(anysolsCol);
     }
 
-    collection(colName: string): AnysolsCollection {
-        const anysolsCol = _getAnysolsCollectionRegistry(this).getCollection(colName);
-        if (!anysolsCol)
-            throw Error("[CollectionService::collection] collection with name '" + colName + "' does not exist");
-        return anysolsCol;
+    collection(colName: string): AnysolsCollection | undefined {
+        return _getAnysolsCollectionRegistry(this).getCollection(colName);
     }
 
     removeCollection(collectionName: string): void {

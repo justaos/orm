@@ -94,6 +94,14 @@ export default class DatabaseConnection {
 
     }
 
+    async deleteAllIndexes() {
+        const dbo = this.getDBO();
+        const collections = await dbo.listCollections().toArray();
+        collections.forEach(function (col: any) {
+            dbo.command({dropIndexes: col.name, index: "*"});
+        });
+    }
+
     closeConnection() {
         return this.conn.close();
     }
