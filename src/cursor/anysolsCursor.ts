@@ -13,7 +13,8 @@ export default class AnysolsCursor {
     }
 
     sort(keyOrList: string | object[] | object, direction?: number) {
-        return _getCursor(this).sort(keyOrList, direction);
+        _getCursor(this).sort(keyOrList, direction);
+        return this;
     }
 
     async toArray(): Promise<AnysolsRecord[]> {
