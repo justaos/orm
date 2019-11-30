@@ -6,11 +6,11 @@ Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparen
 [![Coverage Status](https://coveralls.io/repos/github/anysols/anysols-odm/badge.svg?branch=master)](https://coveralls.io/github/anysols/anysols-odm?branch=master)
 
 ```bash
-npm install --save anysols-odm
+npm install --save @anysols/anysols-odm
 ```
 ## Establishing database connection
 ```js
-const {AnysolsODM} = require("anysols-odm");
+const {AnysolsODM} = require("@anysols/anysols-odm");
 
 const anysolsODM = new AnysolsODM();
  
