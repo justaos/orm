@@ -1,5 +1,5 @@
 {
-    "name": "@anysols/anysols-odm",
+    "name": "@anysols/odm",
     "version": "1.6.8",
     "description": "Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
     "main": "./index.js",
