@@ -1,4 +1,4 @@
-import {createLogger} from "anysols-utils";
+import {createLogger} from "@anysols/utils";
 
 
 export function getLoggerInstance(className: string) {
