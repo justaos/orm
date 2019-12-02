@@ -3,6 +3,7 @@ Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparen
  
  Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete). 
 
+[![Build](https://github.com/anysols/anysols-odm/workflows/Node%20CI/badge.svg)](https://github.com/anysols/anysols-odm/actions?workflow=Node+CI)
 [![Coverage Status](https://coveralls.io/repos/github/anysols/anysols-odm/badge.svg?branch=master)](https://coveralls.io/github/anysols/anysols-odm?branch=master)
 
 ```bash
