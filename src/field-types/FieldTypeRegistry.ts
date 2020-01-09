@@ -1,4 +1,4 @@
-import FieldType from "./fieldType.interface";
+import FieldType from "./FieldType.interface";
 
 export default class FieldTypeRegistry {
 

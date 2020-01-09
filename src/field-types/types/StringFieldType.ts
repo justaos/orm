@@ -1,6 +1,6 @@
-import DataType from "../core/data-types/dataType.interface";
-import StringDataType from "../core/data-types/stringDataType";
-import FieldType from "./fieldType.interface";
+import DataType from "../../core/data-types/dataType.interface";
+import StringDataType from "../../core/data-types/stringDataType";
+import FieldType from "../FieldType.interface";
 
 export default class StringFieldType implements FieldType {
 

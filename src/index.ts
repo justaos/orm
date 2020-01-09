@@ -1,17 +1,17 @@
-import AnysolsODM from "./anysolsODM";
-import AnysolsCursor from "./cursor/anysolsCursor";
-import AnysolsCollection from "./collection/anysolsCollection";
-import AnysolsRecord from "./record/anysolsRecord";
-import FieldType from "./field-types/fieldType.interface";
-import OperationInterceptorInterface from "./operation-interceptor/operationInterceptor.interface";
+import ODM from "./ODM";
+import Cursor from "./Cursor";
+import Collection from "./collection/Collection";
+import Record from "./record/Record";
+import FieldType from "./field-types/FieldType.interface";
+import OperationInterceptorInterface from "./operation-interceptor/OperationInterceptor.interface";
 import {DataType, DateDataType, IntegerDataType, ObjectDataType, StringDataType, ObjectIdDataType} from "./core";
 import {OPERATION_WHEN, OPERATIONS} from "./constants";
 
 export {
-    AnysolsODM,
-    AnysolsCollection,
-    AnysolsRecord,
-    AnysolsCursor,
+    ODM,
+    Collection,
+    Record,
+    Cursor,
     FieldType,
     OperationInterceptorInterface,
     StringDataType,

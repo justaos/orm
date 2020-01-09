@@ -6,9 +6,9 @@ describe('intercept.test.js', () => {
 
     let MODEL_NAME = "intecept";
 
-    it('#AnysolsODM::addInterceptor', function (done) {
+    it('#ODM::addInterceptor', function (done) {
         this.timeout(MAX_TIMEOUT);
-        session.anysolsODM.addInterceptor({
+        session.odm.addInterceptor({
 
             getName: function () {
                 return "my-intercept";
@@ -31,7 +31,7 @@ describe('intercept.test.js', () => {
             }
         });
 
-        session.anysolsODM.defineCollection({
+        session.odm.defineCollection({
             name: MODEL_NAME,
             fields: [{
                 name: 'name',
@@ -42,7 +42,7 @@ describe('intercept.test.js', () => {
             }]
         });
 
-        let interceptTestCollection = session.anysolsODM.collection(MODEL_NAME);
+        let interceptTestCollection = session.odm.collection(MODEL_NAME);
         let s = interceptTestCollection.createNewRecord();
         s.set("name", "John");
         s.insert().then(function (rec) {
@@ -57,9 +57,9 @@ describe('intercept.test.js', () => {
 
     it('#model define check', function (done) {
         this.timeout(MAX_TIMEOUT);
-        session.anysolsODM.deleteInterceptor("my-intercept");
+        session.odm.deleteInterceptor("my-intercept");
 
-        let interceptTestCollection = session.anysolsODM.collection(MODEL_NAME);
+        let interceptTestCollection = session.odm.collection(MODEL_NAME);
         let s = interceptTestCollection.createNewRecord();
         s.set("name", "Ravi");
         s.insert().then(function (rec) {

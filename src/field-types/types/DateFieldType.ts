@@ -1,6 +1,6 @@
-import DataType from "../core/data-types/dataType.interface";
-import FieldType from "./fieldType.interface";
-import DateDataType from "../core/data-types/dateDataType";
+import DataType from "../../core/data-types/dataType.interface";
+import FieldType from "../FieldType.interface";
+import DateDataType from "../../core/data-types/dateDataType";
 
 export default class DateFieldType implements FieldType {
 

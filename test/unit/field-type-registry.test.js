@@ -11,7 +11,7 @@ describe('FieldType', () => {
 
     it('#FieldTypeRegistry::addFieldType Registering Custom field type', function () {
 
-        session.anysolsODM.addFieldType({
+        session.odm.addFieldType({
 
             getDataType: function (fieldDefinition) {
                 return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
@@ -27,7 +27,7 @@ describe('FieldType', () => {
         });
 
         try {
-            session.anysolsODM.defineCollection({
+            session.odm.defineCollection({
                 name: MODEL_NAME,
                 fields: [{
                     name: 'name',
@@ -47,7 +47,7 @@ describe('FieldType', () => {
 
 
     it('#FieldTypeRegistry::registerFieldType creating record with custom field type', function (done) {
-        let collection = session.anysolsODM.collection(MODEL_NAME);
+        let collection = session.odm.collection(MODEL_NAME);
         let rec = collection.createNewRecord();
         rec.set("name", "RAM");
         rec.set(EMAIL_FIELD, EMAIL_VALUE);
@@ -64,7 +64,7 @@ describe('FieldType', () => {
 
     it('#FieldTypeRegistry::registerFieldType trying create invalid field', function () {
         try {
-            session.anysolsODM.defineCollection({
+            session.odm.defineCollection({
                 name: 'field_definition_invalid_test',
                 fields: [{
                     name: 'name',

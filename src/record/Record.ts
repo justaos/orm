@@ -1,22 +1,22 @@
-import AnysolsCollection from "../collection/anysolsCollection";
-import AnysolsSchema from "../schema/anysolsSchema";
+import Collection from "../collection/Collection";
+import Schema from "../Schema";
 
 const privates = new WeakMap();
 
-export default class AnysolsRecord {
+export default class Record {
 
     isNew: any;
 
     record: any;
 
-    constructor(record: any, anysolsCollection: AnysolsCollection) {
+    constructor(record: any, collection: Collection) {
         this.record = record;
-        privates.set(this, {anysolsCollection});
+        privates.set(this, {collection});
     }
 
     initialize() {
         this.record = {};
-        this.record["_collection"] = _getAnysolsCollection(this).getName();
+        this.record["_collection"] = _getCollection(this).getName();
         this.isNew = true;
         return this;
     }
@@ -34,14 +34,14 @@ export default class AnysolsRecord {
     }
 
     async insert() {
-        let record = await _getAnysolsCollection(this).insertRecord(this);
+        let record = await _getCollection(this).insertRecord(this);
         this.record = record.toObject();
         this.isNew = false;
         return this;
     }
 
     async update() {
-        let record = await _getAnysolsCollection(this).updateRecord(this);
+        let record = await _getCollection(this).updateRecord(this);
         this.record = record.toObject();
         this.isNew = false;
         return this;
@@ -50,7 +50,7 @@ export default class AnysolsRecord {
     async delete() {
         if (this.isNew)
             throw Error('[Record::remove] Cannot remove unsaved record');
-        await _getAnysolsCollection(this).deleteOne(this);
+        await _getCollection(this).deleteOne(this);
         return this;
     }
 
@@ -64,10 +64,10 @@ export default class AnysolsRecord {
     }
 }
 
-function _getSchema(that: AnysolsRecord): AnysolsSchema {
-    return _getAnysolsCollection(that).getSchema();
+function _getSchema(that: Record): Schema {
+    return _getCollection(that).getSchema();
 }
 
-function _getAnysolsCollection(that: AnysolsRecord): AnysolsCollection {
-    return privates.get(that).anysolsCollection;
+function _getCollection(that: Record): Collection {
+    return privates.get(that).collection;
 }

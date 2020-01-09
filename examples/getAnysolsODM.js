@@ -12,7 +12,7 @@ async function getAnysolsODM() {
         const config = {
             "host": "localhost",
             "port": "27017",
-            "database": "anysols-odm-example",
+            "database": "odm-example-db",
             "dialect": "mongodb",
         };
 

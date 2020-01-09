@@ -1,19 +1,19 @@
 const {assert} = require('chai');
 const {session, MAX_TIMEOUT} = require('../../test.utils');
 
-describe('AnysolsCollection', () => {
+describe('Collection', () => {
 
 
     let MODEL_NAME = "schema_test";
     let MODEL_EXTENDS = "schema_test_extends";
 
-    it('#AnysolsCollection::collection - negative check', function () {
-        assert.isOk(session.anysolsODM.collection('unknown_collection') === undefined, "Collection should not exists");
+    it('#Collection::collection - negative check', function () {
+        assert.isOk(session.odm.collection('unknown_collection') === undefined, "Collection should not exists");
     });
 
-    it('#AnysolsCollection::defineCollection - simple', function () {
+    it('#Collection::defineCollection - simple', function () {
         this.timeout(MAX_TIMEOUT);
-        session.anysolsODM.defineCollection({
+        session.odm.defineCollection({
             name: MODEL_NAME,
             fields: [{
                 name: 'name',
@@ -32,11 +32,11 @@ describe('AnysolsCollection', () => {
         assert.isOk(true, "Collection not create as expected");
     });
 
-    it('#AnysolsCollection::defineCollection - extends negative check', function () {
+    it('#Collection::defineCollection - extends negative check', function () {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
-            session.anysolsODM.defineCollection({
+            session.odm.defineCollection({
                 name: MODEL_EXTENDS,
                 extends: MODEL_NAME,
                 final: true,
@@ -51,9 +51,9 @@ describe('AnysolsCollection', () => {
         assert.isOk(assertValue, "Collection should not get extended, with name fields");
     });
 
-    it('#AnysolsCollection::defineCollection - extends positive check', function () {
+    it('#Collection::defineCollection - extends positive check', function () {
         this.timeout(MAX_TIMEOUT);
-        session.anysolsODM.defineCollection({
+        session.odm.defineCollection({
             name: MODEL_EXTENDS,
             extends: MODEL_NAME,
             final: true,
@@ -65,11 +65,11 @@ describe('AnysolsCollection', () => {
         assert.isOk(true, "Collection should get extended");
     });
 
-    it('#AnysolsCollection::defineCollection - extends positive check', function () {
+    it('#Collection::defineCollection - extends positive check', function () {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
-            session.anysolsODM.defineCollection({
+            session.odm.defineCollection({
                 name: "EXTEND_FINAL",
                 extends: MODEL_EXTENDS,
                 fields: [{

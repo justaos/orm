@@ -1,7 +1,7 @@
 {
-    "name": "@anysols/odm",
+    "name": "@plt4rm/odm",
     "version": "1.6.9",
-    "description": "Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
+    "description": "plt4rm's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
     "main": "./index.js",
     "scripts": {
         "prepare": "npm run build",
@@ -55,7 +55,7 @@
     "dependencies": {
         "@types/mongodb": "^3.3.4",
         "mongodb": "^3.3.2",
-        "@anysols/utils": "^0.6.6"
+        "@plt4rm/utils": "^0.6.6"
     },
     "devDependencies": {
         "chai": "^4.2.0",

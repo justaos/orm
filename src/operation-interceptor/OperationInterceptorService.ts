@@ -1,4 +1,4 @@
-import OperationInterceptorInterface from "./operationInterceptor.interface";
+import OperationInterceptorInterface from "./OperationInterceptor.interface";
 
 export default class OperationInterceptorService {
 

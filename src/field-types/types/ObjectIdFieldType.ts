@@ -1,6 +1,6 @@
-import DataType from "../core/data-types/dataType.interface";
-import FieldType from "./fieldType.interface";
-import ObjectIdDataType from "../core/data-types/objectIdDataType";
+import DataType from "../../core/data-types/dataType.interface";
+import FieldType from "../FieldType.interface";
+import ObjectIdDataType from "../../core/data-types/objectIdDataType";
 
 export default class ObjectIdFieldType implements FieldType {
 

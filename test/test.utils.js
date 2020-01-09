@@ -1,4 +1,4 @@
-const {createLogger} = require("@anysols/utils");
+const {createLogger} = require("@plt4rm/utils");
 
 const session = {};
 const MAX_TIMEOUT = 3500;

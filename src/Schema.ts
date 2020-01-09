@@ -1,14 +1,14 @@
-import FieldTypeRegistry from "../field-types/fieldTypeRegistry";
-import FieldType from "../field-types/fieldType.interface";
-import AnysolsCollectionRegistry from "../collection/anysolsCollectionRegistry";
-import AnysolsCollection from "../collection/anysolsCollection";
+import FieldTypeRegistry from "./field-types/FieldTypeRegistry";
+import FieldType from "./field-types/FieldType.interface";
+import CollectionRegistry from "./collection/CollectionRegistry";
+import Collection from "./collection/Collection";
 
 const privates = new WeakMap();
 
-export default class AnysolsSchema {
+export default class Schema {
 
-    constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry, anysolsCollectionRegistry: AnysolsCollectionRegistry) {
-        privates.set(this, {fieldTypeRegistry, anysolsCollectionRegistry, schema: schemaObject});
+    constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry, collectionRegistry: CollectionRegistry) {
+        privates.set(this, {fieldTypeRegistry, collectionRegistry, schema: schemaObject});
         _validateSchemaObject(this);
     }
 
@@ -81,7 +81,7 @@ function _validateSchemaError(message: string): Error {
     return new Error("[AnysolsSchema::_validateSchemaJSON] " + message)
 }
 
-function _validateSchemaObject(that: AnysolsSchema) {
+function _validateSchemaObject(that: Schema) {
     const schemaObject = _getSchemaObject(that);
     if (!schemaObject)
         throw _validateSchemaError("Schema not provided");
@@ -94,7 +94,7 @@ function _validateSchemaObject(that: AnysolsSchema) {
     if (_hasAnysolsCollection(that, schemaObject.name))
         throw  _validateSchemaError("Collection name already exists");
     if (schemaObject.extends) {
-        const extendsCol: AnysolsCollection | null = _getAnysolsCollection(that, schemaObject.extends);
+        const extendsCol: Collection | null = _getAnysolsCollection(that, schemaObject.extends);
         if (!extendsCol)
             throw _validateSchemaError("'" + schemaObject.name + "' cannot extend '" + schemaObject.extends + "'. '" + schemaObject.extends + "' does not exists.");
         if (extendsCol.getSchema().isFinal())
@@ -125,29 +125,29 @@ function _areDuplicatesPresent(a: string[]): boolean {
     return false;
 }
 
-function _getSchemaObject(that: AnysolsSchema): any {
+function _getSchemaObject(that: Schema): any {
     return privates.get(that).schema;
 }
 
-function _getFieldTypeRegistry(that: AnysolsSchema): FieldTypeRegistry {
+function _getFieldTypeRegistry(that: Schema): FieldTypeRegistry {
     return privates.get(that).fieldTypeRegistry;
 }
 
-function _getFieldType(that: AnysolsSchema, type: string): FieldType | undefined {
+function _getFieldType(that: Schema, type: string): FieldType | undefined {
     return _getFieldTypeRegistry(that).getFieldType(type);
 }
 
-function _getAnysolsCollectionRegistry(that: AnysolsSchema): AnysolsCollectionRegistry {
-    return privates.get(that).anysolsCollectionRegistry;
+function _getCollectionRegistry(that: Schema): CollectionRegistry {
+    return privates.get(that).collectionRegistry;
 }
 
-function _getAnysolsCollection(that: AnysolsSchema, collectionName: string): AnysolsCollection {
-    const anysolsCollection = _getAnysolsCollectionRegistry(that).getCollection(collectionName);
-    if (!anysolsCollection)
+function _getAnysolsCollection(that: Schema, collectionName: string): Collection {
+    const col = _getCollectionRegistry(that).getCollection(collectionName);
+    if (!col)
         throw Error("[AnysolsSchema::_getAnysolsCollection] Collection not found");
-    return anysolsCollection;
+    return col;
 }
 
-function _hasAnysolsCollection(that: AnysolsSchema, collectionName: string): boolean {
-    return _getAnysolsCollectionRegistry(that).hasCollection(collectionName);
+function _hasAnysolsCollection(that: Schema, collectionName: string): boolean {
+    return _getCollectionRegistry(that).hasCollection(collectionName);
 }

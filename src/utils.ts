@@ -1,6 +1,5 @@
-import {createLogger} from "@anysols/utils";
-
+import {createLogger} from "@plt4rm/utils";
 
 export function getLoggerInstance(className: string) {
-    return createLogger({label: "AnysolsUtils::" + className});
+    return createLogger({label: "ODM::" + className});
 }
