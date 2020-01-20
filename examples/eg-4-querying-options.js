@@ -1,9 +1,9 @@
-let getAnysolsODM = require("./getAnysolsODM");
+let getODM = require("./getODM");
 
-getAnysolsODM().then(async function (anysolsODM) {
+getODM().then(async function (odm) {
 
 
-    anysolsODM.defineCollection({
+    odm.defineCollection({
         name: 'teacher',
         fields: [{
             name: 'name',
@@ -14,7 +14,7 @@ getAnysolsODM().then(async function (anysolsODM) {
         }]
     });
 
-    let teacherCol = anysolsODM.collection("teacher");
+    let teacherCol = odm.collection("teacher");
     /*for (let i = 0; i < 10; i++) {
         let t = teacherCol.createNewRecord();
         t.set("name", "a");
@@ -26,7 +26,6 @@ getAnysolsODM().then(async function (anysolsODM) {
         records.forEach(function(rec){
             console.log(rec.get('name') + " :: " + rec.get('roll_no'));
         });
-
     });
 
 });

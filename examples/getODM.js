@@ -1,13 +1,13 @@
-const {AnysolsODM} = require('../');
+const {ODM} = require('../');
 
-async function getAnysolsODM() {
+async function getODM() {
 
     process.on('unhandledRejection', function onError(err) {
         console.error(err);
     });
 
     return new Promise((resolve, reject) => {
-        const anysolsODM = new AnysolsODM();
+        const odm = new ODM();
 
         const config = {
             "host": "localhost",
@@ -16,9 +16,9 @@ async function getAnysolsODM() {
             "dialect": "mongodb",
         };
 
-        anysolsODM.connect(config).then(() => {
+        odm.connect(config).then(() => {
             console.log('connection success');
-            resolve(anysolsODM);
+            resolve(odm);
         }, (err) => {
             console.log('connection failed');
         });
@@ -26,4 +26,4 @@ async function getAnysolsODM() {
 
 }
 
-module.exports = getAnysolsODM;
+module.exports = getODM;

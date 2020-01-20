@@ -1,8 +1,8 @@
-let getAnysolsODM = require("./getAnysolsODM");
+let getODM = require("./getODM");
 
-getAnysolsODM().then(async function (anysolsODM) {
+getODM().then(async function (odm) {
 
-    anysolsODM.defineCollection({
+    odm.defineCollection({
         name: 'animal',
         fields: [{
             name: 'name',
@@ -10,12 +10,12 @@ getAnysolsODM().then(async function (anysolsODM) {
         }]
     });
 
-    let animalCol = anysolsODM.collection("animal");
+    let animalCol = odm.collection("animal");
     let animal = animalCol.createNewRecord();
     animal.set("name", "Puppy");
     await animal.insert();
 
-    anysolsODM.defineCollection({
+    odm.defineCollection({
         name: 'dog',
         extends: 'animal',
         final: true,
@@ -25,11 +25,11 @@ getAnysolsODM().then(async function (anysolsODM) {
         }]
     });
 
-    let dogCol = anysolsODM.collection("dog");
+    let dogCol = odm.collection("dog");
     let husky = dogCol.createNewRecord();
     husky.set("name", "Jimmy");
     husky.set("breed", "Husky");
     await husky.insert();
 
-    await anysolsODM.closeConnection();
+    await odm.closeConnection();
 });

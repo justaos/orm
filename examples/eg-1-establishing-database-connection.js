@@ -1,6 +1,6 @@
-const {AnysolsODM} = require('../');
+const {ODM} = require('../');
 
-const anysolsODM = new AnysolsODM();
+const odm = new ODM();
 
 const config = {
     "host": "localhost",
@@ -9,16 +9,16 @@ const config = {
     "dialect": "mongodb",
 };
 
-anysolsODM.connect(config).then(() => {
+odm.connect(config).then(() => {
     console.log('connection success');
-    anysolsODM.databaseExists().then(() => {
+    odm.databaseExists().then(() => {
         console.log('db exists');
-        anysolsODM.closeConnection();
+        odm.closeConnection();
     }, () => {
         console.log("db does not exists");
-        anysolsODM.closeConnection();
+        odm.closeConnection();
     });
 }, (err) => {
     console.log('connection failed');
-    anysolsODM.closeConnection();
+    odm.closeConnection();
 });

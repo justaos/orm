@@ -1,6 +1,6 @@
 {
     "name": "@plt4rm/odm",
-    "version": "1.6.9",
+    "version": "1.7.0",
     "description": "plt4rm's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
     "main": "./index.js",
     "scripts": {
@@ -16,8 +16,8 @@
         "index.ts"
     ],
     "keywords": [
-        "anysols",
-        "anysols odm",
+        "plt4rm",
+        "plt4rm odm",
         "mongodb wrapper",
         "object document mapper"
     ],
@@ -43,15 +43,15 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/anysols/anysols-odm.git"
+        "url": "git+https://github.com/plt4rm/odm.git"
     },
     "author": "Shivaji Varma <contact@shivajivarma.com>",
     "contributors": [],
     "license": "Apache-2.0",
     "bugs": {
-        "url": "https://github.com/anysols/anysols-odm/issues"
+        "url": "https://github.com/plt4rm/odm/issues"
     },
-    "homepage": "https://anysols.com",
+    "homepage": "https://plt4rm.com",
     "dependencies": {
         "@types/mongodb": "^3.3.4",
         "mongodb": "^3.3.2",

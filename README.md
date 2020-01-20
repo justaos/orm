@@ -3,37 +3,37 @@ Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparen
  
  Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete). 
 
-[![Build](https://github.com/anysols/anysols-odm/workflows/Node%20CI/badge.svg)](https://github.com/anysols/anysols-odm/actions?workflow=Node+CI)
-[![Coverage Status](https://coveralls.io/repos/github/anysols/anysols-odm/badge.svg?branch=master)](https://coveralls.io/github/anysols/anysols-odm?branch=master)
+[![Build](https://github.com/plt4rm/odm/workflows/Node%20CI/badge.svg)](https://github.com/plt4rm/odm/actions?workflow=Node+CI)
+[![Coverage Status](https://coveralls.io/repos/github/plt4rm/odm/badge.svg?branch=master)](https://coveralls.io/github/plt4rm/odm?branch=master)
 
 ```bash
-npm install --save @anysols/odm
+npm install --save @plt4rm/odm
 ```
 ## Establishing database connection
 ```js
-const {AnysolsODM} = require("@anysols/odm");
+const {ODM} = require("@plt4rm/odm");
 
-const anysolsODM = new AnysolsODM();
+const odm = new ODM();
  
 const config = {
     "host": "localhost",
     "port": "27017",
-    "database": "anysols-collection-service",
+    "database": "collection-service",
     "dialect": "mongodb",
 };
 
-anysolsODM.connect(config).then(() => {
+odm.connect(config).then(() => {
     console.log('connection success');
-    anysolsODM.databaseExists().then(() => {
+    odm.databaseExists().then(() => {
         console.log('db exists');
-        anysolsODM.closeConnection();
+        odm.closeConnection();
     }, () => {
         console.log("db does not exists");
-        anysolsODM.closeConnection();
+        odm.closeConnection();
     });
 }, (err) => {
     console.log('connection failed');
-    anysolsODM.closeConnection();
+    odm.closeConnection();
 });
 
 ```
@@ -42,7 +42,7 @@ anysolsODM.connect(config).then(() => {
 ```js
 // after establishing connection
 
-anysolsODM.addInterceptor({
+odm.addInterceptor({
 
     getName: function () {
         return "my-intercept";
@@ -73,7 +73,7 @@ anysolsODM.addInterceptor({
     }
 });
 
-anysolsODM.defineCollection({
+odm.defineCollection({
     name: 'student',
     fields: [{
         name: 'name',
@@ -84,12 +84,12 @@ anysolsODM.defineCollection({
     }]
 });
 
-let studentCollection = anysolsODM.collection("student");
+let studentCollection = odm.collection("student");
 let s = studentCollection.createNewRecord();
 s.set("name", "John " + new Date().toISOString());
 s.insert().then(function () {
     studentCollection.find().toArray().then(function (students) {
-        anysolsODM.closeConnection();
+        odm.closeConnection();
     });
 });
 ```
@@ -98,7 +98,7 @@ s.insert().then(function () {
 ```js
 // after establishing connection
 
-anysolsODM.addFieldType({
+odm.addFieldType({
 
     getDataType: function (fieldDefinition) {
         return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
@@ -113,7 +113,7 @@ anysolsODM.addFieldType({
     }
 });
 
-anysolsODM.defineCollection({
+odm.defineCollection({
     name: 'student',
     fields: [{
         name: 'name',
@@ -127,17 +127,17 @@ anysolsODM.defineCollection({
     }]
 });
 
-let studentCollection = anysolsODM.collection("student");
+let studentCollection = odm.collection("student");
 let s = studentCollection.createNewRecord();
 s.set("name", "John");
 s.set("email", "test@example.com");
 s.set("dob", new Date());
 s.insert().then(function () {
     console.log("Student created");
-    anysolsODM.closeConnection();
+    odm.closeConnection();
 }, (err) => {
     console.log(err);
-    anysolsODM.closeConnection();
+    odm.closeConnection();
 });
 ```
 

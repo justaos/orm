@@ -1,8 +1,8 @@
-let getAnysolsODM = require("./getAnysolsODM");
+let getODM = require("./getODM");
 
-getAnysolsODM().then(function (anysolsODM) {
+getODM().then(function (odm) {
 
-    anysolsODM.addInterceptor({
+    odm.addInterceptor({
 
         getName: function () {
             return "my-intercept";
@@ -33,7 +33,7 @@ getAnysolsODM().then(function (anysolsODM) {
         }
     });
 
-    anysolsODM.defineCollection({
+    odm.defineCollection({
         name: 'student',
         fields: [{
             name: 'name',
@@ -44,12 +44,12 @@ getAnysolsODM().then(function (anysolsODM) {
         }]
     });
 
-    let studentCollection = anysolsODM.collection("student");
+    let studentCollection = odm.collection("student");
     let s = studentCollection.createNewRecord();
     s.set("name", "John " + new Date().toISOString());
     s.insert().then(function () {
         studentCollection.find().toArray().then(function (students) {
-            anysolsODM.closeConnection();
+            odm.closeConnection();
         });
     });
 
