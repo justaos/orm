@@ -1,8 +1,7 @@
-import {Record} from "../../../src";
-
-const {OPERATIONS, OPERATION_WHEN} = require("../../../lib");
-const {assert} = require('chai');
-const {session, MAX_TIMEOUT, logger} = require('../../test.utils');
+import {assert} from "chai";
+import "mocha";
+import {OPERATION_WHEN, OPERATIONS, Record} from "../../../src";
+import {logger, MAX_TIMEOUT, session} from "../../test.utils";
 
 describe('Operations Intercept', () => {
 

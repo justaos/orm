@@ -26,9 +26,9 @@ export default class Schema {
 
     getHostName(): string {
         let hostName = this.getName();
-        const schemaObject: any = _getSchemaObject(this);
-        if (schemaObject.extends) {
-            const extendedSchema = _getAnysolsCollection(this, schemaObject.extends).getSchema();
+        const extendsCollectionName = this.getExtends();
+        if (extendsCollectionName) {
+            const extendedSchema = _getCollection(this, extendsCollectionName).getSchema();
             hostName = extendedSchema.getName();
         }
         return hostName;
@@ -37,10 +37,14 @@ export default class Schema {
     getFields(): any[] {
         const schemaObject: any = _getSchemaObject(this);
         let allFields: any[] = [];
-        if (schemaObject.fields)
-            allFields = allFields.concat(schemaObject.fields);
-        if (schemaObject.extends) {
-            const extendedSchema = _getAnysolsCollection(this, schemaObject.extends).getSchema();
+
+        let fields = _getFields(this);
+        if (fields)
+            allFields = allFields.concat(fields);
+
+        const extendsCollectionName = this.getExtends();
+        if (extendsCollectionName) {
+            const extendedSchema = _getCollection(this, extendsCollectionName).getSchema();
             allFields = allFields.concat(extendedSchema.getFields());
         } else {
             allFields.push({
@@ -78,7 +82,7 @@ export default class Schema {
 }
 
 function _validateSchemaError(message: string): Error {
-    return new Error("[AnysolsSchema::_validateSchemaJSON] " + message)
+    return new Error("[Schema::_validateSchemaJSON] " + message)
 }
 
 function _validateSchemaObject(that: Schema) {
@@ -91,10 +95,11 @@ function _validateSchemaObject(that: Schema) {
         throw  _validateSchemaError("Collection name should be a string - [collectionName=" + schemaObject.name + "]");
     if (!(/^[a-z0-9_]+$/i.test(schemaObject.name)))
         throw  _validateSchemaError("Collection name should be alphanumeric - [collectionName=" + schemaObject.name + "]");
-    if (_hasAnysolsCollection(that, schemaObject.name))
+    if (_hasCollection(that, schemaObject.name))
         throw  _validateSchemaError("Collection name already exists");
     if (schemaObject.extends) {
-        const extendsCol: Collection | null = _getAnysolsCollection(that, schemaObject.extends);
+        let extendsCol: Collection | null;
+        extendsCol = _getCollection(that, schemaObject.extends);
         if (!extendsCol)
             throw _validateSchemaError("'" + schemaObject.name + "' cannot extend '" + schemaObject.extends + "'. '" + schemaObject.extends + "' does not exists.");
         if (extendsCol.getSchema().isFinal())
@@ -129,6 +134,11 @@ function _getSchemaObject(that: Schema): any {
     return privates.get(that).schema;
 }
 
+function _getFields(that: Schema): any {
+    return _getSchemaObject(that).fields;
+}
+
+
 function _getFieldTypeRegistry(that: Schema): FieldTypeRegistry {
     return privates.get(that).fieldTypeRegistry;
 }
@@ -141,13 +151,13 @@ function _getCollectionRegistry(that: Schema): CollectionRegistry {
     return privates.get(that).collectionRegistry;
 }
 
-function _getAnysolsCollection(that: Schema, collectionName: string): Collection {
+function _getCollection(that: Schema, collectionName: string): Collection {
     const col = _getCollectionRegistry(that).getCollection(collectionName);
     if (!col)
-        throw Error("[AnysolsSchema::_getAnysolsCollection] Collection not found");
+        throw Error("[Schema::_getCollection] Collection not found");
     return col;
 }
 
-function _hasAnysolsCollection(that: Schema, collectionName: string): boolean {
+function _hasCollection(that: Schema, collectionName: string): boolean {
     return _getCollectionRegistry(that).hasCollection(collectionName);
 }

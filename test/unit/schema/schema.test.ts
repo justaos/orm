@@ -1,17 +1,18 @@
-const {assert} = require('chai');
-const {session, MAX_TIMEOUT} = require('../../test.utils');
+import {assert} from "chai";
+import "mocha";
+import {MAX_TIMEOUT, session} from "../../test.utils";
 
-describe('Collection', () => {
+describe('Schema', () => {
 
 
     let MODEL_NAME = "schema_test";
     let MODEL_EXTENDS = "schema_test_extends";
 
-    it('#Collection::collection - negative check', function () {
+    it('#ODM::collection - negative check', function () {
         assert.isOk(session.odm.collection('unknown_collection') === undefined, "Collection should not exists");
     });
 
-    it('#Collection::defineCollection - simple', function () {
+    it('#ODM::defineCollection - simple', function () {
         this.timeout(MAX_TIMEOUT);
         session.odm.defineCollection({
             name: MODEL_NAME,
@@ -32,7 +33,7 @@ describe('Collection', () => {
         assert.isOk(true, "Collection not create as expected");
     });
 
-    it('#Collection::defineCollection - extends negative check', function () {
+    it('#ODM::defineCollection - extends negative check', function () {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
@@ -51,7 +52,7 @@ describe('Collection', () => {
         assert.isOk(assertValue, "Collection should not get extended, with name fields");
     });
 
-    it('#Collection::defineCollection - extends positive check', function () {
+    it('#ODM::defineCollection - extends positive check', function () {
         this.timeout(MAX_TIMEOUT);
         session.odm.defineCollection({
             name: MODEL_EXTENDS,
@@ -65,7 +66,7 @@ describe('Collection', () => {
         assert.isOk(true, "Collection should get extended");
     });
 
-    it('#Collection::defineCollection - extends positive check', function () {
+    it('#ODM::defineCollection - extends positive check', function () {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
