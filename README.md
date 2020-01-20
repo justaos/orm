@@ -1,5 +1,5 @@
-# Anysols ODM
-Anysols ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database.
+# plt4rm's ODM
+plt4rm's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database.
  
  Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete). 
 
