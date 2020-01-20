@@ -1,8 +1,10 @@
-const {assert} = require('chai');
-const {MAX_TIMEOUT} = require('../../test.utils');
-const {DatabaseConfiguration, DatabaseConnection} = require("../../../lib/core");
+import {assert} from "chai";
+import "mocha";
+import {DatabaseConfiguration, DatabaseConnection} from "../../../src/core";
+import {MAX_TIMEOUT} from "../../test.utils";
 
-const defaultConfig = {
+
+const defaultConfig: any = {
     host: "localhost",
     port: "27017",
     database: "odm-conn-test",
@@ -12,20 +14,20 @@ const defaultConfig = {
 describe('DatabaseConnection', () => {
 
     it('#DatabaseConfiguration::getUri with username/password', function () {
-        const config = {...defaultConfig, username: "admin", password: "admin"};
+        const config: any = {...defaultConfig, username: "admin", password: "admin"};
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
         assert.equal(dbConfig.getUri(), 'mongodb://admin:admin@localhost:27017/odm-conn-test', "Unexpected uri generated");
     });
 
     it('#DatabaseConfiguration::getUri without username/password', function () {
-        const config = {
+        const config: any = {
             ...defaultConfig
         };
         let dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
         assert.equal(dbConfig.getUri(), 'mongodb://localhost:27017/odm-conn-test', "Unexpected uri generated");
     });
 
-    let dbConnection;
+    let dbConnection: DatabaseConnection;
 
     it('#DatabaseService::connect', function (done) {
         this.timeout(MAX_TIMEOUT);

@@ -1,12 +1,12 @@
 {
     "name": "@plt4rm/odm",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "description": "plt4rm's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
     "main": "./index.js",
     "scripts": {
         "prepare": "npm run build",
         "build": "gulp | tsc",
-        "test": "nyc mocha --recursive test/init.test.js test/unit/**/*test.js test/end.test.js",
+        "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
         "coverage": "nyc report --reporter=text-lcov | coveralls",
         "release": "npm publish"
     },
@@ -25,13 +25,16 @@
         "check-coverage": false,
         "all": true,
         "extension": [
-            ".js"
+            ".ts"
         ],
         "include": [
-            "lib/"
+            "src/**/*.ts"
         ],
         "exclude": [
-            "**/**.interface.js"
+            "**/**.interface.ts"
+        ],
+        "require": [
+            "ts-node/register"
         ],
         "reporter": [
             "html",
@@ -58,12 +61,15 @@
         "@plt4rm/utils": "^0.6.6"
     },
     "devDependencies": {
+        "@types/chai": "^4.2.7",
+        "@types/mocha": "^5.2.7",
         "chai": "^4.2.0",
         "coveralls": "^3.0.6",
         "del": "^5.1.0",
         "gulp": "^4.0.2",
-        "mocha": "^6.2.0",
+        "mocha": "^6.2.2",
         "nyc": "^14.1.1",
-        "typescript": "^3.6.2"
+        "typescript": "^3.6.2",
+        "ts-node": "^8.5.4"
     }
 }

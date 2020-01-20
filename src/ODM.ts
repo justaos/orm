@@ -1,5 +1,5 @@
 import {DatabaseConfiguration, DatabaseConnection} from "./core";
-
+import {ObjectId} from "mongodb"
 import Collection from "./collection/Collection";
 import CollectionRegistry from "./collection/CollectionRegistry";
 
@@ -82,6 +82,10 @@ export default class ODM {
 
     deleteInterceptor(operationInterceptorName: string): void {
         _getOperationInterceptorService(this).deleteInterceptor(operationInterceptorName);
+    }
+
+    generateNewObjectId(): ObjectId {
+        return new ObjectId();
     }
 
 }

@@ -1,6 +1,7 @@
-const {assert} = require('chai');
-const {session} = require('../test.utils');
-const {StringDataType} = require("../../lib");
+import {assert} from "chai";
+import "mocha";
+import {StringDataType} from "../../src";
+import {session} from "../test.utils";
 
 describe('FieldType', () => {
 

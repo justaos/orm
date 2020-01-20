@@ -1,11 +1,12 @@
-const {ObjectId} = require('mongodb');
-const {assert} = require('chai');
-const {session, MAX_TIMEOUT, logger} = require('../../test.utils');
+import {assert} from "chai";
+import "mocha";
+import {Record} from "../../../src";
+import {session, MAX_TIMEOUT, logger} from "../../test.utils";
 
 describe('Collection', () => {
 
 
-    let johnRecord;
+    let johnRecord: Record;
     let johnObject;
     let MODEL_NAME = "employee";
 
@@ -48,7 +49,7 @@ describe('Collection', () => {
         let employeeCollection = session.odm.collection(MODEL_NAME);
         let empRecord = employeeCollection.createNewRecord();
         empRecord.set("name", "John");
-        empRecord.set("emp_no",  new ObjectId());
+        empRecord.set("emp_no", session.odm.generateNewObjectId());
         empRecord.set("birth_date", new Date());
         empRecord.set("gender", true);
         empRecord.set("salary", 10000);
@@ -56,7 +57,7 @@ describe('Collection', () => {
             "street": "test",
             "zipcode": 500000
         });
-        empRecord.insert().then((rec) => {
+        empRecord.insert().then((rec: Record) => {
             johnRecord = rec;
             johnObject = rec.toObject();
             assert.isOk(johnObject.name === 'John', 'record not created');
@@ -85,7 +86,7 @@ describe('Collection', () => {
     it('#Collection::find', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
-        employeeCollection.find().toArray().then((employees) => {
+        employeeCollection.find().toArray().then((employees: Record[]) => {
             if (employees.length === 1)
                 done();
         });
@@ -94,7 +95,7 @@ describe('Collection', () => {
     it('#Collection::findById', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
-        employeeCollection.findById(johnRecord.getID()).then((employee) => {
+        employeeCollection.findById(johnRecord.getID()).then((employee: Record) => {
             if (employee.get('name') === "John")
                 done();
         });
@@ -103,7 +104,7 @@ describe('Collection', () => {
     it('#Collection::findOne', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
-        employeeCollection.findOne({"name": "John"}).then((employee) => {
+        employeeCollection.findOne({"name": "John"}).then((employee: Record) => {
             if (employee.getID().toString() === johnRecord.getID().toString())
                 done();
         });
@@ -113,7 +114,7 @@ describe('Collection', () => {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         johnRecord.delete().then(() => {
-            employeeCollection.findById(johnRecord.getID()).then((record) => {
+            employeeCollection.findById(johnRecord.getID()).then((record: Record) => {
                 if (!record)
                     done();
             })

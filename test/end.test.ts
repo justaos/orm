@@ -1,5 +1,6 @@
-const {assert} = require('chai');
-const {session, MAX_TIMEOUT} = require('./test.utils');
+import {assert} from "chai";
+import "mocha";
+import {MAX_TIMEOUT, session} from "./test.utils";
 
 describe('End test cleanup', () => {
 

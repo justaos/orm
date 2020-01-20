@@ -1,10 +1,12 @@
+import {Record} from "../../../src";
+
 const {OPERATIONS, OPERATION_WHEN} = require("../../../lib");
 const {assert} = require('chai');
 const {session, MAX_TIMEOUT, logger} = require('../../test.utils');
 
-describe('intercept.test.js', () => {
+describe('Operations Intercept', () => {
 
-    let MODEL_NAME = "intecept";
+    let MODEL_NAME = "intercept";
 
     it('#ODM::addInterceptor', function (done) {
         this.timeout(MAX_TIMEOUT);
@@ -14,7 +16,7 @@ describe('intercept.test.js', () => {
                 return "my-intercept";
             },
 
-            intercept: (collectionName, operation, when, payload) => {
+            intercept: (collectionName: string, operation: string, when: string, payload: any) => {
                 return new Promise((resolve, reject) => {
                     if (collectionName === MODEL_NAME) {
                         if (operation === OPERATIONS.CREATE) {
@@ -45,10 +47,10 @@ describe('intercept.test.js', () => {
         let interceptTestCollection = session.odm.collection(MODEL_NAME);
         let s = interceptTestCollection.createNewRecord();
         s.set("name", "John");
-        s.insert().then(function (rec) {
+        s.insert().then(function (rec: Record) {
             assert.isOk(rec.get("computed") === "this is computed", "read interceptor not computed the value");
             done();
-        }, function (err) {
+        }, function (err: Error) {
             logger.info(err.message + "");
             done();
         });
@@ -62,10 +64,10 @@ describe('intercept.test.js', () => {
         let interceptTestCollection = session.odm.collection(MODEL_NAME);
         let s = interceptTestCollection.createNewRecord();
         s.set("name", "Ravi");
-        s.insert().then(function (rec) {
+        s.insert().then(function (rec: Record) {
             assert.isOk(rec.get("computed") !== "this is computed", "read interceptor computed the value");
             done();
-        }, function (err) {
+        }, function (err: Error) {
             logger.logError(err);
             done();
         });

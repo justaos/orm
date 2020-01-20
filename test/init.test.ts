@@ -1,6 +1,7 @@
-const {assert} = require('chai');
-const {ODM} = require('../');
-const {session, MAX_TIMEOUT} = require('./test.utils');
+import {assert} from "chai";
+import "mocha";
+import {ODM} from "../src";
+import {session, MAX_TIMEOUT} from "./test.utils";
 
 describe('Initial test setup', () => {
 
