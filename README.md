@@ -5,6 +5,7 @@ plt4rm's ODM (Object Document Mapper) is built for NodeJS and provides transpare
 
 [![Build](https://github.com/plt4rm/odm/workflows/Node%20CI/badge.svg)](https://github.com/plt4rm/odm/actions?workflow=Node+CI)
 [![Coverage Status](https://coveralls.io/repos/github/plt4rm/odm/badge.svg?branch=master)](https://coveralls.io/github/plt4rm/odm?branch=master)
+[![CodeFactor](https://www.codefactor.io/repository/github/plt4rm/odm/badge)](https://www.codefactor.io/repository/github/plt4rm/odm)
 
 ```bash
 npm install --save @plt4rm/odm
