@@ -40,3 +40,24 @@ jobs:
       with:
         path-to-lcov: ./docs/reports/coverage/lcov.info
         github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
+          registry-url: https://registry.npmjs.org/
+
+      - run: npm ci
+
+      - id: publish
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+
+      - if: steps.publish.type != 'none'
+        run: |
+          echo "Version changed: ${{ steps.publish.old-version }} => ${{ steps.publish.version }}"
