@@ -92,7 +92,7 @@ describe('Collection', () => {
         });
     });
 
-    it('#Collection::findById', function (done) {
+    it('#Collection::findById ObjectId', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         employeeCollection.findById(johnRecord.getID()).then((employee: Record) => {
@@ -100,6 +100,16 @@ describe('Collection', () => {
                 done();
         });
     });
+
+    it('#Collection::findById string', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeCollection = session.odm.collection(MODEL_NAME);
+        employeeCollection.findById(johnRecord.getID().toString()).then((employee: Record) => {
+            if (employee.get('name') === "John")
+                done();
+        });
+    });
+
 
     it('#Collection::findOne', function (done) {
         this.timeout(MAX_TIMEOUT);

@@ -2,7 +2,7 @@ import Cursor from "../Cursor";
 import Record from "../record/Record";
 import OperationInterceptorService from "../operation-interceptor/OperationInterceptorService";
 import Schema from "../Schema";
-import {FindOneOptions} from "mongodb";
+import {FindOneOptions, ObjectId} from "mongodb";
 import * as mongodb from "mongodb";
 import {OPERATION_WHEN, OPERATIONS} from "../constants";
 
@@ -26,7 +26,9 @@ export default class Collection {
         return new Record(null, this).initialize();
     }
 
-    findById(id: string): Promise<Record | null> {
+    findById(id: ObjectId | string): Promise<Record | null> {
+        if (typeof id === 'string')
+            id = new ObjectId(id);
         return this.findOne({_id: id}, {});
     }
 
