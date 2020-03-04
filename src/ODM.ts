@@ -32,7 +32,7 @@ export default class ODM {
     async connect(config: any) {
         if (!config)
             throw new Error("ODM::connect -> There is no config provided");
-        const dbConfig = new DatabaseConfiguration(config.host, config.port, config.database, config.username, config.password, config.dialect);
+        const dbConfig = new DatabaseConfiguration(config.host, config.port, config.dialect, config.database, config.username, config.password);
         const conn = await DatabaseConnection.connect(dbConfig);
         await conn.deleteAllIndexes();
         _setConnection(this, conn);
