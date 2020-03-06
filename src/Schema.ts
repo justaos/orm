@@ -24,7 +24,7 @@ export default class Schema {
         return !!_getSchemaObject(this).final;
     }
 
-    getHostName(): string {
+    getBaseName(): string {
         let hostName = this.getName();
         const extendsCollectionName = this.getExtends();
         if (extendsCollectionName) {
@@ -35,7 +35,6 @@ export default class Schema {
     }
 
     getFields(): any[] {
-        const schemaObject: any = _getSchemaObject(this);
         let allFields: any[] = [];
 
         let fields = _getFields(this);

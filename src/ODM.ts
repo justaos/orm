@@ -56,7 +56,7 @@ export default class ODM {
     defineCollection(schemaJson: any) {
         const that = this;
         const schema = new Schema(schemaJson, _getFieldTypeRegistry(that), _getCollectionRegistry(this));
-        const col = new Collection(_getConnection(that).getDBO().collection(schema.getHostName()), schema, _getOperationInterceptorService(that));
+        const col = new Collection(_getConnection(that).getDBO().collection(schema.getBaseName()), schema, _getOperationInterceptorService(that));
         _getCollectionRegistry(this).addCollection(col);
     }
 
