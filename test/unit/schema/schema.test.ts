@@ -1,5 +1,6 @@
 import {assert} from "chai";
 import "mocha";
+import {ObjectId} from "mongodb"
 import {MAX_TIMEOUT, session} from "../../test.utils";
 
 describe('Schema', () => {
@@ -82,6 +83,11 @@ describe('Schema', () => {
             assertValue = true;
         }
         assert.isOk(assertValue, "Collection should not extend, final schema");
+    });
+
+    it('#ODM::convertToObjectId', function () {
+        const newId = session.odm.convertToObjectId('569ed8269353e9f4c51617aa');
+        assert.isOk(ObjectId.isValid(newId), "Collection should not extend, final schema");
     });
 
 });

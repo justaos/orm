@@ -88,6 +88,10 @@ export default class ODM {
         return new ObjectId();
     }
 
+    convertToObjectId(id: string): ObjectId {
+        return new ObjectId(id);
+    }
+
 }
 
 /**
