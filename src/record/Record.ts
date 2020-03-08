@@ -29,7 +29,7 @@ export default class Record {
     set(key: string, value: any) {
         const schema: Schema = _getSchema(this);
         const field = schema.getField(key);
-        if (field === 'objectId' && typeof value === 'string')
+        if (field && field.type === 'objectId' && typeof value === 'string')
             this.record[key] = new ObjectId(value);
         else
             this.record[key] = value;
