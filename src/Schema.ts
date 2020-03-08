@@ -37,7 +37,7 @@ export default class Schema {
     getFields(): any[] {
         let allFields: any[] = [];
 
-        let fields = _getFields(this);
+        const fields = _getFields(this);
         if (fields)
             allFields = allFields.concat(fields);
 
@@ -52,6 +52,24 @@ export default class Schema {
             });
         }
         return allFields;
+    }
+
+    getField(name: string): any {
+        if (name === '_id')
+            return {
+                name: '_id',
+                type: 'object'
+            };
+        const fields = _getFields(this);
+        for (let field of fields) {
+            if (field.name === name)
+                return field;
+        }
+        const extendsCollectionName = this.getExtends();
+        if (extendsCollectionName) {
+            const extendedSchema = _getCollection(this, extendsCollectionName).getSchema();
+            return extendedSchema.getField(name);
+        }
     }
 
     validate(recordObject: any) {

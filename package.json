@@ -1,6 +1,6 @@
 {
     "name": "@plt4rm/odm",
-    "version": "1.7.7",
+    "version": "1.8.0",
     "description": "PLT4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
     "main": "./index.js",
     "scripts": {
