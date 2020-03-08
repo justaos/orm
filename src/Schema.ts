@@ -49,7 +49,8 @@ export default class Schema {
         } else {
             allFields.push({
                 name: '_id',
-                type: 'objectId'
+                type: 'objectId',
+                dataType: 'objectId'
             });
         }
         return allFields;
@@ -59,7 +60,8 @@ export default class Schema {
         if (name === '_id')
             return {
                 name: '_id',
-                type: 'objectId'
+                type: 'objectId',
+                dataType: 'objectId'
             };
         const fields = _getFields(this);
         for (let field of fields) {
