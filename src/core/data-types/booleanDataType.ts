@@ -2,6 +2,8 @@ import DataType from "./dataType.interface";
 
 export default class BooleanDataType extends DataType {
 
+    type: string = 'boolean';
+
     config: any;
 
     constructor(config: any = {}) {

@@ -2,6 +2,8 @@ import DataType from "./dataType.interface";
 
 export default class DateDataType extends DataType {
 
+    type: string = 'date';
+
     config: any;
 
     constructor(config: any = {}) {

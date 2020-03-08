@@ -3,6 +3,8 @@ import {ObjectId} from "mongodb";
 
 export default class ObjectIdDataType extends DataType {
 
+    type: string = 'objectId';
+
     config: any;
 
     constructor(config: any = {}) {

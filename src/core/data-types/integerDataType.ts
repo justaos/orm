@@ -2,6 +2,8 @@ import DataType from "./dataType.interface";
 
 export default class IntegerDataType extends DataType {
 
+    type: string = 'integer';
+
     config: any;
 
     constructor(config: any = {}) {

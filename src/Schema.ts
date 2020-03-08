@@ -10,6 +10,7 @@ export default class Schema {
     constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry, collectionRegistry: CollectionRegistry) {
         privates.set(this, {fieldTypeRegistry, collectionRegistry, schema: schemaObject});
         _validateSchemaObject(this);
+        _populateFieldsWithDataType(this);
     }
 
     getName(): string {
@@ -137,6 +138,17 @@ function _validateSchemaObject(that: Schema) {
     const fieldNames: string[] = allFieldsObjects.map((f: any) => f.name);
     if (_areDuplicatesPresent(fieldNames))
         throw _validateSchemaError("Duplicate field name [collectionName=" + schemaObject.name + ", fieldNames=" + fieldNames + "]");
+}
+
+function _populateFieldsWithDataType(that: Schema) {
+    let fields = _getFields(that);
+    if (fields)
+        for (let field of fields) {
+            const fieldType: any = _getFieldType(that, field.type);
+            if (!fieldType)
+                throw Error("Field type should be defined");
+            field.dataType = fieldType.getDataType(field).type;
+        }
 }
 
 function _areDuplicatesPresent(a: string[]): boolean {
