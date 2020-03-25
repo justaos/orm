@@ -1,7 +1,7 @@
 import {DatabaseConfiguration, DatabaseConnection} from "./core";
 import {ObjectId} from "mongodb"
 import Collection from "./collection/Collection";
-import CollectionRegistry from "./collection/CollectionRegistry";
+import CollectionDefinitionRegistry from "./collection/CollectionDefinitionRegistry";
 
 import OperationInterceptorService from "./operation-interceptor/OperationInterceptorService";
 import OperationInterceptorInterface from "./operation-interceptor/OperationInterceptor.interface";
@@ -16,6 +16,7 @@ import FieldTypeRegistry from "./field-types/FieldTypeRegistry";
 import ObjectFieldType from "./field-types/types/ObjectFieldType";
 import BooleanFieldType from "./field-types/types/BooleanFieldType";
 import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType";
+import CollectionDefinition from "./collection/CollectionDefinition";
 
 const privates = new WeakMap();
 
@@ -23,9 +24,9 @@ export default class ODM {
 
     constructor() {
         const fieldTypeRegistry = new FieldTypeRegistry();
-        const collectionRegistry = new CollectionRegistry();
+        const collectionDefinitionRegistry = new CollectionDefinitionRegistry();
         const operationInterceptorService = new OperationInterceptorService();
-        privates.set(this, {fieldTypeRegistry, collectionRegistry, operationInterceptorService});
+        privates.set(this, {fieldTypeRegistry, collectionDefinitionRegistry, operationInterceptorService});
         _loadBuildInFieldTypes(this);
     }
 
@@ -55,21 +56,24 @@ export default class ODM {
 
     defineCollection(schemaJson: any) {
         const that = this;
-        const schema = new Schema(schemaJson, _getFieldTypeRegistry(that), _getCollectionRegistry(this));
-        const col = new Collection(_getConnection(that).getDBO().collection(schema.getBaseName()), schema, _getOperationInterceptorService(that));
-        _getCollectionRegistry(this).addCollection(col);
+        const schema = new Schema(schemaJson, _getFieldTypeRegistry(that), _getCollectionDefinitionRegistry(this));
+        const col = new CollectionDefinition(_getConnection(that).getDBO().collection(schema.getBaseName()), schema, _getOperationInterceptorService(this));
+        _getCollectionDefinitionRegistry(this).addCollectionDefinition(col);
     }
 
-    collection(colName: string): Collection | undefined {
-        return _getCollectionRegistry(this).getCollection(colName);
+    collection(colName: string, context?: any): Collection | undefined {
+        const collectionDefinition: CollectionDefinition | undefined = _getCollectionDefinitionRegistry(this).getCollectionDefinition(colName);
+        if (collectionDefinition === undefined)
+            return undefined;
+        return new Collection(collectionDefinition, context)
     }
 
     removeCollection(collectionName: string): void {
-        _getCollectionRegistry(this).deleteCollection(collectionName);
+        _getCollectionDefinitionRegistry(this).deleteCollectionDefinition(collectionName);
     }
 
     isCollectionDefined(collectionName: string): boolean {
-        return _getCollectionRegistry(this).hasCollection(collectionName);
+        return _getCollectionDefinitionRegistry(this).hasCollectionDefinition(collectionName);
     }
 
     addFieldType(fieldType: FieldType): void {
@@ -108,8 +112,8 @@ function _getConnection(that: ODM): DatabaseConnection {
     return conn;
 }
 
-function _getCollectionRegistry(that: ODM): CollectionRegistry {
-    return privates.get(that).collectionRegistry;
+function _getCollectionDefinitionRegistry(that: ODM): CollectionDefinitionRegistry {
+    return privates.get(that).collectionDefinitionRegistry;
 }
 
 function _getFieldTypeRegistry(that: ODM): FieldTypeRegistry {

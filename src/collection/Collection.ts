@@ -5,13 +5,14 @@ import Schema from "../Schema";
 import {FindOneOptions, ObjectId} from "mongodb";
 import * as mongodb from "mongodb";
 import {OPERATION_WHEN, OPERATIONS} from "../constants";
+import CollectionDefinition from "./CollectionDefinition";
 
 const privates = new WeakMap();
 
 export default class Collection {
 
-    constructor(collection: any, schema: Schema, operationInterceptorService: OperationInterceptorService) {
-        privates.set(this, {collection, schema, operationInterceptorService});
+    constructor(collectionDefinition: CollectionDefinition, context?: any) {
+        privates.set(this, {collectionDefinition, context});
     }
 
     getName(): string {
@@ -19,7 +20,7 @@ export default class Collection {
     }
 
     getSchema(): Schema {
-        return privates.get(this).schema;
+        return _getCollectionDefinition(this).getSchema();
     }
 
     createNewRecord() {
@@ -68,12 +69,16 @@ export default class Collection {
 
 }
 
+function _getCollectionDefinition(that: Collection): CollectionDefinition {
+    return privates.get(that).collectionDefinition;
+}
+
 function _getMongoCollection(that: Collection): mongodb.Collection {
-    return privates.get(that).collection;
+    return _getCollectionDefinition(that).getCollection();
 }
 
 function _getOperationInterceptorService(that: Collection): OperationInterceptorService {
-    return privates.get(that).operationInterceptorService;
+    return _getCollectionDefinition(that).getOperationInterceptorService();
 }
 
 async function _interceptRecord(that: Collection, operation: string, when: string, record: Record): Promise<Record> {
@@ -83,7 +88,7 @@ async function _interceptRecord(that: Collection, operation: string, when: strin
 
 async function _intercept(that: Collection, operation: string, when: string, payload: any): Promise<any> {
     const operationInterceptorService = _getOperationInterceptorService(that);
-    return await operationInterceptorService.intercept(that.getName(), operation, when, payload);
+    return await operationInterceptorService.intercept(that.getName(), operation, when, payload, privates.get(that).context);
 }
 
 

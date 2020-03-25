@@ -1,14 +1,14 @@
 import FieldTypeRegistry from "./field-types/FieldTypeRegistry";
 import FieldType from "./field-types/FieldType.interface";
-import CollectionRegistry from "./collection/CollectionRegistry";
+import CollectionDefinitionRegistry from "./collection/CollectionDefinitionRegistry";
 import Collection from "./collection/Collection";
 
 const privates = new WeakMap();
 
 export default class Schema {
 
-    constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry, collectionRegistry: CollectionRegistry) {
-        privates.set(this, {fieldTypeRegistry, collectionRegistry, schema: schemaObject});
+    constructor(schemaObject: any, fieldTypeRegistry: FieldTypeRegistry, collectionDefinitionRegistry: CollectionDefinitionRegistry) {
+        privates.set(this, {fieldTypeRegistry, collectionDefinitionRegistry, schema: schemaObject});
         _validateSchemaObject(this);
         _populateFieldsWithDataType(this);
     }
@@ -127,7 +127,9 @@ function _validateSchemaObject(that: Schema) {
     }
 
     const allFieldsObjects = that.getFields();
+    console.log(JSON.stringify(allFieldsObjects));
     for (const fieldObject of allFieldsObjects) {
+        console.log(JSON.stringify(fieldObject));
         if (!fieldObject || !fieldObject.type)
             throw _validateSchemaError("field type provided - [collectionName=" + schemaObject.name + "]");
         const fieldType = _getFieldType(that, fieldObject.type);
@@ -178,17 +180,17 @@ function _getFieldType(that: Schema, type: string): FieldType | undefined {
     return _getFieldTypeRegistry(that).getFieldType(type);
 }
 
-function _getCollectionRegistry(that: Schema): CollectionRegistry {
-    return privates.get(that).collectionRegistry;
+function _getCollectionDefinitionRegistry(that: Schema): CollectionDefinitionRegistry {
+    return privates.get(that).collectionDefinitionRegistry;
 }
 
 function _getCollection(that: Schema, collectionName: string): Collection {
-    const col = _getCollectionRegistry(that).getCollection(collectionName);
-    if (!col)
+    const collectionDefinition = _getCollectionDefinitionRegistry(that).getCollectionDefinition(collectionName);
+    if (!collectionDefinition)
         throw Error("[Schema::_getCollection] Collection not found");
-    return col;
+    return new Collection(collectionDefinition);
 }
 
 function _hasCollection(that: Schema, collectionName: string): boolean {
-    return _getCollectionRegistry(that).hasCollection(collectionName);
+    return _getCollectionDefinitionRegistry(that).hasCollectionDefinition(collectionName);
 }

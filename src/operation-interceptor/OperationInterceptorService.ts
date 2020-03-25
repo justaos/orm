@@ -18,12 +18,12 @@ export default class OperationInterceptorService {
         return (this.interceptors.size !== 0);
     }
 
-    async intercept(collectionName: string, operation: string, when: string, payload: any): Promise<any> {
+    async intercept(collectionName: string, operation: string, when: string, payload: any, context?: any): Promise<any> {
         const inactiveIntercepts: any = [];
         if (this.hasInterceptors())
             for (const [name, interceptor] of this.interceptors.entries())
                 if (!inactiveIntercepts || !inactiveIntercepts.includes(name)) {
-                    payload = await interceptor.intercept(collectionName, operation, when, payload);
+                    payload = await interceptor.intercept(collectionName, operation, when, payload, context);
                     if (!payload)
                         break;
                 }

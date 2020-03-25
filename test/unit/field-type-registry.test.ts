@@ -1,7 +1,10 @@
 import {assert} from "chai";
 import "mocha";
-import {StringDataType} from "../../src";
+import {Record, StringDataType} from "../../src";
 import {session} from "../test.utils";
+import {getLoggerInstance} from "../../src/utils";
+
+const logger = getLoggerInstance("FieldType");
 
 describe('FieldType', () => {
 
@@ -14,7 +17,7 @@ describe('FieldType', () => {
 
         session.odm.addFieldType({
 
-            getDataType: function (fieldDefinition) {
+            getDataType: function (fieldDefinition: any) {
                 return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
             },
 
@@ -22,7 +25,7 @@ describe('FieldType', () => {
                 return "email"
             },
 
-            validateDefinition: function (fieldDefinition) {
+            validateDefinition: function (fieldDefinition: any) {
                 return !!fieldDefinition.name
             }
         });
@@ -40,7 +43,7 @@ describe('FieldType', () => {
             });
             assert.isOk(true, "Custom field defined as expected");
         } catch (err) {
-            logger.logError(err);
+            console.error(err);
             assert.isOk(false, "Custom field not defined as expected");
         }
 
@@ -52,12 +55,12 @@ describe('FieldType', () => {
         let rec = collection.createNewRecord();
         rec.set("name", "RAM");
         rec.set(EMAIL_FIELD, EMAIL_VALUE);
-        rec.insert().then(function (rec) {
-            collection.find({[EMAIL_FIELD]: EMAIL_VALUE}).toArray().then(function (records) {
+        rec.insert().then(function (rec: Record) {
+            collection.find({[EMAIL_FIELD]: EMAIL_VALUE}).toArray().then(function (records: Record[]) {
                 if (records.length === 1 && records[0].get(EMAIL_FIELD) === EMAIL_VALUE)
                     done();
             });
-        }, function (err) {
+        }, function (err: Error) {
             logger.logError(err);
         });
     });
