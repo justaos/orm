@@ -127,9 +127,7 @@ function _validateSchemaObject(that: Schema) {
     }
 
     const allFieldsObjects = that.getFields();
-    console.log(JSON.stringify(allFieldsObjects));
     for (const fieldObject of allFieldsObjects) {
-        console.log(JSON.stringify(fieldObject));
         if (!fieldObject || !fieldObject.type)
             throw _validateSchemaError("field type provided - [collectionName=" + schemaObject.name + "]");
         const fieldType = _getFieldType(that, fieldObject.type);
