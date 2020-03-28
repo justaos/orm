@@ -58,7 +58,7 @@
     "dependencies": {
         "@types/mongodb": "^3.3.4",
         "mongodb": "^3.3.2",
-        "@plt4rm/utils": "^0.7.2"
+        "@plt4rm/utils": "^0.7.3"
     },
     "devDependencies": {
         "@types/chai": "^4.2.7",
