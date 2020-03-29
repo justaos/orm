@@ -12,7 +12,8 @@ const privates = new WeakMap();
 export default class Collection {
 
     constructor(collectionDefinition: CollectionDefinition, context?: any) {
-        privates.set(this, {collectionDefinition, context});
+        const inactiveIntercepts: [] = [];
+        privates.set(this, {collectionDefinition, context, inactiveIntercepts});
     }
 
     getName(): string {
@@ -33,6 +34,18 @@ export default class Collection {
         return this.findOne({_id: id}, {});
     }
 
+    deactivateIntercept(interceptName: string) {
+        this.getInActivateIntercepts().push(interceptName);
+    }
+
+    getInActivateIntercepts(): any {
+        return privates.get(this).inactiveIntercepts;
+    }
+
+    clearInActivateIntercepts() {
+        privates.get(this).inactiveIntercepts = [];
+    }
+
     async findOne(filter: any, options?: FindOneOptions): Promise<Record | null> {
         const doc = await _getMongoCollection(this).findOne(filter, options);
         if (doc)
@@ -42,7 +55,7 @@ export default class Collection {
 
     find(filter: any, options?: any): Cursor {
         const cursor = _getMongoCollection(this).find(filter, options);
-        return new Cursor(cursor, this, _getOperationInterceptorService(this))
+        return new Cursor(cursor, this)
     }
 
     async insertRecord(record: Record): Promise<Record> {
@@ -67,6 +80,10 @@ export default class Collection {
         await _interceptRecord(this, OPERATIONS.DELETE, 'after', record);
     }
 
+    async intercept(operation: string, when: string, payload: any) {
+        return await _intercept(this, operation, when, payload);
+    }
+
 }
 
 function _getCollectionDefinition(that: Collection): CollectionDefinition {
@@ -88,7 +105,7 @@ async function _interceptRecord(that: Collection, operation: string, when: strin
 
 async function _intercept(that: Collection, operation: string, when: string, payload: any): Promise<any> {
     const operationInterceptorService = _getOperationInterceptorService(that);
-    return await operationInterceptorService.intercept(that.getName(), operation, when, payload, privates.get(that).context);
+    return await operationInterceptorService.intercept(that.getName(), operation, when, payload, privates.get(that).context, privates.get(that).inactiveIntercepts);
 }
 
 

@@ -1,5 +1,5 @@
 import {DatabaseConfiguration, DatabaseConnection} from "./core";
-import {ObjectId} from "mongodb"
+import {ObjectId} from "mongodb";
 import Collection from "./collection/Collection";
 import CollectionDefinitionRegistry from "./collection/CollectionDefinitionRegistry";
 
