@@ -56,7 +56,7 @@
     },
     "homepage": "https://plt4rm.com",
     "dependencies": {
-        "mongodb": "^3.5.4",
+        "mongodb": "^3.5.6",
         "@types/mongodb": "^3.5.5",
         "@plt4rm/utils": "^0.7.3"
     },
