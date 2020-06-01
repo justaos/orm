@@ -16,6 +16,11 @@ export default class Cursor {
         return this;
     }
 
+    limit(num: number) {
+        _getCursor(this).limit(num);
+        return this;
+    }
+
     async toArray(): Promise<Record[]> {
         const col = _getCollection(this);
         const docs = await _getCursor(this).toArray();

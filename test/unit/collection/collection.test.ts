@@ -131,5 +131,38 @@ describe('Collection', () => {
         })
     });
 
+    /**
+     * SORT
+     */
+    it('#Collection::Cursor::sort', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        session.odm.defineCollection({
+            name: "sort_test",
+            fields: [{
+                name: 'number',
+                type: 'integer'
+            }]
+        });
+        const sortCollection = session.odm.collection("sort_test");
+        const rec = sortCollection.createNewRecord();
+        rec.set("number", 2);
+        rec.insert().then((rec: Record) => {
+            rec = sortCollection.createNewRecord();
+            rec.set("number", 1);
+            rec.insert().then((rec: Record) => {
+                sortCollection.find({}).sort([['number', 1]]).toArray().then(function(recs: Record[]) {
+                    let expected = 1;
+                    recs.forEach(function(rec: Record){
+                        assert.isOk(rec.get('number') == expected, "Not expected value");
+                        expected++;
+                    });
+                    done();
+                });
+
+
+            });
+        });
+    });
+
 });
 
