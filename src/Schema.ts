@@ -75,6 +75,11 @@ export default class Schema {
         }
     }
 
+    getFieldType(name: string): FieldType | undefined {
+        const field = this.getField(name);
+        return _getFieldType(this, field.type);
+    }
+
     validate(recordObject: any) {
         const that = this;
         const errorMessages: string[] = [];

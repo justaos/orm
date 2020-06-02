@@ -39,6 +39,14 @@ export default class Record {
         return this.record[key];
     }
 
+    async getDisplayValue(key: string) {
+        const schema = _getSchema(this);
+        const fieldDef = schema.getField(key);
+        const fieldType = schema.getFieldType(key);
+        if (fieldType)
+            return fieldType.getDisplayValue(fieldDef, this.record[key]);
+    }
+
     async insert() {
         let record = await _getCollection(this).insertRecord(this);
         this.record = record.toObject();
@@ -62,10 +70,26 @@ export default class Record {
 
     toObject() {
         const record = this.record;
-        let obj: any = {};
-        _getSchema(this).getFields().map(function (fieldDefinition: any) {
-            obj[fieldDefinition.name] = typeof record[fieldDefinition.name] === "undefined" ? null : record[fieldDefinition.name];
+        const obj: any = {};
+        _getSchema(this).getFields().map(function (field: any) {
+            obj[field.name] = typeof record[field.name] === "undefined" ? null : record[field.name];
         });
+        return obj;
+    }
+
+    async toObjectWithDisplayValues() {
+        const that = this;
+        const record = this.record;
+        const obj: any = {};
+        for(let field of _getSchema(this).getFields()) {
+            if (typeof record[field.name] === "undefined")
+                obj[field.name] = null;
+            else
+                obj[field.name] = {
+                    value: record[field.name],
+                    displayValue: await that.getDisplayValue(field.name)
+                };
+        }
         return obj;
     }
 }

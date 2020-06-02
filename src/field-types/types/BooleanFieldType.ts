@@ -15,4 +15,8 @@ export default class BooleanFieldType implements FieldType {
     validateDefinition(fieldDefinition: any): boolean {
         return !!fieldDefinition.name
     }
+
+    async getDisplayValue(fieldDefinition: any, value: boolean) {
+        return value
+    }
 }

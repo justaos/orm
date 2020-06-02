@@ -15,4 +15,8 @@ export default class DateFieldType implements FieldType {
     validateDefinition(fieldDefinition: any): boolean {
         return !!fieldDefinition.name
     }
+
+    async getDisplayValue(fieldDefinition: any, value: any) {
+        return value
+    }
 }

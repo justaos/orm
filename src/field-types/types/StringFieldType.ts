@@ -15,4 +15,8 @@ export default class StringFieldType implements FieldType {
     validateDefinition(fieldDefinition: any): boolean {
         return !!fieldDefinition.name
     }
+
+    async getDisplayValue(fieldDefinition: any, value: string) {
+        return value
+    }
 }

@@ -22,9 +22,10 @@ getODM().then(async function (odm) {
         await t.insert();
     }*/
 
-    teacherCol.find({}, {sort: {'roll_no': 1}}).toArray().then(function(records) {
-        records.forEach(function(rec){
-            console.log(rec.get('name') + " :: " + rec.get('roll_no'));
+    teacherCol.find({}, {sort: {'roll_no': -1}}).toArray().then(function(records) {
+        records.forEach(async function(rec){
+            console.log(await rec.getDisplayValue('name') + " :: " + await rec.getDisplayValue('roll_no'));
+            console.log(JSON.stringify(await rec.toObjectWithDisplayValues(), null, 4))
         });
     });
 
