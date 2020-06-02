@@ -16,7 +16,7 @@ export default class BooleanFieldType implements FieldType {
         return !!fieldDefinition.name
     }
 
-    async getDisplayValue(fieldDefinition: any, value: boolean) {
+    async getDisplayValue(schema: any, fieldDefinition: any, value: boolean) {
         return value
     }
 }

@@ -16,7 +16,7 @@ export default class ObjectFieldType implements FieldType {
         return !!fieldDefinition.name
     }
 
-    async getDisplayValue(fieldDefinition: any, value: any) {
+    async getDisplayValue(schema: any, fieldDefinition: any, value: any) {
         return value
     }
 }

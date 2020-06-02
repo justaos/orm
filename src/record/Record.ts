@@ -44,7 +44,7 @@ export default class Record {
         const fieldDef = schema.getField(key);
         const fieldType = schema.getFieldType(key);
         if (fieldType)
-            return fieldType.getDisplayValue(fieldDef, this.record[key]);
+            return fieldType.getDisplayValue(schema, fieldDef, this.record[key]);
     }
 
     async insert() {

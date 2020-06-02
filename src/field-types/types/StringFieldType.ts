@@ -16,7 +16,7 @@ export default class StringFieldType implements FieldType {
         return !!fieldDefinition.name
     }
 
-    async getDisplayValue(fieldDefinition: any, value: string) {
+    async getDisplayValue(schema: any, fieldDefinition: any, value: string) {
         return value
     }
 }

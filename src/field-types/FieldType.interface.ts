@@ -8,5 +8,5 @@ export default abstract class FieldType {
 
     abstract validateDefinition(fieldDefinition: any): boolean;
 
-    abstract async getDisplayValue(fieldDefinition: any, value: any): Promise<any>;
+    abstract async getDisplayValue(schema: any, fieldDefinition: any, value: any): Promise<any>;
 }
