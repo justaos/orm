@@ -61,10 +61,10 @@ export default class ODM {
         _getCollectionDefinitionRegistry(this).addCollectionDefinition(col);
     }
 
-    collection(colName: string, context?: any): Collection | undefined {
+    collection(colName: string, context?: any): Collection  {
         const collectionDefinition: CollectionDefinition | undefined = _getCollectionDefinitionRegistry(this).getCollectionDefinition(colName);
         if (collectionDefinition === undefined)
-            return undefined;
+            throw Error(`Collection with name '${colName}' does not exist`);
         return new Collection(collectionDefinition, context)
     }
 

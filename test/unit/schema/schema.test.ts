@@ -10,7 +10,12 @@ describe('Schema', () => {
     let MODEL_EXTENDS = "schema_test_extends";
 
     it('#ODM::collection - negative check', function () {
-        assert.isOk(session.odm.collection('unknown_collection') === undefined, "Collection should not exists");
+        try {
+            session.odm.collection('unknown_collection')
+            assert.isOk(false, "Collection should not exists");
+        } catch (e) {
+            assert.isOk(true, "Collection should not exists");
+        }
     });
 
     it('#ODM::defineCollection - simple', function () {
