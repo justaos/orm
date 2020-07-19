@@ -47,6 +47,12 @@ export default class Collection {
     }
 
     async findOne(filter: any, options?: FindOneOptions): Promise<Record | null> {
+        const schema = this.getSchema();
+        if (schema.getExtends()) {
+            if (!filter)
+                filter = {};
+            filter._collection = schema.getName();
+        }
         const doc = await _getMongoCollection(this).findOne(filter, options);
         if (doc)
             return new Record(doc, this);
@@ -54,6 +60,13 @@ export default class Collection {
     }
 
     find(filter: any, options?: any): Cursor {
+        const schema = this.getSchema();
+        if (schema.getExtends()) {
+            if (!filter)
+                filter = {};
+            filter._collection = schema.getName();
+            console.log(JSON.stringify(filter._collection));
+        }
         const cursor = _getMongoCollection(this).find(filter, options);
         return new Cursor(cursor, this)
     }

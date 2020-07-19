@@ -51,6 +51,10 @@ export default class Schema {
                 name: '_id',
                 type: 'objectId',
                 dataType: 'objectId'
+            }, {
+                name: '_collection',
+                type: 'string',
+                dataType: 'string'
             });
         }
         return allFields;
@@ -62,6 +66,12 @@ export default class Schema {
                 name: '_id',
                 type: 'objectId',
                 dataType: 'objectId'
+            };
+        else if (name === '_collection')
+            return {
+                name: '_collection',
+                type: 'string',
+                dataType: 'string'
             };
         const fields = _getFields(this);
         for (let field of fields) {
@@ -84,7 +94,7 @@ export default class Schema {
         const that = this;
         const errorMessages: string[] = [];
         for (let field of this.getFields()) {
-            if (field.name === '_id')
+            if (field.name === '_id' || field.name === '_collection')
                 continue;
             let fieldType = _getFieldType(that, field.type);
             if (!fieldType)

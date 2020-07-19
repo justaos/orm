@@ -2,6 +2,7 @@ import {assert} from "chai";
 import "mocha";
 import {ObjectId} from "mongodb"
 import {MAX_TIMEOUT, session} from "../../test.utils";
+import {Record} from "../../../src";
 
 describe('Schema', () => {
 
@@ -88,6 +89,56 @@ describe('Schema', () => {
             assertValue = true;
         }
         assert.isOk(assertValue, "Collection should not extend, final schema");
+    });
+
+    it('#ODM::collection - normal schema record', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let assertValue = false;
+        try {
+            const extendsCol = session.odm.collection(MODEL_NAME);
+            const extendsRec = extendsCol.createNewRecord();
+            extendsRec.insert().then(function(){
+                done();
+            });
+
+        } catch (err) {
+            assertValue = true;
+        }
+    });
+
+    it('#ODM::collection - extends schema record', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let assertValue = false;
+        try {
+            const extendsCol = session.odm.collection(MODEL_EXTENDS);
+            const extendsRec = extendsCol.createNewRecord();
+            extendsRec.insert().then(function(){
+                done();
+            });
+
+        } catch (err) {
+            assertValue = true;
+        }
+    });
+
+    it('#Collection::find extends', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeCollection = session.odm.collection(MODEL_EXTENDS);
+        employeeCollection.find().toArray().then((employees: Record[]) => {
+            console.log('employees.length :: ' + employees.length);
+            if (employees.length === 1)
+                done();
+        });
+    });
+
+    it('#Collection::find normal', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeCollection = session.odm.collection(MODEL_NAME);
+        employeeCollection.find().toArray().then((employees: Record[]) => {
+            console.log('employees.length :: ' + employees.length);
+            if (employees.length === 2)
+                done();
+        });
     });
 
     it('#ODM::convertToObjectId', function () {
