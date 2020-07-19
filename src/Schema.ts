@@ -21,6 +21,14 @@ export default class Schema {
         return _getSchemaObject(this).extends;
     }
 
+    getExtendsStack(): string[] {
+        let extendsStack = [this.getName()];
+        const extendsCollectionName = this.getExtends();
+        if (extendsCollectionName)
+            extendsStack = extendsStack.concat(_getCollection(this, extendsCollectionName).getSchema().getExtendsStack());
+        return extendsStack;
+    }
+
     isFinal(): boolean {
         return !!_getSchemaObject(this).final;
     }
