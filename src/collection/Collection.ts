@@ -52,6 +52,7 @@ export default class Collection {
             if (!filter)
                 filter = {};
             filter._collection = schema.getName();
+            _formatFilter(filter, schema);
         }
         const doc = await _getMongoCollection(this).findOne(filter, options);
         if (doc)
@@ -66,14 +67,7 @@ export default class Collection {
             if (!filter)
                 filter = {};
             filter._collection = schema.getName();
-            Object.keys(filter).forEach((key) => {
-                const fieldDef = schema.getField(key);
-                const fieldType = schema.getFieldType(key);
-                if (fieldType) {
-                    const dataType = fieldType.getDataType(fieldDef);
-                    filter[key] = dataType.parse(filter[key]);
-                }
-            });
+            _formatFilter(filter, schema);
         }
         const cursor = _getMongoCollection(this).find(filter, options);
         return new Cursor(cursor, this)
@@ -127,6 +121,17 @@ async function _interceptRecord(that: Collection, operation: string, when: strin
 async function _intercept(that: Collection, operation: string, when: string, payload: any): Promise<any> {
     const operationInterceptorService = _getOperationInterceptorService(that);
     return await operationInterceptorService.intercept(that.getName(), operation, when, payload, privates.get(that).context, privates.get(that).inactiveIntercepts);
+}
+
+function _formatFilter(filter: any, schema: Schema) {
+    Object.keys(filter).forEach((key) => {
+        const fieldDef = schema.getField(key);
+        const fieldType = schema.getFieldType(key);
+        if (fieldType) {
+            const dataType = fieldType.getDataType(fieldDef);
+            filter[key] = dataType.parse(filter[key]);
+        }
+    });
 }
 
 
