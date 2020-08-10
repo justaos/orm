@@ -32,7 +32,7 @@ export default class Record {
         const schema: Schema = _getSchema(this);
         const fieldDef = schema.getField(key);
         const fieldType = schema.getFieldType(key);
-        if (fieldType) {
+        if (fieldDef && fieldType) {
             const dataType = fieldType.getDataType(fieldDef);
             this.record[key] = dataType.parse(value);
         }
