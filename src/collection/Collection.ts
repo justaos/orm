@@ -61,11 +61,19 @@ export default class Collection {
 
     find(filter: any, options?: any): Cursor {
         const schema = this.getSchema();
+
         if (schema.getExtends()) {
             if (!filter)
                 filter = {};
             filter._collection = schema.getName();
-            console.log(JSON.stringify(filter._collection));
+            Object.keys(filter).forEach((key) => {
+                const fieldDef = schema.getField(key);
+                const fieldType = schema.getFieldType(key);
+                if (fieldType) {
+                    const dataType = fieldType.getDataType(fieldDef);
+                    filter[key] = dataType.parse(filter[key]);
+                }
+            });
         }
         const cursor = _getMongoCollection(this).find(filter, options);
         return new Cursor(cursor, this)
@@ -83,13 +91,13 @@ export default class Collection {
     async updateRecord(record: Record): Promise<Record> {
         record = await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.BEFORE, record);
         this.getSchema().validate(record.toObject());
-        await _getMongoCollection(this).updateOne({_id: record.getID()}, {$set: {...record.toObject()}});
+        await _getMongoCollection(this).updateOne({_id: record.get('_id')}, {$set: {...record.toObject()}});
         return await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.AFTER, record);
     }
 
     async deleteOne(record: Record): Promise<any> {
         record = await _interceptRecord(this, OPERATIONS.DELETE, OPERATION_WHEN.BEFORE, record);
-        await _getMongoCollection(this).deleteOne({_id: record.getID()});
+        await _getMongoCollection(this).deleteOne({_id: record.get('_id')});
         await _interceptRecord(this, OPERATIONS.DELETE, 'after', record);
     }
 

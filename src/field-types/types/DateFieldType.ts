@@ -4,8 +4,10 @@ import DateDataType from "../../core/data-types/dateDataType";
 
 export default class DateFieldType implements FieldType {
 
+    #dataType: DataType = new DateDataType();
+
     getDataType(): DataType {
-        return new DateDataType();
+        return this.#dataType;
     }
 
     getType(): string {
@@ -17,6 +19,6 @@ export default class DateFieldType implements FieldType {
     }
 
     async getDisplayValue(schema: any, fieldDefinition: any, value: any) {
-        return value
+        return this.#dataType.toJSON(value);
     }
 }

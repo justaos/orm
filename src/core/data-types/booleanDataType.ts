@@ -20,4 +20,12 @@ export default class BooleanDataType extends DataType {
                 throw new Error("NOT_VALID_TYPE");
         }
     }
+
+    toJSON(value: any) {
+        return value;
+    }
+
+    parse(value: any) {
+        return value;
+    }
 }

@@ -21,4 +21,17 @@ export default class DateDataType extends DataType {
         }
     }
 
+    toJSON(value: any) {
+        if (value instanceof Date)
+            return value.toISOString();
+        return value
+    }
+
+
+    parse(value: any) {
+        if (typeof value === "string")
+            return new Date(value)
+        return value;
+    }
+
 }

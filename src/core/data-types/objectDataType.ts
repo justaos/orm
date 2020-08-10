@@ -23,5 +23,11 @@ export default class ObjectDataType extends DataType {
         }
     }
 
+    toJSON(value: any) {
+        return value;
+    }
 
+    parse(value: any) {
+       return value;
+    }
 }

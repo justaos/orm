@@ -23,4 +23,11 @@ export default class StringDataType extends DataType {
         }
     }
 
+    toJSON(value: any) {
+        return value;
+    }
+
+    parse(value: any) {
+        return value;
+    }
 }

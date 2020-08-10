@@ -1,6 +1,5 @@
 import Collection from "../collection/Collection";
 import Schema from "../Schema";
-import {ObjectId} from "mongodb"
 
 const privates = new WeakMap();
 
@@ -22,17 +21,21 @@ export default class Record {
         return this;
     }
 
-    getID() {
-        return this.record._id;
+    getID(): string | null {
+        if (this.record._id)
+            return this.record._id.toString();
+        else
+            return null;
     }
 
     set(key: string, value: any) {
         const schema: Schema = _getSchema(this);
-        const field = schema.getField(key);
-        if (field && (field.name === '_id' || field.dataType === 'objectId') && typeof value === 'string')
-            this.record[key] = new ObjectId(value);
-        else
-            this.record[key] = value;
+        const fieldDef = schema.getField(key);
+        const fieldType = schema.getFieldType(key);
+        if (fieldType) {
+            const dataType = fieldType.getDataType(fieldDef);
+            this.record[key] = dataType.parse(value);
+        }
     }
 
     get(key: string) {
@@ -81,7 +84,7 @@ export default class Record {
         const that = this;
         const record = this.record;
         const obj: any = {};
-        for(let field of _getSchema(this).getFields()) {
+        for (let field of _getSchema(this).getFields()) {
             if (typeof record[field.name] === "undefined")
                 obj[field.name] = null;
             else

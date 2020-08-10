@@ -22,5 +22,15 @@ export default class ObjectIdDataType extends DataType {
         }
     }
 
+    toJSON(value: any) {
+        if (value instanceof ObjectId)
+            return value.toString();
+        return value
+    }
 
+    parse(value: any) {
+        if (typeof value === "string")
+            return new ObjectId(value);
+        return value;
+    }
 }

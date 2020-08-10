@@ -4,8 +4,10 @@ import IntegerDataType from "../../core/data-types/integerDataType";
 
 export default class IntegerFieldType implements FieldType {
 
-    getDataType(fieldDefinition: any): DataType {
-        return new IntegerDataType();
+    #dataType: DataType = new IntegerDataType();
+
+    getDataType(): DataType {
+        return this.#dataType;
     }
 
     getType(): string {

@@ -21,5 +21,11 @@ export default class IntegerDataType extends DataType {
         }
     }
 
+    toJSON(value: any) {
+        return value;
+    }
 
+    parse(value: any) {
+        return value;
+    }
 }

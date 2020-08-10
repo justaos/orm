@@ -4,8 +4,10 @@ import ObjectIdDataType from "../../core/data-types/objectIdDataType";
 
 export default class ObjectIdFieldType implements FieldType {
 
+    #dataType: DataType = new ObjectIdDataType();
+
     getDataType(): DataType {
-        return new ObjectIdDataType();
+        return this.#dataType;
     }
 
     getType(): string {
@@ -17,6 +19,6 @@ export default class ObjectIdFieldType implements FieldType {
     }
 
     async getDisplayValue(schema: any, fieldDefinition: any, value: any) {
-        return value
+        return this.#dataType.toJSON(value);
     }
 }

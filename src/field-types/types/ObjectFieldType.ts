@@ -4,8 +4,10 @@ import FieldType from "../FieldType.interface";
 
 export default class ObjectFieldType implements FieldType {
 
+    #dataType: DataType = new ObjectDataType();
+
     getDataType(): DataType {
-        return new ObjectDataType();
+        return this.#dataType;
     }
 
     getType(): string {

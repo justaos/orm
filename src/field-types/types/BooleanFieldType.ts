@@ -4,8 +4,10 @@ import BooleanDataType from "../../core/data-types/booleanDataType";
 
 export default class BooleanFieldType implements FieldType {
 
+    #dataType: DataType = new BooleanDataType();
+
     getDataType(): DataType {
-        return new BooleanDataType();
+        return this.#dataType;
     }
 
     getType(): string {

@@ -1,6 +1,6 @@
 import {assert} from "chai";
 import "mocha";
-import {Record} from "../../../src";
+import {Record} from "../../../lib";
 import {session, MAX_TIMEOUT, logger} from "../../test.utils";
 
 describe('Collection', () => {
@@ -104,7 +104,7 @@ describe('Collection', () => {
     it('#Collection::findById string', function (done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
-        employeeCollection.findById(johnRecord.getID().toString()).then((employee: Record) => {
+        employeeCollection.findById(johnRecord.getID()).then((employee: Record) => {
             if (employee.get('name') === "John")
                 done();
         });
@@ -115,7 +115,7 @@ describe('Collection', () => {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         employeeCollection.findOne({"name": "John"}).then((employee: Record) => {
-            if (employee.getID().toString() === johnRecord.getID().toString())
+            if (employee && employee.getID() === johnRecord.getID())
                 done();
         });
     });
