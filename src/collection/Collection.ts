@@ -48,12 +48,11 @@ export default class Collection {
 
     async findOne(filter: any, options?: FindOneOptions): Promise<Record | null> {
         const schema = this.getSchema();
-        if (schema.getExtends()) {
-            if (!filter)
-                filter = {};
+        if (!filter)
+            filter = {};
+        _formatFilter(filter, schema);
+        if (schema.getExtends())
             filter._collection = schema.getName();
-            _formatFilter(filter, schema);
-        }
         const doc = await _getMongoCollection(this).findOne(filter, options);
         if (doc)
             return new Record(doc, this);
@@ -63,12 +62,11 @@ export default class Collection {
     find(filter: any, options?: any): Cursor {
         const schema = this.getSchema();
 
-        if (schema.getExtends()) {
-            if (!filter)
-                filter = {};
+        if (!filter)
+            filter = {};
+        _formatFilter(filter, schema);
+        if (schema.getExtends())
             filter._collection = schema.getName();
-            _formatFilter(filter, schema);
-        }
         const cursor = _getMongoCollection(this).find(filter, options);
         return new Cursor(cursor, this)
     }
