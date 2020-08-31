@@ -1,6 +1,8 @@
 import DataType from "../../core/data-types/dataType.interface";
 import FieldType from "../FieldType.interface";
-import BooleanDataType from "../../core/data-types/booleanDataType";
+import BooleanDataType from "../../core/data-types/types/booleanDataType";
+import Schema from "../../collection/Schema";
+import Field from "../../collection/Field";
 
 export default class BooleanFieldType implements FieldType {
 
@@ -14,11 +16,25 @@ export default class BooleanFieldType implements FieldType {
         return "boolean"
     }
 
+    async validateValue(fieldDefinition: any, value: any) {
+        if (fieldDefinition.required && value === null)
+            throw new Error("REQUIRED");
+    }
+
     validateDefinition(fieldDefinition: any): boolean {
         return !!fieldDefinition.name
     }
 
-    async getDisplayValue(schema: any, fieldDefinition: any, value: boolean) {
+    getValueIntercept(schema: Schema, field: Field, value: any): any {
+        return value;
+    }
+
+    setValueIntercept(schema: Schema, field: Field, value: any): any {
+        return value;
+    }
+
+    async getDisplayValue(schema: Schema, field: Field, value: boolean) {
         return value
     }
+
 }

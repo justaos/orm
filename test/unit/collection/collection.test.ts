@@ -21,13 +21,20 @@ describe('Collection', () => {
                 type: "objectId"
             }, {
                 name: "salary",
+                maximum: 10000,
                 type: "integer"
             }, {
                 name: "birth_date",
                 type: "date"
             }, {
+                name: "created_on",
+                type: "datetime"
+            },{
                 name: "gender",
                 type: "boolean"
+            },{
+                name: "dynamic",
+                type: "any"
             }, {
                 name: "address",
                 type: "object"
@@ -50,9 +57,11 @@ describe('Collection', () => {
         let empRecord = employeeCollection.createNewRecord();
         empRecord.set("name", "John");
         empRecord.set("emp_no", session.odm.generateNewObjectId());
-        empRecord.set("birth_date", new Date());
+        empRecord.set("birth_date", new Date().toISOString());
+        empRecord.set("created_on", new Date().toISOString());
         empRecord.set("gender", true);
-        empRecord.set("salary", 10000);
+        empRecord.set("dynamic", 100);
+        empRecord.set("salary", 5000);
         empRecord.set("address", {
             "street": "test",
             "zipcode": 500000

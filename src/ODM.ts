@@ -6,7 +6,7 @@ import CollectionDefinitionRegistry from "./collection/CollectionDefinitionRegis
 import OperationInterceptorService from "./operation-interceptor/OperationInterceptorService";
 import OperationInterceptorInterface from "./operation-interceptor/OperationInterceptor.interface";
 
-import Schema from "./Schema";
+import Schema from "./collection/Schema";
 
 import FieldType from "./field-types/FieldType.interface";
 import StringFieldType from "./field-types/types/StringFieldType";
@@ -17,6 +17,8 @@ import ObjectFieldType from "./field-types/types/ObjectFieldType";
 import BooleanFieldType from "./field-types/types/BooleanFieldType";
 import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType";
 import CollectionDefinition from "./collection/CollectionDefinition";
+import DateTimeFieldType from "./field-types/types/DateTimeFieldType";
+import AnyFieldType from "./field-types/types/AnyFieldType";
 
 const privates = new WeakMap();
 
@@ -131,5 +133,7 @@ function _loadBuildInFieldTypes(that: ODM) {
     that.addFieldType(new ObjectFieldType());
     that.addFieldType(new BooleanFieldType());
     that.addFieldType(new ObjectIdFieldType());
+    that.addFieldType(new DateTimeFieldType());
+    that.addFieldType(new AnyFieldType());
 }
 

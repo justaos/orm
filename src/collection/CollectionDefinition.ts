@@ -1,13 +1,19 @@
 import OperationInterceptorService from "../operation-interceptor/OperationInterceptorService";
-import Schema from "../Schema";
+import Schema from "./Schema";
 import * as mongodb from "mongodb";
-
-const privates = new WeakMap();
 
 export default class CollectionDefinition {
 
-    constructor(collection: any, schema: Schema,  operationInterceptorService: OperationInterceptorService) {
-        privates.set(this, {collection, schema, operationInterceptorService});
+    #collection: mongodb.Collection;
+
+    #schema: Schema;
+
+    #operationInterceptorService: OperationInterceptorService;
+
+    constructor(collection: any, schema: Schema, operationInterceptorService: OperationInterceptorService) {
+        this.#collection = collection;
+        this.#schema = schema;
+        this.#operationInterceptorService = operationInterceptorService;
     }
 
     getName(): string {
@@ -15,15 +21,15 @@ export default class CollectionDefinition {
     }
 
     getCollection(): mongodb.Collection {
-        return privates.get(this).collection;
+        return this.#collection;
     }
 
     getSchema(): Schema {
-        return privates.get(this).schema;
+        return this.#schema;
     }
 
     getOperationInterceptorService(): OperationInterceptorService {
-        return privates.get(this).operationInterceptorService;
+        return this.#operationInterceptorService;
     }
 }
 

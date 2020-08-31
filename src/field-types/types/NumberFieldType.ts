@@ -1,27 +1,28 @@
 import DataType from "../../core/data-types/dataType.interface";
 import FieldType from "../FieldType.interface";
-import IntegerDataType from "../../core/data-types/types/integerDataType";
 import Schema from "../../collection/Schema";
+import NumberDataType from "../../core/data-types/types/numberDataType";
 
-export default class IntegerFieldType implements FieldType {
+export default class NumberFieldType implements FieldType {
 
-    #dataType: DataType = new IntegerDataType();
+    #dataType: DataType = new NumberDataType();
 
     getDataType(): DataType {
         return this.#dataType;
     }
 
     getType(): string {
-        return "integer"
+        return "number"
     }
 
-    async validateValue(fieldDefinition: any, value: any) {
-        if (fieldDefinition.required && value === null)
-            throw new Error("REQUIRED");
-        else {
-            if (Number.isInteger(fieldDefinition.maximum) && fieldDefinition.maximum < value)
+    async validateValue(fieldDefinition: any, value: null | number) {
+        if (value === null) {
+            if (fieldDefinition.required)
+                throw new Error("REQUIRED");
+        } else {
+            if (!Number.isNaN(fieldDefinition.maximum) && fieldDefinition.maximum > value)
                 throw new Error(`should be less than ${fieldDefinition.maximum}`);
-            if (Number.isInteger(fieldDefinition.minimum) && fieldDefinition.minimum > value)
+            if (!Number.isNaN(fieldDefinition.minimum) && fieldDefinition.minimum > value)
                 throw new Error(`should be more than ${fieldDefinition.minimum}`);
         }
     }

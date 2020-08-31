@@ -1,18 +1,23 @@
 import CollectionDefinition from "./CollectionDefinition";
 
+
 export default class CollectionDefinitionRegistry {
 
-    collectionDefinitions: Map<string, CollectionDefinition>;
+    collectionDefinitions: Map<string, CollectionDefinition> = new Map<string, CollectionDefinition>();
+
+    relations: Map<string, string | undefined> = new Map<string, string | undefined>();
 
     constructor() {
-        this.collectionDefinitions = new Map<string, CollectionDefinition>();
     }
 
     hasCollectionDefinition = (collectionName: string): boolean => this.collectionDefinitions.has(collectionName);
 
     getCollectionDefinition = (collectionName: string): CollectionDefinition | undefined => this.collectionDefinitions.get(collectionName);
 
-    addCollectionDefinition = (collection: CollectionDefinition) => this.collectionDefinitions.set(collection.getName(), collection);
+    addCollectionDefinition = (collection: CollectionDefinition) => {
+        this.collectionDefinitions.set(collection.getName(), collection);
+        this.relations.set(collection.getName(), collection.getSchema().getExtends());
+    }
 
     deleteCollectionDefinition = (collectionName: string) => this.collectionDefinitions.delete(collectionName);
 

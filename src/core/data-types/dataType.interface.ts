@@ -1,8 +1,7 @@
 export default abstract class DataType {
 
-    abstract validate(value: any): void;
+    abstract validateType(value: any): boolean;
 
     abstract toJSON(value: any): any;
 
-    abstract parse(value: any): any;
 }

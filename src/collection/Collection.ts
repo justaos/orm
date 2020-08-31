@@ -1,9 +1,9 @@
 import Cursor from "../Cursor";
 import Record from "../record/Record";
 import OperationInterceptorService from "../operation-interceptor/OperationInterceptorService";
-import Schema from "../Schema";
-import {FindOneOptions, ObjectId} from "mongodb";
+import Schema from "./Schema";
 import * as mongodb from "mongodb";
+import {FindOneOptions, ObjectId} from "mongodb";
 import {OPERATION_WHEN, OPERATIONS} from "../constants";
 import CollectionDefinition from "./CollectionDefinition";
 
@@ -14,6 +14,10 @@ export default class Collection {
     constructor(collectionDefinition: CollectionDefinition, context?: any) {
         const inactiveIntercepts: [] = [];
         privates.set(this, {collectionDefinition, context, inactiveIntercepts});
+    }
+
+    getContext(): any {
+        return privates.get(this).context;
     }
 
     getName(): string {
@@ -50,7 +54,7 @@ export default class Collection {
         const schema = this.getSchema();
         if (!filter)
             filter = {};
-        _formatFilter(filter, schema);
+        _formatFilter(filter, schema, this);
         if (schema.getExtends())
             filter._collection = schema.getName();
         const doc = await _getMongoCollection(this).findOne(filter, options);
@@ -64,7 +68,7 @@ export default class Collection {
 
         if (!filter)
             filter = {};
-        _formatFilter(filter, schema);
+        _formatFilter(filter, schema, this);
         if (schema.getExtends())
             filter._collection = schema.getName();
         const cursor = _getMongoCollection(this).find(filter, options);
@@ -73,7 +77,7 @@ export default class Collection {
 
     async insertRecord(record: Record): Promise<Record> {
         record = await _interceptRecord(this, OPERATIONS.CREATE, OPERATION_WHEN.BEFORE, record);
-        this.getSchema().validate(record.toObject());
+        await this.getSchema().validateRecord(record.toObject());
         const response = await _getMongoCollection(this).insertOne(record.toObject());
         const savedDoc = response.ops.find(() => true);
         const savedRecord = new Record(savedDoc, this);
@@ -82,7 +86,7 @@ export default class Collection {
 
     async updateRecord(record: Record): Promise<Record> {
         record = await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.BEFORE, record);
-        this.getSchema().validate(record.toObject());
+        await this.getSchema().validateRecord(record.toObject());
         await _getMongoCollection(this).updateOne({_id: record.get('_id')}, {$set: {...record.toObject()}});
         return await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.AFTER, record);
     }
@@ -121,14 +125,11 @@ async function _intercept(that: Collection, operation: string, when: string, pay
     return await operationInterceptorService.intercept(that.getName(), operation, when, payload, privates.get(that).context, privates.get(that).inactiveIntercepts);
 }
 
-function _formatFilter(filter: any, schema: Schema) {
+function _formatFilter(filter: any, schema: Schema, that: Collection) {
     Object.keys(filter).forEach((key) => {
-        const fieldDef = schema.getField(key);
-        const fieldType = schema.getFieldType(key);
-        if (fieldType) {
-            const dataType = fieldType.getDataType(fieldDef);
-            filter[key] = dataType.parse(filter[key]);
-        }
+        const field = schema.getField(key);
+        if (field)
+            filter[key] = field.getFieldType().setValueIntercept(schema, field, filter[key], privates.get(that).context);
     });
 }
 

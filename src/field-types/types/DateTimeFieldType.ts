@@ -1,19 +1,19 @@
 import DataType from "../../core/data-types/dataType.interface";
 import FieldType from "../FieldType.interface";
-import ObjectIdDataType from "../../core/data-types/types/objectIdDataType";
-import {ObjectId} from "mongodb";
+import DateDataType from "../../core/data-types/types/dateDataType";
 import Schema from "../../collection/Schema";
+import {isIsoDate} from "../../utils";
 
-export default class ObjectIdFieldType implements FieldType {
+export default class DateTimeFieldType implements FieldType {
 
-    #dataType: DataType = new ObjectIdDataType();
+    #dataType: DataType = new DateDataType();
 
     getDataType(): DataType {
         return this.#dataType;
     }
 
     getType(): string {
-        return "objectId"
+        return "datetime"
     }
 
     async validateValue(fieldDefinition: any, value: any) {
@@ -25,17 +25,20 @@ export default class ObjectIdFieldType implements FieldType {
         return !!fieldDefinition.name
     }
 
-    async getDisplayValue(schema: any, fieldDefinition: any, value: any) {
-        return this.#dataType.toJSON(value);
-    }
-
     getValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
         return value;
     }
 
     setValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
-        if (typeof value === "string" && ObjectId.isValid(value))
-            return new ObjectId(value);
+        if (typeof value === "string" && isIsoDate(value)) {
+            return new Date(value);
+        }
         return value;
     }
+
+    async getDisplayValue(schema: Schema, fieldDefinition: any, value: any) {
+        return this.#dataType.toJSON(value);
+    }
+
 }
+

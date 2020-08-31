@@ -1,19 +1,18 @@
 import DataType from "../../core/data-types/dataType.interface";
 import FieldType from "../FieldType.interface";
-import ObjectIdDataType from "../../core/data-types/types/objectIdDataType";
-import {ObjectId} from "mongodb";
 import Schema from "../../collection/Schema";
+import AnyDataType from "../../core/data-types/types/anyDataType";
 
-export default class ObjectIdFieldType implements FieldType {
+export default class AnyFieldType implements FieldType {
 
-    #dataType: DataType = new ObjectIdDataType();
+    #dataType: DataType = new AnyDataType();
 
     getDataType(): DataType {
         return this.#dataType;
     }
 
     getType(): string {
-        return "objectId"
+        return "any"
     }
 
     async validateValue(fieldDefinition: any, value: any) {
@@ -26,7 +25,7 @@ export default class ObjectIdFieldType implements FieldType {
     }
 
     async getDisplayValue(schema: any, fieldDefinition: any, value: any) {
-        return this.#dataType.toJSON(value);
+        return value
     }
 
     getValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
@@ -34,8 +33,6 @@ export default class ObjectIdFieldType implements FieldType {
     }
 
     setValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
-        if (typeof value === "string" && ObjectId.isValid(value))
-            return new ObjectId(value);
         return value;
     }
 }
