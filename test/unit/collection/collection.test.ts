@@ -35,7 +35,8 @@ describe('Collection', () => {
                 type: "boolean"
             },{
                 name: "dynamic",
-                type: "any"
+                type: "any",
+                default_value: 100
             }, {
                 name: "address",
                 type: "object"
@@ -61,7 +62,6 @@ describe('Collection', () => {
         empRecord.set("birth_date", new Date().toISOString());
         empRecord.set("created_on", new Date().toISOString());
         empRecord.set("gender", true);
-        empRecord.set("dynamic", 100);
         empRecord.set("salary", 5000);
         empRecord.set("address", {
             "street": "test",
@@ -71,6 +71,7 @@ describe('Collection', () => {
             johnRecord = rec;
             johnObject = rec.toObject();
             assert.isOk(johnObject.name === 'John', 'record not created');
+            assert.isOk(johnObject.dynamic === 100, "default is expected to be 100");
             done();
         });
     });

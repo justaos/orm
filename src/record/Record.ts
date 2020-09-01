@@ -21,7 +21,11 @@ export default class Record {
     }
 
     initialize() {
+        const that = this;
         this.#record = {};
+        this.#collection.getSchema().getFields().map((field: Field) => {
+            that.set(field.getName(), field.getDefaultValue());
+        });
         this.#record["_collection"] = this.#collection.getName();
         this.#isNew = true;
         return this;

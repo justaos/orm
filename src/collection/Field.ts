@@ -27,6 +27,10 @@ export default class Field {
         return this.#fieldDefinition.type;
     }
 
+    getDefaultValue(): any {
+        return this.#fieldDefinition.default_value;
+    }
+
     getFieldType(): FieldType {
         if (!this.#fieldType)
             throw new Error("Field type not found");
