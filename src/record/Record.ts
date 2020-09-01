@@ -51,7 +51,7 @@ export default class Record {
     async getDisplayValue(key: string) {
         const schema = this.#collection.getSchema();
         const field = schema.getField(key);
-        return field?.getFieldType().getDisplayValue(schema, field, this.#record[key], this.#collection.getContext());
+        return field?.getFieldType().getDisplayValue(schema, field, this.#record, this.#collection.getContext());
     }
 
     async insert() {
