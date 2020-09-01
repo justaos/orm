@@ -1,6 +1,6 @@
 import {assert} from "chai";
 import "mocha";
-import {Record} from "../../../lib";
+import {Record} from "../../../src";
 import {session, MAX_TIMEOUT, logger} from "../../test.utils";
 
 describe('Collection', () => {
@@ -15,7 +15,8 @@ describe('Collection', () => {
             name: MODEL_NAME,
             fields: [{
                 name: 'name',
-                type: 'string'
+                type: 'string',
+                unique: true
             }, {
                 name: "emp_no",
                 type: "objectId"
@@ -72,6 +73,19 @@ describe('Collection', () => {
             assert.isOk(johnObject.name === 'John', 'record not created');
             done();
         });
+    });
+
+
+    it('#Collection::insert unique error', function (done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeCollection = session.odm.collection(MODEL_NAME);
+        let empRecord = employeeCollection.createNewRecord();
+        empRecord.set('name', 'John');
+        empRecord.insert().then(() => {
+
+        }, () => {
+            done();
+        })
     });
 
     /**

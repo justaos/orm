@@ -8,6 +8,8 @@ import OperationInterceptorInterface from "./operation-interceptor/OperationInte
 import {DataType, DateDataType, IntegerDataType, ObjectDataType, StringDataType, ObjectIdDataType, AnyDataType} from "./core";
 import {OPERATION_WHEN, OPERATIONS} from "./constants";
 
+import FieldTypeUtils from "./field-types/FieldTypeUtils";
+
 export {
     ODM,
     Collection,
@@ -25,4 +27,5 @@ export {
     AnyDataType,
     OPERATION_WHEN,
     OPERATIONS,
+    FieldTypeUtils
 }

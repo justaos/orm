@@ -3,10 +3,18 @@ import FieldType from "../FieldType.interface";
 import BooleanDataType from "../../core/data-types/types/booleanDataType";
 import Schema from "../../collection/Schema";
 import Field from "../../collection/Field";
+import FieldTypeUtils from "../FieldTypeUtils";
+import ODM from "../../ODM";
 
-export default class BooleanFieldType implements FieldType {
+export default class BooleanFieldType extends FieldType {
 
     #dataType: DataType = new BooleanDataType();
+
+    #odm?: ODM;
+
+    setODM(odm: ODM) {
+        this.#odm = odm;
+    }
 
     getDataType(): DataType {
         return this.#dataType;
@@ -16,25 +24,25 @@ export default class BooleanFieldType implements FieldType {
         return "boolean"
     }
 
-    async validateValue(fieldDefinition: any, value: any) {
-        if (fieldDefinition.required && value === null)
-            throw new Error("REQUIRED");
+    async validateValue(schema: Schema, field: Field, value: any, context: any) {
+        FieldTypeUtils.requiredValidation(schema, field, value);
+        await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, value);
     }
 
     validateDefinition(fieldDefinition: any): boolean {
         return !!fieldDefinition.name
     }
 
-    getValueIntercept(schema: Schema, field: Field, value: any): any {
-        return value;
+    async getDisplayValue(schema: any, field: Field, record: any, context: any) {
+        return record[field.getName()];
     }
 
-    setValueIntercept(schema: Schema, field: Field, value: any): any {
-        return value;
+    getValueIntercept(schema: Schema, field: Field, record: any, context: any): any {
+        return record[field.getName()];
     }
 
-    async getDisplayValue(schema: Schema, field: Field, value: boolean) {
-        return value
+    setValueIntercept(schema: Schema, field: Field, newValue: any, record: any, context: any): any {
+        return newValue;
     }
 
 }

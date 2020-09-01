@@ -77,7 +77,7 @@ export default class Collection {
 
     async insertRecord(record: Record): Promise<Record> {
         record = await _interceptRecord(this, OPERATIONS.CREATE, OPERATION_WHEN.BEFORE, record);
-        await this.getSchema().validateRecord(record.toObject());
+        await this.getSchema().validateRecord(record.toObject(), this.getContext());
         const response = await _getMongoCollection(this).insertOne(record.toObject());
         const savedDoc = response.ops.find(() => true);
         const savedRecord = new Record(savedDoc, this);
@@ -86,7 +86,7 @@ export default class Collection {
 
     async updateRecord(record: Record): Promise<Record> {
         record = await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.BEFORE, record);
-        await this.getSchema().validateRecord(record.toObject());
+        await this.getSchema().validateRecord(record.toObject(), this.getContext());
         await _getMongoCollection(this).updateOne({_id: record.get('_id')}, {$set: {...record.toObject()}});
         return await _interceptRecord(this, OPERATIONS.UPDATE, OPERATION_WHEN.AFTER, record);
     }
@@ -128,8 +128,8 @@ async function _intercept(that: Collection, operation: string, when: string, pay
 function _formatFilter(filter: any, schema: Schema, that: Collection) {
     Object.keys(filter).forEach((key) => {
         const field = schema.getField(key);
-        if (field)
-            filter[key] = field.getFieldType().setValueIntercept(schema, field, filter[key], privates.get(that).context);
+        if (field && typeof filter[key] !== "object")
+            filter[key] = field.getFieldType().setValueIntercept(schema, field, filter[key], filter, privates.get(that).context);
     });
 }
 

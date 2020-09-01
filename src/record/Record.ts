@@ -11,16 +11,18 @@ export default class Record {
 
     #collection: Collection;
 
-
     constructor(record: any, collection: Collection) {
-        this.#record = record;
         this.#collection = collection;
+        if (record) {
+            this.#record = {};
+            for (let key of Object.keys(record))
+                this.set(key, record[key]);
+        }
     }
 
     initialize() {
         this.#record = {};
         this.#record["_collection"] = this.#collection.getName();
-
         this.#isNew = true;
         return this;
     }
@@ -36,7 +38,7 @@ export default class Record {
         const schema = this.#collection.getSchema();
         const field = schema.getField(key);
         if (field)
-            this.#record[key] = field.getFieldType().setValueIntercept(schema, field, value, this.#collection.getContext());
+            this.#record[key] = field.getFieldType().setValueIntercept(schema, field, value, this.#record, this.#collection.getContext());
     }
 
     get(key: string) {

@@ -27,7 +27,7 @@ export default class Schema {
         this.#extends = schemaDefinition.extends;
         if (schemaDefinition.fields && schemaDefinition.fields.length) {
             schemaDefinition.fields.forEach((fieldDefinition: any) => {
-                this.#fields.push(new Field(fieldDefinition, this.#fieldTypeRegistry.getFieldType(fieldDefinition.type)))
+                this.#fields.push(new Field(this, fieldDefinition, this.#fieldTypeRegistry.getFieldType(fieldDefinition.type)))
             });
         }
 
@@ -75,12 +75,12 @@ export default class Schema {
             const extendedSchema = _getSchema(this.#collectionDefinitionRegistry, extendsCollectionName);
             allFields = allFields.concat(extendedSchema.getFields());
         } else {
-            allFields.push(new Field({
+            allFields.push(new Field(this, {
                     name: '_id',
                     type: 'objectId',
                     dataType: 'objectId'
                 }, this.#fieldTypeRegistry.getFieldType('objectId')),
-                new Field({
+                new Field(this, {
                     name: '_collection',
                     type: 'string',
                     dataType: 'string'
@@ -95,17 +95,18 @@ export default class Schema {
         });
     }
 
-    async validateRecord(recordObject: any) {
+    async validateRecord(recordObject: any, context: any) {
         const errorMessages: string[] = [];
         for (let field of this.getFields()) {
             try {
-                await field.validateValue(recordObject[field.getName()]);
+                await field.validateValue(recordObject, context);
             } catch (err) {
                 errorMessages.push(err.message);
             }
         }
-        if (errorMessages.length)
+        if (errorMessages.length) {
             throw new Error(`[${this.getName()}] :: ` + errorMessages.join(", \n\t"));
+        }
     }
 
     private validate() {

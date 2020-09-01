@@ -3,10 +3,19 @@ import FieldType from "../FieldType.interface";
 import DateDataType from "../../core/data-types/types/dateDataType";
 import Schema from "../../collection/Schema";
 import {isIsoDate} from "../../utils";
+import ODM from "../../ODM";
+import FieldTypeUtils from "../FieldTypeUtils";
+import Field from "../../collection/Field";
 
-export default class DateTimeFieldType implements FieldType {
+export default class DateTimeFieldType extends FieldType {
 
     #dataType: DataType = new DateDataType();
+
+    #odm?: ODM;
+
+    setODM(odm: ODM) {
+        this.#odm = odm;
+    }
 
     getDataType(): DataType {
         return this.#dataType;
@@ -16,28 +25,28 @@ export default class DateTimeFieldType implements FieldType {
         return "datetime"
     }
 
-    async validateValue(fieldDefinition: any, value: any) {
-        if (fieldDefinition.required && value === null)
-            throw new Error("REQUIRED");
+    async validateValue(schema: Schema, field: Field, record: any, context: any) {
+        FieldTypeUtils.requiredValidation(schema, field, record);
+        await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, record);
     }
 
     validateDefinition(fieldDefinition: any): boolean {
         return !!fieldDefinition.name
     }
 
-    getValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
-        return value;
+    getValueIntercept(schema: Schema, field: Field, record: any, context: any): any {
+        return record[field.getName()];
     }
 
-    setValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
-        if (typeof value === "string" && isIsoDate(value)) {
-            return new Date(value);
+    setValueIntercept(schema: Schema, field: Field, newValue: any, record: any, context: any): any {
+        if (typeof newValue === "string" && isIsoDate(newValue)) {
+            return new Date(newValue);
         }
-        return value;
+        return newValue;
     }
 
-    async getDisplayValue(schema: Schema, fieldDefinition: any, value: any) {
-        return this.#dataType.toJSON(value);
+    async getDisplayValue(schema: Schema, field: Field, record: any, context: any) {
+        return this.#dataType.toJSON(record[field.getName()]);
     }
 
 }

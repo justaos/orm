@@ -79,6 +79,7 @@ export default class ODM {
     }
 
     addFieldType(fieldType: FieldType): void {
+        fieldType.setODM(this);
         _getFieldTypeRegistry(this).addFieldType(fieldType);
     }
 

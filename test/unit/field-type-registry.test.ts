@@ -4,6 +4,7 @@ import {Record, StringDataType} from "../../src";
 import {session} from "../test.utils";
 import {getLoggerInstance} from "../../src/utils";
 import Schema from "../../src/collection/Schema";
+import Field from "../../src/collection/Field";
 
 const logger = getLoggerInstance("FieldType");
 
@@ -18,7 +19,9 @@ describe('FieldType', () => {
 
         session.odm.addFieldType({
 
-            getDataType: function (fieldDefinition: any) {
+            setODM() {},
+
+            getDataType: function () {
                 return new StringDataType()
             },
 
@@ -26,9 +29,9 @@ describe('FieldType', () => {
                 return "email"
             },
 
-            validateValue(fieldDefinition: any, value: any) {
+            async validateValue(schema: Schema, field: Field, record: any, context: any) {
                 const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
-                if (!new RegExp(pattern).test(value))
+                if (!new RegExp(pattern).test(record[field.getName()]))
                     throw new Error("Not a valid email");
             },
 
@@ -36,12 +39,12 @@ describe('FieldType', () => {
                 return !!fieldDefinition.name
             },
 
-            getValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
-                return value;
+            getValueIntercept(schema: Schema, field: Field, record: any, context: any): any {
+                return record[field.getName()];
             },
 
-            setValueIntercept(schema: Schema, fieldDefinition: any, value: any): any {
-                return value;
+            setValueIntercept(schema: Schema, field: Field, newValue: any, record: any, context: any): any {
+                return newValue;
             }
         });
 
