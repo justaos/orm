@@ -50,9 +50,9 @@ export default class Field {
             await this.#fieldType?.validateValue(this.#schema, this, recordObject, context);
         } catch (e) {
             if (e.message === 'REQUIRED')
-                throw new Error(`${this.getName()}  is required field`);
+                throw new Error(`"${this.getName()}" is required field`);
             else
-                throw new Error(`${this.getName()}  ${e.message}`);
+                throw new Error(`[field :: ${this.getName()} - value :: ${recordObject[this.getName()]}] ${e.message}`);
         }
 
     }

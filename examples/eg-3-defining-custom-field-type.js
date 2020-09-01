@@ -5,16 +5,32 @@ getODM().then(function (odm) {
 
     odm.addFieldType({
 
-        getDataType: function (fieldDefinition) {
-            return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
+        setODM() {},
+
+        getDataType: function () {
+            return new StringDataType()
         },
 
         getType: function () {
             return "email"
         },
 
+        async validateValue(schema, field, record, context) {
+            const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
+            if (!new RegExp(pattern).test(record[field.getName()]))
+                throw new Error("Not a valid email");
+        },
+
         validateDefinition: function (fieldDefinition) {
             return !!fieldDefinition.name
+        },
+
+        getValueIntercept(schema, field, record, context) {
+            return record[field.getName()];
+        },
+
+        setValueIntercept(schema, field, newValue, record, context) {
+            return newValue;
         }
     });
 
@@ -46,7 +62,7 @@ getODM().then(function (odm) {
 
     let studentCollection = odm.collection("student");
     let s = studentCollection.createNewRecord();
-    s.set("personal_contact", "test@example.com");
+    s.set("personal_contact", "ttest");
     s.set("birth_date", new Date());
     s.insert().then(function () {
         console.log("Student created");

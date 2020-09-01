@@ -105,7 +105,7 @@ export default class Schema {
             }
         }
         if (errorMessages.length) {
-            throw new Error(`[${this.getName()}] :: ` + errorMessages.join(", \n\t"));
+            throw new Error(`[collection :: ${this.getName()} - id :: ${recordObject._id}] :: ` + errorMessages.join(", \n\t"));
         }
     }
 

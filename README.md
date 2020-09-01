@@ -101,17 +101,34 @@ s.insert().then(function () {
 
 odm.addFieldType({
 
-    getDataType: function (fieldDefinition) {
-        return new StringDataType({pattern: "(.+)@(.+){2,}\\.(.+){2,}"})
-    },
+ getDataType: function () {
+     return new StringDataType()
+ },
 
-    getType: function () {
-        return "email"
-    },
+ getType: function () {
+     return "email"
+ },
 
-    validateDefinition: function (fieldDefinition) {
-        return !!fieldDefinition.name
-    }
+ async validateValue(schema: Schema, field: Field, record: any, context: any) {
+     const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
+     if (!new RegExp(pattern).test(record[field.getName()]))
+         throw new Error("Not a valid email");
+ },
+
+ validateDefinition: function (fieldDefinition: any) {
+     return !!fieldDefinition.name
+ },
+
+ getValueIntercept(schema: Schema, field: Field, record: any, context: any): any {
+     return record[field.getName()];
+ },
+
+ setValueIntercept(schema: Schema, field: Field, newValue: any, record: any, context: any): any {
+     return newValue;
+ },
+ 
+ setODM() {}
+
 });
 
 odm.defineCollection({
