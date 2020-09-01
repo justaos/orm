@@ -19,6 +19,6 @@ export default abstract class FieldType {
 
     abstract async getDisplayValue(schema: Schema, field: Field, record: any, context: any): Promise<any>;
 
-    abstract validateValue(schema: Schema, field: Field, record: any, context: any): Promise<any>;
+    abstract async validateValue(schema: Schema, field: Field, record: any, context: any): Promise<any>;
 
 }
