@@ -2,6 +2,7 @@ import FieldTypeRegistry from "../field-types/FieldTypeRegistry";
 import CollectionDefinitionRegistry from "./CollectionDefinitionRegistry";
 import {findDuplicates} from "../utils";
 import Field from "./Field";
+import RecordValidationError from "../errors/RecordValidationError";
 
 
 export default class Schema {
@@ -96,16 +97,16 @@ export default class Schema {
     }
 
     async validateRecord(recordObject: any, context: any) {
-        const errorMessages: string[] = [];
+        const fieldErrors: any[] = [];
         for (let field of this.getFields()) {
             try {
                 await field.validateValue(recordObject, context);
             } catch (err) {
-                errorMessages.push(err.message);
+                fieldErrors.push(err);
             }
         }
-        if (errorMessages.length) {
-            throw new Error(`[collection :: ${this.getName()} - id :: ${recordObject._id}] :: ` + errorMessages.join(", \n\t"));
+        if (fieldErrors.length) {
+            throw new RecordValidationError(this.getName(), recordObject._id, fieldErrors);
         }
     }
 
