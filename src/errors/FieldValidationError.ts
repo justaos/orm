@@ -2,18 +2,15 @@ export default class FieldValidationError extends Error {
 
     code: string;
 
-    fieldType: string;
+    fieldDefinition: any;
 
-    fieldName: string;
+    value: string
 
-    fieldValue: string
-
-    constructor(fieldName: string, fieldType: string, fieldValue: string, code: string) {
+    constructor(fieldDefinition: string, value: string, code: string) {
         super();
         this.name = "FieldValidationError";
-        this.fieldName = fieldName;
-        this.fieldType = fieldType;
-        this.fieldValue = fieldValue;
+        this.fieldDefinition = fieldDefinition;
+        this.value = value;
         this.code = code;
         Object.setPrototypeOf(this, FieldValidationError.prototype);
     }
@@ -21,9 +18,8 @@ export default class FieldValidationError extends Error {
     toJSON() {
         const result:any = {};
         result.code = this.code;
-        result.fieldType = this.fieldType;
-        result.fieldName = this.fieldName;
-        result.fieldValue = this.fieldValue;
+        result.fieldDefinition = this.fieldDefinition;
+        result.value = this.value;
         return result;
     }
 

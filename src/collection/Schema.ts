@@ -9,6 +9,8 @@ export default class Schema {
 
     #name: string;
 
+    #label: string;
+
     #final: boolean;
 
     #extends: string;
@@ -24,6 +26,7 @@ export default class Schema {
         this.#fieldTypeRegistry = fieldTypeRegistry;
         this.#collectionDefinitionRegistry = collectionDefinitionRegistry;
         this.#name = schemaDefinition.name;
+        this.#label = schemaDefinition.label;
         this.#final = !!schemaDefinition.final;
         this.#extends = schemaDefinition.extends;
         if (schemaDefinition.fields && schemaDefinition.fields.length) {
@@ -37,6 +40,10 @@ export default class Schema {
 
     getName(): string {
         return this.#name;
+    }
+
+    getLabel(): string {
+        return this.#label;
     }
 
     getExtends(): string {
@@ -106,7 +113,10 @@ export default class Schema {
             }
         }
         if (fieldErrors.length) {
-            throw new RecordValidationError(this.getName(), recordObject._id, fieldErrors);
+            throw new RecordValidationError({
+                label: this.getLabel(),
+                name: this.getName()
+            }, recordObject._id, fieldErrors);
         }
     }
 

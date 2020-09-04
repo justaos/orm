@@ -4,7 +4,7 @@ import Field from "../collection/Field";
 
 export default class FieldTypeUtils {
     static requiredValidation(schema: Schema, field: Field, record: any) {
-        if (field.getDefinition().required && record[field.getName()] === null)
+        if (field.getDefinition().required && (record[field.getName()] === null || record[field.getName()] === ""))
             throw new Error("REQUIRED");
     }
 

@@ -50,11 +50,11 @@ export default class Field {
     async validateValue(recordObject: any, context: any) {
         const value = recordObject[this.getName()];
         if (!this.#fieldType?.getDataType().validateType(value))
-            throw new FieldValidationError(this.getName(), this.getType(), value, 'NOT_VALID_TYPE');
+            throw new FieldValidationError(this.getDefinition(), value, 'NOT_VALID_TYPE');
         try {
             await this.#fieldType?.validateValue(this.#schema, this, recordObject, context);
         } catch (e) {
-            throw new FieldValidationError(this.getName(), this.getType(), value, e.message);
+            throw new FieldValidationError(this.getDefinition(), value, e.message);
         }
     }
 
