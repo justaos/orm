@@ -13,7 +13,8 @@ import {
     ObjectDataType,
     ObjectIdDataType,
     StringDataType,
-    DateTimeFieldType
+    DateTimeFieldType,
+    NumberDataType
 } from "./core";
 import {OPERATION_WHEN, OPERATIONS} from "./constants";
 import {ObjectId} from "mongodb";
@@ -39,6 +40,7 @@ export {
     IntegerDataType,
     ObjectIdDataType,
     AnyDataType,
+    NumberDataType,
 
     OPERATION_WHEN,
     OPERATIONS,
