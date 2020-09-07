@@ -1,7 +1,8 @@
 import {assert} from "chai";
 import "mocha";
-import {DatabaseConfiguration, DatabaseConnection} from "../../../src/core";
 import {MAX_TIMEOUT} from "../../test.utils";
+import DatabaseConfiguration from "../../../src/core/connection/databaseConfiguration";
+import DatabaseConnection from "../../../src/core/connection/databaseConnection";
 
 
 const defaultConfig: any = {

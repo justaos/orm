@@ -1,4 +1,3 @@
-import {DatabaseConfiguration, DatabaseConnection} from "./core";
 import {ObjectId} from "mongodb";
 import Collection from "./collection/Collection";
 import CollectionDefinitionRegistry from "./collection/CollectionDefinitionRegistry";
@@ -19,6 +18,8 @@ import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType";
 import CollectionDefinition from "./collection/CollectionDefinition";
 import DateTimeFieldType from "./field-types/types/DateTimeFieldType";
 import AnyFieldType from "./field-types/types/AnyFieldType";
+import DatabaseConfiguration from "./core/connection/databaseConfiguration";
+import DatabaseConnection from "./core/connection/databaseConnection";
 
 const privates = new WeakMap();
 
@@ -63,7 +64,7 @@ export default class ODM {
         _getCollectionDefinitionRegistry(this).addCollectionDefinition(col);
     }
 
-    collection(colName: string, context?: any): Collection  {
+    collection(colName: string, context?: any): Collection {
         const collectionDefinition: CollectionDefinition | undefined = _getCollectionDefinitionRegistry(this).getCollectionDefinition(colName);
         if (collectionDefinition === undefined)
             throw Error(`Collection with name '${colName}' does not exist`);
