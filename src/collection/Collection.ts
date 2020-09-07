@@ -32,7 +32,7 @@ export default class Collection {
         return new Record(null, this).initialize();
     }
 
-    findById(id: ObjectId | string): Promise<Record | null> {
+    async findById(id: ObjectId | string): Promise<Record | null> {
         if (typeof id === 'string')
             id = new ObjectId(id);
         return this.findOne({_id: id}, {});
