@@ -1,24 +1,32 @@
-import CollectionDefinition from "./CollectionDefinition";
-
+import CollectionDefinition from './CollectionDefinition';
 
 export default class CollectionDefinitionRegistry {
+  collectionDefinitions: Map<string, CollectionDefinition> = new Map<
+    string,
+    CollectionDefinition
+  >();
 
-    collectionDefinitions: Map<string, CollectionDefinition> = new Map<string, CollectionDefinition>();
+  relations: Map<string, string | undefined> = new Map<
+    string,
+    string | undefined
+  >();
 
-    relations: Map<string, string | undefined> = new Map<string, string | undefined>();
+  hasCollectionDefinition = (collectionName: string): boolean =>
+    this.collectionDefinitions.has(collectionName);
 
-    constructor() {
-    }
+  getCollectionDefinition = (
+    collectionName: string,
+  ): CollectionDefinition | undefined =>
+    this.collectionDefinitions.get(collectionName);
 
-    hasCollectionDefinition = (collectionName: string): boolean => this.collectionDefinitions.has(collectionName);
+  addCollectionDefinition = (collection: CollectionDefinition) => {
+    this.collectionDefinitions.set(collection.getName(), collection);
+    this.relations.set(
+      collection.getName(),
+      collection.getSchema().getExtends(),
+    );
+  };
 
-    getCollectionDefinition = (collectionName: string): CollectionDefinition | undefined => this.collectionDefinitions.get(collectionName);
-
-    addCollectionDefinition = (collection: CollectionDefinition) => {
-        this.collectionDefinitions.set(collection.getName(), collection);
-        this.relations.set(collection.getName(), collection.getSchema().getExtends());
-    }
-
-    deleteCollectionDefinition = (collectionName: string) => this.collectionDefinitions.delete(collectionName);
-
-};
+  deleteCollectionDefinition = (collectionName: string) =>
+    this.collectionDefinitions.delete(collectionName);
+}

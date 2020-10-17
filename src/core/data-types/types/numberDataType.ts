@@ -1,19 +1,20 @@
-import DataType from "../dataType.interface";
+import DataType from '../dataType.interface';
 
 export default class NumberDataType extends DataType {
+  #type = 'number';
 
-    type: string = 'number';
+  constructor() {
+    super();
+  }
 
-    constructor() {
-        super();
-    }
+  validateType(value: any): boolean {
+    return value === null || typeof value === 'number';
+  }
 
-    validateType(value: any): boolean {
-        return (value === null || typeof value === 'number');
-    }
-
-    toJSON(value: any) {
-        return value;
-    }
-
+  toJSON(value: any) {
+    return value;
+  }
+  getType(): string {
+    return this.#type;
+  }
 }

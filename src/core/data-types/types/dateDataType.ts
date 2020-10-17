@@ -1,23 +1,24 @@
-import DataType from "../dataType.interface";
+import DataType from '../dataType.interface';
 
 export default class DateDataType extends DataType {
+  #type = 'date';
 
-    type: string = 'date';
+  config: any;
 
-    config: any;
+  constructor() {
+    super();
+  }
 
-    constructor() {
-        super();
-    }
+  validateType(value: any): boolean {
+    return value === null || value instanceof Date;
+  }
 
-    validateType(value: any): boolean {
-        return (value === null || value instanceof Date);
-    }
+  toJSON(value: any) {
+    if (value instanceof Date) return value.toISOString();
+    return value;
+  }
 
-    toJSON(value: any) {
-        if (value instanceof Date)
-            return value.toISOString();
-        return value
-    }
-
+  getType(): string {
+    return this.#type;
+  }
 }

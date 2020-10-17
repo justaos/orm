@@ -1,20 +1,21 @@
-import DataType from "../dataType.interface";
+import DataType from '../dataType.interface';
 
 export default class BooleanDataType extends DataType {
+  #type = 'boolean';
 
-    type: string = 'boolean';
+  constructor() {
+    super();
+  }
 
-    constructor() {
-        super();
-    }
+  validateType(value: any): boolean {
+    return value === null || typeof value === 'boolean';
+  }
 
-    validateType(value: any): boolean {
-        return (value === null || typeof value === 'boolean');
-    }
+  toJSON(value: any) {
+    return value;
+  }
 
-
-    toJSON(value: any) {
-        return value;
-    }
-
+  getType(): string {
+    return this.#type;
+  }
 }

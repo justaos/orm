@@ -64,11 +64,9 @@ describe('DatabaseConnection', () => {
             ...defaultConfig,
             port: 80
         };
-        let dbConfig = new DatabaseConfiguration(defaultConfig.host, defaultConfig.port, defaultConfig.dialect, defaultConfig.database, defaultConfig.username, defaultConfig.password, 1000);
+        let dbConfig = new DatabaseConfiguration(config.host, config.port, config.dialect, config.database, config.username, config.password, 1000);
         DatabaseConnection.connect(dbConfig).then((conn) => {
-            conn.closeConnection();
             assert.isOk(false, 'connection established');
-            done()
         }).catch(() => {
             assert.isOk(true, 'connection failed');
             done();

@@ -1,76 +1,85 @@
 {
-    "name": "@plt4rm/odm",
-    "version": "2.2.9",
-    "description": "PLT4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
-    "main": "./index.js",
-    "scripts": {
-        "prepare": "npm run build",
-        "build": "gulp | tsc",
-        "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
-        "coverage": "nyc report --reporter=text-lcov | coveralls",
-        "release": "npm publish"
-    },
-    "files": [
-        "lib",
-        "src",
-        "index.js",
-        "index.ts"
+  "name": "@plt4rm/odm",
+  "version": "2.3.0",
+  "description": "PLT4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
+  "main": "./index.js",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "gulp | tsc",
+    "lint": "eslint ./src --ext .ts,.tsx",
+    "lint:quiet": "eslint ./src --quiet --ext .ts,.tsx",
+    "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "release": "npm publish"
+  },
+  "files": [
+    "lib",
+    "src",
+    "index.js",
+    "index.ts"
+  ],
+  "keywords": [
+    "plt4rm",
+    "plt4rm odm",
+    "mongodb wrapper",
+    "object document mapper"
+  ],
+  "nyc": {
+    "check-coverage": false,
+    "all": true,
+    "extension": [
+      ".ts"
     ],
-    "keywords": [
-        "plt4rm",
-        "plt4rm odm",
-        "mongodb wrapper",
-        "object document mapper"
+    "include": [
+      "src/**/*.ts"
     ],
-    "nyc": {
-        "check-coverage": false,
-        "all": true,
-        "extension": [
-            ".ts"
-        ],
-        "include": [
-            "src/**/*.ts"
-        ],
-        "exclude": [
-            "**/**.interface.ts"
-        ],
-        "require": [
-            "ts-node/register"
-        ],
-        "reporter": [
-            "html",
-            "lcov",
-            "text",
-            "text-summary"
-        ],
-        "report-dir": "docs/reports/coverage"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/plt4rm/odm.git"
-    },
-    "author": "Shivaji Varma <contact@shivajivarma.com>",
-    "contributors": [],
-    "license": "Apache-2.0",
-    "bugs": {
-        "url": "https://github.com/plt4rm/odm/issues"
-    },
-    "homepage": "https://plt4rm.com",
-    "dependencies": {
-        "mongodb": "3.6.0",
-        "@types/mongodb": "3.5.25",
-        "@plt4rm/utils": "^0.8.6"
-    },
-    "devDependencies": {
-        "@types/chai": "^4.2.7",
-        "@types/mocha": "^5.2.7",
-        "chai": "^4.2.0",
-        "coveralls": "^3.0.6",
-        "del": "^5.1.0",
-        "gulp": "^4.0.2",
-        "mocha": "^6.2.2",
-        "nyc": "^14.1.1",
-        "typescript": "^3.9.7",
-        "ts-node": "^8.10.2"
-    }
+    "exclude": [
+      "**/**.interface.ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "html",
+      "lcov",
+      "text",
+      "text-summary"
+    ],
+    "report-dir": "docs/reports/coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/plt4rm/odm.git"
+  },
+  "author": "Shivaji Varma <contact@shivajivarma.com>",
+  "contributors": [],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/plt4rm/odm/issues"
+  },
+  "homepage": "https://plt4rm.com",
+  "dependencies": {
+    "mongodb": "3.6.2",
+    "@plt4rm/utils": "0.9.3"
+  },
+  "devDependencies": {
+    "@types/mongodb": "3.5.25",
+    "@types/node": "^14.11.10",
+    "@types/chai": "^4.2.7",
+    "@types/mocha": "^5.2.7",
+    "@typescript-eslint/eslint-plugin": "^4.4.1",
+    "@typescript-eslint/parser": "^4.4.1",
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.6",
+    "del": "^5.1.0",
+    "eslint": "^7.11.0",
+    "eslint-config-prettier": "^6.13.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "gulp": "^4.0.2",
+    "mocha": "^8.1.1",
+    "nyc": "^15.1.0",
+    "prettier": "^2.1.2",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
+  }
 }
