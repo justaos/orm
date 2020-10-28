@@ -153,9 +153,9 @@ export default class Schema {
     if (!this.getName())
       throw new Error(
         'Collection name not provided :: ' +
-          this.getName() +
-          ' :: ' +
-          this.getExtends(),
+        this.getName() +
+        ' :: ' +
+        this.getExtends(),
       );
     if (typeof this.getName() !== 'string')
       throw new Error(

@@ -18,6 +18,11 @@ export default class Cursor {
     return this;
   }
 
+  skip(num: number) {
+    this.#cursor.skip(num);
+    return this;
+  }
+
   limit(num: number) {
     this.#cursor.limit(num);
     return this;

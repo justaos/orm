@@ -14,6 +14,7 @@ export default class NumberDataType extends DataType {
   toJSON(value: any) {
     return value;
   }
+
   getType(): string {
     return this.#type;
   }

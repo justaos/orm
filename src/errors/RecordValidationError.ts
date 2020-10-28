@@ -24,9 +24,7 @@ export default class RecordValidationError extends Error {
     const result: any = {};
     result.collection = this.collection;
     result.recordId = this.recordId;
-    result.fieldErrors = this.fieldErrors.map(function (
-      fieldError: FieldValidationError,
-    ) {
+    result.fieldErrors = this.fieldErrors.map((fieldError: FieldValidationError) => {
       return fieldError.toJSON();
     });
     return result;

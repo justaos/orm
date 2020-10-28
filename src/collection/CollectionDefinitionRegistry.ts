@@ -1,15 +1,11 @@
 import CollectionDefinition from './CollectionDefinition';
 
 export default class CollectionDefinitionRegistry {
-  collectionDefinitions: Map<string, CollectionDefinition> = new Map<
-    string,
-    CollectionDefinition
-  >();
+  collectionDefinitions: Map<string, CollectionDefinition> = new Map<string,
+    CollectionDefinition>();
 
-  relations: Map<string, string | undefined> = new Map<
-    string,
-    string | undefined
-  >();
+  relations: Map<string, string | undefined> = new Map<string,
+    string | undefined>();
 
   hasCollectionDefinition = (collectionName: string): boolean =>
     this.collectionDefinitions.has(collectionName);
