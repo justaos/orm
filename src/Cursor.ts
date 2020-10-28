@@ -28,6 +28,10 @@ export default class Cursor {
     return this;
   }
 
+  async count(): Promise<number> {
+    return await this.#cursor.count();
+  }
+
   async toArray(): Promise<Record[]> {
     const odmCollection = this.#odmCollection;
     const docs = await this.#cursor.toArray();

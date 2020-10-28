@@ -58,10 +58,8 @@ export default class Collection {
     return null;
   }
 
-  find(filter: any, options?: any): Cursor {
+  find(filter: any = {}, options?: any): Cursor {
     const schema = this.getSchema();
-
-    if (!filter) filter = {};
     _formatFilter(filter, schema, this);
     if (schema.getExtends()) filter._collection = schema.getName();
     const cursor = _getMongoCollection(this).find(filter, options);
@@ -123,6 +121,11 @@ export default class Collection {
   async intercept(operation: string, when: string, payload: any) {
     return await _intercept(this, operation, when, payload);
   }
+
+  async count(filter?: any, options?: any) {
+    return _getMongoCollection(this).count(filter, options);
+  }
+
 }
 
 function _getCollectionDefinition(that: Collection): CollectionDefinition {
