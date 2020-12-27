@@ -1,6 +1,6 @@
 import FieldTypeRegistry from '../field-types/FieldTypeRegistry';
 import CollectionDefinitionRegistry from './CollectionDefinitionRegistry';
-import DSUtils from '@p4rm/ds-utils';
+import CommonUtils from '@p4rm/common-utils';
 import Field from './Field';
 import RecordValidationError from '../errors/RecordValidationError';
 
@@ -197,7 +197,7 @@ export default class Schema {
     }
 
     const fieldNames: string[] = allFields.map((f: Field) => f.getName());
-    const duplicates = DSUtils.findDuplicates(fieldNames);
+    const duplicates = CommonUtils.findDuplicates(fieldNames);
     if (duplicates.length)
       throw new Error(
         `[Collection :: ${this.getName()}] Duplicate fields -> ${duplicates.join(
