@@ -1,11 +1,10 @@
-name: Node CI
+name: Node Build CI
 
 on:
   push:
     # Sequence of patterns matched against refs/heads
     branches:
-      - master
-      - 'releases/**'
+      - main
 
 jobs:
   build:

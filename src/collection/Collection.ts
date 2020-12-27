@@ -71,11 +71,11 @@ export default class Collection {
       this,
       OPERATIONS.CREATE,
       OPERATION_WHEN.BEFORE,
-      record,
+      record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
     const response = await _getMongoCollection(this).insertOne(
-      record.toObject(),
+      record.toObject()
     );
     const savedDoc = response.ops.find(() => true);
     const savedRecord = new Record(savedDoc, this);
@@ -83,7 +83,7 @@ export default class Collection {
       this,
       OPERATIONS.CREATE,
       OPERATION_WHEN.AFTER,
-      savedRecord,
+      savedRecord
     );
   }
 
@@ -92,18 +92,18 @@ export default class Collection {
       this,
       OPERATIONS.UPDATE,
       OPERATION_WHEN.BEFORE,
-      record,
+      record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
     await _getMongoCollection(this).updateOne(
       { _id: record.get('_id') },
-      { $set: { ...record.toObject() } },
+      { $set: { ...record.toObject() } }
     );
     return await _interceptRecord(
       this,
       OPERATIONS.UPDATE,
       OPERATION_WHEN.AFTER,
-      record,
+      record
     );
   }
 
@@ -112,7 +112,7 @@ export default class Collection {
       this,
       OPERATIONS.DELETE,
       OPERATION_WHEN.BEFORE,
-      record,
+      record
     );
     await _getMongoCollection(this).deleteOne({ _id: record.get('_id') });
     await _interceptRecord(this, OPERATIONS.DELETE, 'after', record);
@@ -125,7 +125,6 @@ export default class Collection {
   async count(filter?: any, options?: any) {
     return _getMongoCollection(this).count(filter, options);
   }
-
 }
 
 function _getCollectionDefinition(that: Collection): CollectionDefinition {
@@ -137,7 +136,7 @@ function _getMongoCollection(that: Collection): mongodb.Collection {
 }
 
 function _getOperationInterceptorService(
-  that: Collection,
+  that: Collection
 ): OperationInterceptorService {
   return _getCollectionDefinition(that).getOperationInterceptorService();
 }
@@ -146,10 +145,10 @@ async function _interceptRecord(
   that: Collection,
   operation: string,
   when: string,
-  record: Record,
+  record: Record
 ): Promise<Record> {
   const updatedPayload = await _intercept(that, operation, when, {
-    records: [record],
+    records: [record]
   });
   return updatedPayload.records[0];
 }
@@ -158,7 +157,7 @@ async function _intercept(
   that: Collection,
   operation: string,
   when: string,
-  payload: any,
+  payload: any
 ): Promise<any> {
   const operationInterceptorService = _getOperationInterceptorService(that);
   return await operationInterceptorService.intercept(
@@ -167,7 +166,7 @@ async function _intercept(
     when,
     payload,
     privates.get(that).context,
-    privates.get(that).inactiveIntercepts,
+    privates.get(that).inactiveIntercepts
   );
 }
 
@@ -182,7 +181,7 @@ function _formatFilter(filter: any, schema: Schema, that: Collection) {
           field,
           filter[key],
           filter,
-          privates.get(that).context,
+          privates.get(that).context
         );
   });
 }

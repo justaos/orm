@@ -40,7 +40,7 @@ export default class AnyFieldType extends FieldType {
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ): any {
     return record[field.getName()];
   }
@@ -50,7 +50,7 @@ export default class AnyFieldType extends FieldType {
     field: Field,
     newValue: any,
     record: any,
-    context: any,
+    context: any
   ): any {
     return newValue;
   }

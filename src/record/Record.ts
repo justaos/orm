@@ -46,7 +46,7 @@ export default class Record {
           field,
           value,
           this.#record,
-          this.#collection.getContext(),
+          this.#collection.getContext()
         );
   }
 
@@ -68,7 +68,7 @@ export default class Record {
         schema,
         field,
         this.#record,
-        this.#collection.getContext(),
+        this.#collection.getContext()
       );
   }
 

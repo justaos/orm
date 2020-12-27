@@ -42,5 +42,5 @@ export {
   OPERATION_WHEN,
   OPERATIONS,
   FieldTypeUtils,
-  ObjectId,
+  ObjectId
 };

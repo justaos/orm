@@ -37,7 +37,7 @@ export default class DateFieldType extends FieldType {
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ): any {
     return record[field.getName()];
   }
@@ -47,7 +47,7 @@ export default class DateFieldType extends FieldType {
     field: Field,
     newValue: any,
     record: any,
-    context: any,
+    context: any
   ): any {
     if (typeof newValue === 'string' && isIsoDate(newValue)) {
       const date = new Date(newValue);
@@ -61,7 +61,7 @@ export default class DateFieldType extends FieldType {
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ) {
     return this.#dataType.toJSON(record[field.getName()]);
   }

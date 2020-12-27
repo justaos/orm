@@ -12,7 +12,7 @@ export default class CollectionDefinition {
   constructor(
     collection: any,
     schema: Schema,
-    operationInterceptorService: OperationInterceptorService,
+    operationInterceptorService: OperationInterceptorService
   ) {
     this.#collection = collection;
     this.#schema = schema;

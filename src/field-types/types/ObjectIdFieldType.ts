@@ -41,7 +41,7 @@ export default class ObjectIdFieldType extends FieldType {
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ): any {
     return record[field.getName()];
   }
@@ -51,7 +51,7 @@ export default class ObjectIdFieldType extends FieldType {
     field: Field,
     newValue: any,
     record: any,
-    context: any,
+    context: any
   ): any {
     if (typeof newValue === 'string' && ObjectId.isValid(newValue))
       return new ObjectId(newValue);

@@ -25,7 +25,7 @@ export default class OperationInterceptorService {
     when: string,
     payload: any,
     context: any = {},
-    inactiveIntercepts: any,
+    inactiveIntercepts: any
   ): Promise<any> {
     if (this.hasInterceptors())
       for (const [name, interceptor] of this.interceptors.entries())
@@ -35,7 +35,7 @@ export default class OperationInterceptorService {
             operation,
             when,
             payload,
-            context,
+            context
           );
           if (!payload) break;
         }

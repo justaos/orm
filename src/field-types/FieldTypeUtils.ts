@@ -15,7 +15,7 @@ export default class FieldTypeUtils {
     odm: ODM | undefined,
     schema: Schema,
     field: Field,
-    record: any,
+    record: any
   ) {
     const value = record[field.getName()];
     if (!odm) throw new Error('ODM required for unique check');

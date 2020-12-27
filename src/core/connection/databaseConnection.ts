@@ -55,14 +55,14 @@ export default class DatabaseConnection {
     const dbs = await adminDb.listDatabases();
 
     const index = dbs.databases.findIndex(
-      (db: any) => db.name === this.getDatabaseName(),
+      (db: any) => db.name === this.getDatabaseName()
     );
     if (index !== -1) {
       logger.info(`database "${this.getDatabaseName()}" exists`);
       return;
     } else {
       const err = new Error(
-        `database "${this.getDatabaseName()}" don't exists`,
+        `database "${this.getDatabaseName()}" don't exists`
       );
       logger.error(err.message + '');
       throw err;

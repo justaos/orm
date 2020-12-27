@@ -6,6 +6,6 @@ export default abstract class OperationInterceptorInterface {
     operation: string,
     when: string,
     payload: any,
-    context: any,
+    context: any
   ): any;
 }

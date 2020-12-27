@@ -1,6 +1,6 @@
 const {ODM} = require('../');
 
-async function getODM() {
+module.exports = async function() {
 
     process.on('unhandledRejection', function onError(err) {
         console.error(err);
@@ -25,5 +25,3 @@ async function getODM() {
     });
 
 }
-
-module.exports = getODM;

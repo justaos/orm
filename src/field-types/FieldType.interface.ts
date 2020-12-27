@@ -16,7 +16,7 @@ export default abstract class FieldType {
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ): any;
 
   abstract setValueIntercept(
@@ -24,20 +24,20 @@ export default abstract class FieldType {
     field: Field,
     newValue: any,
     record: any,
-    context: any,
+    context: any
   ): any;
 
   abstract async getDisplayValue(
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ): Promise<any>;
 
   abstract async validateValue(
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ): Promise<any>;
 }

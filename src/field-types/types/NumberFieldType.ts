@@ -48,7 +48,7 @@ export default class NumberFieldType extends FieldType {
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ) {
     return record[field.getName()];
   }
@@ -57,7 +57,7 @@ export default class NumberFieldType extends FieldType {
     schema: Schema,
     field: Field,
     record: any,
-    context: any,
+    context: any
   ): any {
     return record[field.getName()];
   }
@@ -67,7 +67,7 @@ export default class NumberFieldType extends FieldType {
     field: Field,
     newValue: any,
     record: any,
-    context: any,
+    context: any
   ): any {
     return newValue;
   }

@@ -41,11 +41,11 @@ export default class Field {
       throw new Error(`field type not provided`);
     if (!this.#fieldType)
       throw new Error(
-        `[Field :: ${this.getName()}] [Type :: ${this.getType()}] No such field type`,
+        `[Field :: ${this.getName()}] [Type :: ${this.getType()}] No such field type`
       );
     if (!this.#fieldType.validateDefinition(this.#fieldDefinition))
       throw new Error(
-        `[Field :: ${this.getName()}] [Type :: ${this.getType()}] Invalid field definition`,
+        `[Field :: ${this.getName()}] [Type :: ${this.getType()}] Invalid field definition`
       );
   }
 
@@ -55,14 +55,14 @@ export default class Field {
       throw new FieldValidationError(
         this.getDefinition(),
         value,
-        'NOT_VALID_TYPE',
+        'NOT_VALID_TYPE'
       );
     try {
       await this.#fieldType?.validateValue(
         this.#schema,
         this,
         recordObject,
-        context,
+        context
       );
     } catch (e) {
       throw new FieldValidationError(this.getDefinition(), value, e.message);

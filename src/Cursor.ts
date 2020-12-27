@@ -40,7 +40,7 @@ export default class Cursor {
     const updatedPayload = await odmCollection.intercept(
       OPERATIONS.READ,
       OPERATION_WHEN.AFTER,
-      { records },
+      { records }
     );
     return updatedPayload.records;
   }

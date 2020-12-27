@@ -14,7 +14,7 @@ export default class DatabaseConfiguration {
     database?: string,
     username?: string,
     password?: string,
-    connectTimeoutMS?: number,
+    connectTimeoutMS?: number
   ) {
     this.host = host;
     this.port = port;

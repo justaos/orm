@@ -1,4 +1,5 @@
-let getODM = require("./getODM");
+
+const getODM = require("./getODM");
 
 getODM().then(function (odm) {
 

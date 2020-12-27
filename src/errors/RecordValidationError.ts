@@ -10,7 +10,7 @@ export default class RecordValidationError extends Error {
   constructor(
     collection: any,
     recordId: string | undefined,
-    fieldErrors: any[],
+    fieldErrors: any[]
   ) {
     super();
     this.name = 'RecordValidationError';
@@ -24,9 +24,11 @@ export default class RecordValidationError extends Error {
     const result: any = {};
     result.collection = this.collection;
     result.recordId = this.recordId;
-    result.fieldErrors = this.fieldErrors.map((fieldError: FieldValidationError) => {
-      return fieldError.toJSON();
-    });
+    result.fieldErrors = this.fieldErrors.map(
+      (fieldError: FieldValidationError) => {
+        return fieldError.toJSON();
+      }
+    );
     return result;
   }
 }

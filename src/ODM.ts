@@ -32,7 +32,7 @@ export default class ODM {
     const operationInterceptorService = new OperationInterceptorService();
     privates.set(this, {
       collectionDefinitionRegistry,
-      operationInterceptorService,
+      operationInterceptorService
     });
     _loadBuildInFieldTypes(this);
   }
@@ -45,7 +45,7 @@ export default class ODM {
       config.dialect,
       config.database,
       config.username,
-      config.password,
+      config.password
     );
     const conn = await DatabaseConnection.connect(dbConfig);
     await conn.deleteAllIndexes();
@@ -71,14 +71,14 @@ export default class ODM {
     const schema = new Schema(
       schemaJson,
       this.#fieldTypeRegistry,
-      _getCollectionDefinitionRegistry(this),
+      _getCollectionDefinitionRegistry(this)
     );
     const col = new CollectionDefinition(
       _getConnection(this.#conn)
         .getDBO()
         .collection(schema.getBaseName()),
       schema,
-      _getOperationInterceptorService(this),
+      _getOperationInterceptorService(this)
     );
     _getCollectionDefinitionRegistry(this).addCollectionDefinition(col);
   }
@@ -87,7 +87,7 @@ export default class ODM {
     const collectionDefinition:
       | CollectionDefinition
       | undefined = _getCollectionDefinitionRegistry(
-      this,
+      this
     ).getCollectionDefinition(colName);
     if (collectionDefinition === undefined)
       throw Error(`Collection with name '${colName}' does not exist`);
@@ -96,13 +96,13 @@ export default class ODM {
 
   removeCollection(collectionName: string): void {
     _getCollectionDefinitionRegistry(this).deleteCollectionDefinition(
-      collectionName,
+      collectionName
     );
   }
 
   isCollectionDefined(collectionName: string): boolean {
     return _getCollectionDefinitionRegistry(this).hasCollectionDefinition(
-      collectionName,
+      collectionName
     );
   }
 
@@ -117,7 +117,7 @@ export default class ODM {
 
   deleteInterceptor(operationInterceptorName: string): void {
     _getOperationInterceptorService(this).deleteInterceptor(
-      operationInterceptorName,
+      operationInterceptorName
     );
   }
 
@@ -135,20 +135,20 @@ export default class ODM {
  */
 
 function _getConnection(
-  conn: DatabaseConnection | undefined,
+  conn: DatabaseConnection | undefined
 ): DatabaseConnection {
   if (!conn) throw new Error('ODM::getConn -> There is no active connection');
   return conn;
 }
 
 function _getCollectionDefinitionRegistry(
-  that: ODM,
+  that: ODM
 ): CollectionDefinitionRegistry {
   return privates.get(that).collectionDefinitionRegistry;
 }
 
 function _getOperationInterceptorService(
-  that: ODM,
+  that: ODM
 ): OperationInterceptorService {
   return privates.get(that).operationInterceptorService;
 }
