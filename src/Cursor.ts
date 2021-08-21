@@ -13,17 +13,17 @@ export default class Cursor {
     this.#odmCollection = odmCollection;
   }
 
-  sort(keyOrList: string | any[] | any, direction?: number) {
+  sort(keyOrList: string | any[] | any, direction?: number): Cursor {
     this.#cursor.sort(keyOrList, direction);
     return this;
   }
 
-  skip(num: number) {
+  skip(num: number): Cursor {
     this.#cursor.skip(num);
     return this;
   }
 
-  limit(num: number) {
+  limit(num: number): Cursor {
     this.#cursor.limit(num);
     return this;
   }

@@ -84,11 +84,8 @@ export default class ODM {
   }
 
   collection(colName: string, context?: any): Collection {
-    const collectionDefinition:
-      | CollectionDefinition
-      | undefined = _getCollectionDefinitionRegistry(
-      this
-    ).getCollectionDefinition(colName);
+    const collectionDefinition: CollectionDefinition | undefined =
+      _getCollectionDefinitionRegistry(this).getCollectionDefinition(colName);
     if (collectionDefinition === undefined)
       throw Error(`Collection with name '${colName}' does not exist`);
     return new Collection(collectionDefinition, context);

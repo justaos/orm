@@ -48,7 +48,10 @@ export default class Collection {
     privates.get(this).inactiveIntercepts = [];
   }
 
-  async findOne(filter: any, options?: FindOneOptions): Promise<Record | null> {
+  async findOne(
+    filter: any,
+    options?: FindOneOptions<any>
+  ): Promise<Record | null> {
     const schema = this.getSchema();
     if (!filter) filter = {};
     _formatFilter(filter, schema, this);

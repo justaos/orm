@@ -211,9 +211,8 @@ function _getSchema(
   collectionDefinitionRegistry: CollectionDefinitionRegistry,
   schemaName: string
 ): Schema {
-  const collectionDefinition = collectionDefinitionRegistry.getCollectionDefinition(
-    schemaName
-  );
+  const collectionDefinition =
+    collectionDefinitionRegistry.getCollectionDefinition(schemaName);
   if (!collectionDefinition)
     throw Error('[Schema::_getCollection] Collection not found');
   return collectionDefinition.getSchema();

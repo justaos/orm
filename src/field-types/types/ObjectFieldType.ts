@@ -11,7 +11,7 @@ export default class ObjectFieldType extends FieldType {
 
   #odm?: ODM;
 
-  setODM(odm: ODM) {
+  setODM(odm: ODM): void {
     this.#odm = odm;
   }
 
@@ -23,7 +23,12 @@ export default class ObjectFieldType extends FieldType {
     return 'object';
   }
 
-  async validateValue(schema: Schema, field: Field, record: any, context: any) {
+  async validateValue(
+    schema: Schema,
+    field: Field,
+    record: any,
+    context: any
+  ): Promise<void> {
     FieldTypeUtils.requiredValidation(schema, field, record);
     await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, record);
   }
@@ -32,7 +37,12 @@ export default class ObjectFieldType extends FieldType {
     return !!fieldDefinition.name;
   }
 
-  async getDisplayValue(schema: any, field: Field, record: any, context: any) {
+  async getDisplayValue(
+    schema: Schema,
+    field: Field,
+    record: any,
+    context: any
+  ): Promise<string> {
     return record[field.getName()];
   }
 
