@@ -1,10 +1,31 @@
 {
   "name": "@p4rm/odm",
   "version": "2.3.7",
+  "private": false,
   "description": "P4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
+  "keywords": [
+    "p4rm",
+    "p4rm odm",
+    "mongodb wrapper",
+    "object document mapper"
+  ],
+  "homepage": "https://p4rm.com",
+  "bugs": {
+    "url": "https://github.com/p4rm/odm/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p4rm/odm.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Shivaji Varma <contact@shivajivarma.com>",
+  "contributors": [],
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
-  "private": false,
+  "files": [
+    "lib",
+    "src"
+  ],
   "scripts": {
     "prepare": "npm run build",
     "build": "gulp | tsc",
@@ -16,69 +37,45 @@
     "release": "npm publish",
     "generate-docs": "embedme --stdout --strip-embed-comment README.template.md > README.md"
   },
-  "files": [
-    "lib",
-    "src"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "keywords": [
-    "p4rm",
-    "p4rm odm",
-    "mongodb wrapper",
-    "object document mapper"
-  ],
   "nyc": {
-    "check-coverage": false,
     "all": true,
+    "check-coverage": false,
+    "exclude": [
+      "**/**.interface.ts"
+    ],
     "extension": [
       ".ts"
     ],
     "include": [
       "src/**/*.ts"
     ],
-    "exclude": [
-      "**/**.interface.ts"
-    ],
-    "require": [
-      "ts-node/register"
-    ],
+    "report-dir": "docs/reports/coverage",
     "reporter": [
       "html",
       "lcov",
       "text",
       "text-summary"
     ],
-    "report-dir": "docs/reports/coverage"
+    "require": [
+      "ts-node/register"
+    ]
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/p4rm/odm.git"
-  },
-  "author": "Shivaji Varma <contact@shivajivarma.com>",
-  "contributors": [],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/p4rm/odm/issues"
-  },
-  "homepage": "https://p4rm.com",
   "dependencies": {
-    "mongodb": "3.6.11",
-    "@types/mongodb": "3.6.20",
     "@p4rm/common-utils": "^1.4.0",
-    "@p4rm/logger-utils": "^1.4.0"
+    "@p4rm/logger-utils": "^1.4.0",
+    "@types/mongodb": "3.6.20",
+    "mongodb": "3.6.11"
   },
   "devDependencies": {
-    "embedme": "^1.22.0",
-    "@types/node": "^16.7.1",
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
+    "@types/node": "^16.7.1",
     "@typescript-eslint/eslint-plugin": "^4.29.2",
     "@typescript-eslint/parser": "^4.29.2",
     "chai": "^4.3.4",
     "coveralls": "^3.0.6",
     "del": "^6.0.0",
+    "embedme": "^1.22.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.1",
@@ -88,5 +85,8 @@
     "prettier": "^2.3.2",
     "ts-node": "^10.2.1",
     "typescript": "^4.3.5"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
