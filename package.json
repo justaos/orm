@@ -61,10 +61,10 @@
     ]
   },
   "dependencies": {
-    "@p4rm/common-utils": "^1.4.0",
+    "@p4rm/common-utils": "^1.4.2",
     "@p4rm/logger-utils": "^1.4.0",
-    "@types/mongodb": "3.6.20",
-    "mongodb": "3.6.11"
+    "@types/mongodb": "4.0.7",
+    "mongodb": "4.1.1"
   },
   "devDependencies": {
     "@types/chai": "^4.2.21",

@@ -1,5 +1,5 @@
 import ODM from './ODM';
-import Cursor from './Cursor';
+import FindCursor from './FindCursor';
 import Schema from './collection/Schema';
 import Collection from './collection/Collection';
 import Record from './record/Record';
@@ -25,7 +25,7 @@ export {
   ODM,
   Collection,
   Record,
-  Cursor,
+  FindCursor,
   Schema,
   Field,
   FieldType,
