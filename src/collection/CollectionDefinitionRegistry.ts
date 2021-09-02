@@ -19,7 +19,7 @@ export default class CollectionDefinitionRegistry {
   ): CollectionDefinition | undefined =>
     this.collectionDefinitions.get(collectionName);
 
-  addCollectionDefinition = (collection: CollectionDefinition) => {
+  addCollectionDefinition = (collection: CollectionDefinition): void => {
     this.collectionDefinitions.set(collection.getName(), collection);
     this.relations.set(
       collection.getName(),
@@ -27,6 +27,6 @@ export default class CollectionDefinitionRegistry {
     );
   };
 
-  deleteCollectionDefinition = (collectionName: string) =>
+  deleteCollectionDefinition = (collectionName: string): boolean =>
     this.collectionDefinitions.delete(collectionName);
 }

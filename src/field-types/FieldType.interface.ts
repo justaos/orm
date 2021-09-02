@@ -27,14 +27,14 @@ export default abstract class FieldType {
     context: any
   ): any;
 
-  abstract async getDisplayValue(
+  abstract getDisplayValue(
     schema: Schema,
     field: Field,
     record: any,
     context: any
   ): Promise<any>;
 
-  abstract async validateValue(
+  abstract validateValue(
     schema: Schema,
     field: Field,
     record: any,

@@ -52,8 +52,7 @@ export default class DatabaseConnection {
     const adminDb = this.#conn.db('test').admin();
 
     // List all the available databases
-    const dbs = await adminDb.listDatabases();
-
+    const dbs = await adminDb.command({ listDatabases: 1 });
     const index = dbs.databases.findIndex(
       (db: any) => db.name === this.getDatabaseName()
     );

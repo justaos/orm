@@ -2,28 +2,29 @@ import Collection from './collection/Collection';
 import * as mongodb from 'mongodb';
 import Record from './record/Record';
 import { OPERATION_WHEN, OPERATIONS } from './constants';
+import { Sort, SortDirection } from 'mongodb';
 
-export default class Cursor {
-  #cursor: mongodb.Cursor;
+export default class FindCursor {
+  #cursor: mongodb.FindCursor;
 
   #odmCollection: Collection;
 
-  constructor(cursor: mongodb.Cursor, odmCollection: Collection) {
+  constructor(cursor: mongodb.FindCursor, odmCollection: Collection) {
     this.#cursor = cursor;
     this.#odmCollection = odmCollection;
   }
 
-  sort(keyOrList: string | any[] | any, direction?: number) {
+  sort(keyOrList: Sort | string, direction?: SortDirection): FindCursor {
     this.#cursor.sort(keyOrList, direction);
     return this;
   }
 
-  skip(num: number) {
+  skip(num: number): FindCursor {
     this.#cursor.skip(num);
     return this;
   }
 
-  limit(num: number) {
+  limit(num: number): FindCursor {
     this.#cursor.limit(num);
     return this;
   }

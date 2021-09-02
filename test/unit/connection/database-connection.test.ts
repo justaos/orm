@@ -85,8 +85,7 @@ describe('DatabaseConnection', () => {
     it('#DatabaseService::getDBO - create record', function (done) {
         this.timeout(MAX_TIMEOUT);
         dbConnection.getDBO().collection('test').insertOne({"name": "hello"}).then(function (res) {
-            const savedDoc = res.ops.find(() => true);
-            if (savedDoc) {
+            if (res.acknowledged) {
                 done();
             }
         });

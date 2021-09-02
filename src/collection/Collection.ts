@@ -1,9 +1,9 @@
-import Cursor from '../Cursor';
+import FindCursor from '../FindCursor';
 import Record from '../record/Record';
 import OperationInterceptorService from '../operation-interceptor/OperationInterceptorService';
 import Schema from './Schema';
 import * as mongodb from 'mongodb';
-import { FindOneOptions, ObjectId } from 'mongodb';
+import { FindOptions, ObjectId } from 'mongodb';
 import { OPERATION_WHEN, OPERATIONS } from '../constants';
 import CollectionDefinition from './CollectionDefinition';
 
@@ -48,7 +48,10 @@ export default class Collection {
     privates.get(this).inactiveIntercepts = [];
   }
 
-  async findOne(filter: any, options?: FindOneOptions): Promise<Record | null> {
+  async findOne(
+    filter: any,
+    options?: FindOptions<any>
+  ): Promise<Record | null> {
     const schema = this.getSchema();
     if (!filter) filter = {};
     _formatFilter(filter, schema, this);
@@ -58,12 +61,12 @@ export default class Collection {
     return null;
   }
 
-  find(filter: any = {}, options?: any): Cursor {
+  find(filter: any = {}, options?: any): FindCursor {
     const schema = this.getSchema();
     _formatFilter(filter, schema, this);
     if (schema.getExtends()) filter._collection = schema.getName();
     const cursor = _getMongoCollection(this).find(filter, options);
-    return new Cursor(cursor, this);
+    return new FindCursor(cursor, this);
   }
 
   async insertRecord(record: Record): Promise<Record> {
@@ -77,7 +80,10 @@ export default class Collection {
     const response = await _getMongoCollection(this).insertOne(
       record.toObject()
     );
-    const savedDoc = response.ops.find(() => true);
+    const savedDoc = await _getMongoCollection(this).findOne(
+      { _id: response.insertedId },
+      {}
+    );
     const savedRecord = new Record(savedDoc, this);
     return await _interceptRecord(
       this,
