@@ -3,9 +3,8 @@ P4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent
  
  Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete). 
 
-[![Build](https://github.com/p4rm/odm/workflows/Node%20CI/badge.svg)](https://github.com/p4rm/odm/actions?workflow=Node+CI)
+[![Build](https://github.com/p4rm/odm/workflows/Node%20Build%20CI/badge.svg)](https://github.com/p4rm/odm/actions?workflow=Node+CI)
 [![Coverage Status](https://coveralls.io/repos/github/p4rm/odm/badge.svg?branch=master)](https://coveralls.io/github/p4rm/odm?branch=master)
-[![CodeFactor](https://www.codefactor.io/repository/github/p4rm/odm/badge)](https://www.codefactor.io/repository/github/p4rm/odm)
 
 ```bash
 npm install --save @p4rm/odm
