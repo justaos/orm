@@ -18,7 +18,7 @@ export default class DatabaseConnection {
       const conn = await _createConnectionByUri(dbConfig.getUri());
       logger.info('mongo db connection open');
       return new DatabaseConnection(conn, dbConfig);
-    } catch (err) {
+    } catch (err: any) {
       logger.error(err.message + '');
       throw err;
     }

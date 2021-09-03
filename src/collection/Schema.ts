@@ -191,7 +191,7 @@ export default class Schema {
     for (const fieldObject of allFields) {
       try {
         fieldObject.validate();
-      } catch (err) {
+      } catch (err: any) {
         throw new Error(`[Collection :: ${this.getName()}] ${err.message}`);
       }
     }

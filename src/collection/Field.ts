@@ -64,8 +64,8 @@ export default class Field {
         recordObject,
         context
       );
-    } catch (e) {
-      throw new FieldValidationError(this.getDefinition(), value, e.message);
+    } catch (err: any) {
+      throw new FieldValidationError(this.getDefinition(), value, err.message);
     }
   }
 }

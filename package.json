@@ -1,6 +1,6 @@
 {
   "name": "@p4rm/odm",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "private": false,
   "description": "P4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
   "keywords": [
@@ -63,7 +63,6 @@
   "dependencies": {
     "@p4rm/common-utils": "^1.4.2",
     "@p4rm/logger-utils": "^1.4.0",
-    "@types/mongodb": "4.0.7",
     "mongodb": "4.1.1"
   },
   "devDependencies": {
