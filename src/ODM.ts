@@ -97,6 +97,12 @@ export default class ODM {
     );
   }
 
+  getSchema(colName: string): Schema | undefined {
+    const colDefinition: CollectionDefinition | undefined =
+      _getCollectionDefinitionRegistry(this).getCollectionDefinition(colName);
+    return colDefinition?.getSchema();
+  }
+
   isCollectionDefined(collectionName: string): boolean {
     return _getCollectionDefinitionRegistry(this).hasCollectionDefinition(
       collectionName
