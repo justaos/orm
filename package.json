@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "prepare": "npm run build",
-    "build": "node ./gulpfile.js | tsc",
+    "build": "node ./clean.js | tsc",
     "lint": "eslint ./src --ext .ts,.tsx",
     "lint:fix": "eslint --fix ./src --ext .ts,.tsx",
     "lint:quiet": "eslint ./src --quiet --ext .ts,.tsx",
