@@ -37,7 +37,7 @@ export default class ODM {
     _loadBuildInFieldTypes(this);
   }
 
-  async connect(config: any) {
+  async connect(config: any): Promise<void> {
     if (!config) throw new Error('ODM::connect -> There is no config provided');
     const dbConfig = new DatabaseConfiguration(
       config.host,
@@ -53,17 +53,17 @@ export default class ODM {
   }
 
   closeConnection(): Promise<void> {
-    const conn = _getConnection(this.#conn);
+    const conn = this.#getConnection();
     return conn.closeConnection();
   }
 
-  databaseExists(): Promise<any> {
-    const conn = _getConnection(this.#conn);
+  databaseExists(): Promise<boolean> {
+    const conn = this.#getConnection();
     return conn.databaseExists();
   }
 
-  dropDatabase() {
-    const conn = _getConnection(this.#conn);
+  dropDatabase(): Promise<boolean> {
+    const conn = this.#getConnection();
     return conn.dropDatabase();
   }
 
@@ -74,9 +74,7 @@ export default class ODM {
       _getCollectionDefinitionRegistry(this)
     );
     const col = new CollectionDefinition(
-      _getConnection(this.#conn)
-        .getDBO()
-        .collection(schema.getBaseName()),
+      this.#getConnection().getDBO().collection(schema.getBaseName()),
       schema,
       _getOperationInterceptorService(this)
     );
@@ -131,18 +129,17 @@ export default class ODM {
   convertToObjectId(id: string): ObjectId {
     return new ObjectId(id);
   }
+
+  #getConnection = (): DatabaseConnection => {
+    if (!this.#conn)
+      throw new Error('ODM::#getConnection -> There is no active connection');
+    return this.#conn;
+  };
 }
 
 /**
  * PRIVATE METHODS
  */
-
-function _getConnection(
-  conn: DatabaseConnection | undefined
-): DatabaseConnection {
-  if (!conn) throw new Error('ODM::getConn -> There is no active connection');
-  return conn;
-}
 
 function _getCollectionDefinitionRegistry(
   that: ODM

@@ -1,4 +1,4 @@
-import Logger from '@p4rm/logger-utils';
+import { Logger } from '@p4rm/utils';
 
 export function getLoggerInstance(className: string): Logger {
   return Logger.createLogger({ label: `ODM :: ${className}` });

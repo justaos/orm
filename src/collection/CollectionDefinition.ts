@@ -3,11 +3,11 @@ import Schema from './Schema';
 import * as mongodb from 'mongodb';
 
 export default class CollectionDefinition {
-  #collection: mongodb.Collection;
+  readonly #collection: mongodb.Collection;
 
-  #schema: Schema;
+  readonly #schema: Schema;
 
-  #operationInterceptorService: OperationInterceptorService;
+  readonly #operationInterceptorService: OperationInterceptorService;
 
   constructor(
     collection: any,

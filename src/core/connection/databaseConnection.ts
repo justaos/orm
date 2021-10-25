@@ -15,7 +15,7 @@ export default class DatabaseConnection {
 
   static async connect(dbConfig: DatabaseConfiguration): Promise<any> {
     try {
-      const conn = await _createConnectionByUri(dbConfig.getUri());
+      const conn = await this.#createConnectionByUri(dbConfig.getUri());
       logger.info('mongo db connection open');
       return new DatabaseConnection(conn, dbConfig);
     } catch (err: any) {
@@ -35,8 +35,8 @@ export default class DatabaseConnection {
     }
   }
 
-  async dropDatabase(): Promise<any> {
-    await this.getDBO().dropDatabase();
+  async dropDatabase(): Promise<boolean> {
+    return this.getDBO().dropDatabase();
   }
 
   getDBO(): Db {
@@ -47,7 +47,7 @@ export default class DatabaseConnection {
     return this.#config.getDatabaseName();
   }
 
-  async databaseExists() {
+  async databaseExists(): Promise<boolean> {
     // Use the admin database for the operation
     const adminDb = this.#conn.db('test').admin();
 
@@ -58,13 +58,10 @@ export default class DatabaseConnection {
     );
     if (index !== -1) {
       logger.info(`database "${this.getDatabaseName()}" exists`);
-      return;
+      return true;
     } else {
-      const err = new Error(
-        `database "${this.getDatabaseName()}" don't exists`
-      );
-      logger.error(err.message + '');
-      throw err;
+      logger.info(`database "${this.getDatabaseName()}" don't exists`);
+      return false;
     }
   }
 
@@ -76,15 +73,15 @@ export default class DatabaseConnection {
     });
   }
 
-  closeConnection() {
+  closeConnection(): Promise<void> {
     return this.#conn.close();
   }
-}
 
-async function _createConnectionByUri(uri: string): Promise<MongoClient> {
-  const client = new MongoClient(uri);
-  await client.connect();
-  return client;
+  static #createConnectionByUri = async (uri: string): Promise<MongoClient> => {
+    const client = new MongoClient(uri);
+    await client.connect();
+    return client;
+  };
 }
 
 const logger = getLoggerInstance(DatabaseConnection.name);

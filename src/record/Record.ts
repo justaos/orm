@@ -35,7 +35,7 @@ export default class Record {
     return id;
   }
 
-  set(key: string, value: any) {
+  set(key: string, value: any): void {
     const schema = this.#collection.getSchema();
     const field = schema.getField(key);
     if (field)
@@ -50,7 +50,7 @@ export default class Record {
         );
   }
 
-  get(key: string) {
+  get(key: string): any {
     const schema = this.#collection.getSchema();
     if (schema.getField(key))
       return typeof this.#record[key] !== 'undefined'

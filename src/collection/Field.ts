@@ -3,11 +3,11 @@ import Schema from './Schema';
 import FieldValidationError from '../errors/FieldValidationError';
 
 export default class Field {
-  #schema: Schema;
+  readonly #schema: Schema;
 
-  #fieldDefinition: any;
+  readonly #fieldDefinition: any;
 
-  #fieldType: FieldType | undefined;
+  readonly #fieldType: FieldType | undefined;
 
   constructor(schema: Schema, fieldDefinition: any, fieldType?: FieldType) {
     this.#fieldDefinition = fieldDefinition;

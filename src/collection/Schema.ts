@@ -1,17 +1,17 @@
 import FieldTypeRegistry from '../field-types/FieldTypeRegistry';
 import CollectionDefinitionRegistry from './CollectionDefinitionRegistry';
-import CommonUtils from '@p4rm/common-utils';
+import { CommonUtils } from '@p4rm/utils';
 import Field from './Field';
 import RecordValidationError from '../errors/RecordValidationError';
 
 export default class Schema {
-  #name: string;
+  readonly #name: string;
 
-  #label: string;
+  readonly #label: string;
 
-  #final: boolean;
+  readonly #final: boolean;
 
-  #extends: string;
+  readonly #extends: string;
 
   #fields: Field[] = [];
 
@@ -66,10 +66,7 @@ export default class Schema {
     const extendsCollectionName = this.getExtends();
     if (extendsCollectionName)
       extendsStack = extendsStack.concat(
-        _getSchema(
-          this.#collectionDefinitionRegistry,
-          extendsCollectionName
-        ).getExtendsStack()
+        this.#getSchema(extendsCollectionName).getExtendsStack()
       );
     return extendsStack;
   }
@@ -78,10 +75,7 @@ export default class Schema {
     let hostName = this.getName();
     const extendsCollectionName = this.getExtends();
     if (extendsCollectionName) {
-      const extendedSchema = _getSchema(
-        this.#collectionDefinitionRegistry,
-        extendsCollectionName
-      );
+      const extendedSchema = this.#getSchema(extendsCollectionName);
       hostName = extendedSchema.getBaseName();
     }
     return hostName;
@@ -92,10 +86,7 @@ export default class Schema {
 
     const extendsCollectionName = this.getExtends();
     if (extendsCollectionName) {
-      const extendedSchema = _getSchema(
-        this.#collectionDefinitionRegistry,
-        extendsCollectionName
-      );
+      const extendedSchema = this.#getSchema(extendsCollectionName);
       allFields = allFields.concat(extendedSchema.getFields());
     } else {
       allFields.push(
@@ -177,10 +168,7 @@ export default class Schema {
         throw new Error(
           `[Collection :: ${this.getName()}] cannot extend '${this.getExtends()}'. '${this.getExtends()}' does not exists.`
         );
-      const extendsCol: Schema = _getSchema(
-        this.#collectionDefinitionRegistry,
-        this.getExtends()
-      );
+      const extendsCol: Schema = this.#getSchema(this.getExtends());
       if (extendsCol.isFinal())
         throw new Error(
           `[Collection :: ${this.getName()}] cannot extend '${this.getExtends()}'. '${this.getExtends()}' is final schema.`
@@ -205,15 +193,12 @@ export default class Schema {
         )}`
       );
   }
-}
 
-function _getSchema(
-  collectionDefinitionRegistry: CollectionDefinitionRegistry,
-  schemaName: string
-): Schema {
-  const collectionDefinition =
-    collectionDefinitionRegistry.getCollectionDefinition(schemaName);
-  if (!collectionDefinition)
-    throw Error('[Schema::_getCollection] Collection not found');
-  return collectionDefinition.getSchema();
+  #getSchema = (schemaName: string): Schema => {
+    const collectionDefinition =
+      this.#collectionDefinitionRegistry.getCollectionDefinition(schemaName);
+    if (!collectionDefinition)
+      throw Error('[Schema::_getCollection] Collection not found');
+    return collectionDefinition.getSchema();
+  };
 }

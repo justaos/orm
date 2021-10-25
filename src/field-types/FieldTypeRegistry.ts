@@ -7,10 +7,10 @@ export default class FieldTypeRegistry {
     this.fieldTypes = new Map<string, FieldType>();
   }
 
-  addFieldType = (fieldType: FieldType) =>
+  addFieldType = (fieldType: FieldType): Map<string, FieldType> =>
     this.fieldTypes.set(fieldType.getType(), fieldType);
 
-  deleteFieldType = (type: string) => this.fieldTypes.delete(type);
+  deleteFieldType = (type: string): boolean => this.fieldTypes.delete(type);
 
   getFieldType = (type: string): FieldType | undefined =>
     this.fieldTypes.get(type);

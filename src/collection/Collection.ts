@@ -27,7 +27,7 @@ export default class Collection {
     return _getCollectionDefinition(this).getSchema();
   }
 
-  createNewRecord() {
+  createNewRecord(): Record {
     return new Record(null, this).initialize();
   }
 
@@ -36,7 +36,7 @@ export default class Collection {
     return this.findOne({ _id: id }, {});
   }
 
-  deactivateIntercept(interceptName: string) {
+  deactivateIntercept(interceptName: string): void {
     this.getInActivateIntercepts().push(interceptName);
   }
 
@@ -44,7 +44,7 @@ export default class Collection {
     return privates.get(this).inactiveIntercepts;
   }
 
-  clearInActivateIntercepts() {
+  clearInActivateIntercepts(): void {
     privates.get(this).inactiveIntercepts = [];
   }
 

@@ -5,9 +5,9 @@ import { OPERATION_WHEN, OPERATIONS } from './constants';
 import { Sort, SortDirection } from 'mongodb';
 
 export default class FindCursor {
-  #cursor: mongodb.FindCursor;
+  readonly #cursor: mongodb.FindCursor;
 
-  #odmCollection: Collection;
+  readonly #odmCollection: Collection;
 
   constructor(cursor: mongodb.FindCursor, odmCollection: Collection) {
     this.#cursor = cursor;

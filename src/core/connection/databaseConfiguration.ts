@@ -25,7 +25,7 @@ export default class DatabaseConfiguration {
     this.connectTimeoutMS = connectTimeoutMS;
   }
 
-  getUri() {
+  getUri(): string {
     let uri = this.getUriWithoutDatabase();
     if (this.database) uri = `${uri}/${this.database}`;
     if (this.connectTimeoutMS)
@@ -33,13 +33,13 @@ export default class DatabaseConfiguration {
     return uri;
   }
 
-  getUriWithoutDatabase() {
+  getUriWithoutDatabase(): string {
     if (this.username && this.password)
       return `${this.dialect}://${this.username}:${this.password}@${this.host}:${this.port}`;
     return `${this.dialect}://${this.host}:${this.port}`;
   }
 
-  getDatabaseName() {
+  getDatabaseName(): string {
     return this.database;
   }
 }
