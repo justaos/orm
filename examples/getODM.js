@@ -10,10 +10,10 @@ module.exports = async function() {
         const odm = new ODM();
 
         const config = {
-          host: '127.0.0.1',
-          port: '27017',
-          database: 'odm-example-db',
-          dialect: 'mongodb'
+            "host": "127.0.0.1",
+            "port": "27017",
+            "database": "odm-example-db",
+            "dialect": "mongodb",
         };
 
         odm.connect(config).then(() => {
