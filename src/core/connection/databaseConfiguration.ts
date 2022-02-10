@@ -8,7 +8,7 @@ export default class DatabaseConfiguration {
   private readonly connectTimeoutMS: number | undefined;
 
   constructor(
-    host = 'localhost',
+    host = '127.0.0.1',
     port = 27017,
     dialect = 'mongodb',
     database?: string,

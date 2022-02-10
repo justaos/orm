@@ -19,7 +19,7 @@ const ODM = require("@p4rm/odm");
 const odm = new ODM();
 
 const config = {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "port": "27017",
     "database": "anysols-collection-service",
     "dialect": "mongodb",

@@ -5,7 +5,7 @@ import DatabaseConfiguration from '../../../src/core/connection/databaseConfigur
 import DatabaseConnection from '../../../src/core/connection/databaseConnection';
 
 const defaultConfig: any = {
-  host: 'localhost',
+  host: '127.0.0.1',
   port: '27017',
   database: 'odm-conn-test',
   dialect: 'mongodb'
@@ -28,7 +28,7 @@ describe('DatabaseConnection', () => {
     );
     assert.equal(
       dbConfig.getUri(),
-      'mongodb://admin:admin@localhost:27017/odm-conn-test',
+      'mongodb://admin:admin@127.0.0.1:27017/odm-conn-test',
       'Unexpected uri generated'
     );
   });
@@ -47,7 +47,7 @@ describe('DatabaseConnection', () => {
     );
     assert.equal(
       dbConfig.getUri(),
-      'mongodb://localhost:27017/odm-conn-test',
+      'mongodb://127.0.0.1:27017/odm-conn-test',
       'Unexpected uri generated'
     );
   });
@@ -67,7 +67,7 @@ describe('DatabaseConnection', () => {
     );
     assert.equal(
       dbConfig.getUri(),
-      'mongodb://localhost:27017',
+      'mongodb://127.0.0.1:27017',
       'Unexpected uri generated'
     );
   });
@@ -84,7 +84,7 @@ describe('DatabaseConnection', () => {
     );
     assert.equal(
       dbConfig.getUri(),
-      'mongodb://localhost:27017',
+      'mongodb://127.0.0.1:27017',
       'Unexpected uri generated'
     );
   });
@@ -127,7 +127,7 @@ describe('DatabaseConnection', () => {
       config.database,
       config.username,
       config.password,
-      1000
+      500
     );
     DatabaseConnection.connect(dbConfig)
       .then((conn) => {

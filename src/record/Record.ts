@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import Collection from '../collection/Collection';
 import Field from '../collection/Field';
 
@@ -16,7 +17,7 @@ export default class Record {
     }
   }
 
-  initialize() {
+  initialize(): Record {
     this.#record = {};
     this.#collection
       .getSchema()
@@ -24,9 +25,14 @@ export default class Record {
       .map((field: Field) => {
         this.set(field.getName(), field.getDefaultValue());
       });
+    this.#record['_id'] = new ObjectId();
     this.#record['_collection'] = this.#collection.getName();
     this.#isNew = true;
     return this;
+  }
+
+  isNew(): boolean {
+    return this.#isNew;
   }
 
   getID(): string | null {
@@ -52,11 +58,9 @@ export default class Record {
 
   get(key: string): any {
     const schema = this.#collection.getSchema();
-    if (schema.getField(key))
-      return typeof this.#record[key] !== 'undefined'
-        ? this.#record[key]
-        : null;
-    return; // no field exists with key
+    if (schema.getField(key) && typeof this.#record[key] !== 'undefined')
+      return this.#record[key];
+    return null;
   }
 
   async getDisplayValue(key: string) {
@@ -72,28 +76,28 @@ export default class Record {
       );
   }
 
-  async insert() {
+  async insert(): Promise<Record> {
     const record = await this.#collection.insertRecord(this);
     this.#record = record.toObject();
     this.#isNew = false;
     return this;
   }
 
-  async update() {
+  async update(): Promise<Record> {
     const record = await this.#collection.updateRecord(this);
     this.#record = record.toObject();
     this.#isNew = false;
     return this;
   }
 
-  async delete() {
+  async delete(): Promise<Record> {
     if (this.#isNew)
       throw Error('[Record::remove] Cannot remove unsaved record');
     await this.#collection.deleteOne(this);
     return this;
   }
 
-  toObject() {
+  toObject(): any {
     const obj: any = {};
     this.#collection
       .getSchema()

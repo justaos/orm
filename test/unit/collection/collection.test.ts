@@ -12,35 +12,48 @@ describe('Collection', () => {
 
     before(function () {
         session.odm.defineCollection({
-            name: MODEL_NAME,
-            fields: [{
-                name: 'name',
-                type: 'string',
-                unique: true
-            }, {
-                name: "emp_no",
-                type: "objectId"
-            }, {
-                name: "salary",
-                maximum: 10000,
-                type: "integer"
-            }, {
-                name: "birth_date",
-                type: "date"
-            }, {
-                name: "created_on",
-                type: "datetime"
-            },{
-                name: "gender",
-                type: "boolean"
-            },{
-                name: "dynamic",
-                type: "any",
-                default_value: 100
-            }, {
-                name: "address",
-                type: "object"
-            }]
+          name: MODEL_NAME,
+          fields: [
+            {
+              name: 'name',
+              type: 'string',
+              unique: true
+            },
+            {
+              name: 'emp_no',
+              type: 'objectId'
+            },
+            {
+              name: 'salary',
+              maximum: 10000,
+              type: 'integer'
+            },
+            {
+              name: 'birth_date',
+              type: 'date'
+            },
+            {
+              name: 'created_on',
+              type: 'datetime'
+            },
+            {
+              name: 'gender',
+              type: 'boolean'
+            },
+            {
+              name: 'dynamic',
+              type: 'any',
+              default_value: 100
+            },
+            {
+              name: 'address',
+              type: 'object'
+            },
+            {
+              name: 'rating',
+              type: 'number'
+            }
+          ]
         });
     });
 
@@ -57,22 +70,24 @@ describe('Collection', () => {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         let empRecord = employeeCollection.createNewRecord();
+        const empId = empRecord.getID();
         empRecord.set("name", "John");
         empRecord.set("emp_no", session.odm.generateNewObjectId());
         empRecord.set("birth_date", new Date().toISOString());
         empRecord.set("created_on", new Date().toISOString());
         empRecord.set("gender", true);
-        empRecord.set("salary", 5000);
-        empRecord.set("address", {
-            "street": "test",
-            "zipcode": 500000
+        empRecord.set('salary', 5000);
+        empRecord.set('rating', 4.5);
+        empRecord.set('address', {
+          street: 'test',
+          zipcode: 500000
         });
         empRecord.insert().then((rec: Record) => {
             johnRecord = rec;
             johnObject = rec.toObject();
-            assert.isOk(johnObject.name === 'John', 'record not created');
-            assert.isOk(johnObject.dynamic === 100, "default is expected to be 100");
-            done();
+            assert.isOk(johnObject._id + '' === empId, '_id is expected to be same as initialized value');
+            assert.isOk(johnObject.name === 'John', 'name is expected to be John');
+            assert.isOk(johnObject.dynamic === 100, "default'default is expected to be 100'       done();
         });
     });
 

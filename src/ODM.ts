@@ -20,6 +20,7 @@ import DateTimeFieldType from './field-types/types/DateTimeFieldType';
 import AnyFieldType from './field-types/types/AnyFieldType';
 import DatabaseConfiguration from './core/connection/databaseConfiguration';
 import DatabaseConnection from './core/connection/databaseConnection';
+import NumberFieldType from './field-types/types/NumberFieldType';
 
 const privates = new WeakMap();
 
@@ -156,6 +157,7 @@ function _getOperationInterceptorService(
 function _loadBuildInFieldTypes(that: ODM) {
   that.addFieldType(new StringFieldType());
   that.addFieldType(new IntegerFieldType());
+  that.addFieldType(new NumberFieldType());
   that.addFieldType(new DateFieldType());
   that.addFieldType(new ObjectFieldType());
   that.addFieldType(new BooleanFieldType());

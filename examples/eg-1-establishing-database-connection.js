@@ -3,10 +3,10 @@ const {ODM} = require('../');
 const odm = new ODM();
 
 const config = {
-    "host": "localhost",
-    "port": "27017",
-    "database": "anysols-collection-service",
-    "dialect": "mongodb",
+  host: '127.0.0.1',
+  port: '27017',
+  database: 'anysols-collection-service',
+  dialect: 'mongodb'
 };
 
 odm.connect(config).then(() => {

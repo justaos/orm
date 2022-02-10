@@ -125,7 +125,6 @@ describe('Schema', () => {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_EXTENDS);
         employeeCollection.find().toArray().then((employees: Record[]) => {
-            console.log('employees.length :: ' + employees.length);
             if (employees.length === 1)
                 done();
         });
