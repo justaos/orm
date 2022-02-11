@@ -134,14 +134,13 @@ describe('Schema', () => {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         employeeCollection.find().toArray().then((employees: Record[]) => {
-            console.log('employees.length :: ' + employees.length);
             if (employees.length === 2)
                 done();
         });
     });
 
     it('#ODM::convertToObjectId', function () {
-        const newId = session.odm.convertToObjectId('569ed8269353e9f4c51617aa');
+        const newId = session.odm.generateObjectId('569ed8269353e9f4c51617aa');
         assert.isOk(ObjectId.isValid(newId), "Collection should not extend, final schema");
     });
 

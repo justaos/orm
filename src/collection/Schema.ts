@@ -194,11 +194,11 @@ export default class Schema {
       );
   }
 
-  #getSchema = (schemaName: string): Schema => {
+  #getSchema(schemaName: string): Schema {
     const collectionDefinition =
       this.#collectionDefinitionRegistry.getCollectionDefinition(schemaName);
     if (!collectionDefinition)
       throw Error('[Schema::_getCollection] Collection not found');
     return collectionDefinition.getSchema();
-  };
+  }
 }

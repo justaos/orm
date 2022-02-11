@@ -22,20 +22,16 @@ import DatabaseConfiguration from './core/connection/databaseConfiguration';
 import DatabaseConnection from './core/connection/databaseConnection';
 import NumberFieldType from './field-types/types/NumberFieldType';
 
-const privates = new WeakMap();
-
 export default class ODM {
-  #fieldTypeRegistry: FieldTypeRegistry = new FieldTypeRegistry();
   #conn: DatabaseConnection | undefined;
+  #fieldTypeRegistry: FieldTypeRegistry = new FieldTypeRegistry();
+  #collectionDefinitionRegistry: CollectionDefinitionRegistry =
+    new CollectionDefinitionRegistry();
+  #operationInterceptorService: OperationInterceptorService =
+    new OperationInterceptorService();
 
   constructor() {
-    const collectionDefinitionRegistry = new CollectionDefinitionRegistry();
-    const operationInterceptorService = new OperationInterceptorService();
-    privates.set(this, {
-      collectionDefinitionRegistry,
-      operationInterceptorService
-    });
-    _loadBuildInFieldTypes(this);
+    this.#loadBuildInFieldTypes();
   }
 
   async connect(config: any): Promise<void> {
@@ -68,42 +64,42 @@ export default class ODM {
     return conn.dropDatabase();
   }
 
-  defineCollection(schemaJson: any) {
+  defineCollection(schemaJson: any): void {
     const schema = new Schema(
       schemaJson,
       this.#fieldTypeRegistry,
-      _getCollectionDefinitionRegistry(this)
+      this.#collectionDefinitionRegistry
     );
     const col = new CollectionDefinition(
       this.#getConnection().getDBO().collection(schema.getBaseName()),
       schema,
-      _getOperationInterceptorService(this)
+      this.#operationInterceptorService
     );
-    _getCollectionDefinitionRegistry(this).addCollectionDefinition(col);
+    this.#collectionDefinitionRegistry.addCollectionDefinition(col);
   }
 
   collection(colName: string, context?: any): Collection {
     const collectionDefinition: CollectionDefinition | undefined =
-      _getCollectionDefinitionRegistry(this).getCollectionDefinition(colName);
+      this.#collectionDefinitionRegistry.getCollectionDefinition(colName);
     if (collectionDefinition === undefined)
       throw Error(`Collection with name '${colName}' does not exist`);
     return new Collection(collectionDefinition, context);
   }
 
   removeCollection(collectionName: string): void {
-    _getCollectionDefinitionRegistry(this).deleteCollectionDefinition(
+    this.#collectionDefinitionRegistry.deleteCollectionDefinition(
       collectionName
     );
   }
 
   getSchema(colName: string): Schema | undefined {
     const colDefinition: CollectionDefinition | undefined =
-      _getCollectionDefinitionRegistry(this).getCollectionDefinition(colName);
+      this.#collectionDefinitionRegistry.getCollectionDefinition(colName);
     return colDefinition?.getSchema();
   }
 
   isCollectionDefined(collectionName: string): boolean {
-    return _getCollectionDefinitionRegistry(this).hasCollectionDefinition(
+    return this.#collectionDefinitionRegistry.hasCollectionDefinition(
       collectionName
     );
   }
@@ -114,54 +110,34 @@ export default class ODM {
   }
 
   addInterceptor(operationInterceptor: OperationInterceptorInterface): void {
-    _getOperationInterceptorService(this).addInterceptor(operationInterceptor);
+    this.#operationInterceptorService.addInterceptor(operationInterceptor);
   }
 
   deleteInterceptor(operationInterceptorName: string): void {
-    _getOperationInterceptorService(this).deleteInterceptor(
+    this.#operationInterceptorService.deleteInterceptor(
       operationInterceptorName
     );
   }
 
-  generateNewObjectId(): ObjectId {
-    return new ObjectId();
-  }
-
-  convertToObjectId(id: string): ObjectId {
+  generateObjectId(id: string | undefined): ObjectId {
     return new ObjectId(id);
   }
 
-  #getConnection = (): DatabaseConnection => {
+  #loadBuildInFieldTypes(): void {
+    this.addFieldType(new StringFieldType());
+    this.addFieldType(new IntegerFieldType());
+    this.addFieldType(new NumberFieldType());
+    this.addFieldType(new DateFieldType());
+    this.addFieldType(new ObjectFieldType());
+    this.addFieldType(new BooleanFieldType());
+    this.addFieldType(new ObjectIdFieldType());
+    this.addFieldType(new DateTimeFieldType());
+    this.addFieldType(new AnyFieldType());
+  }
+
+  #getConnection(): DatabaseConnection {
     if (!this.#conn)
       throw new Error('ODM::#getConnection -> There is no active connection');
     return this.#conn;
-  };
-}
-
-/**
- * PRIVATE METHODS
- */
-
-function _getCollectionDefinitionRegistry(
-  that: ODM
-): CollectionDefinitionRegistry {
-  return privates.get(that).collectionDefinitionRegistry;
-}
-
-function _getOperationInterceptorService(
-  that: ODM
-): OperationInterceptorService {
-  return privates.get(that).operationInterceptorService;
-}
-
-function _loadBuildInFieldTypes(that: ODM) {
-  that.addFieldType(new StringFieldType());
-  that.addFieldType(new IntegerFieldType());
-  that.addFieldType(new NumberFieldType());
-  that.addFieldType(new DateFieldType());
-  that.addFieldType(new ObjectFieldType());
-  that.addFieldType(new BooleanFieldType());
-  that.addFieldType(new ObjectIdFieldType());
-  that.addFieldType(new DateTimeFieldType());
-  that.addFieldType(new AnyFieldType());
+  }
 }

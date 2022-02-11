@@ -61,7 +61,7 @@ describe('Collection', () => {
         let empRecord = employeeCollection.createNewRecord();
         const empId = empRecord.getID();
         empRecord.set("name", "John");
-        empRecord.set("emp_no", session.odm.generateNewObjectId());
+        empRecord.set("emp_no", session.odm.generateObjectId());
         empRecord.set("birth_date", new Date().toISOString());
         empRecord.set("created_on", new Date().toISOString());
         empRecord.set("gender", true);
