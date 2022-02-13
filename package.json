@@ -31,7 +31,6 @@
     "build": "node ./clean.js | tsc",
     "lint": "eslint ./src --ext .ts,.tsx",
     "lint:fix": "eslint --fix ./src --ext .ts,.tsx",
-    "lint:quiet": "eslint ./src --quiet --ext .ts,.tsx",
     "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "release": "npm publish",
@@ -61,26 +60,13 @@
     ]
   },
   "dependencies": {
-    "@p4rm/utils": "^1.4.3",
+    "@p4rm/utils": "^1.7.0",
     "mongodb": "^4.3.1"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.21",
-    "@types/mocha": "^9.0.0",
-    "@types/node": "^16.7.1",
-    "@typescript-eslint/eslint-plugin": "^4.31.1",
-    "@typescript-eslint/parser": "^4.31.1",
-    "chai": "^4.3.4",
+    "@p4rm/dev-dependencies": "^1.0.0",
     "coveralls": "^3.1.1",
-    "embedme": "^1.22.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "mocha": "^9.2.0",
-    "nyc": "^15.1.0",
-    "prettier": "^2.4.0",
-    "ts-node": "^10.2.1",
-    "typescript": "^4.4.3"
+    "embedme": "^1.22.0"
   },
   "publishConfig": {
     "access": "public"

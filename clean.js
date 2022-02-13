@@ -1,9 +1,7 @@
-const {default: FileUtils} = require('@p4rm/file-utils');
+const { FileUtils } = require('@p4rm/utils');
 
 function cleanOutput() {
-  return FileUtils.delete([
-    'lib/'
-  ]);
+  FileUtils.delete(['lib/']);
 }
 
 cleanOutput();
