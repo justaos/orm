@@ -24,7 +24,7 @@ export default class OperationInterceptorService {
     for (const [name, interceptor] of this.interceptors.entries()) {
       intercepts.push(interceptor);
     }
-    return intercepts.sort((a, b) => a.order - b.order);
+    return intercepts.sort((a, b) => a.getOrder() - b.getOrder());
   }
 
   async intercept(
