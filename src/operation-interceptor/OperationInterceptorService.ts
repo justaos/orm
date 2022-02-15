@@ -33,11 +33,11 @@ export default class OperationInterceptorService {
     when: string,
     payload: any,
     context: any = {},
-    inactiveIntercepts: any
+    inactiveIntercepts: string[]
   ): Promise<any> {
     if (this.hasInterceptors())
       for (const interceptor of this.#getSortedIntercepts())
-        if (!inactiveIntercepts || !inactiveIntercepts.includes(name)) {
+        if (!inactiveIntercepts || !inactiveIntercepts.includes(interceptor.getName())) {
           payload = await interceptor.intercept(
             collectionName,
             operation,
