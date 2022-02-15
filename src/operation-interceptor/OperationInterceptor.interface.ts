@@ -1,4 +1,6 @@
 export default abstract class OperationInterceptorInterface {
+  order = 100;
+
   abstract getName(): string;
 
   abstract intercept(

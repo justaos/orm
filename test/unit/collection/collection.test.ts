@@ -89,7 +89,7 @@ describe('Collection', () => {
         empRecord.set('name', 'John');
         empRecord.insert().then(() => {
 
-        }, () => {
+        }, (err: any) => {
             done();
         })
     });

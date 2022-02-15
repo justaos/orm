@@ -19,6 +19,14 @@ export default class OperationInterceptorService {
     return this.interceptors.size !== 0;
   }
 
+  #getSortedIntercepts(): OperationInterceptorInterface[] {
+    const intercepts = [];
+    for (const [name, interceptor] of this.interceptors.entries()) {
+      intercepts.push(interceptor);
+    }
+    return intercepts.sort((a, b) => a.order - b.order);
+  }
+
   async intercept(
     collectionName: string,
     operation: string,
@@ -28,7 +36,7 @@ export default class OperationInterceptorService {
     inactiveIntercepts: any
   ): Promise<any> {
     if (this.hasInterceptors())
-      for (const [name, interceptor] of this.interceptors.entries())
+      for (const interceptor of this.#getSortedIntercepts())
         if (!inactiveIntercepts || !inactiveIntercepts.includes(name)) {
           payload = await interceptor.intercept(
             collectionName,
