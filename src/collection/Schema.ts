@@ -13,6 +13,8 @@ export default class Schema {
 
   readonly #extends: string;
 
+  readonly #definition: any;
+
   #fields: Field[] = [];
 
   #fieldTypeRegistry: FieldTypeRegistry;
@@ -30,6 +32,7 @@ export default class Schema {
     this.#label = schemaDefinition.label;
     this.#final = !!schemaDefinition.final;
     this.#extends = schemaDefinition.extends;
+    this.#definition = schemaDefinition;
     if (schemaDefinition.fields && schemaDefinition.fields.length) {
       schemaDefinition.fields.forEach((fieldDefinition: any) => {
         this.#fields.push(
@@ -59,6 +62,10 @@ export default class Schema {
 
   isFinal(): boolean {
     return this.#final;
+  }
+
+  getDefinition(): any {
+    return this.#definition;
   }
 
   getExtendsStack(): string[] {
