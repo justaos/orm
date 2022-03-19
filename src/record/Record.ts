@@ -7,7 +7,7 @@ export default class Record {
 
   #record: any;
 
-  #collection: Collection;
+  readonly #collection: Collection;
 
   constructor(record: any, collection: Collection) {
     this.#collection = collection;
@@ -33,6 +33,10 @@ export default class Record {
 
   isNew(): boolean {
     return this.#isNew;
+  }
+
+  getCollection(): Collection {
+    return this.#collection;
   }
 
   getID(): string | null {
