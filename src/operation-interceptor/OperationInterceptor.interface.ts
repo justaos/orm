@@ -19,5 +19,5 @@ export default abstract class OperationInterceptorInterface {
     when: string,
     records: Record[],
     context: any
-  ): any;
+  ): Promise<Record[]>;
 }
