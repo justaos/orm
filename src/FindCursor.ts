@@ -7,11 +7,15 @@ import { Sort, SortDirection } from 'mongodb';
 export default class FindCursor {
   readonly #cursor: mongodb.FindCursor;
 
-  readonly #odmCollection: Collection;
+  readonly #collection: Collection;
 
-  constructor(cursor: mongodb.FindCursor, odmCollection: Collection) {
+  constructor(cursor: mongodb.FindCursor, collection: Collection) {
     this.#cursor = cursor;
-    this.#odmCollection = odmCollection;
+    this.#collection = collection;
+  }
+
+  getCollection(): Collection {
+    return this.#collection;
   }
 
   sort(keyOrList: Sort | string, direction?: SortDirection): FindCursor {
@@ -34,7 +38,7 @@ export default class FindCursor {
   }
 
   async toArray(): Promise<Record[]> {
-    const odmCollection = this.#odmCollection;
+    const odmCollection = this.#collection;
     const docs = await this.#cursor.toArray();
     await odmCollection.intercept(OPERATIONS.READ, OPERATION_WHEN.BEFORE, {});
     const records = docs.map((doc) => new Record(doc, odmCollection));
