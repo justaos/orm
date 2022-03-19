@@ -1,3 +1,5 @@
+import Record from '../record/Record';
+
 export default abstract class OperationInterceptorInterface {
   #order = 100;
 
@@ -15,7 +17,7 @@ export default abstract class OperationInterceptorInterface {
     collectionName: string,
     operation: string,
     when: string,
-    payload: any,
+    records: Record[],
     context: any
   ): any;
 }

@@ -1,4 +1,5 @@
 import OperationInterceptorInterface from './OperationInterceptor.interface';
+import Record from '../record/Record';
 
 export default class OperationInterceptorService {
   #interceptors: Map<string, OperationInterceptorInterface>;
@@ -34,25 +35,25 @@ export default class OperationInterceptorService {
     collectionName: string,
     operation: string,
     when: string,
-    payload: any,
+    records: Record[],
     context: any = {},
     inactiveIntercepts: string[]
-  ): Promise<any> {
+  ): Promise<Record[]> {
     if (this.hasInterceptors())
       for (const interceptor of this.#getSortedIntercepts())
         if (
           !inactiveIntercepts ||
           !inactiveIntercepts.includes(interceptor.getName())
         ) {
-          payload = await interceptor.intercept(
+          records = await interceptor.intercept(
             collectionName,
             operation,
             when,
-            payload,
+            records,
             context
           );
-          if (!payload) break;
+          if (!records) break;
         }
-    return payload;
+    return records;
   }
 }

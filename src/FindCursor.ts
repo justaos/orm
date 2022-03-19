@@ -1,8 +1,8 @@
 import Collection from './collection/Collection';
 import * as mongodb from 'mongodb';
-import Record from './record/Record';
-import { OPERATION_WHEN, OPERATIONS } from './constants';
 import { Sort, SortDirection } from 'mongodb';
+import Record from './record/Record';
+import { OperationType, OperationWhen } from './constants';
 
 export default class FindCursor {
   readonly #cursor: mongodb.FindCursor;
@@ -40,13 +40,12 @@ export default class FindCursor {
   async toArray(): Promise<Record[]> {
     const odmCollection = this.#collection;
     const docs = await this.#cursor.toArray();
-    await odmCollection.intercept(OPERATIONS.READ, OPERATION_WHEN.BEFORE, {});
+    await odmCollection.intercept(OperationType.READ, OperationWhen.BEFORE, []);
     const records = docs.map((doc) => new Record(doc, odmCollection));
-    const updatedPayload = await odmCollection.intercept(
-      OPERATIONS.READ,
-      OPERATION_WHEN.AFTER,
-      { records }
+    return await odmCollection.intercept(
+      OperationType.READ,
+      OperationWhen.AFTER,
+      records
     );
-    return updatedPayload.records;
   }
 }

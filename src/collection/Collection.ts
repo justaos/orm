@@ -3,7 +3,7 @@ import Record from '../record/Record';
 import Schema from './Schema';
 import * as mongodb from 'mongodb';
 import { FindOptions, ObjectId } from 'mongodb';
-import { OPERATION_WHEN, OPERATIONS } from '../constants';
+import { OperationType, OperationWhen } from '../constants';
 import CollectionDefinition from './CollectionDefinition';
 
 export default class Collection {
@@ -72,8 +72,8 @@ export default class Collection {
 
   async insertRecord(record: Record): Promise<Record> {
     record = await this.#interceptRecord(
-      OPERATIONS.CREATE,
-      OPERATION_WHEN.BEFORE,
+      OperationType.CREATE,
+      OperationWhen.BEFORE,
       record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
@@ -86,16 +86,16 @@ export default class Collection {
     );
     const savedRecord = new Record(savedDoc, this);
     return await this.#interceptRecord(
-      OPERATIONS.CREATE,
-      OPERATION_WHEN.AFTER,
+      OperationType.CREATE,
+      OperationWhen.AFTER,
       savedRecord
     );
   }
 
   async updateRecord(record: Record): Promise<Record> {
     record = await this.#interceptRecord(
-      OPERATIONS.UPDATE,
-      OPERATION_WHEN.BEFORE,
+      OperationType.UPDATE,
+      OperationWhen.BEFORE,
       record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
@@ -104,24 +104,32 @@ export default class Collection {
       { $set: { ...record.toObject() } }
     );
     return await this.#interceptRecord(
-      OPERATIONS.UPDATE,
-      OPERATION_WHEN.AFTER,
+      OperationType.UPDATE,
+      OperationWhen.AFTER,
       record
     );
   }
 
   async deleteOne(record: Record): Promise<any> {
     record = await this.#interceptRecord(
-      OPERATIONS.DELETE,
-      OPERATION_WHEN.BEFORE,
+      OperationType.DELETE,
+      OperationWhen.BEFORE,
       record
     );
     await this.#getMongoCollection().deleteOne({ _id: record.get('_id') });
-    await this.#interceptRecord(OPERATIONS.DELETE, 'after', record);
+    await this.#interceptRecord(
+      OperationType.DELETE,
+      OperationWhen.AFTER,
+      record
+    );
   }
 
-  async intercept(operation: string, when: string, payload: any) {
-    return await this.#intercept(operation, when, payload);
+  async intercept(
+    operation: OperationType,
+    when: OperationWhen,
+    records: Record[]
+  ): Promise<any> {
+    return await this.#intercept(operation, when, records);
   }
 
   async count(filter?: any, options?: any) {
@@ -137,24 +145,22 @@ export default class Collection {
     when: string,
     record: Record
   ): Promise<Record> {
-    const updatedPayload = await this.#intercept(operation, when, {
-      records: [record]
-    });
-    return updatedPayload.records[0];
+    const records: Record[] = await this.#intercept(operation, when, [record]);
+    return records[0];
   }
 
   async #intercept(
     operation: string,
     when: string,
-    payload: any
-  ): Promise<any> {
+    records: Record[]
+  ): Promise<Record[]> {
     const operationInterceptorService =
       this.#collectionDefinition.getOperationInterceptorService();
     return await operationInterceptorService.intercept(
       this.getName(),
       operation,
       when,
-      payload,
+      records,
       this.#context,
       this.#inactiveIntercepts
     );

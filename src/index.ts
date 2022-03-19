@@ -15,7 +15,7 @@ import IntegerDataType from './core/data-types/types/integerDataType';
 import ObjectIdDataType from './core/data-types/types/objectIdDataType';
 import NumberDataType from './core/data-types/types/numberDataType';
 
-import { OPERATION_WHEN, OPERATIONS } from './constants';
+import { OperationType, OperationWhen } from './constants';
 import { ObjectId } from 'mongodb';
 import Field from './collection/Field';
 
@@ -39,8 +39,8 @@ export {
   ObjectIdDataType,
   AnyDataType,
   NumberDataType,
-  OPERATION_WHEN,
-  OPERATIONS,
+  OperationType,
+  OperationWhen,
   FieldTypeUtils,
   ObjectId
 };
