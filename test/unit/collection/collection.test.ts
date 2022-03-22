@@ -1,197 +1,230 @@
-import {assert} from "chai";
-import "mocha";
-import {Record} from "../../../src";
-import {session, MAX_TIMEOUT, logger} from "../../test.utils";
+import { assert } from 'chai';
+import 'mocha';
+import { Record } from '../../../src';
+import { logger, MAX_TIMEOUT, session } from '../../test.utils';
 
 describe('Collection', () => {
-
     let johnRecord: Record;
     let johnObject;
-    let MODEL_NAME = "employee";
+    let MODEL_NAME = 'employee';
 
-    before(function () {
+    before(function() {
         session.odm.defineCollection({
             name: MODEL_NAME,
-            fields: [{
-                name: "name",
-                type: "string",
-                unique: true
-            }, {
-                name: "emp_no",
-                type: "objectId"
-            }, {
-                name: "salary",
-                maximum: 10000,
-                type: "integer"
-            }, {
-                name: "birth_date",
-                type: "date"
-            }, {
-                name: "created_on",
-                type: "datetime"
-            },{
-                name: "gender",
-                type: "boolean"
-            },{
-                name: "dynamic",
-                type: "any",
-                default_value: 100
-            }, {
-                name: "address",
-                type: "object"
-            }, {
-                name: "rating",
-                type: "number"
-            }]
+            fields: [
+                {
+                    name: 'name',
+                    type: 'string',
+                    unique: true
+                },
+                {
+                    name: 'emp_no',
+                    type: 'objectId'
+                },
+                {
+                    name: 'salary',
+                    maximum: 10000,
+                    type: 'integer'
+                },
+                {
+                    name: 'birth_date',
+                    type: 'date'
+                },
+                {
+                    name: 'created_on',
+                    type: 'datetime'
+                },
+                {
+                    name: 'gender',
+                    type: 'boolean'
+                },
+                {
+                    name: 'dynamic',
+                    type: 'any',
+                    default_value: 100
+                },
+                {
+                    name: 'address',
+                    type: 'object'
+                },
+                {
+                    name: 'rating',
+                    type: 'number'
+                }
+            ]
         });
     });
 
-    it('#Collection::getCollectionName', function () {
+    it('#Collection::getCollectionName', function() {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
-        assert.isOk(employeeCollection.getName() === MODEL_NAME, 'Invalid collection-service name');
+        assert.isOk(
+          employeeCollection.getName() === MODEL_NAME,
+          'Invalid collection-service name'
+        );
     });
 
     /**
      * CREATE
      */
-    it('#Collection::insert', function (done) {
+    it('#Collection::insert', function(done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         let empRecord = employeeCollection.createNewRecord();
         const empId = empRecord.getID();
-        empRecord.set("name", "John");
-        empRecord.set("emp_no", session.odm.generateObjectId());
-        empRecord.set("birth_date", new Date().toISOString());
-        empRecord.set("created_on", new Date().toISOString());
-        empRecord.set("gender", true);
-        empRecord.set("salary", 5000);
-        empRecord.set("rating", 4.5);
-        empRecord.set("address", {
-            "street": "test",
-            "zipcode": 500000
+        empRecord.set('name', 'John');
+        empRecord.set('emp_no', session.odm.generateObjectId());
+        empRecord.set('birth_date', new Date().toISOString());
+        empRecord.set('created_on', new Date().toISOString());
+        empRecord.set('gender', true);
+        empRecord.set('salary', 5000);
+        empRecord.set('rating', 4.5);
+        empRecord.set('address', {
+            street: 'test',
+            zipcode: 500000
         });
         empRecord.insert().then((rec: Record) => {
             johnRecord = rec;
             johnObject = rec.toObject();
-            assert.isOk(johnObject._id + '' === empId, '_id is expected to be same as initialized value');
+            assert.isOk(
+              johnObject._id + '' === empId,
+              '_id is expected to be same as initialized value'
+            );
             assert.isOk(johnObject.name === 'John', 'name is expected to be John');
-            assert.isOk(johnObject.dynamic === 100, "default is expected to be 100");
+            assert.isOk(johnObject.dynamic === 100, 'default is expected to be 100');
             done();
         });
     });
 
-
-    it('#Collection::insert unique error', function (done) {
+    it('#Collection::insert unique error', function(done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         let empRecord = employeeCollection.createNewRecord();
         empRecord.set('name', 'John');
-        empRecord.insert().then(() => {
-
-        }, (err: any) => {
-            done();
-        })
+        empRecord.insert().then(
+          () => {
+          },
+          (err: any) => {
+              done();
+          }
+        );
     });
 
     /**
      * CREATE
      */
-    it('#Collection::update', function (done) {
+    it('#Collection::update', function(done) {
         this.timeout(MAX_TIMEOUT);
-        johnRecord.set("salary", 200);
-        johnRecord.update().then((rec) => {
-            assert.isOk(rec.get("salary") === 200, 'record not updated');
-            done();
-        }, (err) => {
-            logger.logError(err);
-        })
+        johnRecord.set('salary', 200);
+        johnRecord.update().then(
+          (rec) => {
+              assert.isOk(rec.get('salary') === 200, 'record not updated');
+              done();
+          },
+          (err) => {
+              logger.logError(err);
+          }
+        );
     });
-
 
     /**
      * READ
      */
-    it('#Collection::find', function (done) {
+    it('#Collection::find', function(done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
-        employeeCollection.find().toArray().then((employees: Record[]) => {
-            if (employees.length === 1)
-                done();
-        });
+        employeeCollection
+          .find()
+          .toArray()
+          .then((employees: Record[]) => {
+              if (employees.length === 1) done();
+          });
     });
 
-    it('#Collection::findById ObjectId', function (done) {
-        this.timeout(MAX_TIMEOUT);
-        let employeeCollection = session.odm.collection(MODEL_NAME);
-        employeeCollection.findById(johnRecord.getID()).then((employee: Record) => {
-            if (employee.get('name') === "John")
-                done();
-        });
-    });
-
-    it('#Collection::findById string', function (done) {
+    it('#Collection::findById ObjectId', function(done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         employeeCollection.findById(johnRecord.getID()).then((employee: Record) => {
-            if (employee.get('name') === "John")
-                done();
+            if (employee.get('name') === 'John') done();
         });
     });
 
-
-    it('#Collection::findOne', function (done) {
+    it('#Collection::findById string', function(done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
-        employeeCollection.findOne({"name": "John"}).then((employee: Record) => {
-            if (employee && employee.getID() === johnRecord.getID())
-                done();
+        employeeCollection.findById(johnRecord.getID()).then((employee: Record) => {
+            if (employee.get('name') === 'John') done();
         });
     });
 
-    it('#Record::delete', function (done) {
+    it('#Collection::findOne', function(done) {
+        this.timeout(MAX_TIMEOUT);
+        let employeeCollection = session.odm.collection(MODEL_NAME);
+        employeeCollection.findOne({ name: 'John' }).then((employee: Record) => {
+            if (employee && employee.getID() === johnRecord.getID()) done();
+        });
+    });
+
+    it('#Record::delete', function(done) {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = session.odm.collection(MODEL_NAME);
         johnRecord.delete().then(() => {
             employeeCollection.findById(johnRecord.getID()).then((record: Record) => {
-                if (!record)
-                    done();
-            })
-        })
+                if (!record) done();
+            });
+        });
     });
 
     /**
      * SORT
      */
-    it('#Collection::Cursor::sort', function (done) {
+    it('#Collection::Cursor::sort', function(done) {
         this.timeout(MAX_TIMEOUT);
         session.odm.defineCollection({
-            name: "sort_test",
-            fields: [{
-                name: 'number',
-                type: 'integer'
-            }]
+            name: 'sort_test',
+            fields: [
+                {
+                    name: 'number',
+                    type: 'integer'
+                }
+            ]
         });
-        const sortCollection = session.odm.collection("sort_test");
+        const sortCollection = session.odm.collection('sort_test');
         const rec = sortCollection.createNewRecord();
-        rec.set("number", 2);
+        rec.set('number', 2);
         rec.insert().then((rec: Record) => {
             rec = sortCollection.createNewRecord();
-            rec.set("number", 1);
+            rec.set('number', 1);
             rec.insert().then((rec: Record) => {
-                sortCollection.find({}).sort([['number', 1]]).toArray().then(function(recs: Record[]) {
-                    let expected = 1;
-                    recs.forEach(function(rec: Record){
-                        assert.isOk(rec.get('number') == expected, "Not expected value");
-                        expected++;
-                    });
-                    done();
-                });
-
-
+                sortCollection
+                  .find({})
+                  .sort([['number', 1]])
+                  .toArray()
+                  .then(function(recs: Record[]) {
+                      let expected = 1;
+                      recs.forEach(function(rec: Record) {
+                          assert.isOk(rec.get('number') == expected, 'Not expected value');
+                          expected++;
+                      });
+                      done();
+                  });
             });
         });
     });
 
+    it('#Collection::Cursor::sort 2', function(done) {
+        const sortCollection = session.odm.collection('sort_test');
+        sortCollection
+          .find({}, { sort: { number: 1 } })
+          .toArray()
+          .then(function(recs: Record[]) {
+              let expected = 1;
+              recs.forEach(function(rec: Record) {
+                  assert.isOk(rec.get('number') == expected, 'Not expected value');
+                  expected++;
+              });
+              done();
+          });
+    });
 });
 

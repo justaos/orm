@@ -1,24 +1,24 @@
 {
-  "name": "@p4rm/odm",
+  "name": "@justaos/odm",
   "version": "3.0.1",
   "private": false,
-  "description": "P4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
+  "description": "JUST A OS's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
   "keywords": [
-    "p4rm",
-    "p4rm odm",
+    "justaos",
+    "justaos odm",
     "mongodb wrapper",
     "object document mapper"
   ],
-  "homepage": "https://p4rm.com",
+  "homepage": "https://justaos.com",
   "bugs": {
-    "url": "https://github.com/p4rm/odm/issues"
+    "url": "https://github.com/justaos/odm/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/p4rm/odm.git"
+    "url": "git+https://github.com/justaos/odm.git"
   },
+  "author": "Shivaji Varma Pusapati Venkata <contact@shivajivarma.com> (https://shivajivarma.com)",
   "license": "Apache-2.0",
-  "author": "Shivaji Varma <contact@shivajivarma.com>",
   "contributors": [],
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "prepare": "npm run build",
-    "build": "node ./clean.js | tsc",
+    "build": "ts-node ./clean.ts | tsc",
     "lint": "eslint ./src --ext .ts,.tsx",
     "lint:fix": "eslint --fix ./src --ext .ts,.tsx",
     "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
@@ -60,11 +60,11 @@
     ]
   },
   "dependencies": {
-    "@p4rm/utils": "^1.7.0",
-    "mongodb": "^4.3.1"
+    "@justaos/utils": "^1.0.2",
+    "mongodb": "^4.4.1"
   },
   "devDependencies": {
-    "@p4rm/dev-dependencies": "^1.0.0",
+    "@justaos/dev-dependencies": "^1.0.3",
     "coveralls": "^3.1.1",
     "embedme": "^1.22.0"
   },

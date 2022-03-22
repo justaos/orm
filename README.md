@@ -1,17 +1,17 @@
-# P4RM's ODM
-P4RM's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database.
+# JUSTAOS's ODM
+JUSTAOS's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database.
  
  Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete). 
 
-[![Build](https://github.com/p4rm/odm/workflows/Node%20Build%20CI/badge.svg)](https://github.com/p4rm/odm/actions?workflow=Node+CI)
-[![Coverage Status](https://coveralls.io/repos/github/p4rm/odm/badge.svg?branch=main)](https://coveralls.io/github/p4rm/odm?branch=master)
+[![Build](https://github.com/justaos/odm/workflows/Node%20Build%20CI/badge.svg)](https://github.com/justaos/odm/actions?workflow=Node+CI)
+[![Coverage Status](https://coveralls.io/repos/github/justaos/odm/badge.svg?branch=main)](https://coveralls.io/github/justaos/odm?branch=master)
 
 ```bash
-npm install --save @p4rm/odm
+npm install --save @justaos/odm
 ```
 
 ```js
-const ODM = require("@p4rm/odm");
+const ODM = require("@justaos/odm");
 ```
 
 ## Establishing database connection

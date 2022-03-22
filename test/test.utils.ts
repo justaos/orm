@@ -1,4 +1,4 @@
-import { Logger } from '@p4rm/utils';
+import { Logger } from '@justaos/utils';
 
 const session: any = {};
 const MAX_TIMEOUT = 5000;

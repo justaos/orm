@@ -34,11 +34,10 @@ jobs:
           npm run test --if-present
         env:
           CI: true
-      - name: Coveralls
-        uses: coverallsapp/github-action@master
+      - name: Codecov
+        uses: codecov/codecov-action@v2
         with:
-          path-to-lcov: ./docs/reports/coverage/lcov.info
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          files: ./docs/reports/coverage/lcov.info
 
   publish-npm:
     needs: build

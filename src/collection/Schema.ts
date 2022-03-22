@@ -1,6 +1,6 @@
 import FieldTypeRegistry from '../field-types/FieldTypeRegistry';
 import CollectionDefinitionRegistry from './CollectionDefinitionRegistry';
-import { CommonUtils } from '@p4rm/utils';
+import { CommonUtils } from '@justaos/utils';
 import Field from './Field';
 import RecordValidationError from '../errors/RecordValidationError';
 
