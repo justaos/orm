@@ -3,6 +3,7 @@ JUSTAOS's ODM (Object Document Mapper) is built for NodeJS and provides transpar
 
 Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete).
 
+[![Version](https://img.shields.io/npm/v/@justaos/odm)](https://img.shields.io/npm/v/@justaos/odm)
 [![Build](https://github.com/justaos/odm/workflows/Node%20Build%20CI/badge.svg)](https://github.com/justaos/odm/actions?workflow=Node+CI)
 [![codecov](https://codecov.io/gh/justaos/odm/branch/main/graph/badge.svg?token=OzlniGFmNp)](https://codecov.io/gh/justaos/odm)
 [![GitHub license](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
