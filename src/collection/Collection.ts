@@ -31,7 +31,7 @@ export default class Collection {
     return new Record(undefined, this).initialize();
   }
 
-  async findById(id: ObjectId | string): Promise<Record | void> {
+  async findById(id: ObjectId | string): Promise<Record | undefined> {
     if (typeof id === 'string') id = new ObjectId(id);
     return this.findOne({ _id: id }, {});
   }
@@ -51,7 +51,7 @@ export default class Collection {
   async findOne(
     filter: any,
     options?: FindOptions<any>
-  ): Promise<Record | void> {
+  ): Promise<Record | undefined> {
     const schema = this.getSchema();
     if (!filter) filter = {};
     this.#formatFilter(filter, schema);
