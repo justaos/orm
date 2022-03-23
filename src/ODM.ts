@@ -119,7 +119,7 @@ export default class ODM {
     );
   }
 
-  generateObjectId(id: string | undefined): ObjectId {
+  generateObjectId(id?: string): ObjectId {
     return new ObjectId(id);
   }
 

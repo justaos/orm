@@ -1,7 +1,6 @@
 import FindCursor from '../FindCursor';
 import Record from '../record/Record';
 import Schema from './Schema';
-import * as mongodb from 'mongodb';
 import { FindOptions, ObjectId } from 'mongodb';
 import { OperationType, OperationWhen } from '../constants';
 import CollectionDefinition from './CollectionDefinition';
@@ -29,10 +28,10 @@ export default class Collection {
   }
 
   createNewRecord(): Record {
-    return new Record(null, this).initialize();
+    return new Record(undefined, this).initialize();
   }
 
-  async findById(id: ObjectId | string): Promise<Record | null> {
+  async findById(id: ObjectId | string): Promise<Record | void> {
     if (typeof id === 'string') id = new ObjectId(id);
     return this.findOne({ _id: id }, {});
   }
@@ -52,21 +51,24 @@ export default class Collection {
   async findOne(
     filter: any,
     options?: FindOptions<any>
-  ): Promise<Record | null> {
+  ): Promise<Record | void> {
     const schema = this.getSchema();
     if (!filter) filter = {};
     this.#formatFilter(filter, schema);
     if (schema.getExtends()) filter._collection = schema.getName();
-    const doc = await this.#getMongoCollection().findOne(filter, options);
+    const doc = await this.#collectionDefinition
+      .getCollection()
+      .findOne(filter, options);
     if (doc) return new Record(doc, this);
-    return null;
   }
 
   find(filter: any = {}, options?: any): FindCursor {
     const schema = this.getSchema();
     this.#formatFilter(filter, schema);
     if (schema.getExtends()) filter._collection = schema.getName();
-    const cursor = this.#getMongoCollection().find(filter, options);
+    const cursor = this.#collectionDefinition
+      .getCollection()
+      .find(filter, options);
     return new FindCursor(cursor, this);
   }
 
@@ -77,13 +79,12 @@ export default class Collection {
       record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
-    const response = await this.#getMongoCollection().insertOne(
-      record.toObject()
-    );
-    const savedDoc = await this.#getMongoCollection().findOne(
-      { _id: response.insertedId },
-      {}
-    );
+    const response = await this.#collectionDefinition
+      .getCollection()
+      .insertOne(record.toObject());
+    const savedDoc = await this.#collectionDefinition
+      .getCollection()
+      .findOne({ _id: response.insertedId }, {});
     const savedRecord = new Record(savedDoc, this);
     return await this.#interceptRecord(
       OperationType.CREATE,
@@ -99,10 +100,12 @@ export default class Collection {
       record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
-    await this.#getMongoCollection().updateOne(
-      { _id: record.get('_id') },
-      { $set: { ...record.toObject() } }
-    );
+    await this.#collectionDefinition
+      .getCollection()
+      .updateOne(
+        { _id: record.get('_id') },
+        { $set: { ...record.toObject() } }
+      );
     return await this.#interceptRecord(
       OperationType.UPDATE,
       OperationWhen.AFTER,
@@ -110,48 +113,33 @@ export default class Collection {
     );
   }
 
-  async deleteOne(record: Record): Promise<any> {
+  async deleteOne(record: Record): Promise<{
+    /** Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined. */
+    acknowledged: boolean;
+    /** The number of documents that were deleted */
+    deletedCount: number;
+  }> {
     record = await this.#interceptRecord(
       OperationType.DELETE,
       OperationWhen.BEFORE,
       record
     );
-    await this.#getMongoCollection().deleteOne({ _id: record.get('_id') });
+    const deletedResult = await this.#collectionDefinition
+      .getCollection()
+      .deleteOne({
+        _id: record.get('_id')
+      });
     await this.#interceptRecord(
       OperationType.DELETE,
       OperationWhen.AFTER,
       record
     );
+    return deletedResult;
   }
 
   async intercept(
     operation: OperationType,
     when: OperationWhen,
-    records: Record[]
-  ): Promise<any> {
-    return await this.#intercept(operation, when, records);
-  }
-
-  async count(filter?: any, options?: any) {
-    return this.#getMongoCollection().count(filter, options);
-  }
-
-  #getMongoCollection(): mongodb.Collection {
-    return this.#collectionDefinition.getCollection();
-  }
-
-  async #interceptRecord(
-    operation: string,
-    when: string,
-    record: Record
-  ): Promise<Record> {
-    const records: Record[] = await this.#intercept(operation, when, [record]);
-    return records[0];
-  }
-
-  async #intercept(
-    operation: string,
-    when: string,
     records: Record[]
   ): Promise<Record[]> {
     const operationInterceptorService =
@@ -164,6 +152,23 @@ export default class Collection {
       this.#context,
       this.#inactiveIntercepts
     );
+  }
+
+  async countDocuments(): Promise<number>;
+  async countDocuments(filter?: any): Promise<number>;
+  async countDocuments(filter?: any, options?: any): Promise<number> {
+    return this.#collectionDefinition
+      .getCollection()
+      .countDocuments(filter, options);
+  }
+
+  async #interceptRecord(
+    operation: OperationType,
+    when: OperationWhen,
+    record: Record
+  ): Promise<Record> {
+    const records: Record[] = await this.intercept(operation, when, [record]);
+    return records[0];
   }
 
   #formatFilter(filter: any, schema: Schema): void {

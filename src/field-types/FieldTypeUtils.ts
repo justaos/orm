@@ -6,7 +6,8 @@ export default class FieldTypeUtils {
   static requiredValidation(schema: Schema, field: Field, record: any) {
     if (
       field.getDefinition().required &&
-      (record[field.getName()] === null || record[field.getName()] === '')
+      (typeof record[field.getName()] === 'undefined' ||
+        record[field.getName()] === '')
     )
       throw new Error('REQUIRED');
   }
@@ -19,7 +20,7 @@ export default class FieldTypeUtils {
   ) {
     const value = record[field.getName()];
     if (!odm) throw new Error('ODM required for unique check');
-    if (field.getDefinition().unique && value !== null) {
+    if (field.getDefinition().unique && typeof value !== 'undefined') {
       const collection = odm.collection(schema.getName());
       const condition = { [field.getName()]: value };
       if (record._id) condition._id = { $ne: record._id };

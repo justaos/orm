@@ -33,10 +33,6 @@ export default class FindCursor {
     return this;
   }
 
-  async count(): Promise<number> {
-    return await this.#cursor.count();
-  }
-
   async toArray(): Promise<Record[]> {
     const odmCollection = this.#collection;
     const docs = await this.#cursor.toArray();

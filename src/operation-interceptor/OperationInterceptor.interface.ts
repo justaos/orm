@@ -1,4 +1,5 @@
 import Record from '../record/Record';
+import { OperationType, OperationWhen } from '../constants';
 
 export default abstract class OperationInterceptorInterface {
   #order = 100;
@@ -15,8 +16,8 @@ export default abstract class OperationInterceptorInterface {
 
   abstract intercept(
     collectionName: string,
-    operation: string,
-    when: string,
+    operation: OperationType,
+    when: OperationWhen,
     records: Record[],
     context: any
   ): Promise<Record[]>;

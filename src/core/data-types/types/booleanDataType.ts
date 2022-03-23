@@ -8,7 +8,7 @@ export default class BooleanDataType extends DataType {
   }
 
   validateType(value: any): boolean {
-    return value === null || typeof value === 'boolean';
+    return typeof value === 'undefined' || typeof value === 'boolean';
   }
 
   toJSON(value: any) {

@@ -9,13 +9,13 @@ getODM().then(function (odm) {
             return "my-intercept";
         },
 
-        intercept: (collectionName, operation, when, payload) => {
+        intercept: (collectionName, operation, when, records) => {
             return new Promise((resolve, reject) => {
                 if (collectionName === 'student') {
                     if (operation === 'CREATE') {
                         console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
                         if (when === "BEFORE") {
-                            for (let record of payload.records) {
+                            for (let record of records) {
                                 console.log("computed field updated for :: " + record.get('name'));
                                 record.set("computed", record.get("name") + " +++ computed");
                             }
@@ -24,12 +24,12 @@ getODM().then(function (odm) {
                     if (operation === 'READ') {
                         console.log("[collectionName=" + collectionName + ", operation=" + operation + ", when=" + when + "]");
                         if (when === "AFTER") {
-                            for (let record of payload.records)
+                            for (let record of records)
                                 console.log(JSON.stringify(record.toObject(), null, 4));
                         }
                     }
                 }
-                resolve(payload);
+                resolve(records);
             });
         }
     });

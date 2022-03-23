@@ -9,7 +9,7 @@ export default class DateDataType extends DataType {
   }
 
   validateType(value: any): boolean {
-    return value === null || value instanceof Date;
+    return typeof value === 'undefined' || value instanceof Date;
   }
 
   toJSON(value: any) {

@@ -8,7 +8,7 @@ export default class NumberDataType extends DataType {
   }
 
   validateType(value: any): boolean {
-    return value === null || typeof value === 'number';
+    return typeof value === 'undefined' || typeof value === 'number';
   }
 
   toJSON(value: any) {

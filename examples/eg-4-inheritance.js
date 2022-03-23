@@ -31,5 +31,12 @@ getODM().then(async function (odm) {
     husky.set("breed", "Husky");
     await husky.insert();
 
-    await odm.closeConnection();
+    animalCol.find({}).toArray().then(function (animals) {
+        animals.forEach((animal) => {
+            console.log(animal.toObject());
+        });
+        odm.closeConnection();
+    });
+
+
 });

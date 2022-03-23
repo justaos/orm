@@ -1,12 +1,12 @@
 import {assert} from "chai";
 import "mocha";
-import {MAX_TIMEOUT, session} from "./test.utils";
+import {MAX_TIMEOUT, Session} from "./test.utils";
 
 describe('End test cleanup', () => {
 
     it("disconnect check", function (done) {
         this.timeout(MAX_TIMEOUT);
-        session.odm.closeConnection().then(() => {
+        Session.getODM().closeConnection().then(() => {
             assert.isOk(true, 'close connection success');
             done()
         }, () => {

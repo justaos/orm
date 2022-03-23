@@ -9,7 +9,8 @@ export default class IntegerDataType extends DataType {
 
   validateType(value: any): boolean {
     return (
-      value === null || (typeof value === 'number' && Number.isInteger(value))
+      typeof value === 'undefined' ||
+      (typeof value === 'number' && Number.isInteger(value))
     );
   }
 

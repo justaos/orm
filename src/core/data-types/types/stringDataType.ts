@@ -8,7 +8,7 @@ export default class StringDataType extends DataType {
   }
 
   validateType(value: any): boolean {
-    return value === null || typeof value === 'string';
+    return typeof value === 'undefined' || typeof value === 'string';
   }
 
   toJSON(value: any) {

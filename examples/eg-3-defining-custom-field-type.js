@@ -35,6 +35,7 @@ getODM().then(function (odm) {
     });
 
     odm.defineCollection({
+        label: 'Student',
         name: 'student',
         fields: [{
             name: 'name',
@@ -75,7 +76,9 @@ getODM().then(function (odm) {
         });
 
     }, (err) => {
-        console.log(err);
-        odm.closeConnection();
+        console.log(err.toJSON());
+        odm.closeConnection().then(function () {
+            console.log("Connection closed");
+        });
     });
 });

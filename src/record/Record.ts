@@ -11,7 +11,7 @@ export default class Record {
 
   constructor(record: any, collection: Collection) {
     this.#collection = collection;
-    if (record) {
+    if (typeof record !== 'undefined') {
       this.#record = {};
       for (const key of Object.keys(record)) this.set(key, record[key]);
     }
@@ -39,10 +39,8 @@ export default class Record {
     return this.#collection;
   }
 
-  getID(): string | null {
-    let id = this.get('_id');
-    if (id !== null) id = this.#record._id.toString();
-    return id;
+  getID(): string {
+    return this.get('_id').toString();
   }
 
   set(key: string, value: any): void {
@@ -62,9 +60,7 @@ export default class Record {
 
   get(key: string): any {
     const schema = this.#collection.getSchema();
-    if (schema.getField(key) && typeof this.#record[key] !== 'undefined')
-      return this.#record[key];
-    return null;
+    if (schema.getField(key)) return this.#record[key];
   }
 
   async getDisplayValue(key: string) {

@@ -1,5 +1,6 @@
 import OperationInterceptorInterface from './OperationInterceptor.interface';
 import Record from '../record/Record';
+import { OperationType, OperationWhen } from '../constants';
 
 export default class OperationInterceptorService {
   #interceptors: Map<string, OperationInterceptorInterface>;
@@ -33,8 +34,8 @@ export default class OperationInterceptorService {
 
   async intercept(
     collectionName: string,
-    operation: string,
-    when: string,
+    operation: OperationType,
+    when: OperationWhen,
     records: Record[],
     context: any = {},
     inactiveIntercepts: string[]
