@@ -32,7 +32,7 @@
     "lint": "eslint ./src --ext .ts,.tsx",
     "lint:fix": "eslint --fix ./src --ext .ts,.tsx",
     "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "posttest": "nyc report --reporter=json",
     "release": "npm publish",
     "generate-docs": "embedme --stdout --strip-embed-comment README.template.md > README.md"
   },
