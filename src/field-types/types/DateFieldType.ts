@@ -2,10 +2,10 @@ import DataType from '../../core/data-types/dataType.interface';
 import FieldType from '../FieldType.interface';
 import DateDataType from '../../core/data-types/types/dateDataType';
 import Schema from '../../collection/Schema';
-import { isIsoDate } from '../../utils';
 import Field from '../../collection/Field';
 import ODM from '../../ODM';
 import FieldTypeUtils from '../FieldTypeUtils';
+import { DateUtils } from '@justaos/utils';
 
 export default class DateFieldType extends FieldType {
   #dataType: DataType = new DateDataType();
@@ -49,7 +49,7 @@ export default class DateFieldType extends FieldType {
     record: any,
     context: any
   ): any {
-    if (typeof newValue === 'string' && isIsoDate(newValue)) {
+    if (typeof newValue === 'string' && DateUtils.isIsoDate(newValue)) {
       const date = new Date(newValue);
       date.setUTCHours(0, 0, 0, 0);
       return date;

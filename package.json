@@ -28,7 +28,7 @@
   ],
   "scripts": {
     "prepare": "npm run build",
-    "build": "ts-node ./clean.ts | tsc",
+    "build": "node ./clean.mjs | tsc",
     "lint": "eslint ./src --ext .ts,.tsx",
     "lint:fix": "eslint --fix ./src --ext .ts,.tsx",
     "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
@@ -60,7 +60,7 @@
     ]
   },
   "dependencies": {
-    "@justaos/utils": "^1.0.3",
+    "@justaos/utils": "^1.0.5",
     "mongodb": "^4.4.1"
   },
   "devDependencies": {

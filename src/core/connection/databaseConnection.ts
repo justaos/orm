@@ -1,30 +1,34 @@
 import { Db, MongoClient } from 'mongodb';
 import DatabaseConfiguration from './databaseConfiguration';
-import { getLoggerInstance } from '../../utils';
+import { Logger } from '@justaos/utils';
 
 export default class DatabaseConnection {
   #conn: MongoClient;
-  #collections: Map<string, any>;
   #config: DatabaseConfiguration;
+
+  static #logger = Logger.createLogger({
+    label: `ODM :: ${DatabaseConnection.name}`
+  });
 
   constructor(conn: MongoClient, config: DatabaseConfiguration) {
     this.#conn = conn;
-    this.#collections = new Map<string, any>();
     this.#config = config;
   }
 
-  static async connect(dbConfig: DatabaseConfiguration): Promise<any> {
+  static async connect(
+    dbConfig: DatabaseConfiguration
+  ): Promise<DatabaseConnection> {
     try {
       const conn = await this.#createConnectionByUri(dbConfig.getUri());
-      logger.info('mongo db connection open');
+      DatabaseConnection.#logger.info('mongo db connection open');
       return new DatabaseConnection(conn, dbConfig);
     } catch (err: any) {
-      logger.error(err.message + '');
+      DatabaseConnection.#logger.error(err.message + '');
       throw err;
     }
   }
 
-  static async dropDatabase(dbConfig: DatabaseConfiguration): Promise<any> {
+  static async dropDatabase(dbConfig: DatabaseConfiguration): Promise<void> {
     const c = await DatabaseConnection.connect(dbConfig);
     try {
       await c.dropDatabase();
@@ -57,10 +61,14 @@ export default class DatabaseConnection {
       (db: any) => db.name === this.getDatabaseName()
     );
     if (index !== -1) {
-      logger.info(`database "${this.getDatabaseName()}" exists`);
+      DatabaseConnection.#logger.info(
+        `database "${this.getDatabaseName()}" exists`
+      );
       return true;
     } else {
-      logger.info(`database "${this.getDatabaseName()}" don't exists`);
+      DatabaseConnection.#logger.info(
+        `database "${this.getDatabaseName()}" don't exists`
+      );
       return false;
     }
   }
@@ -68,7 +76,7 @@ export default class DatabaseConnection {
   async deleteAllIndexes() {
     const dbo = this.getDBO();
     const collections = await dbo.listCollections().toArray();
-    collections.forEach((col: any) => {
+    collections.forEach((col) => {
       dbo.command({ dropIndexes: col.name, index: '*' });
     });
   }
@@ -83,5 +91,3 @@ export default class DatabaseConnection {
     return client;
   };
 }
-
-const logger = getLoggerInstance(DatabaseConnection.name);
