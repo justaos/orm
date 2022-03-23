@@ -154,8 +154,6 @@ export default class Collection {
     );
   }
 
-  async countDocuments(): Promise<number>;
-  async countDocuments(filter?: any): Promise<number>;
   async countDocuments(filter?: any, options?: any): Promise<number> {
     return this.#collectionDefinition
       .getCollection()
