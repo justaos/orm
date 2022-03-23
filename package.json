@@ -60,7 +60,7 @@
     ]
   },
   "dependencies": {
-    "@justaos/utils": "^1.0.2",
+    "@justaos/utils": "^1.0.3",
     "mongodb": "^4.4.1"
   },
   "devDependencies": {

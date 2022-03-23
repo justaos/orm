@@ -1,5 +1,4 @@
 coverage:
-  token: 5c8578f1-e52f-41c5-b401-03ee6c711ae6
   require_ci_to_pass: no
   status:
     patch:
