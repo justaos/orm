@@ -1,84 +1,95 @@
-let {StringDataType} = require("../");
-let getODM = require("./getODM");
+let { StringDataType } = require('../');
+let getODM = require('./getODM');
 
-getODM().then(function (odm) {
+getODM().then(function(odm) {
+  odm.addFieldType({
+    setODM() {},
 
-    odm.addFieldType({
+    getDataType: function() {
+      return new StringDataType();
+    },
 
-        setODM() {},
+    getType: function() {
+      return 'email';
+    },
 
-        getDataType: function () {
-            return new StringDataType()
-        },
+    async validateValue(schema, field, record, context) {
+      const pattern = '(.+)@(.+){2,}\\.(.+){2,}';
+      if (!new RegExp(pattern).test(record[field.getName()]))
+        throw new Error('Not a valid email');
+    },
 
-        getType: function () {
-            return "email"
-        },
+    validateDefinition: function(fieldDefinition) {
+      return !!fieldDefinition.name;
+    },
 
-        async validateValue(schema, field, record, context) {
-            const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
-            if (!new RegExp(pattern).test(record[field.getName()]))
-                throw new Error("Not a valid email");
-        },
+    getValueIntercept(schema, field, record, context) {
+      return record[field.getName()];
+    },
 
-        validateDefinition: function (fieldDefinition) {
-            return !!fieldDefinition.name
-        },
+    setValueIntercept(schema, field, newValue, record, context) {
+      return newValue;
+    }
+  });
 
-        getValueIntercept(schema, field, record, context) {
-            return record[field.getName()];
-        },
+  odm.defineCollection({
+    label: 'Student',
+    name: 'student',
+    fields: [
+      {
+        name: 'name',
+        type: 'string'
+      },
+      {
+        name: 'personal_contact',
+        type: 'email'
+      },
+      {
+        name: 'emp_no',
+        type: 'objectId'
+      },
+      {
+        name: 'salary',
+        type: 'integer'
+      },
+      {
+        name: 'birth_date',
+        type: 'date'
+      },
+      {
+        name: 'gender',
+        type: 'boolean'
+      },
+      {
+        name: 'address',
+        type: 'object'
+      }
+    ]
+  });
 
-        setValueIntercept(schema, field, newValue, record, context) {
-            return newValue;
-        }
-    });
-
-    odm.defineCollection({
-        label: 'Student',
-        name: 'student',
-        fields: [{
-            name: 'name',
-            type: 'string'
-        }, {
-            name: "personal_contact",
-            type: "email"
-        }, {
-            name: "emp_no",
-            type: "objectId"
-        }, {
-            name: "salary",
-            type: "integer"
-        }, {
-            name: "birth_date",
-            type: "date"
-        }, {
-            name: "gender",
-            type: "boolean"
-        }, {
-            name: "address",
-            type: "object"
-        }]
-    });
-
-    let studentCollection = odm.collection("student");
-    let s = studentCollection.createNewRecord();
-    s.set("personal_contact", "ttest");
-    s.set("birth_date", new Date());
-    s.insert().then(function () {
-        console.log("Student created");
-        studentCollection.find({}).toArray().then(function (res) {
-            console.log(JSON.stringify(res));
-            s.set("graduated", null);
-            s.update().then(function () {
-                odm.closeConnection();
-            });
+  let studentCollection = odm.collection('student');
+  let s = studentCollection.createNewRecord();
+  s.set('personal_contact', 'ttest');
+  s.set('birth_date', new Date());
+  s.insert().then(
+    function() {
+      console.log('Student created');
+      studentCollection
+        .find({})
+        .toArray()
+        .then(function(res) {
+          console.log(JSON.stringify(res));
+          s.set('graduated', null);
+          s.update().then(function() {
+            odm.closeConnection();
+          });
         });
-
-    }, (err) => {
-        console.log(err.toJSON());
-        odm.closeConnection().then(function () {
-            console.log("Connection closed");
-        });
-    });
+    },
+    (err) => {
+      console.log(err.toJSON());
+      odm.closeConnection().then(function() {
+        console.log('Connection closed');
+      });
+    }
+  );
 });

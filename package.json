@@ -33,8 +33,7 @@
     "lint:fix": "eslint --fix ./src --ext .ts,.tsx",
     "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
     "posttest": "nyc report --reporter=json",
-    "release": "npm publish",
-    "generate-docs": "embedme --stdout --strip-embed-comment README.template.md > README.md"
+    "release": "npm publish"
   },
   "nyc": {
     "all": true,
@@ -64,9 +63,7 @@
     "mongodb": "^4.4.1"
   },
   "devDependencies": {
-    "@justaos/dev-dependencies": "^1.0.3",
-    "coveralls": "^3.1.1",
-    "embedme": "^1.22.0"
+    "@justaos/dev-dependencies": "^1.0.3"
   },
   "publishConfig": {
     "access": "public"

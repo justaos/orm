@@ -1,33 +1,25 @@
 import {assert} from "chai";
 import "mocha";
 import {ODM} from "../src";
-import {session, MAX_TIMEOUT} from "./test.utils";
+import {Session, MAX_TIMEOUT} from "./test.utils";
 
 describe('Debug', () => {
-
+    let odm: ODM;
     let MODEL_NAME = "schema_test";
     let MODEL_EXTENDS = "schema_test_extends";
 
-    before('#connect()', function (done) {
+    before('#connect()', async function (done) {
         this.timeout(MAX_TIMEOUT);
-        session.odm = new ODM();
-        session.odm.connect({
-            "host": "127.0.0.1",
-            "port": "27017",
-            "database": "odm-debug",
-            "dialect": "mongodb",
-        }).then(() => {
-            assert.isOk(true, 'connection established');
-            done();
-        }, () => {
-            assert.isOk(false, 'connection failed');
-            done();
-        });
+        odm = await Session.getODMByForce();
+    });
+
+    after('#disconnect()', async function (done) {
+        odm.closeConnection();
     });
 
     it('#ODM::defineCollection - simple', function () {
         this.timeout(MAX_TIMEOUT);
-        session.odm.defineCollection({
+        odm.defineCollection({
             name: MODEL_NAME,
             fields: [{
                 name: 'name',
@@ -49,7 +41,7 @@ describe('Debug', () => {
 
     it('#ODM::defineCollection - extends positive check', function () {
         this.timeout(MAX_TIMEOUT);
-        session.odm.defineCollection({
+        odm.defineCollection({
             name: MODEL_EXTENDS,
             extends: MODEL_NAME,
             final: true,
@@ -65,7 +57,7 @@ describe('Debug', () => {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
-            const extendsCol = session.odm.collection(MODEL_NAME);
+            const extendsCol = odm.collection(MODEL_NAME);
             const extendsRec = extendsCol.createNewRecord();
             extendsRec.insert().then(function(){
                 done();
