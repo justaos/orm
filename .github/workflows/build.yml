@@ -37,7 +37,7 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v2
         with:
-          files: ./docs/reports/coverage/*.json
+          files: ./docs/reports/coverage/coverage-final.json
 
   publish-npm:
     needs: build
