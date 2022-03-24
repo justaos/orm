@@ -1,6 +1,6 @@
 {
   "name": "@justaos/odm",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "private": false,
   "description": "JUST A OS's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
   "keywords": [
