@@ -8,7 +8,11 @@ export default class ObjectDataType extends DataType {
   }
 
   validateType(value: any): boolean {
-    return typeof value === 'undefined' || typeof value === 'object';
+    return (
+      typeof value === 'undefined' ||
+      value === null ||
+      typeof value === 'object'
+    );
   }
 
   toJSON(value: any) {

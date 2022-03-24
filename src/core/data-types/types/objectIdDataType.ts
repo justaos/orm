@@ -9,7 +9,11 @@ export default class ObjectIdDataType extends DataType {
   }
 
   validateType(value: any): boolean {
-    return typeof value === 'undefined' || value instanceof ObjectId;
+    return (
+      typeof value === 'undefined' ||
+      value === null ||
+      value instanceof ObjectId
+    );
   }
 
   toJSON(value: any) {
