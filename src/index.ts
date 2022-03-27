@@ -1,5 +1,6 @@
 import ODM from './ODM';
 import FindCursor from './collection/FindCursor';
+import AggregationCursor from './collection/AggregationCursor';
 import Schema from './collection/Schema';
 import Collection from './collection/Collection';
 import Record from './record/Record';
@@ -42,5 +43,6 @@ export {
   OperationType,
   OperationWhen,
   FieldTypeUtils,
+  AggregationCursor,
   ObjectId
 };
