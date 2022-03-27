@@ -1,8 +1,8 @@
-import Collection from './collection/Collection';
+import Collection from './Collection';
 import * as mongodb from 'mongodb';
 import { Sort, SortDirection } from 'mongodb';
-import Record from './record/Record';
-import { OperationType, OperationWhen } from './constants';
+import Record from '../record/Record';
+import { OperationType, OperationWhen } from '../constants';
 
 export default class FindCursor {
   readonly #cursor: mongodb.FindCursor;

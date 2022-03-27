@@ -2,12 +2,12 @@ import { assert } from 'chai';
 import 'mocha';
 import { ODM, Record, StringDataType } from '../../src';
 import { Session } from '../test.utils';
-import { getLoggerInstance } from '../../src/utils';
+import { Logger } from '@justaos/utils';
 import Schema from '../../src/collection/Schema';
 import Field from '../../src/collection/Field';
 import FieldType from '../../src/field-types/FieldType.interface';
 
-const logger = getLoggerInstance('FieldType');
+const logger = Logger.createLogger({ label: 'FieldType' });
 
 describe('FieldType', () => {
   let odm: ODM;
@@ -21,10 +21,11 @@ describe('FieldType', () => {
     odm = await Session.getODMByForce();
   });
 
-  it('#FieldTypeRegistry::addFieldType Registering Custom field type', function () {
+  it('#FieldTypeRegistry::addFieldType Registering Custom field type', function() {
     odm.addFieldType(
       new (class extends FieldType {
-        setODM() {}
+        setODM() {
+        }
 
         getDataType() {
           return new StringDataType();
@@ -100,17 +101,17 @@ describe('FieldType', () => {
     }
   });
 
-  it('#FieldTypeRegistry::registerFieldType creating record with custom field type', function (done) {
+  it('#FieldTypeRegistry::registerFieldType creating record with custom field type', function(done) {
     let collection = odm.collection(MODEL_NAME);
     let rec = collection.createNewRecord();
     rec.set('name', 'RAM');
     rec.set(EMAIL_FIELD, EMAIL_VALUE);
     rec.insert().then(
-      function (rec: Record) {
+      function(rec: Record) {
         collection
           .find({ [EMAIL_FIELD]: EMAIL_VALUE })
           .toArray()
-          .then(function (records: Record[]) {
+          .then(function(records: Record[]) {
             if (
               records.length === 1 &&
               records[0].get(EMAIL_FIELD) === EMAIL_VALUE
@@ -118,13 +119,13 @@ describe('FieldType', () => {
               done();
           });
       },
-      function (err: Error) {
+      function(err: Error) {
         logger.logError(err);
       }
     );
   });
 
-  it('#FieldTypeRegistry::registerFieldType trying create invalid field', function () {
+  it('#FieldTypeRegistry::registerFieldType trying create invalid field', function() {
     try {
       odm.defineCollection({
         name: 'field_definition_invalid_test',

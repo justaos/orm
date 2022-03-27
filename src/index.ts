@@ -1,5 +1,5 @@
 import ODM from './ODM';
-import FindCursor from './FindCursor';
+import FindCursor from './collection/FindCursor';
 import Schema from './collection/Schema';
 import Collection from './collection/Collection';
 import Record from './record/Record';

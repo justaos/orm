@@ -27,7 +27,7 @@ class Session {
   }
 }
 
-const MAX_TIMEOUT = 5000;
+const MAX_TIMEOUT = 10000;
 const logger = Logger.createLogger({
   label: 'test',
   filePath: __dirname + '/test.log'

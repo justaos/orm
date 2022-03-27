@@ -2,9 +2,10 @@
   <configuration default="true" type="mocha-javascript-test-runner">
     <node-interpreter>project</node-interpreter>
     <node-options />
+    <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>
     <working-directory />
     <pass-parent-env>true</pass-parent-env>
-    <ui />
+    <ui>bdd</ui>
     <extra-mocha-options>--require ts-node/register</extra-mocha-options>
     <test-kind>DIRECTORY</test-kind>
     <test-directory />

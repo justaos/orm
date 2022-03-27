@@ -1,9 +1,10 @@
-import FindCursor from '../FindCursor';
+import FindCursor from './FindCursor';
 import Record from '../record/Record';
 import Schema from './Schema';
 import { FindOptions, ObjectId } from 'mongodb';
 import { OperationType, OperationWhen } from '../constants';
 import CollectionDefinition from './CollectionDefinition';
+import AggregationCursor from './AggregationCursor';
 
 export default class Collection {
   #collectionDefinition: CollectionDefinition;
@@ -135,6 +136,13 @@ export default class Collection {
       record
     );
     return deletedResult;
+  }
+
+  aggregate(pipeline: any[]): AggregationCursor {
+    const cursor = this.#collectionDefinition
+      .getCollection()
+      .aggregate(pipeline);
+    return new AggregationCursor(cursor, this);
   }
 
   async intercept(
