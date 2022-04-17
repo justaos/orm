@@ -38,13 +38,16 @@ export default class OperationInterceptorService {
     when: OperationWhen,
     records: Record[],
     context: any = {},
-    inactiveIntercepts: string[]
+    disabledIntercepts: boolean | string[]
   ): Promise<Record[]> {
+    if (disabledIntercepts === true) {
+      return records;
+    }
     if (this.hasInterceptors())
       for (const interceptor of this.#getSortedIntercepts())
         if (
-          !inactiveIntercepts ||
-          !inactiveIntercepts.includes(interceptor.getName())
+          !disabledIntercepts ||
+          !disabledIntercepts.includes(interceptor.getName())
         ) {
           records = await interceptor.intercept(
             collectionName,

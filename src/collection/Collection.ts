@@ -9,7 +9,7 @@ import AggregationCursor from './AggregationCursor';
 export default class Collection {
   #collectionDefinition: CollectionDefinition;
   #context: any;
-  #inactiveIntercepts: string[] = [];
+  #disableIntercepts: boolean | string[] = false;
 
   constructor(collectionDefinition: CollectionDefinition, context?: any) {
     this.#collectionDefinition = collectionDefinition;
@@ -37,16 +37,20 @@ export default class Collection {
     return this.findOne({ _id: id }, {});
   }
 
-  deactivateIntercept(interceptName: string): void {
-    this.#inactiveIntercepts.push(interceptName);
+  disableIntercepts(): void {
+    this.#disableIntercepts = true;
   }
 
-  getInActivateIntercepts(): string[] {
-    return this.#inactiveIntercepts;
+  enableIntercepts(): void {
+    this.#disableIntercepts = false;
   }
 
-  clearInActivateIntercepts(): void {
-    this.#inactiveIntercepts = [];
+  disableIntercept(interceptName: string): void {
+    if (this.#disableIntercepts === true) return;
+    if (this.#disableIntercepts === false) {
+      this.#disableIntercepts = [];
+    }
+    this.#disableIntercepts.push(interceptName);
   }
 
   async findOne(
@@ -158,7 +162,7 @@ export default class Collection {
       when,
       records,
       this.#context,
-      this.#inactiveIntercepts
+      this.#disableIntercepts
     );
   }
 
