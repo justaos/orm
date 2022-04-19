@@ -45,9 +45,9 @@ getODM().then(function(odm) {
   });
 
   let studentCollection = odm.collection('student');
-  let s = studentCollection.createNewRecord();
-  s.set('name', 'John ' + new Date().toISOString());
-  s.insert().then(function() {
+  let studentRecord = studentCollection.createNewRecord();
+  studentRecord.set('name', 'John ' + new Date().toISOString());
+  studentRecord.insert().then(function() {
     studentCollection.find().toArray().then(function(students) {
       odm.closeConnection();
     });

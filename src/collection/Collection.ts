@@ -164,7 +164,7 @@ export default class Collection {
     );
   }
 
-  async countDocuments(filter?: any, options?: any): Promise<number> {
+  async count(filter?: any, options?: any): Promise<number> {
     return this.#collection.countDocuments(filter, options);
   }
 
