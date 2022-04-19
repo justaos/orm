@@ -130,7 +130,7 @@ describe('DatabaseConnection', () => {
       500
     );
     DatabaseConnection.connect(dbConfig)
-      .then((conn) => {
+      .then(() => {
         assert.isOk(false, 'connection established');
       })
       .catch(() => {

@@ -1,5 +1,5 @@
 import FieldTypeRegistry from '../field-types/FieldTypeRegistry';
-import CollectionDefinitionRegistry from './CollectionDefinitionRegistry';
+import SchemaRegistry from './SchemaRegistry';
 import { CommonUtils } from '@justaos/utils';
 import Field from './Field';
 import RecordValidationError from '../errors/RecordValidationError';
@@ -19,15 +19,15 @@ export default class Schema {
 
   #fieldTypeRegistry: FieldTypeRegistry;
 
-  #collectionDefinitionRegistry: CollectionDefinitionRegistry;
+  #schemaRegistry: SchemaRegistry;
 
   constructor(
     schemaDefinition: any,
     fieldTypeRegistry: FieldTypeRegistry,
-    collectionDefinitionRegistry: CollectionDefinitionRegistry
+    schemaRegistry: SchemaRegistry
   ) {
     this.#fieldTypeRegistry = fieldTypeRegistry;
-    this.#collectionDefinitionRegistry = collectionDefinitionRegistry;
+    this.#schemaRegistry = schemaRegistry;
     this.#name = schemaDefinition.name;
     this.#label = schemaDefinition.label;
     this.#final = !!schemaDefinition.final;
@@ -160,18 +160,12 @@ export default class Schema {
       throw new Error(
         `[Collection :: ${this.getName()}] Collection name should be alphanumeric`
       );
-    if (
-      this.#collectionDefinitionRegistry.hasCollectionDefinition(this.getName())
-    )
+    if (this.#schemaRegistry.hasSchema(this.getName()))
       throw new Error(
         `[Collection :: ${this.getName()}] Collection name already exists`
       );
     if (this.getExtends()) {
-      if (
-        !this.#collectionDefinitionRegistry.hasCollectionDefinition(
-          this.getExtends()
-        )
-      )
+      if (!this.#schemaRegistry.hasSchema(this.getExtends()))
         throw new Error(
           `[Collection :: ${this.getName()}] cannot extend '${this.getExtends()}'. '${this.getExtends()}' does not exists.`
         );
@@ -202,10 +196,8 @@ export default class Schema {
   }
 
   #getSchema(schemaName: string): Schema {
-    const collectionDefinition =
-      this.#collectionDefinitionRegistry.getCollectionDefinition(schemaName);
-    if (!collectionDefinition)
-      throw Error('[Schema::_getCollection] Collection not found');
-    return collectionDefinition.getSchema();
+    const schema = this.#schemaRegistry.getSchema(schemaName);
+    if (!schema) throw Error('[Schema::_getSchema] Schema not found');
+    return schema;
   }
 }

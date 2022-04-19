@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import Collection from './collection/Collection';
-import CollectionDefinitionRegistry from './collection/CollectionDefinitionRegistry';
+import SchemaRegistry from './collection/SchemaRegistry';
 
 import OperationInterceptorService from './operation-interceptor/OperationInterceptorService';
 import OperationInterceptorInterface from './operation-interceptor/OperationInterceptor.interface';
@@ -15,7 +15,6 @@ import FieldTypeRegistry from './field-types/FieldTypeRegistry';
 import ObjectFieldType from './field-types/types/ObjectFieldType';
 import BooleanFieldType from './field-types/types/BooleanFieldType';
 import ObjectIdFieldType from './field-types/types/ObjectIdFieldType';
-import CollectionDefinition from './collection/CollectionDefinition';
 import DateTimeFieldType from './field-types/types/DateTimeFieldType';
 import AnyFieldType from './field-types/types/AnyFieldType';
 import DatabaseConfiguration from './core/connection/databaseConfiguration';
@@ -25,8 +24,7 @@ import NumberFieldType from './field-types/types/NumberFieldType';
 export default class ODM {
   #conn: DatabaseConnection | undefined;
   #fieldTypeRegistry: FieldTypeRegistry = new FieldTypeRegistry();
-  #collectionDefinitionRegistry: CollectionDefinitionRegistry =
-    new CollectionDefinitionRegistry();
+  #schemaRegistry: SchemaRegistry = new SchemaRegistry();
   #operationInterceptorService: OperationInterceptorService =
     new OperationInterceptorService();
 
@@ -68,40 +66,30 @@ export default class ODM {
     const schema = new Schema(
       schemaJson,
       this.#fieldTypeRegistry,
-      this.#collectionDefinitionRegistry
+      this.#schemaRegistry
     );
-    const col = new CollectionDefinition(
+    this.#schemaRegistry.addSchema(schema);
+  }
+
+  collection(collectionName: string, context?: any): Collection {
+    const schema: Schema | undefined =
+      this.#schemaRegistry.getSchema(collectionName);
+    if (schema === undefined)
+      throw Error(`Collection with name '${collectionName}' is not defined`);
+    return new Collection(
       this.#getConnection().getDBO().collection(schema.getBaseName()),
       schema,
-      this.#operationInterceptorService
-    );
-    this.#collectionDefinitionRegistry.addCollectionDefinition(col);
-  }
-
-  collection(colName: string, context?: any): Collection {
-    const collectionDefinition: CollectionDefinition | undefined =
-      this.#collectionDefinitionRegistry.getCollectionDefinition(colName);
-    if (collectionDefinition === undefined)
-      throw Error(`Collection with name '${colName}' does not exist`);
-    return new Collection(collectionDefinition, context);
-  }
-
-  removeCollection(collectionName: string): void {
-    this.#collectionDefinitionRegistry.deleteCollectionDefinition(
-      collectionName
+      this.#operationInterceptorService,
+      context
     );
   }
 
-  getSchema(colName: string): Schema | undefined {
-    const colDefinition: CollectionDefinition | undefined =
-      this.#collectionDefinitionRegistry.getCollectionDefinition(colName);
-    return colDefinition?.getSchema();
+  getSchema(name: string): Schema | undefined {
+    return this.#schemaRegistry.getSchema(name);
   }
 
   isCollectionDefined(collectionName: string): boolean {
-    return this.#collectionDefinitionRegistry.hasCollectionDefinition(
-      collectionName
-    );
+    return this.#schemaRegistry.hasSchema(collectionName);
   }
 
   addFieldType(fieldType: FieldType): void {

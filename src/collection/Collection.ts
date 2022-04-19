@@ -3,16 +3,27 @@ import Record from '../record/Record';
 import Schema from './Schema';
 import { FindOptions, ObjectId } from 'mongodb';
 import { OperationType, OperationWhen } from '../constants';
-import CollectionDefinition from './CollectionDefinition';
 import AggregationCursor from './AggregationCursor';
+import * as mongodb from 'mongodb';
+import OperationInterceptorService from '../operation-interceptor/OperationInterceptorService';
 
 export default class Collection {
-  #collectionDefinition: CollectionDefinition;
-  #context: any;
+  readonly #collection: mongodb.Collection;
+  readonly #schema: Schema;
+  readonly #context: any;
+  readonly #operationInterceptorService: OperationInterceptorService;
+
   #disableIntercepts: boolean | string[] = false;
 
-  constructor(collectionDefinition: CollectionDefinition, context?: any) {
-    this.#collectionDefinition = collectionDefinition;
+  constructor(
+    collection: mongodb.Collection,
+    schema: Schema,
+    operationInterceptorService: OperationInterceptorService,
+    context?: any
+  ) {
+    this.#collection = collection;
+    this.#operationInterceptorService = operationInterceptorService;
+    this.#schema = schema;
     this.#context = context;
   }
 
@@ -25,7 +36,7 @@ export default class Collection {
   }
 
   getSchema(): Schema {
-    return this.#collectionDefinition.getSchema();
+    return this.#schema;
   }
 
   createNewRecord(): Record {
@@ -61,9 +72,7 @@ export default class Collection {
     if (!filter) filter = {};
     this.#formatFilter(filter, schema);
     if (schema.getExtends()) filter._collection = schema.getName();
-    const doc = await this.#collectionDefinition
-      .getCollection()
-      .findOne(filter, options);
+    const doc = await this.#collection.findOne(filter, options);
     if (doc) return new Record(doc, this);
   }
 
@@ -71,9 +80,7 @@ export default class Collection {
     const schema = this.getSchema();
     this.#formatFilter(filter, schema);
     if (schema.getExtends()) filter._collection = schema.getName();
-    const cursor = this.#collectionDefinition
-      .getCollection()
-      .find(filter, options);
+    const cursor = this.#collection.find(filter, options);
     return new FindCursor(cursor, this);
   }
 
@@ -84,12 +91,11 @@ export default class Collection {
       record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
-    const response = await this.#collectionDefinition
-      .getCollection()
-      .insertOne(record.toObject());
-    const savedDoc = await this.#collectionDefinition
-      .getCollection()
-      .findOne({ _id: response.insertedId }, {});
+    const response = await this.#collection.insertOne(record.toObject());
+    const savedDoc = await this.#collection.findOne(
+      { _id: response.insertedId },
+      {}
+    );
     const savedRecord = new Record(savedDoc, this);
     return await this.#interceptRecord(
       OperationType.CREATE,
@@ -105,12 +111,10 @@ export default class Collection {
       record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
-    await this.#collectionDefinition
-      .getCollection()
-      .updateOne(
-        { _id: record.get('_id') },
-        { $set: { ...record.toObject() } }
-      );
+    await this.#collection.updateOne(
+      { _id: record.get('_id') },
+      { $set: { ...record.toObject() } }
+    );
     return await this.#interceptRecord(
       OperationType.UPDATE,
       OperationWhen.AFTER,
@@ -129,11 +133,9 @@ export default class Collection {
       OperationWhen.BEFORE,
       record
     );
-    const deletedResult = await this.#collectionDefinition
-      .getCollection()
-      .deleteOne({
-        _id: record.get('_id')
-      });
+    const deletedResult = await this.#collection.deleteOne({
+      _id: record.get('_id')
+    });
     await this.#interceptRecord(
       OperationType.DELETE,
       OperationWhen.AFTER,
@@ -143,9 +145,7 @@ export default class Collection {
   }
 
   aggregate(pipeline: any[]): AggregationCursor {
-    const cursor = this.#collectionDefinition
-      .getCollection()
-      .aggregate(pipeline);
+    const cursor = this.#collection.aggregate(pipeline);
     return new AggregationCursor(cursor, this);
   }
 
@@ -154,9 +154,7 @@ export default class Collection {
     when: OperationWhen,
     records: Record[]
   ): Promise<Record[]> {
-    const operationInterceptorService =
-      this.#collectionDefinition.getOperationInterceptorService();
-    return await operationInterceptorService.intercept(
+    return await this.#operationInterceptorService.intercept(
       this.getName(),
       operation,
       when,
@@ -167,9 +165,7 @@ export default class Collection {
   }
 
   async countDocuments(filter?: any, options?: any): Promise<number> {
-    return this.#collectionDefinition
-      .getCollection()
-      .countDocuments(filter, options);
+    return this.#collection.countDocuments(filter, options);
   }
 
   async #interceptRecord(
