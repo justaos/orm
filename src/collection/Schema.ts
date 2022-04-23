@@ -68,6 +68,13 @@ export default class Schema {
     return this.#definition;
   }
 
+  getCollectionDefinition(): any {
+    return {
+      ...this.#definition,
+      fields: undefined
+    };
+  }
+
   getExtendsStack(): string[] {
     let extendsStack = [this.getName()];
     const extendsCollectionName = this.getExtends();
@@ -137,10 +144,7 @@ export default class Schema {
     }
     if (fieldErrors.length) {
       throw new RecordValidationError(
-        {
-          label: this.getLabel(),
-          name: this.getName()
-        },
+        this.getCollectionDefinition(),
         recordObject._id,
         fieldErrors
       );

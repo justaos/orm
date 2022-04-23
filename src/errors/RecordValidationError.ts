@@ -1,22 +1,22 @@
 import FieldValidationError from './FieldValidationError';
 
 export default class RecordValidationError extends Error {
-  readonly #collectionName: string;
+  readonly #collectionDefinition: any;
 
   readonly #recordId: string | undefined;
 
   readonly #fieldErrors: any[] = [];
 
   constructor(
-    collectionName: any,
+    collectionDefinition: any,
     recordId: string | undefined,
     fieldErrors: any[]
   ) {
     super(
-      `Record validation error in collection ${collectionName} with id ${recordId}`
+      `Record validation error in collection ${collectionDefinition.name} with id ${recordId}`
     );
     this.name = 'RecordValidationError';
-    this.#collectionName = collectionName;
+    this.#collectionDefinition = collectionDefinition;
     this.#recordId = recordId;
     this.#fieldErrors = fieldErrors;
     Object.setPrototypeOf(this, RecordValidationError.prototype);
@@ -24,7 +24,7 @@ export default class RecordValidationError extends Error {
 
   toJSON(): any {
     const result: any = {};
-    result.collection = this.#collectionName;
+    result.collectionDefinition = this.#collectionDefinition;
     result.recordId = this.#recordId;
     result.fieldErrors = this.#fieldErrors.map(
       (fieldError: FieldValidationError) => {
