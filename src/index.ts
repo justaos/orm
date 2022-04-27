@@ -23,7 +23,7 @@ import ObjectIdDataType from './core/data-types/types/objectIdDataType';
 import NumberDataType from './core/data-types/types/numberDataType';
 
 import { OperationType, OperationWhen } from './constants';
-import RecordId from './record/RecordId';
+import ObjectId from './record/ObjectId';
 
 export {
   ODM,
@@ -47,6 +47,6 @@ export {
   OperationWhen,
   FieldTypeUtils,
   AggregationCursor,
-  RecordId,
+  ObjectId,
   SortDirection
 };

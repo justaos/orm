@@ -20,7 +20,7 @@ import AnyFieldType from './field-types/types/AnyFieldType';
 import DatabaseConfiguration from './core/connection/databaseConfiguration';
 import DatabaseConnection from './core/connection/databaseConnection';
 import NumberFieldType from './field-types/types/NumberFieldType';
-import RecordId from './record/RecordId';
+import ObjectId from './record/ObjectId';
 
 export default class ODM {
   #conn: DatabaseConnection | undefined;
@@ -108,7 +108,7 @@ export default class ODM {
     );
   }
 
-  generateObjectId(id?: string): RecordId {
+  generateObjectId(id?: string): ObjectId {
     return new mongodb.ObjectId(id);
   }
 
