@@ -1,5 +1,3 @@
 import * as mongodb from 'mongodb';
 
-type RecordId = mongodb.ObjectId;
-
-export default RecordId;
+export default class RecordId extends mongodb.ObjectId {}
