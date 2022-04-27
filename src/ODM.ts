@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import * as mongodb from 'mongodb';
 import Collection from './collection/Collection';
 import SchemaRegistry from './collection/SchemaRegistry';
 
@@ -20,6 +20,7 @@ import AnyFieldType from './field-types/types/AnyFieldType';
 import DatabaseConfiguration from './core/connection/databaseConfiguration';
 import DatabaseConnection from './core/connection/databaseConnection';
 import NumberFieldType from './field-types/types/NumberFieldType';
+import RecordId from './record/RecordId';
 
 export default class ODM {
   #conn: DatabaseConnection | undefined;
@@ -107,8 +108,8 @@ export default class ODM {
     );
   }
 
-  generateObjectId(id?: string): ObjectId {
-    return new ObjectId(id);
+  generateObjectId(id?: string): RecordId {
+    return new mongodb.ObjectId(id);
   }
 
   #loadBuildInFieldTypes(): void {

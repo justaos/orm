@@ -1,7 +1,7 @@
 import DataType from '../../core/data-types/dataType.interface';
 import FieldType from '../FieldType.interface';
 import ObjectIdDataType from '../../core/data-types/types/objectIdDataType';
-import { ObjectId } from 'mongodb';
+import * as mongodb from 'mongodb';
 import Schema from '../../collection/Schema';
 import ODM from '../../ODM';
 import FieldTypeUtils from '../FieldTypeUtils';
@@ -53,8 +53,8 @@ export default class ObjectIdFieldType extends FieldType {
     record: any,
     context: any
   ): any {
-    if (typeof newValue === 'string' && ObjectId.isValid(newValue))
-      return new ObjectId(newValue);
+    if (typeof newValue === 'string' && mongodb.ObjectId.isValid(newValue))
+      return new mongodb.ObjectId(newValue);
     return newValue;
   }
 }

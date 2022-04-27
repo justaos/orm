@@ -1,7 +1,6 @@
 import FindCursor from './FindCursor';
 import Record from '../record/Record';
 import Schema from './Schema';
-import { FindOptions, ObjectId } from 'mongodb';
 import { OperationType, OperationWhen } from '../constants';
 import AggregationCursor from './AggregationCursor';
 import * as mongodb from 'mongodb';
@@ -43,8 +42,8 @@ export default class Collection {
     return new Record(undefined, this).initialize();
   }
 
-  async findById(id: ObjectId | string): Promise<Record | undefined> {
-    if (typeof id === 'string') id = new ObjectId(id);
+  async findById(id: mongodb.ObjectId | string): Promise<Record | undefined> {
+    if (typeof id === 'string') id = new mongodb.ObjectId(id);
     return this.findOne({ _id: id }, {});
   }
 
@@ -66,7 +65,7 @@ export default class Collection {
 
   async findOne(
     filter: any,
-    options?: FindOptions<any>
+    options?: mongodb.FindOptions<any>
   ): Promise<Record | undefined> {
     const schema = this.getSchema();
     if (!filter) filter = {};

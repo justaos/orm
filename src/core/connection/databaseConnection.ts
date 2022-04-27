@@ -1,16 +1,16 @@
-import { Db, MongoClient } from 'mongodb';
+import * as mongodb from 'mongodb';
 import DatabaseConfiguration from './databaseConfiguration';
 import { Logger } from '@justaos/utils';
 
 export default class DatabaseConnection {
-  #conn: MongoClient;
+  #conn: mongodb.MongoClient;
   #config: DatabaseConfiguration;
 
   static #logger = Logger.createLogger({
     label: `ODM :: ${DatabaseConnection.name}`
   });
 
-  constructor(conn: MongoClient, config: DatabaseConfiguration) {
+  constructor(conn: mongodb.MongoClient, config: DatabaseConfiguration) {
     this.#conn = conn;
     this.#config = config;
   }
@@ -43,7 +43,7 @@ export default class DatabaseConnection {
     return this.getDBO().dropDatabase();
   }
 
-  getDBO(): Db {
+  getDBO(): mongodb.Db {
     return this.#conn.db(this.getDatabaseName());
   }
 
@@ -85,8 +85,10 @@ export default class DatabaseConnection {
     return this.#conn.close();
   }
 
-  static #createConnectionByUri = async (uri: string): Promise<MongoClient> => {
-    const client = new MongoClient(uri);
+  static #createConnectionByUri = async (
+    uri: string
+  ): Promise<mongodb.MongoClient> => {
+    const client = new mongodb.MongoClient(uri);
     await client.connect();
     return client;
   };

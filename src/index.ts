@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongodb';
-
 import ODM from './ODM';
 
 import FindCursor from './collection/FindCursor';
@@ -25,6 +23,7 @@ import ObjectIdDataType from './core/data-types/types/objectIdDataType';
 import NumberDataType from './core/data-types/types/numberDataType';
 
 import { OperationType, OperationWhen } from './constants';
+import RecordId from './record/RecordId';
 
 export {
   ODM,
@@ -48,6 +47,6 @@ export {
   OperationWhen,
   FieldTypeUtils,
   AggregationCursor,
-  ObjectId,
+  RecordId,
   SortDirection
 };

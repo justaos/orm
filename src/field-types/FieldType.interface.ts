@@ -4,6 +4,12 @@ import Field from '../collection/Field';
 import ODM from '../ODM';
 
 export default abstract class FieldType {
+  category: string[] = [];
+
+  is(category: string): boolean {
+    return this.category.includes(category);
+  }
+
   abstract setODM(odm: ODM): void;
 
   abstract getDataType(): DataType;

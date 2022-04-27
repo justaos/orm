@@ -1,6 +1,5 @@
 import Collection from './Collection';
 import * as mongodb from 'mongodb';
-import { Sort } from 'mongodb';
 import Record from '../record/Record';
 import { OperationType, OperationWhen } from '../constants';
 import SortDirection from './SortDirection';
@@ -19,7 +18,10 @@ export default class FindCursor {
     return this.#collection;
   }
 
-  sort(keyOrList: Sort | string, direction?: SortDirection): FindCursor {
+  sort(
+    keyOrList: mongodb.Sort | string,
+    direction?: SortDirection
+  ): FindCursor {
     this.#cursor.sort(keyOrList, direction);
     return this;
   }

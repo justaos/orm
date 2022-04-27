@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import * as mongodb from 'mongodb';
 import Collection from '../collection/Collection';
 import Field from '../collection/Field';
 
@@ -25,7 +25,7 @@ export default class Record {
       .map((field: Field) => {
         this.set(field.getName(), field.getDefaultValue());
       });
-    this.#record['_id'] = new ObjectId();
+    this.#record['_id'] = new mongodb.ObjectId();
     this.#record['_collection'] = this.#collection.getName();
     this.#isNew = true;
     return this;

@@ -1,5 +1,5 @@
 import DataType from '../dataType.interface';
-import { ObjectId } from 'mongodb';
+import * as mongodb from 'mongodb';
 
 export default class ObjectIdDataType extends DataType {
   #type = 'objectId';
@@ -12,12 +12,12 @@ export default class ObjectIdDataType extends DataType {
     return (
       typeof value === 'undefined' ||
       value === null ||
-      value instanceof ObjectId
+      value instanceof mongodb.ObjectId
     );
   }
 
   toJSON(value: any) {
-    if (value instanceof ObjectId) return value.toString();
+    if (value instanceof mongodb.ObjectId) return value.toString();
     return value;
   }
 
