@@ -37,7 +37,7 @@ export default class OperationInterceptorService {
     operation: OperationType,
     when: OperationWhen,
     records: Record[],
-    context: any = {},
+    context: any,
     disabledIntercepts: boolean | string[]
   ): Promise<Record[]> {
     if (disabledIntercepts === true) {

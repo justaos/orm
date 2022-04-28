@@ -18,7 +18,7 @@ export default class Collection {
     collection: mongodb.Collection,
     schema: Schema,
     operationInterceptorService: OperationInterceptorService,
-    context?: any
+    context: any
   ) {
     this.#collection = collection;
     this.#operationInterceptorService = operationInterceptorService;
