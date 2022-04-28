@@ -182,7 +182,7 @@ export default class Collection {
       if (field && typeof filter[key] !== 'object')
         filter[key] = field
           .getFieldType()
-          .setValueIntercept(schema, field, filter[key], filter, this.#context);
+          .setValueIntercept(this.getSchema(), key, filter[key], filter);
     });
   }
 }

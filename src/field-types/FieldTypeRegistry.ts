@@ -1,4 +1,4 @@
-import FieldType from './FieldType.interface';
+import FieldType from './FieldType';
 
 export default class FieldTypeRegistry {
   fieldTypes: Map<string, FieldType>;
@@ -8,7 +8,7 @@ export default class FieldTypeRegistry {
   }
 
   addFieldType = (fieldType: FieldType): Map<string, FieldType> =>
-    this.fieldTypes.set(fieldType.getType(), fieldType);
+    this.fieldTypes.set(fieldType.getName(), fieldType);
 
   deleteFieldType = (type: string): boolean => this.fieldTypes.delete(type);
 

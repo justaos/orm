@@ -1,60 +1,56 @@
-import DataType from '../../core/data-types/dataType.interface';
-import FieldType from '../FieldType.interface';
-import ObjectIdDataType from '../../core/data-types/types/objectIdDataType';
+import FieldType from '../FieldType';
 import * as mongodb from 'mongodb';
 import Schema from '../../collection/Schema';
 import ODM from '../../ODM';
 import FieldTypeUtils from '../FieldTypeUtils';
-import Field from '../../collection/Field';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
+import ObjectIdDataType from '../../core/data-types/types/ObjectIdDataType';
 
 export default class ObjectIdFieldType extends FieldType {
-  #dataType: DataType = new ObjectIdDataType();
-
-  #odm?: ODM;
-
-  setODM(odm: ODM) {
-    this.#odm = odm;
+  constructor(odm: ODM) {
+    super(odm, PrimitiveDataType.OBJECT_ID);
   }
 
-  getDataType(): DataType {
-    return this.#dataType;
-  }
-
-  getType(): string {
+  getName(): string {
     return 'objectId';
   }
 
-  async validateValue(schema: Schema, field: Field, record: any, context: any) {
-    FieldTypeUtils.requiredValidation(schema, field, record);
-    await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, record);
+  async validateValue(
+    schema: Schema,
+    fieldName: string,
+    record: any,
+    context: any
+  ) {
+    FieldTypeUtils.requiredValidation(schema, fieldName, record);
+    await FieldTypeUtils.uniqueValidation(
+      this.getODM(),
+      schema,
+      fieldName,
+      record
+    );
   }
 
   validateDefinition(fieldDefinition: any): boolean {
     return !!fieldDefinition.name;
   }
 
-  async getDisplayValue(schema: any, field: Field, record: any, context: any) {
-    return this.#dataType.toJSON(record[field.getName()]);
-  }
-
-  getValueIntercept(
+  async getDisplayValue(
     schema: Schema,
-    field: Field,
-    record: any,
-    context: any
-  ): any {
-    return record[field.getName()];
+    fieldName: string,
+    record: any
+  ): Promise<string | null> {
+    const objectIdType = <ObjectIdDataType>this.getDataType();
+    return objectIdType.toJSON(record[fieldName]);
   }
 
   setValueIntercept(
     schema: Schema,
-    field: Field,
-    newValue: any,
-    record: any,
-    context: any
-  ): any {
-    if (typeof newValue === 'string' && mongodb.ObjectId.isValid(newValue))
-      return new mongodb.ObjectId(newValue);
-    return newValue;
+    fieldName: string,
+    value: any,
+    record: any
+  ): mongodb.ObjectId {
+    if (typeof value === 'string' && mongodb.ObjectId.isValid(value))
+      return new mongodb.ObjectId(value);
+    return value;
   }
 }

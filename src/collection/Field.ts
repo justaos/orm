@@ -1,4 +1,4 @@
-import FieldType from '../field-types/FieldType.interface';
+import FieldType from '../field-types/FieldType';
 import Schema from './Schema';
 import FieldValidationError from '../errors/FieldValidationError';
 
@@ -51,16 +51,17 @@ export default class Field {
 
   async validateValue(recordObject: any, context: any) {
     const value = recordObject[this.getName()];
-    if (!this.#fieldType?.getDataType().validateType(value))
+    const fieldType = this.getFieldType();
+    if (!fieldType.getDataType().validate(value))
       throw new FieldValidationError(
         this.getDefinition(),
         value,
         'NOT_VALID_TYPE'
       );
     try {
-      await this.#fieldType?.validateValue(
+      await fieldType.validateValue(
         this.#schema,
-        this,
+        this.getName(),
         recordObject,
         context
       );

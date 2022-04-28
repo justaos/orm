@@ -127,10 +127,12 @@ export default class Schema {
     return allFields;
   }
 
-  getField(name: string): Field | undefined {
-    return this.getFields().find((field: Field) => {
+  getField(name: string): Field {
+    const field = this.getFields().find((field: Field) => {
       return field.getName() === name;
     });
+    if (!field) throw new Error('No such field');
+    return field;
   }
 
   async validateRecord(recordObject: any, context: any) {

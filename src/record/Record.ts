@@ -50,11 +50,10 @@ export default class Record {
       this.#record[key] = field
         .getFieldType()
         .setValueIntercept(
-          schema,
-          field,
+          this.#collection.getSchema(),
+          key,
           value,
-          this.#record,
-          this.#collection.getContext()
+          this.#record
         );
   }
 
@@ -67,10 +66,10 @@ export default class Record {
     const schema = this.#collection.getSchema();
     const field = schema.getField(key);
     return field
-      ?.getFieldType()
+      .getFieldType()
       .getDisplayValue(
         schema,
-        field,
+        key,
         this.#record,
         this.#collection.getContext()
       );

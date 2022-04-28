@@ -1,57 +1,47 @@
-import DataType from '../../core/data-types/dataType.interface';
-import FieldType from '../FieldType.interface';
-import BooleanDataType from '../../core/data-types/types/booleanDataType';
+import FieldType from '../FieldType';
 import Schema from '../../collection/Schema';
-import Field from '../../collection/Field';
 import FieldTypeUtils from '../FieldTypeUtils';
 import ODM from '../../ODM';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
 
 export default class BooleanFieldType extends FieldType {
-  #dataType: DataType = new BooleanDataType();
-
-  #odm?: ODM;
-
-  setODM(odm: ODM) {
-    this.#odm = odm;
+  constructor(odm: ODM) {
+    super(odm, PrimitiveDataType.BOOLEAN);
   }
 
-  getDataType(): DataType {
-    return this.#dataType;
-  }
-
-  getType(): string {
+  getName(): string {
     return 'boolean';
   }
 
-  async validateValue(schema: Schema, field: Field, value: any, context: any) {
-    FieldTypeUtils.requiredValidation(schema, field, value);
-    await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, value);
+  async validateValue(
+    schema: Schema,
+    fieldName: string,
+    value: any,
+    context: any
+  ) {
+    FieldTypeUtils.requiredValidation(schema, fieldName, value);
+    await FieldTypeUtils.uniqueValidation(
+      this.getODM(),
+      schema,
+      fieldName,
+      value
+    );
   }
 
   validateDefinition(fieldDefinition: any): boolean {
     return !!fieldDefinition.name;
   }
 
-  async getDisplayValue(schema: any, field: Field, record: any, context: any) {
-    return record[field.getName()];
-  }
-
-  getValueIntercept(
-    schema: Schema,
-    field: Field,
-    record: any,
-    context: any
-  ): any {
-    return record[field.getName()];
+  async getDisplayValue(schema: Schema, fieldName: string, record: any) {
+    return this.getDataType().toJSON(record[fieldName]);
   }
 
   setValueIntercept(
     schema: Schema,
-    field: Field,
-    newValue: any,
-    record: any,
-    context: any
+    fieldName: string,
+    value: any,
+    record: any
   ): any {
-    return newValue;
+    return value;
   }
 }

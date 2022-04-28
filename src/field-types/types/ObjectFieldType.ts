@@ -1,36 +1,31 @@
-import DataType from '../../core/data-types/dataType.interface';
-import ObjectDataType from '../../core/data-types/types/objectDataType';
-import FieldType from '../FieldType.interface';
+import FieldType from '../FieldType';
 import Schema from '../../collection/Schema';
 import ODM from '../../ODM';
 import FieldTypeUtils from '../FieldTypeUtils';
-import Field from '../../collection/Field';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
 
 export default class ObjectFieldType extends FieldType {
-  #dataType: DataType = new ObjectDataType();
-
-  #odm?: ODM;
-
-  setODM(odm: ODM): void {
-    this.#odm = odm;
+  constructor(odm: ODM) {
+    super(odm, PrimitiveDataType.OBJECT);
   }
 
-  getDataType(): DataType {
-    return this.#dataType;
-  }
-
-  getType(): string {
+  getName(): string {
     return 'object';
   }
 
   async validateValue(
     schema: Schema,
-    field: Field,
+    fieldName: string,
     record: any,
     context: any
   ): Promise<void> {
-    FieldTypeUtils.requiredValidation(schema, field, record);
-    await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, record);
+    FieldTypeUtils.requiredValidation(schema, fieldName, record);
+    await FieldTypeUtils.uniqueValidation(
+      this.getODM(),
+      schema,
+      fieldName,
+      record
+    );
   }
 
   validateDefinition(fieldDefinition: any): boolean {
@@ -39,29 +34,19 @@ export default class ObjectFieldType extends FieldType {
 
   async getDisplayValue(
     schema: Schema,
-    field: Field,
+    fieldName: string,
     record: any,
     context: any
-  ): Promise<string> {
-    return record[field.getName()];
-  }
-
-  getValueIntercept(
-    schema: Schema,
-    field: Field,
-    record: any,
-    context: any
-  ): any {
-    return record[field.getName()];
+  ): Promise<any> {
+    return this.getDataType().toJSON(record[fieldName]);
   }
 
   setValueIntercept(
     schema: Schema,
-    field: Field,
-    newValue: any,
-    record: any,
-    context: any
+    fieldName: string,
+    value: any,
+    record: any
   ): any {
-    return newValue;
+    return value;
   }
 }

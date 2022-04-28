@@ -1,57 +1,42 @@
-import DataType from '../../core/data-types/dataType.interface';
-import StringDataType from '../../core/data-types/types/stringDataType';
-import FieldType from '../FieldType.interface';
-import Schema from '../../collection/Schema';
-import ODM from '../../ODM';
+import FieldType from '../FieldType';
 import FieldTypeUtils from '../FieldTypeUtils';
-import Field from '../../collection/Field';
+import ODM from '../../ODM';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
+import Schema from '../../collection/Schema';
 
 export default class StringFieldType extends FieldType {
-  #dataType: DataType = new StringDataType();
-
-  #odm?: ODM;
-
-  setODM(odm: ODM) {
-    this.#odm = odm;
+  constructor(odm: ODM) {
+    super(odm, PrimitiveDataType.STRING);
   }
 
-  getDataType(): DataType {
-    return this.#dataType;
-  }
-
-  getType(): string {
+  getName(): string {
     return 'string';
-  }
-
-  async validateValue(schema: Schema, field: Field, record: any, context: any) {
-    FieldTypeUtils.requiredValidation(schema, field, record);
-    await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, record);
   }
 
   validateDefinition(fieldDefinition: any): boolean {
     return !!fieldDefinition.name;
   }
 
-  async getDisplayValue(schema: any, field: Field, record: any, context: any) {
-    return record[field.getName()];
-  }
-
-  getValueIntercept(
-    schema: Schema,
-    field: Field,
-    record: any,
-    context: any
-  ): any {
-    return record[field.getName()];
-  }
-
   setValueIntercept(
     schema: Schema,
-    field: Field,
-    newValue: any,
-    record: any,
-    context: any
+    fieldName: string,
+    value: any,
+    record: any
   ): any {
-    return newValue;
+    return value;
+  }
+
+  async validateValue(schema: Schema, fieldName: string, record: any) {
+    FieldTypeUtils.requiredValidation(schema, fieldName, record);
+    await FieldTypeUtils.uniqueValidation(
+      this.getODM(),
+      schema,
+      fieldName,
+      record
+    );
+  }
+
+  async getDisplayValue(schema: Schema, fieldName: string, record: any) {
+    return this.getDataType().toJSON(record[fieldName]);
   }
 }

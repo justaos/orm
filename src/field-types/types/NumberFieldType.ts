@@ -1,25 +1,15 @@
-import DataType from '../../core/data-types/dataType.interface';
-import FieldType from '../FieldType.interface';
+import FieldType from '../FieldType';
 import Schema from '../../collection/Schema';
-import NumberDataType from '../../core/data-types/types/numberDataType';
 import ODM from '../../ODM';
 import FieldTypeUtils from '../FieldTypeUtils';
-import Field from '../../collection/Field';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
 
 export default class NumberFieldType extends FieldType {
-  #dataType: DataType = new NumberDataType();
-
-  #odm?: ODM;
-
-  setODM(odm: ODM) {
-    this.#odm = odm;
+  constructor(odm: ODM) {
+    super(odm, PrimitiveDataType.NUMBER);
   }
 
-  getDataType(): DataType {
-    return this.#dataType;
-  }
-
-  getType(): string {
+  getName(): string {
     return 'number';
   }
 
@@ -27,11 +17,21 @@ export default class NumberFieldType extends FieldType {
     return !!fieldDefinition.name;
   }
 
-  async validateValue(schema: Schema, field: Field, record: any, context: any) {
-    FieldTypeUtils.requiredValidation(schema, field, record);
-    await FieldTypeUtils.uniqueValidation(this.#odm, schema, field, record);
-    const fieldDefinition = field.getDefinition();
-    const value = record[field.getName()];
+  async validateValue(
+    schema: Schema,
+    fieldName: string,
+    record: any,
+    context: any
+  ) {
+    FieldTypeUtils.requiredValidation(schema, fieldName, record);
+    await FieldTypeUtils.uniqueValidation(
+      this.getODM(),
+      schema,
+      fieldName,
+      record
+    );
+    const fieldDefinition = schema.getField(fieldName).getDefinition();
+    const value = record[fieldName];
     if (
       !Number.isNaN(fieldDefinition.maximum) &&
       fieldDefinition.maximum > value
@@ -46,29 +46,19 @@ export default class NumberFieldType extends FieldType {
 
   async getDisplayValue(
     schema: Schema,
-    field: Field,
+    fieldName: string,
     record: any,
     context: any
   ) {
-    return record[field.getName()];
-  }
-
-  getValueIntercept(
-    schema: Schema,
-    field: Field,
-    record: any,
-    context: any
-  ): any {
-    return record[field.getName()];
+    return this.getDataType().toJSON(record[fieldName]);
   }
 
   setValueIntercept(
     schema: Schema,
-    field: Field,
-    newValue: any,
-    record: any,
-    context: any
+    fieldName: string,
+    value: any,
+    record: any
   ): any {
-    return newValue;
+    return value;
   }
 }

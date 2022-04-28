@@ -7,7 +7,7 @@ import OperationInterceptorInterface from './operation-interceptor/OperationInte
 
 import Schema from './collection/Schema';
 
-import FieldType from './field-types/FieldType.interface';
+import FieldType from './field-types/FieldType';
 import StringFieldType from './field-types/types/StringFieldType';
 import IntegerFieldType from './field-types/types/IntegerFieldType';
 import DateFieldType from './field-types/types/DateFieldType';
@@ -93,9 +93,8 @@ export default class ODM {
     return this.#schemaRegistry.hasSchema(collectionName);
   }
 
-  addFieldType(fieldType: FieldType): void {
-    fieldType.setODM(this);
-    this.#fieldTypeRegistry.addFieldType(fieldType);
+  addFieldType(FieldTypeClass: new (odm: ODM) => FieldType): void {
+    this.#fieldTypeRegistry.addFieldType(new FieldTypeClass(this));
   }
 
   addInterceptor(operationInterceptor: OperationInterceptorInterface): void {
@@ -113,15 +112,15 @@ export default class ODM {
   }
 
   #loadBuildInFieldTypes(): void {
-    this.addFieldType(new StringFieldType());
-    this.addFieldType(new IntegerFieldType());
-    this.addFieldType(new NumberFieldType());
-    this.addFieldType(new DateFieldType());
-    this.addFieldType(new ObjectFieldType());
-    this.addFieldType(new BooleanFieldType());
-    this.addFieldType(new ObjectIdFieldType());
-    this.addFieldType(new DateTimeFieldType());
-    this.addFieldType(new AnyFieldType());
+    this.addFieldType(StringFieldType);
+    this.addFieldType(IntegerFieldType);
+    this.addFieldType(NumberFieldType);
+    this.addFieldType(DateFieldType);
+    this.addFieldType(ObjectFieldType);
+    this.addFieldType(BooleanFieldType);
+    this.addFieldType(ObjectIdFieldType);
+    this.addFieldType(DateTimeFieldType);
+    this.addFieldType(AnyFieldType);
   }
 
   #getConnection(): DatabaseConnection {

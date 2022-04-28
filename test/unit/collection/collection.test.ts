@@ -77,8 +77,8 @@ describe('Collection', () => {
     const empId = empRecord.getID();
     empRecord.set('name', 'John');
     empRecord.set('emp_no', odm.generateObjectId());
-    empRecord.set('birth_date', new Date().toISOString());
-    empRecord.set('created_on', new Date().toISOString());
+    empRecord.set('birth_date', new Date());
+    empRecord.set('created_on', new Date());
     empRecord.set('gender', true);
     empRecord.set('salary', 5000);
     empRecord.set('rating', 4.5);

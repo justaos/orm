@@ -1,9 +1,9 @@
 import Schema from '../collection/Schema';
 import ODM from '../ODM';
-import Field from '../collection/Field';
 
 export default class FieldTypeUtils {
-  static requiredValidation(schema: Schema, field: Field, record: any) {
+  static requiredValidation(schema: Schema, fieldName: string, record: any) {
+    const field = schema.getField(fieldName);
     if (
       field.getDefinition().required &&
       (typeof record[field.getName()] === 'undefined' ||
@@ -13,13 +13,13 @@ export default class FieldTypeUtils {
   }
 
   static async uniqueValidation(
-    odm: ODM | undefined,
+    odm: ODM,
     schema: Schema,
-    field: Field,
+    fieldName: string,
     record: any
   ) {
-    const value = record[field.getName()];
-    if (!odm) throw new Error('ODM required for unique check');
+    const value = record[fieldName];
+    const field = schema.getField(fieldName);
     if (field.getDefinition().unique && typeof value !== 'undefined') {
       const collection = odm.collection(schema.getName());
       const condition = { [field.getName()]: value };
