@@ -14,11 +14,11 @@ export default abstract class FieldType {
     this.#dataType = DataTypeFactory.getDataType(primitiveDataType);
   }
 
-  getODM() {
+  getODM(): ODM {
     return this.#odm;
   }
 
-  getDataType() {
+  getDataType(): DataType {
     return this.#dataType;
   }
 
