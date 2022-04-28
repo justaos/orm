@@ -1,36 +1,32 @@
-let { StringDataType } = require('../');
+let { FieldType, PrimitiveDataType } = require('../lib');
 let getODM = require('./getODM');
 
-getODM().then(function(odm) {
-  odm.addFieldType({
-    setODM() {},
+getODM().then(function (odm) {
+  odm.addFieldType(
+    class extends FieldType {
+      constructor(odm) {
+        super(odm, PrimitiveDataType.STRING);
+      }
 
-    getDataType: function() {
-      return new StringDataType();
-    },
+      getName() {
+        return 'email';
+      }
 
-    getType: function() {
-      return 'email';
-    },
+      async validateValue(schema, fieldName, record, context) {
+        const pattern = '(.+)@(.+){2,}\\.(.+){2,}';
+        if (!new RegExp(pattern).test(record[fieldName]))
+          throw new Error('Not a valid email');
+      }
 
-    async validateValue(schema, field, record, context) {
-      const pattern = '(.+)@(.+){2,}\\.(.+){2,}';
-      if (!new RegExp(pattern).test(record[field.getName()]))
-        throw new Error('Not a valid email');
-    },
+      validateDefinition(fieldDefinition) {
+        return !!fieldDefinition.name;
+      }
 
-    validateDefinition: function(fieldDefinition) {
-      return !!fieldDefinition.name;
-    },
-
-    getValueIntercept(schema, field, record, context) {
-      return record[field.getName()];
-    },
-
-    setValueIntercept(schema, field, newValue, record, context) {
-      return newValue;
+      setValueIntercept(schema, field, newValue, record) {
+        return newValue;
+      }
     }
-  });
+  );
 
   odm.defineCollection({
     label: 'Student',
@@ -68,26 +64,16 @@ getODM().then(function(odm) {
   });
 
   let studentCollection = odm.collection('student');
-  let s = studentCollection.createNewRecord();
-  s.set('personal_contact', 'ttest');
-  s.set('birth_date', new Date());
-  s.insert().then(
-    function() {
+  let studentRecord = studentCollection.createNewRecord();
+  studentRecord.set('personal_contact', 'test');
+  studentRecord.set('birth_date', new Date());
+  studentRecord.insert().then(
+    function () {
       console.log('Student created');
-      studentCollection
-        .find({})
-        .toArray()
-        .then(function(res) {
-          console.log(JSON.stringify(res));
-          s.set('graduated', null);
-          s.update().then(function() {
-            odm.closeConnection();
-          });
-        });
     },
     (err) => {
       console.log(err.toJSON());
-      odm.closeConnection().then(function() {
+      odm.closeConnection().then(function () {
         console.log('Connection closed');
       });
     }

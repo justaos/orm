@@ -5,6 +5,7 @@ export default class FieldTypeUtils {
   static requiredValidation(schema: Schema, fieldName: string, record: any) {
     const field = schema.getField(fieldName);
     if (
+      field &&
       field.getDefinition().required &&
       (typeof record[field.getName()] === 'undefined' ||
         record[field.getName()] === '')
@@ -20,7 +21,7 @@ export default class FieldTypeUtils {
   ) {
     const value = record[fieldName];
     const field = schema.getField(fieldName);
-    if (field.getDefinition().unique && typeof value !== 'undefined') {
+    if (field && field.getDefinition().unique && typeof value !== 'undefined') {
       const collection = odm.collection(schema.getName());
       const condition = { [field.getName()]: value };
       if (record._id) condition._id = { $ne: record._id };

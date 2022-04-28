@@ -30,7 +30,7 @@ export default class NumberFieldType extends FieldType {
       fieldName,
       record
     );
-    const fieldDefinition = schema.getField(fieldName).getDefinition();
+    const fieldDefinition = schema.getField(fieldName)?.getDefinition();
     const value = record[fieldName];
     if (
       !Number.isNaN(fieldDefinition.maximum) &&

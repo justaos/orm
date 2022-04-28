@@ -66,7 +66,7 @@ export default class Record {
     const schema = this.#collection.getSchema();
     const field = schema.getField(key);
     return field
-      .getFieldType()
+      ?.getFieldType()
       .getDisplayValue(
         schema,
         key,

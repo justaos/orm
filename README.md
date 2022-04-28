@@ -145,56 +145,82 @@ s.insert().then(function () {
 ## Define custom field type
 After connection established, you can define custom field type.
 ```js
- odm.addInterceptor({
+odm.addFieldType(
+  class extends FieldType {
+    constructor(odm) {
+      super(odm, PrimitiveDataType.STRING);
+    }
 
-  getName: function() {
-    return 'my-intercept';
-  },
+    getName() {
+      return 'email';
+    }
 
-  intercept: (collectionName, operation, when, records) => {
-    return new Promise((resolve, reject) => {
-      if (collectionName === 'student') {
-        if (operation === 'CREATE') {
-          console.log('[collectionName=' + collectionName + ', operation=' + operation + ', when=' + when + ']');
-          if (when === 'BEFORE') {
-            for (let record of records) {
-              console.log('computed field updated for :: ' + record.get('name'));
-              record.set('computed', record.get('name') + ' +++ computed');
-            }
-          }
-        }
-        if (operation === 'READ') {
-          console.log('[collectionName=' + collectionName + ', operation=' + operation + ', when=' + when + ']');
-          if (when === 'AFTER') {
-            for (let record of records)
-              console.log(JSON.stringify(record.toObject(), null, 4));
-          }
-        }
-      }
-      resolve(records);
-    });
+    async validateValue(schema, fieldName, record, context) {
+      const pattern = '(.+)@(.+){2,}\\.(.+){2,}';
+      if (!new RegExp(pattern).test(record[fieldName]))
+        throw new Error('Not a valid email');
+    }
+
+    validateDefinition(fieldDefinition) {
+      return !!fieldDefinition.name;
+    }
+
+    setValueIntercept(schema, field, newValue, record) {
+      return newValue;
+    }
   }
-});
+);
 
 odm.defineCollection({
+  label: 'Student',
   name: 'student',
-  fields: [{
-    name: 'name',
-    type: 'string'
-  }, {
-    name: 'computed',
-    type: 'string'
-  }]
+  fields: [
+    {
+      name: 'name',
+      type: 'string'
+    },
+    {
+      name: 'personal_contact',
+      type: 'email'
+    },
+    {
+      name: 'emp_no',
+      type: 'objectId'
+    },
+    {
+      name: 'salary',
+      type: 'integer'
+    },
+    {
+      name: 'birth_date',
+      type: 'date'
+    },
+    {
+      name: 'gender',
+      type: 'boolean'
+    },
+    {
+      name: 'address',
+      type: 'object'
+    }
+  ]
 });
 
 let studentCollection = odm.collection('student');
 let studentRecord = studentCollection.createNewRecord();
-studentRecord.set('name', 'John ' + new Date().toISOString());
-studentRecord.insert().then(function() {
-  studentCollection.find().toArray().then(function(students) {
-    odm.closeConnection();
-  });
-});
+studentRecord.set('personal_contact', 'test');
+studentRecord.set('birth_date', new Date());
+studentRecord.insert().then(
+  function () {
+    console.log('Student created');
+  },
+  (err) => {
+    console.log(err.toJSON());
+    odm.closeConnection().then(function () {
+      console.log('Connection closed');
+    });
+  }
+);
 ```
 
 ## Inheritance

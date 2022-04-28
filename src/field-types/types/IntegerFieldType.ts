@@ -26,7 +26,7 @@ export default class IntegerFieldType extends FieldType {
       fieldName,
       record
     );
-    const fieldDefinition = schema.getField(fieldName).getDefinition();
+    const fieldDefinition = schema.getField(fieldName)?.getDefinition();
     const value = record[fieldName];
     if (
       Number.isInteger(fieldDefinition.maximum) &&
