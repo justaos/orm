@@ -182,11 +182,7 @@ export default class Schema {
 
     const allFields = this.getFields();
     for (const fieldObject of allFields) {
-      try {
-        fieldObject.validate();
-      } catch (err: any) {
-        throw new Error(`[Collection :: ${this.getName()}] ${err.message}`);
-      }
+      fieldObject.validate();
     }
 
     const fieldNames: string[] = allFields.map((f: Field) => f.getName());
