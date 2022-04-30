@@ -1,6 +1,7 @@
 import FieldType from '../field-types/FieldType';
 import Schema from './Schema';
 import FieldValidationError from '../errors/FieldValidationError';
+import FieldDefinitionError from '../errors/FieldDefinitionError';
 
 export default class Field {
   readonly #schema: Schema;
@@ -13,6 +14,10 @@ export default class Field {
     this.#fieldDefinition = fieldDefinition;
     this.#fieldType = fieldType;
     this.#schema = schema;
+  }
+
+  getCollectionName(): string {
+    return this.#schema.getName();
   }
 
   getName(): string {
@@ -40,13 +45,9 @@ export default class Field {
     if (!this.#fieldDefinition || !this.getType())
       throw new Error(`field type not provided`);
     if (!this.#fieldType)
-      throw new Error(
-        `[Field :: ${this.getName()}] [Type :: ${this.getType()}] No such field type`
-      );
+      throw new FieldDefinitionError(this, 'No such field type');
     if (!this.#fieldType.validateDefinition(this.#fieldDefinition))
-      throw new Error(
-        `[Field :: ${this.getName()}] [Type :: ${this.getType()}] Invalid field definition`
-      );
+      throw new FieldDefinitionError(this, 'Invalid field definition');
   }
 
   async validateValue(recordObject: any, context: any) {

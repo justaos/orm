@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Debug" type="mocha-javascript-test-runner" nameIsGenerated="true">
+  <configuration default="false" name="debug" type="mocha-javascript-test-runner">
     <node-interpreter>project</node-interpreter>
     <node-options />
     <mocha-package>$PROJECT_DIR$/node_modules/mocha</mocha-package>

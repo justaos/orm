@@ -166,4 +166,21 @@ describe('Schema', () => {
           'Collection should not extend, final schema'
         );
     });
+
+    it('#ODM::defineCollection - unknown field type', function() {
+        this.timeout(MAX_TIMEOUT);
+        try {
+            odm.defineCollection({
+                name: 'unknown',
+                fields: [
+                    {
+                        name: 'unknown',
+                        type: 'unknown'
+                    }
+                ]
+            });
+        } catch(e) {
+            assert.isOk(true, 'Collection not create as expected');
+        }
+    });
 });
