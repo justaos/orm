@@ -1,4 +1,4 @@
-name: Node Build CI
+name: Build
 
 on:
   push:
@@ -19,39 +19,17 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 12.x ]
+        deno-version: [ 1.23.4 ]
 
     steps:
       - uses: actions/checkout@v1
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Use Deno ${{ matrix.deno-version }}
+        uses: denolib/setup-deno@v2
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: npm install, build, and test
+          deno-version: ${{ matrix.deno-version }}
+      - name: build and test
         run: |
-          npm ci
-          npm run lint --if-present
-          npm run test --if-present
+          deno --version
+          deno test --coverage=docs/reports/coverage -A --unstable
         env:
           CI: true
-      - name: Codecov
-        uses: codecov/codecov-action@v2
-        with:
-          files: ./docs/reports/coverage/coverage-final.json
-
-  publish-npm:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
-
-      - run: npm ci
-
-      - id: publish
-        uses: JS-DevTools/npm-publish@v1
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
