@@ -1,5 +1,5 @@
 # JUSTAOS's ODM
-JUSTAOS's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database.
+JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to MongoDB database.
 
 Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete).
 
@@ -7,12 +7,10 @@ Supports schemas with multi-level inheritance. Also supports interception on ope
 [![codecov](https://codecov.io/gh/justaos/odm/branch/main/graph/badge.svg?token=OzlniGFmNp)](https://codecov.io/gh/justaos/odm)
 [![GitHub license](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
 
-```bash
-npm install --save @justaos/odm
-```
 
 ```js
 const ODM = require("@justaos/odm");
+import {ODM} from 'https://raw.githubusercontent.com/justaos/odm/4.3.4/mod.ts';
 ```
 
 ## Establishing database connection
@@ -257,16 +255,16 @@ husky.set('name', 'Jimmy');
 husky.set('breed', 'Husky');
 await husky.insert();
 
-animalCol
+const animals = await animalCol
   .find({})
-  .toArray()
-  .then(function (animals) {
-    animals.forEach((animal) => {
-      console.log(animal.toObject());
-    });
-    odm.closeConnection();
-  });
-```
+  .toArray();
+
+animals.forEach((animal) => {
+  console.log(animal.toObject());
+});
+
+odm.closeConnection();
+ ```
 
 Check the examples >> [here](./examples) <<
 
