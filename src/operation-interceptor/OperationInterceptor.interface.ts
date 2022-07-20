@@ -1,5 +1,5 @@
-import Record from '../record/Record';
-import { OperationType, OperationWhen } from '../constants';
+import Record from '../record/Record.ts';
+import { OperationType, OperationWhen } from '../constants.ts';
 
 export default abstract class OperationInterceptorInterface {
   #order = 100;

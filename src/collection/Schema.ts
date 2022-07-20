@@ -1,8 +1,9 @@
-import FieldTypeRegistry from '../field-types/FieldTypeRegistry';
-import SchemaRegistry from './SchemaRegistry';
-import { CommonUtils } from '@justaos/utils';
-import Field from './Field';
-import RecordValidationError from '../errors/RecordValidationError';
+import { CommonUtils } from '../../deps.ts';
+
+import FieldTypeRegistry from '../field-types/FieldTypeRegistry.ts';
+import SchemaRegistry from './SchemaRegistry.ts';
+import Field from './Field.ts';
+import RecordValidationError from '../errors/RecordValidationError.ts';
 
 export default class Schema {
   readonly #name: string;

@@ -1,26 +1,27 @@
-import * as mongodb from 'mongodb';
-import Collection from './collection/Collection';
-import SchemaRegistry from './collection/SchemaRegistry';
+import { mongodb } from '../deps.ts';
 
-import OperationInterceptorService from './operation-interceptor/OperationInterceptorService';
-import OperationInterceptorInterface from './operation-interceptor/OperationInterceptor.interface';
+import Collection from './collection/Collection.ts';
+import SchemaRegistry from './collection/SchemaRegistry.ts';
 
-import Schema from './collection/Schema';
+import OperationInterceptorService from './operation-interceptor/OperationInterceptorService.ts';
+import OperationInterceptorInterface from './operation-interceptor/OperationInterceptor.interface.ts';
 
-import FieldType from './field-types/FieldType';
-import StringFieldType from './field-types/types/StringFieldType';
-import IntegerFieldType from './field-types/types/IntegerFieldType';
-import DateFieldType from './field-types/types/DateFieldType';
-import FieldTypeRegistry from './field-types/FieldTypeRegistry';
-import ObjectFieldType from './field-types/types/ObjectFieldType';
-import BooleanFieldType from './field-types/types/BooleanFieldType';
-import ObjectIdFieldType from './field-types/types/ObjectIdFieldType';
-import DateTimeFieldType from './field-types/types/DateTimeFieldType';
-import AnyFieldType from './field-types/types/AnyFieldType';
-import DatabaseConfiguration from './core/connection/databaseConfiguration';
-import DatabaseConnection from './core/connection/databaseConnection';
-import NumberFieldType from './field-types/types/NumberFieldType';
-import ObjectId from './record/ObjectId';
+import Schema from './collection/Schema.ts';
+
+import FieldType from './field-types/FieldType.ts';
+import StringFieldType from './field-types/types/StringFieldType.ts';
+import IntegerFieldType from './field-types/types/IntegerFieldType.ts';
+import DateFieldType from './field-types/types/DateFieldType.ts';
+import FieldTypeRegistry from './field-types/FieldTypeRegistry.ts';
+import ObjectFieldType from './field-types/types/ObjectFieldType.ts';
+import BooleanFieldType from './field-types/types/BooleanFieldType.ts';
+import ObjectIdFieldType from './field-types/types/ObjectIdFieldType.ts';
+import DateTimeFieldType from './field-types/types/DateTimeFieldType.ts';
+import AnyFieldType from './field-types/types/AnyFieldType.ts';
+import DatabaseConfiguration from './core/connection/databaseConfiguration.ts';
+import DatabaseConnection from './core/connection/databaseConnection.ts';
+import NumberFieldType from './field-types/types/NumberFieldType.ts';
+import ObjectId from './record/ObjectId.ts';
 
 export default class ODM {
   #conn: DatabaseConnection | undefined;
@@ -48,9 +49,9 @@ export default class ODM {
     this.#conn = conn;
   }
 
-  closeConnection(): Promise<void> {
+  closeConnection(): void {
     const conn = this.#getConnection();
-    return conn.closeConnection();
+    conn.closeConnection();
   }
 
   databaseExists(): Promise<boolean> {

@@ -1,4 +1,4 @@
-import FieldValidationError from './FieldValidationError';
+import FieldValidationError from './FieldValidationError.ts';
 
 export default class RecordValidationError extends Error {
   readonly #collectionDefinition: any;

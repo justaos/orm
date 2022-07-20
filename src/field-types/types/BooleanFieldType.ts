@@ -1,8 +1,8 @@
-import FieldType from '../FieldType';
-import Schema from '../../collection/Schema';
-import FieldTypeUtils from '../FieldTypeUtils';
-import ODM from '../../ODM';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
+import FieldType from '../FieldType.ts';
+import Schema from '../../collection/Schema.ts';
+import FieldTypeUtils from '../FieldTypeUtils.ts';
+import ODM from '../../ODM.ts';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
 
 export default class BooleanFieldType extends FieldType {
   constructor(odm: ODM) {

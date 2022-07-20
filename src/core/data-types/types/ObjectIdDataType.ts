@@ -1,5 +1,6 @@
-import DataType from '../DataType';
-import * as mongodb from 'mongodb';
+import { mongodb } from '../../../../deps.ts';
+
+import DataType from '../DataType.ts';
 
 export default class ObjectIdDataType implements DataType {
   validate(value: any): boolean {

@@ -1,40 +1,49 @@
-import {assert} from "chai";
-import "mocha";
-import {ODM} from "../src";
-import {Session, MAX_TIMEOUT} from "./test.utils";
+import { assertEquals, assert } from 'https://deno.land/std@0.107.0/testing/asserts.ts';
+import {
+  describe,
+  it
+} from 'https://deno.land/x/test_suite@v0.8.0/mod.ts';
+import { ODM } from '../mod.ts';
+import { Session, MAX_TIMEOUT } from './test.utils.ts';
 
-describe('Initial test setup', () => {
+describe({
+  name: 'Initial test setup',
+  sanitizeResources: false,
+  sanitizeOps: false,
+  fn: () => {
 
-    it('#connect()', function (done) {
-        this.timeout(MAX_TIMEOUT);
-        Session.setODM(new ODM());
-        Session.getODM().connect({
-            "host": "127.0.0.1",
-            "port": "27017",
-            "database": "odm-test-db",
-            "dialect": "mongodb",
-        }).then(() => {
-            assert.isOk(true, 'connection established');
-            done();
-        }, () => {
-            assert.isOk(false, 'connection failed');
-            done();
+    it('#connect()', async () => {
+      Session.setODM(new ODM());
+
+      try {
+        await Session.getODM().connect({
+          'host': '127.0.0.1',
+          'port': '27017',
+          'database': 'odm-test-db',
+          'dialect': 'mongodb'
         });
+        assert( true, 'connection established');
+      } catch (error) {
+        assert( false, 'connection failed');
+      }
     });
 
-    it('#clear existing database', function (done) {
-        this.timeout(MAX_TIMEOUT);
-        Session.getODM().databaseExists().then(() => {
-            Session.getODM().dropDatabase().then(() => {
-                assert.isOk(true, 'dropped successfully');
-                done()
-            }, () => {
-                assert.isOk(false, 'dropping failed');
-                done()
-            })
-        }, () => {
-            done();
-        })
+    it('#clear existing database', async () => {
+
+      const odm = Session.getODM();
+
+      const exists = await odm.databaseExists();
+
+      if (exists) {
+        const result = await odm.dropDatabase();
+        if (result) {
+          assert( true, 'dropped successfully');
+        } else {
+          assert( false, 'dropping failed');
+        }
+      }
+      odm.closeConnection();
     });
 
+  }
 });

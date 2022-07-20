@@ -1,6 +1,6 @@
-import OperationInterceptorInterface from './OperationInterceptor.interface';
-import Record from '../record/Record';
-import { OperationType, OperationWhen } from '../constants';
+import OperationInterceptorInterface from './OperationInterceptor.interface.ts';
+import Record from '../record/Record.ts';
+import { OperationType, OperationWhen } from '../constants.ts';
 
 export default class OperationInterceptorService {
   #interceptors: Map<string, OperationInterceptorInterface>;

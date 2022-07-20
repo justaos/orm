@@ -1,9 +1,9 @@
-import FieldType from '../FieldType';
-import Schema from '../../collection/Schema';
-import ODM from '../../ODM';
-import FieldTypeUtils from '../FieldTypeUtils';
-import { DateUtils } from '@justaos/utils';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
+import FieldType from '../FieldType.ts';
+import Schema from '../../collection/Schema.ts';
+import ODM from '../../ODM.ts';
+import FieldTypeUtils from '../FieldTypeUtils.ts';
+import { DateUtils } from '../../../deps.ts';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
 
 export default class DateFieldType extends FieldType {
   constructor(odm: ODM) {

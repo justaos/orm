@@ -1,5 +1,5 @@
-import Schema from '../collection/Schema';
-import ODM from '../ODM';
+import Schema from '../collection/Schema.ts';
+import ODM from '../ODM.ts';
 
 export default class FieldTypeUtils {
   static requiredValidation(schema: Schema, fieldName: string, record: any) {

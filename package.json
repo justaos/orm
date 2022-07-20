@@ -20,52 +20,12 @@
   "author": "Shivaji Varma Pusapati Venkata <contact@shivajivarma.com> (https://shivajivarma.com)",
   "license": "Apache-2.0",
   "contributors": [],
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
-  "files": [
-    "lib",
-    "src"
-  ],
   "scripts": {
-    "prepare": "npm run build",
-    "build": "node ./clean.mjs | tsc",
-    "lint": "eslint ./src --ext .ts,.tsx",
-    "lint:fix": "eslint --fix ./src --ext .ts,.tsx",
-    "test": "nyc mocha test/init.test.ts test/unit/**/*test.ts test/end.test.ts",
-    "posttest": "nyc report --reporter=json",
-    "codecov": "nyc report --reporter=json | codecov",
-    "release": "npm publish"
-  },
-  "nyc": {
-    "all": true,
-    "check-coverage": false,
-    "exclude": [
-      "**/**.interface.ts"
-    ],
-    "extension": [
-      ".ts"
-    ],
-    "include": [
-      "src/**/*.ts"
-    ],
-    "report-dir": "docs/reports/coverage",
-    "reporter": [
-      "html",
-      "lcov",
-      "text",
-      "text-summary"
-    ],
-    "require": [
-      "ts-node/register"
-    ]
-  },
-  "dependencies": {
-    "@justaos/utils": "^1.0.5",
-    "mongodb": "^4.4.1"
+    "test": "deno test --coverage=docs/reports/coverage --allow-net --allow-read --allow-write --unstable test/init.test.ts test/unit/ test/end.test.ts"
   },
   "devDependencies": {
-    "@justaos/dev-dependencies": "^1.0.3",
-    "codecov": "^3.8.3"
+    "typescript": "^4.4.3",
+    "typescript-deno-plugin": "^1.31.0"
   },
   "publishConfig": {
     "access": "public"

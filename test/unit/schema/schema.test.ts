@@ -1,8 +1,11 @@
-import { assert } from 'chai';
-import 'mocha';
-import { ObjectId } from 'mongodb';
-import { MAX_TIMEOUT, Session } from '../../test.utils';
-import { ODM, Record } from '../../../src';
+/*
+import { assertEquals, assert } from 'https://deno.land/std@0.107.0/testing/asserts.ts';
+import {
+    describe,
+    it
+} from 'https://deno.land/x/test_suite@v0.8.0/mod.ts';
+import { MAX_TIMEOUT, Session } from '../../test.utils.ts';
+import { ODM, Record, ObjectId } from '../../../mod.ts';
 
 describe('Schema', () => {
     let odm: ODM;
@@ -17,9 +20,9 @@ describe('Schema', () => {
     it('#ODM::collection - negative check', function() {
         try {
             odm.collection('unknown_collection');
-            assert.isOk(false, 'Collection should not exists');
+            assert( false, 'Collection should not exists');
         } catch (e) {
-            assert.isOk(true, 'Collection should not exists');
+            assert( true, 'Collection should not exists');
         }
     });
 
@@ -46,7 +49,7 @@ describe('Schema', () => {
                 }
             ]
         });
-        assert.isOk(true, 'Collection not create as expected');
+        assert( true, 'Collection not create as expected');
     });
 
     it('#ODM::defineCollection - extends negative check', function() {
@@ -67,7 +70,7 @@ describe('Schema', () => {
         } catch (err) {
             assertValue = true;
         }
-        assert.isOk(
+        assert( 
           assertValue,
           'Collection should not get extended, with name fields'
         );
@@ -86,7 +89,7 @@ describe('Schema', () => {
                 }
             ]
         });
-        assert.isOk(true, 'Collection should get extended');
+        assert( true, 'Collection should get extended');
     });
 
     it('#ODM::defineCollection - extends positive check', function() {
@@ -106,10 +109,10 @@ describe('Schema', () => {
         } catch (err) {
             assertValue = true;
         }
-        assert.isOk(assertValue, 'Collection should not extend, final schema');
+        assert( assertValue, 'Collection should not extend, final schema');
     });
 
-    it('#ODM::collection - normal schema record', function(done) {
+    it('#ODM::collection - normal schema record', async () => {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
@@ -123,7 +126,7 @@ describe('Schema', () => {
         }
     });
 
-    it('#ODM::collection - extends schema record', function(done) {
+    it('#ODM::collection - extends schema record', async () => {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
@@ -137,7 +140,7 @@ describe('Schema', () => {
         }
     });
 
-    it('#Collection::find extends', function(done) {
+    it('#Collection::find extends', async () => {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = odm.collection(MODEL_EXTENDS);
         employeeCollection
@@ -148,7 +151,7 @@ describe('Schema', () => {
           });
     });
 
-    it('#Collection::find normal', function(done) {
+    it('#Collection::find normal', async () => {
         this.timeout(MAX_TIMEOUT);
         let employeeCollection = odm.collection(MODEL_NAME);
         employeeCollection
@@ -161,7 +164,7 @@ describe('Schema', () => {
 
     it('#ODM::convertToObjectId', function() {
         const newId = odm.generateObjectId('569ed8269353e9f4c51617aa');
-        assert.isOk(
+        assert( 
           ObjectId.isValid(newId),
           'Collection should not extend, final schema'
         );
@@ -180,7 +183,8 @@ describe('Schema', () => {
                 ]
             });
         } catch(e) {
-            assert.isOk(true, 'Collection not create as expected');
+            assert( true, 'Collection not create as expected');
         }
     });
 });
+*/

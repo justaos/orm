@@ -1,15 +1,15 @@
-import Collection from './Collection';
-import * as mongodb from 'mongodb';
-import Record from '../record/Record';
-import { OperationType, OperationWhen } from '../constants';
-import SortDirection from './SortDirection';
+import { mongodb, FindCursor as MongoFindCursor } from '../../deps.ts';
+
+import Collection from './Collection.ts';
+import Record from '../record/Record.ts';
+import { OperationType, OperationWhen } from '../constants.ts';
 
 export default class FindCursor {
-  readonly #cursor: mongodb.FindCursor;
+  readonly #cursor: MongoFindCursor<any>;
 
   readonly #collection: Collection;
 
-  constructor(cursor: mongodb.FindCursor, collection: Collection) {
+  constructor(cursor: MongoFindCursor<any>, collection: Collection) {
     this.#cursor = cursor;
     this.#collection = collection;
   }
@@ -18,11 +18,20 @@ export default class FindCursor {
     return this.#collection;
   }
 
+  /*
+  * Sort the results by the given key.
+  * 'name' or { age : -1, posts: 1 }
+   */
   sort(
-    keyOrList: mongodb.Sort | string,
-    direction?: SortDirection
+    keyOrList: string | { [key: string]: number },
+    direction: number = 1
   ): FindCursor {
-    this.#cursor.sort(keyOrList, direction);
+    if (typeof keyOrList === 'string') {
+      this.#cursor.sort({ [keyOrList]: direction });
+    } else {
+      this.#cursor.sort(keyOrList);
+    }
+
     return this;
   }
 

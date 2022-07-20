@@ -1,23 +1,28 @@
-import { assert } from 'chai';
-import 'mocha';
+/*
+import { assertEquals, assert } from 'https://deno.land/std@0.107.0/testing/asserts.ts';
+import {
+  beforeAll,
+  describe,
+  it
+} from 'https://deno.land/x/test_suite@v0.8.0/mod.ts';
 import {
   ODM,
   OperationInterceptorInterface,
   OperationType,
   OperationWhen,
   Record
-} from '../../../src';
-import { logger, MAX_TIMEOUT, Session } from '../../test.utils';
+} from '../../../mod.ts';
+import { logger, MAX_TIMEOUT, Session } from '../../test.utils.ts';
 
 describe('Operations Intercept', () => {
   let odm: ODM;
   let MODEL_NAME = 'intercept';
 
-  before(async () => {
+  beforeAll(async () => {
     odm = await Session.getODMByForce();
   });
 
-  it('#ODM::addInterceptor', function (done) {
+  it('#ODM::addInterceptor', async () => {
     this.timeout(MAX_TIMEOUT);
     odm.addInterceptor(
       new (class extends OperationInterceptorInterface {
@@ -67,7 +72,7 @@ describe('Operations Intercept', () => {
     s.set('name', 'John');
     s.insert().then(
       function (rec: Record) {
-        assert.isOk(
+        assert( 
           rec.get('computed') === 'this is computed',
           'read interceptor not computed the value'
         );
@@ -80,7 +85,7 @@ describe('Operations Intercept', () => {
     );
   });
 
-  it('#model define check', function (done) {
+  it('#model define check', async () => {
     this.timeout(MAX_TIMEOUT);
     odm.deleteInterceptor('my-intercept');
 
@@ -89,7 +94,7 @@ describe('Operations Intercept', () => {
     s.set('name', 'Ravi');
     s.insert().then(
       function (rec: Record) {
-        assert.isOk(
+        assert( 
           rec.get('computed') !== 'this is computed',
           'read interceptor computed the value'
         );
@@ -102,3 +107,4 @@ describe('Operations Intercept', () => {
     );
   });
 });
+*/

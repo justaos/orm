@@ -1,4 +1,4 @@
-import FieldType from './FieldType';
+import FieldType from './FieldType.ts';
 
 export default class FieldTypeRegistry {
   fieldTypes: Map<string, FieldType>;

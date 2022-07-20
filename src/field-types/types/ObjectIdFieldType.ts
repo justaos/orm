@@ -1,10 +1,11 @@
-import FieldType from '../FieldType';
-import * as mongodb from 'mongodb';
-import Schema from '../../collection/Schema';
-import ODM from '../../ODM';
-import FieldTypeUtils from '../FieldTypeUtils';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
-import ObjectIdDataType from '../../core/data-types/types/ObjectIdDataType';
+import { mongodb } from '../../../deps.ts';
+
+import FieldType from '../FieldType.ts';
+import Schema from '../../collection/Schema.ts';
+import ODM from '../../ODM.ts';
+import FieldTypeUtils from '../FieldTypeUtils.ts';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
+import ObjectIdDataType from '../../core/data-types/types/ObjectIdDataType.ts';
 
 export default class ObjectIdFieldType extends FieldType {
   constructor(odm: ODM) {

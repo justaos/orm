@@ -1,6 +1,5 @@
-import * as mongodb from 'mongodb';
-import DatabaseConfiguration from './databaseConfiguration';
-import { Logger } from '@justaos/utils';
+import { mongodb, Logger } from '../../../deps.ts';
+import DatabaseConfiguration from './databaseConfiguration.ts';
 
 export default class DatabaseConnection {
   #conn: mongodb.MongoClient;
@@ -40,11 +39,11 @@ export default class DatabaseConnection {
   }
 
   async dropDatabase(): Promise<boolean> {
-    return this.getDBO().dropDatabase();
+    return this.#conn.runCommand(this.getDatabaseName(), { dropDatabase: 1 });
   }
 
-  getDBO(): mongodb.Db {
-    return this.#conn.db(this.getDatabaseName());
+  getDBO(): mongodb.Database {
+    return this.#conn.database(this.getDatabaseName());
   }
 
   getDatabaseName(): string {
@@ -52,12 +51,14 @@ export default class DatabaseConnection {
   }
 
   async databaseExists(): Promise<boolean> {
-    // Use the admin database for the operation
-    const adminDb = this.#conn.db('test').admin();
-
     // List all the available databases
-    const dbs = await adminDb.command({ listDatabases: 1 });
-    const index = dbs.databases.findIndex(
+    const { databases } = await this.#conn.getCluster().protocol.commandSingle(
+      'admin',
+      {
+        listDatabases: 1
+      }
+    );
+    const index = databases.findIndex(
       (db: any) => db.name === this.getDatabaseName()
     );
     if (index !== -1) {
@@ -73,23 +74,26 @@ export default class DatabaseConnection {
     }
   }
 
+
   async deleteAllIndexes() {
     const dbo = this.getDBO();
-    const collections = await dbo.listCollections().toArray();
-    collections.forEach((col) => {
-      dbo.command({ dropIndexes: col.name, index: '*' });
+    const cursor = dbo.listCollections();
+    cursor.toArray().then((collections: any) => {
+      collections.forEach((col: any) => {
+        this.#conn.runCommand(this.getDatabaseName(), { dropIndexes: col.name, index: '*' });
+      });
     });
   }
 
-  closeConnection(): Promise<void> {
-    return this.#conn.close();
+  closeConnection() {
+    this.#conn.close();
   }
 
   static #createConnectionByUri = async (
     uri: string
   ): Promise<mongodb.MongoClient> => {
-    const client = new mongodb.MongoClient(uri);
-    await client.connect();
+    const client = new mongodb.MongoClient();
+    await client.connect(uri);
     return client;
   };
 }

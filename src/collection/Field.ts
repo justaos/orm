@@ -1,7 +1,7 @@
-import FieldType from '../field-types/FieldType';
-import Schema from './Schema';
-import FieldValidationError from '../errors/FieldValidationError';
-import FieldDefinitionError from '../errors/FieldDefinitionError';
+import FieldType from '../field-types/FieldType.ts';
+import Schema from './Schema.ts';
+import FieldValidationError from '../errors/FieldValidationError.ts';
+import FieldDefinitionError from '../errors/FieldDefinitionError.ts';
 
 export default class Field {
   readonly #schema: Schema;

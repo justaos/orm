@@ -1,10 +1,15 @@
-import { assert } from 'chai';
-import 'mocha';
-import { ODM, PrimitiveDataType, Record } from '../../src';
-import { Session } from '../test.utils';
-import { Logger } from '@justaos/utils';
-import Schema from '../../src/collection/Schema';
-import FieldType from '../../src/field-types/FieldType';
+/*
+import { assertEquals, assert } from 'https://deno.land/std@0.107.0/testing/asserts.ts';
+import {
+  describe,
+  it
+} from 'https://deno.land/x/test_suite@v0.8.0/mod.ts';
+
+import { ODM, PrimitiveDataType, Record } from '../../mod.ts';
+import { Session } from '../test.utils.ts';
+import { Logger } from '../../deps.ts';
+import Schema from '../../src/collection/Schema.ts';
+import FieldType from '../../src/field-types/FieldType.ts';
 
 const logger = Logger.createLogger({ label: 'FieldType' });
 
@@ -89,14 +94,14 @@ describe('FieldType', () => {
           }
         ]
       });
-      assert.isOk(true, 'Custom field defined as expected');
+      assert( true, 'Custom field defined as expected');
     } catch (err) {
       console.error(err);
-      assert.isOk(false, 'Custom field not defined as expected');
+      assert( false, 'Custom field not defined as expected');
     }
   });
 
-  it('#FieldTypeRegistry::registerFieldType creating record with custom field type', function (done) {
+  it('#FieldTypeRegistry::registerFieldType creating record with custom field type', async () => {
     let collection = odm.collection(MODEL_NAME);
     let rec = collection.createNewRecord();
     rec.set('name', 'RAM');
@@ -135,9 +140,10 @@ describe('FieldType', () => {
           }
         ]
       });
-      assert.isOk(false, 'Able to create, not defined field type element');
+      assert( false, 'Able to create, not defined field type element');
     } catch (err) {
-      assert.isOk(true, 'Invalid field type element not created as expected');
+      assert( true, 'Invalid field type element not created as expected');
     }
   });
 });
+*/

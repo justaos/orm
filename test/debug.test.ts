@@ -1,5 +1,9 @@
-import {assert} from "chai";
-import "mocha";
+/*
+import { assertEquals, assert } from 'https://deno.land/std@0.107.0/testing/asserts.ts';
+import {
+    describe,
+    it
+} from 'https://deno.land/x/test_suite@v0.8.0/mod.ts';
 import {ODM} from "../src";
 import {Session, MAX_TIMEOUT} from "./test.utils";
 
@@ -8,12 +12,12 @@ describe('Debug', () => {
     let MODEL_NAME = "schema_test";
     let MODEL_EXTENDS = "schema_test_extends";
 
-    before('#connect()', async function (done) {
+    before('#connect()', async async () => {
         this.timeout(MAX_TIMEOUT);
         odm = await Session.getODMByForce();
     });
 
-    after('#disconnect()', async function (done) {
+    after('#disconnect()', async async () => {
         odm.closeConnection();
     });
 
@@ -35,7 +39,7 @@ describe('Debug', () => {
                 type: "boolean"
             }]
         });
-        assert.isOk(true, "Collection not create as expected");
+        assert( true, "Collection not create as expected");
     });
 
 
@@ -50,10 +54,10 @@ describe('Debug', () => {
                 type: 'string'
             }]
         });
-        assert.isOk(true, "Collection should get extended");
+        assert( true, "Collection should get extended");
     });
 
-    it('#ODM::collection - normal schema record', function (done) {
+    it('#ODM::collection - normal schema record', async () => {
         this.timeout(MAX_TIMEOUT);
         let assertValue = false;
         try {
@@ -69,3 +73,4 @@ describe('Debug', () => {
     });
 
 });
+*/

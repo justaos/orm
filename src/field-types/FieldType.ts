@@ -1,8 +1,8 @@
-import DataType from '../core/data-types/DataType';
-import ODM from '../ODM';
-import DataTypeFactory from '../core/data-types/DataTypeFactory';
-import PrimitiveDataType from '../core/data-types/PrimitiveDataType';
-import Schema from '../collection/Schema';
+import DataType from '../core/data-types/DataType.ts';
+import ODM from '../ODM.ts';
+import DataTypeFactory from '../core/data-types/DataTypeFactory.ts';
+import PrimitiveDataType from '../core/data-types/PrimitiveDataType.ts';
+import Schema from '../collection/Schema.ts';
 
 export default abstract class FieldType {
   category: string[] = [];

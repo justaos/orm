@@ -1,12 +1,12 @@
-import PrimitiveDataType from './PrimitiveDataType';
-import DataType from './DataType';
-import AnyDataType from './types/AnyDataType';
-import DateDataType from './types/DateDataType';
-import StringDataType from './types/StringDataType';
-import NumberDataType from './types/NumberDataType';
-import BooleanDataType from './types/BooleanDataType';
-import ObjectDataType from './types/ObjectDataType';
-import ObjectIdDataType from './types/ObjectIdDataType';
+import PrimitiveDataType from './PrimitiveDataType.ts';
+import DataType from './DataType.ts';
+import AnyDataType from './types/AnyDataType.ts';
+import DateDataType from './types/DateDataType.ts';
+import StringDataType from './types/StringDataType.ts';
+import NumberDataType from './types/NumberDataType.ts';
+import BooleanDataType from './types/BooleanDataType.ts';
+import ObjectDataType from './types/ObjectDataType.ts';
+import ObjectIdDataType from './types/ObjectIdDataType.ts';
 
 export default class DataTypeFactory {
   static getDataType(type: PrimitiveDataType): DataType {

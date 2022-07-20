@@ -1,8 +1,8 @@
-import FieldType from '../FieldType';
-import FieldTypeUtils from '../FieldTypeUtils';
-import ODM from '../../ODM';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType';
-import Schema from '../../collection/Schema';
+import FieldType from '../FieldType.ts';
+import FieldTypeUtils from '../FieldTypeUtils.ts';
+import ODM from '../../ODM.ts';
+import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
+import Schema from '../../collection/Schema.ts';
 
 export default class StringFieldType extends FieldType {
   constructor(odm: ODM) {

@@ -1,5 +1,5 @@
-import { Logger } from '@justaos/utils';
-import { ODM } from '../src';
+import { Logger } from '../deps.ts';
+import { ODM } from '../mod.ts';
 
 class Session {
   static #odm: undefined | ODM;
@@ -7,6 +7,10 @@ class Session {
   static getODM() {
     if (!this.#odm) throw new Error('ODM is not initialized');
     return this.#odm;
+  }
+
+  static hasODM() {
+    return !!this.#odm;
   }
 
   static setODM(odm: ODM) {
@@ -30,7 +34,7 @@ class Session {
 const MAX_TIMEOUT = 10000;
 const logger = Logger.createLogger({
   label: 'test',
-  filePath: __dirname + '/test.log'
+  filePath:  './test/test.log'
 });
 
 export { Session, MAX_TIMEOUT, logger };

@@ -1,13 +1,14 @@
-import FindCursor from './FindCursor';
-import Record from '../record/Record';
-import Schema from './Schema';
-import { OperationType, OperationWhen } from '../constants';
-import AggregationCursor from './AggregationCursor';
-import * as mongodb from 'mongodb';
-import OperationInterceptorService from '../operation-interceptor/OperationInterceptorService';
+import { mongodb } from '../../deps.ts';
+
+import FindCursor from './FindCursor.ts';
+import Record from '../record/Record.ts';
+import Schema from './Schema.ts';
+import { OperationType, OperationWhen } from '../constants.ts';
+import AggregationCursor from './AggregationCursor.ts';
+import OperationInterceptorService from '../operation-interceptor/OperationInterceptorService.ts';
 
 export default class Collection {
-  readonly #collection: mongodb.Collection;
+  readonly #collection: mongodb.Collection<any>;
   readonly #schema: Schema;
   readonly #context: any;
   readonly #operationInterceptorService: OperationInterceptorService;
@@ -15,7 +16,7 @@ export default class Collection {
   #disableIntercepts: boolean | string[] = false;
 
   constructor(
-    collection: mongodb.Collection,
+    collection: mongodb.Collection<any>,
     schema: Schema,
     operationInterceptorService: OperationInterceptorService,
     context: any
@@ -65,7 +66,7 @@ export default class Collection {
 
   async findOne(
     filter: any,
-    options?: mongodb.FindOptions<any>
+    options?: mongodb.FindOptions
   ): Promise<Record | undefined> {
     const schema = this.getSchema();
     if (!filter) filter = {};
@@ -140,7 +141,10 @@ export default class Collection {
       OperationWhen.AFTER,
       record
     );
-    return deletedResult;
+    return {
+      acknowledged: true,
+      deletedCount: deletedResult
+    };
   }
 
   aggregate(pipeline: any[]): AggregationCursor {

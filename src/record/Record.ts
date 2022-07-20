@@ -1,6 +1,6 @@
-import * as mongodb from 'mongodb';
-import Collection from '../collection/Collection';
-import Field from '../collection/Field';
+import { mongodb } from '../../deps.ts';
+import Collection from '../collection/Collection.ts';
+import Field from '../collection/Field.ts';
 
 export default class Record {
   #isNew = false;
