@@ -43,7 +43,7 @@ export default class Field {
 
   validate(): void {
     if (!this.#fieldDefinition || !this.getType())
-      throw new Error(`field type not provided`);
+      throw new FieldDefinitionError(this, `Field type not provided`);
     if (!this.#fieldType)
       throw new FieldDefinitionError(this, 'No such field type');
     if (!this.#fieldType.validateDefinition(this.#fieldDefinition))

@@ -6,14 +6,15 @@
         "types/*"
       ]
     },
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "inlineSources": true,
     "target": "es2016",
     "module": "commonjs",
     "declaration": true,
     "outDir": "./lib",
-    "strict": true
+    "strict": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "pretty": true,
+    "inlineSources": true
   },
   "include": [
     "src/**/*"
