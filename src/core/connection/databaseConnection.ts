@@ -1,26 +1,29 @@
-import { mongodb, Logger } from '../../../deps.ts';
+import { Logger, mongodb } from '../../../deps.ts';
 import DatabaseConfiguration from './databaseConfiguration.ts';
 
 export default class DatabaseConnection {
-  #conn: mongodb.MongoClient;
-  #config: DatabaseConfiguration;
-
   static #logger = Logger.createLogger({
     label: `ODM :: ${DatabaseConnection.name}`
   });
+  #conn: mongodb.MongoClient;
+  #uri: string;
 
-  constructor(conn: mongodb.MongoClient, config: DatabaseConfiguration) {
+  constructor(conn: mongodb.MongoClient, uri: string) {
     this.#conn = conn;
-    this.#config = config;
+    this.#uri = uri;
   }
 
   static async connect(
     dbConfig: DatabaseConfiguration
   ): Promise<DatabaseConnection> {
+    return await this.connectByUri(dbConfig.getUri());
+  }
+
+  static async connectByUri(uri: string) {
     try {
-      const conn = await this.#createConnectionByUri(dbConfig.getUri());
+      const conn = await this.#createConnectionByUri(uri);
       DatabaseConnection.#logger.info('mongo db connection open');
-      return new DatabaseConnection(conn, dbConfig);
+      return new DatabaseConnection(conn, uri);
     } catch (err: any) {
       DatabaseConnection.#logger.error(err.message + '');
       throw err;
@@ -38,6 +41,14 @@ export default class DatabaseConnection {
     }
   }
 
+  static #createConnectionByUri = async (
+    uri: string
+  ): Promise<mongodb.MongoClient> => {
+    const client = new mongodb.MongoClient();
+    await client.connect(uri);
+    return client;
+  };
+
   async dropDatabase(): Promise<boolean> {
     return this.#conn.runCommand(this.getDatabaseName(), { dropDatabase: 1 });
   }
@@ -47,7 +58,7 @@ export default class DatabaseConnection {
   }
 
   getDatabaseName(): string {
-    return this.#config.getDatabaseName();
+    return new URL(this.#uri).pathname.substring(1);
   }
 
   async databaseExists(): Promise<boolean> {
@@ -74,7 +85,6 @@ export default class DatabaseConnection {
     }
   }
 
-
   async deleteAllIndexes() {
     const dbo = this.getDBO();
     const cursor = dbo.listCollections();
@@ -88,12 +98,4 @@ export default class DatabaseConnection {
   closeConnection() {
     this.#conn.close();
   }
-
-  static #createConnectionByUri = async (
-    uri: string
-  ): Promise<mongodb.MongoClient> => {
-    const client = new mongodb.MongoClient();
-    await client.connect(uri);
-    return client;
-  };
 }

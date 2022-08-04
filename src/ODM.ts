@@ -49,6 +49,13 @@ export default class ODM {
     this.#conn = conn;
   }
 
+  async connectByUri(uri: string): Promise<void> {
+    if (!uri) throw new Error('ODM::connect -> There is no config provided');
+    const conn = await DatabaseConnection.connectByUri(uri);
+    await conn.deleteAllIndexes();
+    this.#conn = conn;
+  }
+
   closeConnection(): void {
     const conn = this.#getConnection();
     conn.closeConnection();
