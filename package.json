@@ -1,6 +1,6 @@
 {
   "name": "@justaos/odm",
-  "version": "4.3.3",
+  "version": "4.3.5",
   "private": false,
   "description": "JUST A OS's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
   "keywords": [
@@ -23,10 +23,6 @@
   "scripts": {
     "test": "deno test --coverage=docs/reports/coverage --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts",
     "coverage": "deno coverage docs/reports/coverage/ --lcov > docs/reports/coverage/lcov.info"
-  },
-  "devDependencies": {
-    "typescript": "^4.4.3",
-    "typescript-deno-plugin": "^1.31.0"
   },
   "publishConfig": {
     "access": "public"
