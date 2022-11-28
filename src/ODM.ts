@@ -19,7 +19,7 @@ import ObjectIdFieldType from './field-types/types/ObjectIdFieldType.ts';
 import DateTimeFieldType from './field-types/types/DateTimeFieldType.ts';
 import AnyFieldType from './field-types/types/AnyFieldType.ts';
 import DatabaseConfiguration from './core/connection/databaseConfiguration.ts';
-import DatabaseConnection from './core/connection/databaseConnection.ts';
+import DatabaseConnection from './core/connection/DatabaseConnection.ts';
 import NumberFieldType from './field-types/types/NumberFieldType.ts';
 import ObjectId from './record/ObjectId.ts';
 

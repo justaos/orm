@@ -16,7 +16,7 @@ export default class Collection {
   #disableIntercepts: boolean | string[] = false;
 
   constructor(
-    collection: mongodb.Collection<any>,
+    collection: mongodb.Collection,
     schema: Schema,
     operationInterceptorService: OperationInterceptorService,
     context: any
@@ -66,7 +66,7 @@ export default class Collection {
 
   async findOne(
     filter: any,
-    options?: mongodb.FindOptions
+    options?: mongodb.FindOptions<any>
   ): Promise<Record | undefined> {
     const schema = this.getSchema();
     if (!filter) filter = {};
@@ -141,10 +141,7 @@ export default class Collection {
       OperationWhen.AFTER,
       record
     );
-    return {
-      acknowledged: true,
-      deletedCount: deletedResult
-    };
+    return deletedResult;
   }
 
   aggregate(pipeline: any[]): AggregationCursor {

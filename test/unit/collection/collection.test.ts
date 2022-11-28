@@ -1,12 +1,8 @@
-import { assertEquals, assert } from 'https://deno.land/std@0.107.0/testing/asserts.ts';
-import {
-  describe,
-  it,
-  beforeAll, afterAll
-} from 'https://deno.land/x/test_suite@v0.8.0/mod.ts';
+import { assert } from 'https://deno.land/std@0.135.0/testing/asserts.ts';
+import { afterAll, beforeAll, describe, it } from 'https://deno.land/std@0.166.0/testing/bdd.ts';
 
 import { ODM, Record } from '../../../mod.ts';
-import { logger, MAX_TIMEOUT, Session } from '../../test.utils.ts';
+import { Session } from '../../test.utils.ts';
 
 describe({
   name: 'Collection',
@@ -105,8 +101,8 @@ describe({
         johnObject._id + '' === empId,
         '_id is expected to be same as initialized value'
       );
-      assert( johnObject.name === 'John', 'name is expected to be John');
-      assert( johnObject.dynamic === 100, 'default is expected to be 100');
+      assert(johnObject.name === 'John', 'name is expected to be John');
+      assert(johnObject.dynamic === 100, 'default is expected to be 100');
 
     });
 

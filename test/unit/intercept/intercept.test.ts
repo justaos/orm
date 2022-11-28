@@ -1,29 +1,20 @@
 /*
-import { assertEquals, assert } from 'https://deno.land/std@0.107.0/testing/asserts.ts';
-import {
-  beforeAll,
-  describe,
-  it
-} from 'https://deno.land/x/test_suite@v0.8.0/mod.ts';
-import {
-  ODM,
-  OperationInterceptorInterface,
-  OperationType,
-  OperationWhen,
-  Record
-} from '../../../mod.ts';
-import { logger, MAX_TIMEOUT, Session } from '../../test.utils.ts';
+import { assert } from 'https://deno.land/std@0.135.0/testing/asserts.ts';
+import { beforeAll, describe, it } from 'https://deno.land/std@0.166.0/testing/bdd.ts';
+
+import { ODM, OperationInterceptorInterface, OperationType, OperationWhen, Record } from '../../../mod.ts';
+import { logger, Session } from '../../test.utils.ts';
 
 describe('Operations Intercept', () => {
   let odm: ODM;
-  let MODEL_NAME = 'intercept';
+  const MODEL_NAME = 'intercept';
 
   beforeAll(async () => {
     odm = await Session.getODMByForce();
   });
 
   it('#ODM::addInterceptor', async () => {
-    this.timeout(MAX_TIMEOUT);
+
     odm.addInterceptor(
       new (class extends OperationInterceptorInterface {
         getName() {
@@ -67,44 +58,41 @@ describe('Operations Intercept', () => {
       ]
     });
 
-    let interceptTestCollection = odm.collection(MODEL_NAME);
-    let s = interceptTestCollection.createNewRecord();
+    const interceptTestCollection = odm.collection(MODEL_NAME);
+    const s = interceptTestCollection.createNewRecord();
     s.set('name', 'John');
     s.insert().then(
-      function (rec: Record) {
-        assert( 
+      function(rec: Record) {
+        assert(
           rec.get('computed') === 'this is computed',
           'read interceptor not computed the value'
         );
-        done();
       },
-      function (err: Error) {
+      function(err: Error) {
         logger.info(err.message + '');
-        done();
       }
     );
   });
 
   it('#model define check', async () => {
-    this.timeout(MAX_TIMEOUT);
+
     odm.deleteInterceptor('my-intercept');
 
-    let interceptTestCollection = odm.collection(MODEL_NAME);
-    let s = interceptTestCollection.createNewRecord();
+    const interceptTestCollection = odm.collection(MODEL_NAME);
+    const s = interceptTestCollection.createNewRecord();
     s.set('name', 'Ravi');
     s.insert().then(
-      function (rec: Record) {
-        assert( 
+      function(rec: Record) {
+        assert(
           rec.get('computed') !== 'this is computed',
           'read interceptor computed the value'
         );
-        done();
       },
-      function (err: Error) {
-        logger.logError(err);
-        done();
+      function(err: Error) {
+        console.log(err);
       }
     );
   });
 });
+
 */

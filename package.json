@@ -21,7 +21,7 @@
   "license": "Apache-2.0",
   "contributors": [],
   "scripts": {
-    "test": "deno test --coverage=docs/reports/coverage --allow-net --allow-read --allow-write --unstable test/init.test.ts test/unit/ test/end.test.ts",
+    "test": "deno test --coverage=docs/reports/coverage --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts",
     "coverage": "deno coverage docs/reports/coverage/ --lcov > docs/reports/coverage/lcov.info"
   },
   "devDependencies": {

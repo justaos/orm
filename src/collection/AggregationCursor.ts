@@ -1,15 +1,15 @@
-import { mongodb, AggregateCursor } from '../../deps.ts';
+import { mongodb } from '../../deps.ts';
 
 
 
 import Collection from './Collection.ts';
 
 export default class AggregationCursor {
-  readonly #cursor: AggregateCursor<any>;
+  readonly #cursor: mongodb.AggregationCursor;
 
   readonly #collection: Collection;
 
-  constructor(cursor: AggregateCursor<any>, collection: Collection) {
+  constructor(cursor: mongodb.AggregationCursor, collection: Collection) {
     this.#cursor = cursor;
     this.#collection = collection;
   }
