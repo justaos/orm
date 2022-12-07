@@ -30,6 +30,6 @@ jobs:
       - name: build and test
         run: |
           deno --version --unstable
-          deno test deno test --coverage=docs/reports/coverage --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts
+          deno test --coverage=docs/reports/coverage --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts
         env:
           CI: true
