@@ -8,13 +8,12 @@ Supports schemas with multi-level inheritance. Also supports interception on ope
 [![GitHub license](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
 
 
-```js
-const ODM = require("@justaos/odm");
+```ts
 import {ODM} from 'https://raw.githubusercontent.com/justaos/odm/4.3.4/mod.ts';
 ```
 
 ## Establishing database connection
-```js
+```ts
 const odm = new ODM();
 
 const config = {
@@ -41,7 +40,7 @@ odm.connect(config).then(() => {
 
 
 ## Querying
-```js
+```ts
 odm.defineCollection({
   name: 'teacher',
   fields: [
@@ -85,7 +84,7 @@ teacherCollection.count().then(function (count) {
 ```
 
 ## Intercepting database operations
-```js
+```ts
 odm.addInterceptor({
 
     getName: function () {
@@ -141,7 +140,7 @@ s.insert().then(function () {
 
 ## Define custom field type
 After connection established, you can define custom field type.
-```js
+```ts
 odm.addFieldType(
   class extends FieldType {
     constructor(odm) {
@@ -221,7 +220,7 @@ studentRecord.insert().then(
 ```
 
 ## Inheritance
-```js
+```ts
 odm.defineCollection({
   name: 'animal',
   fields: [
