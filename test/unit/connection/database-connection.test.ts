@@ -115,7 +115,7 @@ describe({
       }
     });
 
-    it('#DatabaseConnection::connect wrong config', async () => {
+    /*it('#DatabaseConnection::connect wrong config', async () => {
       const config: any = {
         ...defaultConfig,
         port: 80
@@ -136,7 +136,7 @@ describe({
       } catch (error) {
         assert( true, 'connection failed as expected');
       }
-    });
+    });*/
 
 
     it('#DatabaseConnection::databaseExists - without database', async () => {
