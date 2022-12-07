@@ -36,5 +36,5 @@ jobs:
       - name: Codecov
         uses: codecov/codecov-action@v3
         with:
-          directory: ./docs/reports/coverage/
+          files: ./docs/reports/coverage/lcov.info
 
