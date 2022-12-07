@@ -33,3 +33,8 @@ jobs:
           deno test --coverage=docs/reports/coverage --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts
         env:
           CI: true
+      - name: Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./docs/reports/coverage/
+
