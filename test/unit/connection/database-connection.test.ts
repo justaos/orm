@@ -1,5 +1,4 @@
-import { assert, assertEquals } from 'https://deno.land/std@0.135.0/testing/asserts.ts';
-import { afterAll, beforeAll, describe, it } from 'https://deno.land/std@0.166.0/testing/bdd.ts';
+import { assert, afterAll, beforeAll, describe, it, assertEquals  } from '../../test.deps.ts';
 
 import DatabaseConfiguration from '../../../src/core/connection/databaseConfiguration.ts';
 import DatabaseConnection from '../../../src/core/connection/DatabaseConnection.ts';

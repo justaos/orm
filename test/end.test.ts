@@ -1,5 +1,4 @@
-import { assert } from 'https://deno.land/std@0.135.0/testing/asserts.ts';
-import { afterAll, beforeAll, describe, it } from 'https://deno.land/std@0.166.0/testing/bdd.ts';
+import { assert, afterAll, beforeAll, describe, it  } from './test.deps.ts';
 import {Session} from "./test.utils.ts";
 
 describe('End test cleanup', () => {

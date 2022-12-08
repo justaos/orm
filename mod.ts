@@ -32,3 +32,5 @@ export {
   AggregationCursor,
   ObjectId
 };
+
+export type { Sort, SortDirection } from './src/collection/Sort.ts';

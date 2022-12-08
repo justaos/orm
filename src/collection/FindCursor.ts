@@ -20,7 +20,7 @@ export default class FindCursor {
 
   sort(
     keyOrList: mongodb.Sort | string,
-    direction?: any
+    direction?: mongodb.SortDirection
   ): FindCursor {
     this.#cursor.sort(keyOrList, direction);
     return this;
@@ -40,7 +40,7 @@ export default class FindCursor {
     const odmCollection = this.#collection;
     const docs = await this.#cursor.toArray();
     await odmCollection.intercept(OperationType.READ, OperationWhen.BEFORE, []);
-    const records = docs.map((doc) => new Record(doc, odmCollection));
+    const records = docs.map((doc: any) => new Record(doc, odmCollection));
     return await odmCollection.intercept(
       OperationType.READ,
       OperationWhen.AFTER,

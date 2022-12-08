@@ -56,9 +56,9 @@ export default class ODM {
     this.#conn = conn;
   }
 
-  closeConnection(): void {
+  closeConnection(): Promise<void> {
     const conn = this.#getConnection();
-    conn.closeConnection();
+    return conn.closeConnection();
   }
 
   databaseExists(): Promise<boolean> {

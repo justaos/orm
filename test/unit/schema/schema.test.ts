@@ -1,7 +1,8 @@
-import { assert } from 'https://deno.land/std@0.135.0/testing/asserts.ts';
-import { afterAll, beforeAll, describe, it } from 'https://deno.land/std@0.166.0/testing/bdd.ts';
-import { Session } from '../../test.utils.ts';
-import { ODM } from '../../../mod.ts';
+import { assert, afterAll, beforeAll, describe, it, assertEquals  } from '../../test.deps.ts';
+
+import { logger, Session } from '../../test.utils.ts';
+import { ObjectId, ODM, Record } from '../../../mod.ts';
+
 
 describe('Schema', {
   sanitizeResources: false,
@@ -115,74 +116,75 @@ describe('Schema', {
     assert(assertValue, 'Collection should not extend, final schema');
   });
 
-  /* it('#ODM::collection - normal schema record', async () => {
+  it('#ODM::collection - normal schema record', async () => {
 
-       let assertValue = false;
-       try {
-           const extendsCol = odm.collection(MODEL_NAME);
-           const extendsRec = extendsCol.createNewRecord();
-           extendsRec.insert().then(function() {
-               done();
-           });
-       } catch (err) {
-           assertValue = true;
-       }
-   });
+    let assertValue = false;
+    try {
+      const extendsCol = odm.collection(MODEL_NAME);
+      const extendsRec = extendsCol.createNewRecord();
+      await extendsRec.insert();
+      assertValue = true;
+    } catch (err) {
+      logger.error(err.message);
+    }
+    assert(assertValue);
+  });
 
-   it('#ODM::collection - extends schema record', async () => {
 
-       let assertValue = false;
-       try {
-           const extendsCol = odm.collection(MODEL_EXTENDS);
-           const extendsRec = extendsCol.createNewRecord();
-           await extendsRec.insert();
-       } catch (err) {
-           assertValue = true;
-       }
-        assertEquals(assertValue, true);
-   });
+  it('#ODM::collection - extends schema record', async () => {
 
-   it('#Collection::find extends', async () => {
+    let assertValue = false;
+    try {
+      const extendsCol = odm.collection(MODEL_EXTENDS);
+      const extendsRec = extendsCol.createNewRecord();
+      await extendsRec.insert();
+      assertValue = true;
+    } catch (err) {
+      logger.error(err.message);
+    }
+    assert(assertValue);
+  });
 
-       let employeeCollection = odm.collection(MODEL_EXTENDS);
-       const employees: Record[] = await employeeCollection
-         .find()
-         .toArray();
-       assertEquals(employees.length, 1)
-   });
+  it('#Collection::find extends', async () => {
 
-   it('#Collection::find normal', async () => {
-       let employeeCollection = odm.collection(MODEL_NAME);
-       employeeCollection
-         .find()
-         .toArray()
-         .then((employees: Record[]) => {
-             assertEquals(employees.length, 2);
-         });
-   });
+    const employeeCollection = odm.collection(MODEL_EXTENDS);
+    const employees: Record[] = await employeeCollection
+      .find()
+      .toArray();
+    assertEquals(employees.length, 1);
+  });
 
-   it('#ODM::convertToObjectId', function() {
-       const newId = odm.generateObjectId('569ed8269353e9f4c51617aa');
-       assert(
-         ObjectId.isValid(newId),
-         'Collection should not extend, final schema'
-       );
-   });
+  it('#Collection::find normal', async () => {
+    const employeeCollection = odm.collection(MODEL_NAME);
+    const employees: Record[] = await employeeCollection
+      .find()
+      .toArray();
+    assertEquals(employees.length, 2);
+  });
 
-   it('#ODM::defineCollection - unknown field type', function() {
-       try {
-           odm.defineCollection({
-               name: 'unknown',
-               fields: [
-                   {
-                       name: 'unknown',
-                       type: 'unknown'
-                   }
-               ]
-           });
-       } catch(e) {
-           assert( true, 'Collection not create as expected');
-       }
-   });*/
+
+  it('#ODM::convertToObjectId', function() {
+    const newId = odm.generateObjectId('569ed8269353e9f4c51617aa');
+    assert(
+      ObjectId.isValid(newId),
+      'Collection should not extend, final schema'
+    );
+  });
+
+  it('#ODM::defineCollection - unknown field type', function() {
+    try {
+      odm.defineCollection({
+        name: 'unknown',
+        fields: [
+          {
+            name: 'unknown',
+            type: 'unknown'
+          }
+        ]
+      });
+    } catch (e) {
+      assert(true, 'Collection not create as expected');
+    }
+  });
 });
 
