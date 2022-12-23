@@ -1,4 +1,4 @@
-import { assert, afterAll, beforeAll, describe, it, assertEquals  } from '../../test.deps.ts';
+import { assert, afterAll, beforeAll, describe, it  } from '../../test.deps.ts';
 
 import { ODM, OperationInterceptorInterface, OperationType, OperationWhen, Record } from '../../../mod.ts';
 import { logger, Session } from '../../test.utils.ts';
@@ -40,7 +40,7 @@ describe({
                 );
                 if (when === OperationWhen.BEFORE) {
                   logger.info('before');
-                  for (let record of records)
+                  for (const record of records)
                     record.set('computed', 'this is computed');
                 }
               }
