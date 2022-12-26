@@ -1,8 +1,8 @@
-import FieldType from '../FieldType.ts';
-import Schema from '../../collection/Schema.ts';
-import ODM from '../../ODM.ts';
-import FieldTypeUtils from '../FieldTypeUtils.ts';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
+import FieldType from "../FieldType.ts";
+import Schema from "../../collection/Schema.ts";
+import ODM from "../../ODM.ts";
+import FieldTypeUtils from "../FieldTypeUtils.ts";
+import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 
 export default class ObjectFieldType extends FieldType {
   constructor(odm: ODM) {
@@ -10,21 +10,21 @@ export default class ObjectFieldType extends FieldType {
   }
 
   getName(): string {
-    return 'object';
+    return "object";
   }
 
   async validateValue(
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ): Promise<void> {
     FieldTypeUtils.requiredValidation(schema, fieldName, record);
     await FieldTypeUtils.uniqueValidation(
       this.getODM(),
       schema,
       fieldName,
-      record
+      record,
     );
   }
 
@@ -36,7 +36,7 @@ export default class ObjectFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ): Promise<any> {
     return this.getDataType().toJSON(record[fieldName]);
   }
@@ -45,7 +45,7 @@ export default class ObjectFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     value: any,
-    record: any
+    record: any,
   ): any {
     return value;
   }

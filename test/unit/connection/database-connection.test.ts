@@ -1,26 +1,32 @@
-import { assert, afterAll, beforeAll, describe, it, assertEquals  } from '../../test.deps.ts';
+import {
+  afterAll,
+  assert,
+  assertEquals,
+  beforeAll,
+  describe,
+  it,
+} from "../../test.deps.ts";
 
-import DatabaseConfiguration from '../../../src/core/connection/databaseConfiguration.ts';
-import DatabaseConnection from '../../../src/core/connection/DatabaseConnection.ts';
-
+import DatabaseConfiguration from "../../../src/core/connection/databaseConfiguration.ts";
+import DatabaseConnection from "../../../src/core/connection/DatabaseConnection.ts";
 
 const defaultConfig: any = {
-  host: '127.0.0.1',
-  port: '27017',
-  database: 'odm-conn-test',
-  dialect: 'mongodb'
+  host: "127.0.0.1",
+  port: "27017",
+  database: "odm-conn-test",
+  dialect: "mongodb",
 };
 
 describe({
-  name: 'DatabaseConnection',
+  name: "DatabaseConnection",
   sanitizeResources: false,
   sanitizeOps: false,
   fn: () => {
-    it('#DatabaseConfiguration::getUri with username/password', function() {
+    it("#DatabaseConfiguration::getUri with username/password", function () {
       const config: any = {
         ...defaultConfig,
-        username: 'admin',
-        password: 'admin'
+        username: "admin",
+        password: "admin",
       };
       let dbConfig = new DatabaseConfiguration(
         config.host,
@@ -28,38 +34,18 @@ describe({
         config.dialect,
         config.database,
         config.username,
-        config.password
+        config.password,
       );
       assertEquals(
         dbConfig.getUri(),
-        'mongodb://admin:admin@127.0.0.1:27017/odm-conn-test',
-        'Unexpected uri generated'
+        "mongodb://admin:admin@127.0.0.1:27017/odm-conn-test",
+        "Unexpected uri generated",
       );
     });
 
-    it('#DatabaseConfiguration::getUri without username/password', function() {
-      const config: any = {
-        ...defaultConfig
-      };
-      let dbConfig = new DatabaseConfiguration(
-        config.host,
-        config.port,
-        config.dialect,
-        config.database,
-        config.username,
-        config.password
-      );
-      assertEquals(
-        dbConfig.getUri(),
-        'mongodb://127.0.0.1:27017/odm-conn-test',
-        'Unexpected uri generated'
-      );
-    });
-
-    it('#DatabaseConfiguration::getUri without database', function() {
+    it("#DatabaseConfiguration::getUri without username/password", function () {
       const config: any = {
         ...defaultConfig,
-        database: ''
       };
       let dbConfig = new DatabaseConfiguration(
         config.host,
@@ -67,16 +53,36 @@ describe({
         config.dialect,
         config.database,
         config.username,
-        config.password
+        config.password,
       );
       assertEquals(
         dbConfig.getUri(),
-        'mongodb://127.0.0.1:27017',
-        'Unexpected uri generated'
+        "mongodb://127.0.0.1:27017/odm-conn-test",
+        "Unexpected uri generated",
       );
     });
 
-    it('#DatabaseConfiguration::getUri default params', function() {
+    it("#DatabaseConfiguration::getUri without database", function () {
+      const config: any = {
+        ...defaultConfig,
+        database: "",
+      };
+      let dbConfig = new DatabaseConfiguration(
+        config.host,
+        config.port,
+        config.dialect,
+        config.database,
+        config.username,
+        config.password,
+      );
+      assertEquals(
+        dbConfig.getUri(),
+        "mongodb://127.0.0.1:27017",
+        "Unexpected uri generated",
+      );
+    });
+
+    it("#DatabaseConfiguration::getUri default params", function () {
       const config: any = {};
       let dbConfig = new DatabaseConfiguration(
         config.host,
@@ -84,33 +90,33 @@ describe({
         config.dialect,
         config.database,
         config.username,
-        config.password
+        config.password,
       );
       assertEquals(
         dbConfig.getUri(),
-        'mongodb://127.0.0.1:27017',
-        'Unexpected uri generated'
+        "mongodb://127.0.0.1:27017",
+        "Unexpected uri generated",
       );
     });
 
     let defaultConfigInstance: DatabaseConfiguration;
 
-    it('#DatabaseService::connect', async () => {
+    it("#DatabaseService::connect", async () => {
       defaultConfigInstance = new DatabaseConfiguration(
         defaultConfig.host,
         defaultConfig.port,
         defaultConfig.dialect,
         defaultConfig.database,
         defaultConfig.username,
-        defaultConfig.password
+        defaultConfig.password,
       );
 
       const conn = await DatabaseConnection.connect(defaultConfigInstance);
       if (conn) {
         conn.closeConnection();
-        assert( true, 'connection established');
+        assert(true, "connection established");
       } else {
-        assert( false, 'connection failed');
+        assert(false, "connection failed");
       }
     });
 
@@ -137,59 +143,57 @@ describe({
       }
     });*/
 
-
-    it('#DatabaseConnection::databaseExists - without database', async () => {
+    it("#DatabaseConnection::databaseExists - without database", async () => {
       const conn = await DatabaseConnection.connect(defaultConfigInstance);
       const value = await conn.databaseExists();
       if (value) {
-        assert( false, 'Database should not exists');
+        assert(false, "Database should not exists");
       } else {
-        assert( true, 'Database exists');
+        assert(true, "Database exists");
       }
       conn.closeConnection();
     });
 
-
-    it('#DatabaseConnection::getDBO - create record', async () => {
+    it("#DatabaseConnection::getDBO - create record", async () => {
       const conn = await DatabaseConnection.connect(defaultConfigInstance);
       const res = await conn
         .getDBO()
-        .collection('test')
-        .insertOne({ name: 'hello' });
-      assert( !!res, 'insertedCount should be 1');
+        .collection("test")
+        .insertOne({ name: "hello" });
+      assert(!!res, "insertedCount should be 1");
       conn.closeConnection();
     });
 
-    it('#DatabaseService::databaseExists - with database', async () => {
+    it("#DatabaseService::databaseExists - with database", async () => {
       const conn = await DatabaseConnection.connect(defaultConfigInstance);
       const value = await conn.databaseExists();
       if (value) {
-        assert( true, 'Database should not exists');
+        assert(true, "Database should not exists");
       } else {
-        assert( false, 'Database exists');
+        assert(false, "Database exists");
       }
       conn.closeConnection();
     });
 
-
-    it('#DatabaseService::dropDatabase', async () => {
+    it("#DatabaseService::dropDatabase", async () => {
       try {
         await DatabaseConnection.dropDatabase(defaultConfigInstance);
-        assert( true, 'Database dropped successfully');
+        assert(true, "Database dropped successfully");
       } catch (error) {
-        assert( false, 'Database dropping failed');
+        assert(false, "Database dropping failed");
       }
     });
 
-
-    it('#DatabaseService::closeConnection', async () => {
-      const dbConnection = await DatabaseConnection.connect(defaultConfigInstance);
+    it("#DatabaseService::closeConnection", async () => {
+      const dbConnection = await DatabaseConnection.connect(
+        defaultConfigInstance,
+      );
       dbConnection.closeConnection();
       try {
-        assert( true, 'close connection success');
+        assert(true, "close connection success");
       } catch (error) {
-        assert( false, 'close connection failed');
+        assert(false, "close connection failed");
       }
     });
-  }
+  },
 });

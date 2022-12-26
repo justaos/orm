@@ -1,8 +1,8 @@
-import { mongodb } from '../../deps.ts';
+import { mongodb } from "../../deps.ts";
 
-import Collection from './Collection.ts';
-import Record from '../record/Record.ts';
-import { OperationType, OperationWhen } from '../constants.ts';
+import Collection from "./Collection.ts";
+import Record from "../record/Record.ts";
+import { OperationType, OperationWhen } from "../constants.ts";
 
 export default class FindCursor {
   readonly #cursor: mongodb.FindCursor;
@@ -20,7 +20,7 @@ export default class FindCursor {
 
   sort(
     keyOrList: mongodb.Sort | string,
-    direction?: mongodb.SortDirection
+    direction?: mongodb.SortDirection,
   ): FindCursor {
     this.#cursor.sort(keyOrList, direction);
     return this;
@@ -44,7 +44,7 @@ export default class FindCursor {
     return await odmCollection.intercept(
       OperationType.READ,
       OperationWhen.AFTER,
-      records
+      records,
     );
   }
 }

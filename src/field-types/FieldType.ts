@@ -1,8 +1,8 @@
-import DataType from '../core/data-types/DataType.ts';
-import ODM from '../ODM.ts';
-import DataTypeFactory from '../core/data-types/DataTypeFactory.ts';
-import PrimitiveDataType from '../core/data-types/PrimitiveDataType.ts';
-import Schema from '../collection/Schema.ts';
+import DataType from "../core/data-types/DataType.ts";
+import ODM from "../ODM.ts";
+import DataTypeFactory from "../core/data-types/DataTypeFactory.ts";
+import PrimitiveDataType from "../core/data-types/PrimitiveDataType.ts";
+import Schema from "../collection/Schema.ts";
 
 export default abstract class FieldType {
   category: string[] = [];
@@ -34,20 +34,20 @@ export default abstract class FieldType {
     schema: Schema,
     fieldName: string,
     value: any,
-    record: any
+    record: any,
   ): any;
 
   abstract validateValue(
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ): Promise<any>;
 
   abstract getDisplayValue(
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ): Promise<any>;
 }

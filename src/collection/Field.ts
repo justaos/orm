@@ -1,7 +1,7 @@
-import FieldType from '../field-types/FieldType.ts';
-import Schema from './Schema.ts';
-import FieldValidationError from '../errors/FieldValidationError.ts';
-import FieldDefinitionError from '../errors/FieldDefinitionError.ts';
+import FieldType from "../field-types/FieldType.ts";
+import Schema from "./Schema.ts";
+import FieldValidationError from "../errors/FieldValidationError.ts";
+import FieldDefinitionError from "../errors/FieldDefinitionError.ts";
 
 export default class Field {
   readonly #schema: Schema;
@@ -37,34 +37,38 @@ export default class Field {
   }
 
   getFieldType(): FieldType {
-    if (!this.#fieldType) throw new Error('Field type not found');
+    if (!this.#fieldType) throw new Error("Field type not found");
     return this.#fieldType;
   }
 
   validate(): void {
-    if (!this.#fieldDefinition || !this.getType())
+    if (!this.#fieldDefinition || !this.getType()) {
       throw new FieldDefinitionError(this, `Field type not provided`);
-    if (!this.#fieldType)
-      throw new FieldDefinitionError(this, 'No such field type');
-    if (!this.#fieldType.validateDefinition(this.#fieldDefinition))
-      throw new FieldDefinitionError(this, 'Invalid field definition');
+    }
+    if (!this.#fieldType) {
+      throw new FieldDefinitionError(this, "No such field type");
+    }
+    if (!this.#fieldType.validateDefinition(this.#fieldDefinition)) {
+      throw new FieldDefinitionError(this, "Invalid field definition");
+    }
   }
 
   async validateValue(recordObject: any, context: any) {
     const value = recordObject[this.getName()];
     const fieldType = this.getFieldType();
-    if (!fieldType.getDataType().validate(value))
+    if (!fieldType.getDataType().validate(value)) {
       throw new FieldValidationError(
         this.getDefinition(),
         value,
-        'NOT_VALID_TYPE'
+        "NOT_VALID_TYPE",
       );
+    }
     try {
       await fieldType.validateValue(
         this.#schema,
         this.getName(),
         recordObject,
-        context
+        context,
       );
     } catch (err: any) {
       throw new FieldValidationError(this.getDefinition(), value, err.message);

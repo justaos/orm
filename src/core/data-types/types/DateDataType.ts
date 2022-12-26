@@ -1,9 +1,9 @@
-import DataType from '../DataType.ts';
+import DataType from "../DataType.ts";
 
 export default class DateDataType implements DataType {
   validate(value: any): boolean {
     return (
-      typeof value === 'undefined' || value === null || value instanceof Date
+      typeof value === "undefined" || value === null || value instanceof Date
     );
   }
 

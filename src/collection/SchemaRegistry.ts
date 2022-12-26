@@ -1,4 +1,4 @@
-import Schema from './Schema.ts';
+import Schema from "./Schema.ts";
 
 export default class SchemaRegistry {
   schemas: Map<string, Schema> = new Map<string, Schema>();

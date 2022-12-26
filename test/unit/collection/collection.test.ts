@@ -1,17 +1,24 @@
-import { afterAll, assert, beforeAll, describe, it, assertEquals } from '../../test.deps.ts';
+import {
+  afterAll,
+  assert,
+  assertEquals,
+  beforeAll,
+  describe,
+  it,
+} from "../../test.deps.ts";
 
-import { ODM, Record } from '../../../mod.ts';
-import { Session } from '../../test.utils.ts';
+import { ODM, Record } from "../../../mod.ts";
+import { Session } from "../../test.utils.ts";
 
 describe({
-  name: 'Collection',
+  name: "Collection",
   sanitizeResources: false,
   sanitizeOps: false,
   fn: () => {
     let odm: ODM;
     let johnRecord: Record;
     let johnObject;
-    const EMPLOYEE_MODEL_NAME = 'employee';
+    const EMPLOYEE_MODEL_NAME = "employee";
 
     beforeAll(async () => {
       odm = await Session.getODMByForce();
@@ -20,45 +27,45 @@ describe({
         name: EMPLOYEE_MODEL_NAME,
         fields: [
           {
-            name: 'name',
-            type: 'string',
-            unique: true
+            name: "name",
+            type: "string",
+            unique: true,
           },
           {
-            name: 'emp_no',
-            type: 'objectId'
+            name: "emp_no",
+            type: "objectId",
           },
           {
-            name: 'salary',
+            name: "salary",
             maximum: 10000,
-            type: 'integer'
+            type: "integer",
           },
           {
-            name: 'birth_date',
-            type: 'date'
+            name: "birth_date",
+            type: "date",
           },
           {
-            name: 'created_on',
-            type: 'datetime'
+            name: "created_on",
+            type: "datetime",
           },
           {
-            name: 'gender',
-            type: 'boolean'
+            name: "gender",
+            type: "boolean",
           },
           {
-            name: 'dynamic',
-            type: 'any',
-            default_value: 100
+            name: "dynamic",
+            type: "any",
+            default_value: 100,
           },
           {
-            name: 'address',
-            type: 'object'
+            name: "address",
+            type: "object",
           },
           {
-            name: 'rating',
-            type: 'number'
-          }
-        ]
+            name: "rating",
+            type: "number",
+          },
+        ],
       });
     });
 
@@ -66,75 +73,73 @@ describe({
       await Session.getODM().closeConnection();
     });
 
-    it('#Collection::getCollectionName', function() {
+    it("#Collection::getCollectionName", function () {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       assert(
         employeeCollection.getName() === EMPLOYEE_MODEL_NAME,
-        'Invalid collection-service name'
+        "Invalid collection-service name",
       );
     });
 
     /**
      * CREATE
      */
-    it('#Collection::insert', async () => {
+    it("#Collection::insert", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const empRecord = employeeCollection.createNewRecord();
       const empId = empRecord.getID();
-      empRecord.set('name', 'John');
-      empRecord.set('emp_no', odm.generateObjectId());
-      empRecord.set('birth_date', new Date());
-      empRecord.set('created_on', new Date());
-      empRecord.set('gender', true);
-      empRecord.set('salary', 5000);
-      empRecord.set('rating', 4.5);
-      empRecord.set('address', {
-        street: 'test',
-        zipcode: 500000
+      empRecord.set("name", "John");
+      empRecord.set("emp_no", odm.generateObjectId());
+      empRecord.set("birth_date", new Date());
+      empRecord.set("created_on", new Date());
+      empRecord.set("gender", true);
+      empRecord.set("salary", 5000);
+      empRecord.set("rating", 4.5);
+      empRecord.set("address", {
+        street: "test",
+        zipcode: 500000,
       });
       const rec = await empRecord.insert();
 
       johnRecord = rec;
       johnObject = rec.toObject();
       assert(
-        johnObject._id + '' === empId,
-        '_id is expected to be same as initialized value'
+        johnObject._id + "" === empId,
+        "_id is expected to be same as initialized value",
       );
-      assert(johnObject.name === 'John', 'name is expected to be John');
-      assert(johnObject.dynamic === 100, 'default is expected to be 100');
-
+      assert(johnObject.name === "John", "name is expected to be John");
+      assert(johnObject.dynamic === 100, "default is expected to be 100");
     });
 
-    it('#Collection::insert unique error', async () => {
+    it("#Collection::insert unique error", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const empRecord = employeeCollection.createNewRecord();
-      empRecord.set('name', 'John');
+      empRecord.set("name", "John");
       try {
         await empRecord.insert();
-        assert(false, 'duplicate key error expected');
+        assert(false, "duplicate key error expected");
       } catch (error) {
-        assert(true, 'duplicate key error');
+        assert(true, "duplicate key error");
       }
     });
 
     /**
      * UPDATE
      */
-    it('#Collection::update', async () => {
-      johnRecord.set('salary', 200);
+    it("#Collection::update", async () => {
+      johnRecord.set("salary", 200);
       try {
         const rec = await johnRecord.update();
-        assert(rec.get('salary') === 200, 'record not updated');
+        assert(rec.get("salary") === 200, "record not updated");
       } catch (error) {
-        assert(false, 'duplicate key error');
+        assert(false, "duplicate key error");
       }
     });
-
 
     /**
      * READ
      */
-    it('#Collection::find', async () => {
+    it("#Collection::find", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const employees: Record[] = await employeeCollection
         .find()
@@ -142,30 +147,28 @@ describe({
       assertEquals(employees.length, 1);
     });
 
-
-    it('#Collection::findById ObjectId', async () => {
+    it("#Collection::findById ObjectId", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const employee: Record | undefined = await employeeCollection
-        .findById(johnRecord.get('_id'));
-      assert(!!employee && employee.get('name') === 'John');
+        .findById(johnRecord.get("_id"));
+      assert(!!employee && employee.get("name") === "John");
     });
 
-    it('#Collection::findById string', async () => {
+    it("#Collection::findById string", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const employee: Record | undefined = await employeeCollection
         .findById(johnRecord.getID());
-      assert(!!employee && employee.get('name') === 'John');
+      assert(!!employee && employee.get("name") === "John");
     });
 
-    it('#Collection::findOne', async () => {
+    it("#Collection::findOne", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const employee: Record | undefined = await employeeCollection
-        .findOne({ name: 'John' });
+        .findOne({ name: "John" });
       assert(!!employee && employee.getID() === johnRecord.getID());
     });
 
-    it('#Record::delete', async () => {
-
+    it("#Record::delete", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       await johnRecord.delete();
       const employee: Record | undefined = await employeeCollection
@@ -173,34 +176,33 @@ describe({
       assert(!employee);
     });
 
-
     /**
      * SORT
      */
-    it('#Collection::Cursor::sort', async () => {
+    it("#Collection::Cursor::sort", async () => {
       odm.defineCollection({
-        name: 'sort_test',
+        name: "sort_test",
         fields: [
           {
-            name: 'number',
-            type: 'integer'
-          }
-        ]
+            name: "number",
+            type: "integer",
+          },
+        ],
       });
-      const sortCollection = odm.collection('sort_test');
+      const sortCollection = odm.collection("sort_test");
       let rec = sortCollection.createNewRecord();
-      rec.set('number', 2);
+      rec.set("number", 2);
       await rec.insert();
       rec = sortCollection.createNewRecord();
-      rec.set('number', 1);
+      rec.set("number", 1);
       await rec.insert();
       const recs: Record[] = await sortCollection
         .find({})
-        .sort([['number', 1]])
+        .sort([["number", 1]])
         .toArray();
       let expected = 1;
-      recs.forEach(function(rec: Record) {
-        assert(rec.get('number') == expected, 'Not expected value');
+      recs.forEach(function (rec: Record) {
+        assert(rec.get("number") == expected, "Not expected value");
         expected++;
       });
     });
@@ -254,6 +256,5 @@ describe({
           });
       });
     });*/
-  }
+  },
 });
-

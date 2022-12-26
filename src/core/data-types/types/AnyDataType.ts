@@ -1,4 +1,4 @@
-import DataType from '../DataType.ts';
+import DataType from "../DataType.ts";
 
 export default class AnyDataType implements DataType {
   validate(_value: any): boolean {

@@ -7,7 +7,7 @@ export default class FieldValidationError extends Error {
 
   constructor(fieldDefinition: string, value: string, code: string) {
     super(`FieldValidationError: ${fieldDefinition} ${value} ${code}`);
-    this.name = 'FieldValidationError';
+    this.name = "FieldValidationError";
     this.#fieldDefinition = fieldDefinition;
     this.#value = value;
     this.#code = code;

@@ -1,11 +1,11 @@
-import DataType from '../DataType.ts';
+import DataType from "../DataType.ts";
 
 export default class ObjectDataType implements DataType {
   validate(value: any): boolean {
     return (
-      typeof value === 'undefined' ||
+      typeof value === "undefined" ||
       value === null ||
-      typeof value === 'object'
+      typeof value === "object"
     );
   }
 

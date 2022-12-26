@@ -1,6 +1,6 @@
-import { mongodb } from '../../deps.ts';
-import Collection from '../collection/Collection.ts';
-import Field from '../collection/Field.ts';
+import { mongodb } from "../../deps.ts";
+import Collection from "../collection/Collection.ts";
+import Field from "../collection/Field.ts";
 
 export default class Record {
   #isNew = false;
@@ -11,7 +11,7 @@ export default class Record {
 
   constructor(record: any, collection: Collection) {
     this.#collection = collection;
-    if (typeof record !== 'undefined') {
+    if (typeof record !== "undefined") {
       this.#record = {};
       for (const key of Object.keys(record)) this.set(key, record[key]);
     }
@@ -25,8 +25,8 @@ export default class Record {
       .map((field: Field) => {
         this.set(field.getName(), field.getDefaultValue());
       });
-    this.#record['_id'] = new mongodb.ObjectId();
-    this.#record['_collection'] = this.#collection.getName();
+    this.#record["_id"] = new mongodb.ObjectId();
+    this.#record["_collection"] = this.#collection.getName();
     this.#isNew = true;
     return this;
   }
@@ -40,21 +40,22 @@ export default class Record {
   }
 
   getID(): string {
-    return this.get('_id').toString();
+    return this.get("_id").toString();
   }
 
   set(key: string, value: any): void {
     const schema = this.#collection.getSchema();
     const field = schema.getField(key);
-    if (field)
+    if (field) {
       this.#record[key] = field
         .getFieldType()
         .setValueIntercept(
           this.#collection.getSchema(),
           key,
           value,
-          this.#record
+          this.#record,
         );
+    }
   }
 
   get(key: string): any {
@@ -71,7 +72,7 @@ export default class Record {
         schema,
         key,
         this.#record,
-        this.#collection.getContext()
+        this.#collection.getContext(),
       );
   }
 
@@ -90,8 +91,9 @@ export default class Record {
   }
 
   async delete(): Promise<Record> {
-    if (this.#isNew)
-      throw Error('[Record::remove] Cannot remove unsaved record');
+    if (this.#isNew) {
+      throw Error("[Record::remove] Cannot remove unsaved record");
+    }
     await this.#collection.deleteOne(this);
     return this;
   }

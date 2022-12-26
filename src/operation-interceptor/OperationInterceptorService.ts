@@ -1,6 +1,6 @@
-import OperationInterceptorInterface from './OperationInterceptor.interface.ts';
-import Record from '../record/Record.ts';
-import { OperationType, OperationWhen } from '../constants.ts';
+import OperationInterceptorInterface from "./OperationInterceptor.interface.ts";
+import Record from "../record/Record.ts";
+import { OperationType, OperationWhen } from "../constants.ts";
 
 export default class OperationInterceptorService {
   #interceptors: Map<string, OperationInterceptorInterface>;
@@ -12,7 +12,7 @@ export default class OperationInterceptorService {
   addInterceptor = (operationInterceptor: OperationInterceptorInterface) =>
     this.#interceptors.set(
       operationInterceptor.getName(),
-      operationInterceptor
+      operationInterceptor,
     );
 
   deleteInterceptor = (name: string) => this.#interceptors.delete(name);
@@ -38,13 +38,13 @@ export default class OperationInterceptorService {
     when: OperationWhen,
     records: Record[],
     context: any,
-    disabledIntercepts: boolean | string[]
+    disabledIntercepts: boolean | string[],
   ): Promise<Record[]> {
     if (disabledIntercepts === true) {
       return records;
     }
-    if (this.hasInterceptors())
-      for (const interceptor of this.#getSortedIntercepts())
+    if (this.hasInterceptors()) {
+      for (const interceptor of this.#getSortedIntercepts()) {
         if (
           !disabledIntercepts ||
           !disabledIntercepts.includes(interceptor.getName())
@@ -54,10 +54,12 @@ export default class OperationInterceptorService {
             operation,
             when,
             records,
-            context
+            context,
           );
           if (!records) break;
         }
+      }
+    }
     return records;
   }
 }

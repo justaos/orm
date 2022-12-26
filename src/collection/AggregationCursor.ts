@@ -1,8 +1,6 @@
-import { mongodb } from '../../deps.ts';
+import { mongodb } from "../../deps.ts";
 
-
-
-import Collection from './Collection.ts';
+import Collection from "./Collection.ts";
 
 export default class AggregationCursor {
   readonly #cursor: mongodb.AggregationCursor;

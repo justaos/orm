@@ -1,3 +1,3 @@
-import { mongodb } from '../../deps.ts';
+import { mongodb } from "../../deps.ts";
 
 export default class ObjectId extends mongodb.ObjectId {}

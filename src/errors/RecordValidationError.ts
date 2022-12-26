@@ -1,4 +1,4 @@
-import FieldValidationError from './FieldValidationError.ts';
+import FieldValidationError from "./FieldValidationError.ts";
 
 export default class RecordValidationError extends Error {
   readonly #collectionDefinition: any;
@@ -10,12 +10,12 @@ export default class RecordValidationError extends Error {
   constructor(
     collectionDefinition: any,
     recordId: string | undefined,
-    fieldErrors: any[]
+    fieldErrors: any[],
   ) {
     super(
-      `Record validation error in collection ${collectionDefinition.name} with id ${recordId}`
+      `Record validation error in collection ${collectionDefinition.name} with id ${recordId}`,
     );
-    this.name = 'RecordValidationError';
+    this.name = "RecordValidationError";
     this.#collectionDefinition = collectionDefinition;
     this.#recordId = recordId;
     this.#fieldErrors = fieldErrors;
@@ -29,7 +29,7 @@ export default class RecordValidationError extends Error {
     result.fieldErrors = this.#fieldErrors.map(
       (fieldError: FieldValidationError) => {
         return fieldError.toJSON();
-      }
+      },
     );
     return result;
   }

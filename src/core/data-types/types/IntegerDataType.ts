@@ -1,11 +1,11 @@
-import DataType from '../DataType.ts';
+import DataType from "../DataType.ts";
 
 export default class IntegerDataType implements DataType {
   validate(value: any): boolean {
     return (
-      typeof value === 'undefined' ||
+      typeof value === "undefined" ||
       value === null ||
-      (typeof value === 'number' && Number.isInteger(value))
+      (typeof value === "number" && Number.isInteger(value))
     );
   }
 

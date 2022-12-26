@@ -1,11 +1,11 @@
-import { mongodb } from '../../../../deps.ts';
+import { mongodb } from "../../../../deps.ts";
 
-import DataType from '../DataType.ts';
+import DataType from "../DataType.ts";
 
 export default class ObjectIdDataType implements DataType {
   validate(value: any): boolean {
     return (
-      typeof value === 'undefined' ||
+      typeof value === "undefined" ||
       value === null ||
       value instanceof mongodb.ObjectId
     );

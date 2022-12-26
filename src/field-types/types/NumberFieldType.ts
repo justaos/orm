@@ -1,8 +1,8 @@
-import FieldType from '../FieldType.ts';
-import Schema from '../../collection/Schema.ts';
-import ODM from '../../ODM.ts';
-import FieldTypeUtils from '../FieldTypeUtils.ts';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
+import FieldType from "../FieldType.ts";
+import Schema from "../../collection/Schema.ts";
+import ODM from "../../ODM.ts";
+import FieldTypeUtils from "../FieldTypeUtils.ts";
+import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 
 export default class NumberFieldType extends FieldType {
   constructor(odm: ODM) {
@@ -10,7 +10,7 @@ export default class NumberFieldType extends FieldType {
   }
 
   getName(): string {
-    return 'number';
+    return "number";
   }
 
   validateDefinition(fieldDefinition: any): boolean {
@@ -21,34 +21,36 @@ export default class NumberFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ) {
     FieldTypeUtils.requiredValidation(schema, fieldName, record);
     await FieldTypeUtils.uniqueValidation(
       this.getODM(),
       schema,
       fieldName,
-      record
+      record,
     );
     const fieldDefinition = schema.getField(fieldName)?.getDefinition();
     const value = record[fieldName];
     if (
       !Number.isNaN(fieldDefinition.maximum) &&
       fieldDefinition.maximum > value
-    )
+    ) {
       throw new Error(`should be less than ${fieldDefinition.maximum}`);
+    }
     if (
       !Number.isNaN(fieldDefinition.minimum) &&
       fieldDefinition.minimum > value
-    )
+    ) {
       throw new Error(`should be more than ${fieldDefinition.minimum}`);
+    }
   }
 
   async getDisplayValue(
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ) {
     return this.getDataType().toJSON(record[fieldName]);
   }
@@ -57,7 +59,7 @@ export default class NumberFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     value: any,
-    record: any
+    record: any,
   ): any {
     return value;
   }

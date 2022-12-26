@@ -1,9 +1,9 @@
-import FieldType from '../FieldType.ts';
-import Schema from '../../collection/Schema.ts';
-import ODM from '../../ODM.ts';
-import FieldTypeUtils from '../FieldTypeUtils.ts';
-import { DateUtils } from '../../../deps.ts';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
+import FieldType from "../FieldType.ts";
+import Schema from "../../collection/Schema.ts";
+import ODM from "../../ODM.ts";
+import FieldTypeUtils from "../FieldTypeUtils.ts";
+import { DateUtils } from "../../../deps.ts";
+import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 
 export default class DateTimeFieldType extends FieldType {
   constructor(odm: ODM) {
@@ -11,21 +11,21 @@ export default class DateTimeFieldType extends FieldType {
   }
 
   getName(): string {
-    return 'datetime';
+    return "datetime";
   }
 
   async validateValue(
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ) {
     FieldTypeUtils.requiredValidation(schema, fieldName, record);
     await FieldTypeUtils.uniqueValidation(
       this.getODM(),
       schema,
       fieldName,
-      record
+      record,
     );
   }
 
@@ -37,9 +37,9 @@ export default class DateTimeFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     value: any,
-    record: any
+    record: any,
   ): any {
-    if (typeof value === 'string' && DateUtils.isIsoDate(value)) {
+    if (typeof value === "string" && DateUtils.isIsoDate(value)) {
       return new Date(value);
     }
     return value;
@@ -49,7 +49,7 @@ export default class DateTimeFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     record: any,
-    context: any
+    context: any,
   ) {
     return this.getDataType().toJSON(record[fieldName]);
   }

@@ -1,8 +1,8 @@
-import FieldType from '../FieldType.ts';
-import FieldTypeUtils from '../FieldTypeUtils.ts';
-import ODM from '../../ODM.ts';
-import PrimitiveDataType from '../../core/data-types/PrimitiveDataType.ts';
-import Schema from '../../collection/Schema.ts';
+import FieldType from "../FieldType.ts";
+import FieldTypeUtils from "../FieldTypeUtils.ts";
+import ODM from "../../ODM.ts";
+import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
+import Schema from "../../collection/Schema.ts";
 
 export default class StringFieldType extends FieldType {
   constructor(odm: ODM) {
@@ -10,7 +10,7 @@ export default class StringFieldType extends FieldType {
   }
 
   getName(): string {
-    return 'string';
+    return "string";
   }
 
   validateDefinition(fieldDefinition: any): boolean {
@@ -21,7 +21,7 @@ export default class StringFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     value: any,
-    record: any
+    record: any,
   ): any {
     return value;
   }
@@ -32,7 +32,7 @@ export default class StringFieldType extends FieldType {
       this.getODM(),
       schema,
       fieldName,
-      record
+      record,
     );
   }
 

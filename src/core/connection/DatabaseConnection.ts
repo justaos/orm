@@ -1,9 +1,9 @@
-import { Logger, mongodb } from '../../../deps.ts';
-import DatabaseConfiguration from './databaseConfiguration.ts';
+import { Logger, mongodb } from "../../../deps.ts";
+import DatabaseConfiguration from "./databaseConfiguration.ts";
 
 export default class DatabaseConnection {
   static #logger = Logger.createLogger({
-    label: `ODM :: ${DatabaseConnection.name}`
+    label: `ODM :: ${DatabaseConnection.name}`,
   });
   #conn: mongodb.MongoClient;
   #uri: string;
@@ -14,7 +14,7 @@ export default class DatabaseConnection {
   }
 
   static async connect(
-    dbConfig: DatabaseConfiguration
+    dbConfig: DatabaseConfiguration,
   ): Promise<DatabaseConnection> {
     return await this.connectByUri(dbConfig.getUri());
   }
@@ -22,10 +22,10 @@ export default class DatabaseConnection {
   static async connectByUri(uri: string) {
     try {
       const conn = await this.#createConnectionByUri(uri);
-      DatabaseConnection.#logger.info('mongo db connection open');
+      DatabaseConnection.#logger.info("mongo db connection open");
       return new DatabaseConnection(conn, uri);
     } catch (err: any) {
-      DatabaseConnection.#logger.error(err.message + '');
+      DatabaseConnection.#logger.error(err.message + "");
       throw err;
     }
   }
@@ -42,7 +42,7 @@ export default class DatabaseConnection {
   }
 
   static #createConnectionByUri = async (
-    uri: string
+    uri: string,
   ): Promise<mongodb.MongoClient> => {
     //@ts-ignore
     const client = new mongodb.MongoClient(uri);
@@ -65,21 +65,21 @@ export default class DatabaseConnection {
 
   async databaseExists(): Promise<boolean> {
     // Use the admin database for the operation
-    const adminDb = this.#conn.db('test').admin();
+    const adminDb = this.#conn.db("test").admin();
 
     // List all the available databases
     const dbs = await adminDb.command({ listDatabases: 1 });
     const index = dbs.databases.findIndex(
-      (db: any) => db.name === this.getDatabaseName()
+      (db: any) => db.name === this.getDatabaseName(),
     );
     if (index !== -1) {
       DatabaseConnection.#logger.info(
-        `database "${this.getDatabaseName()}" exists`
+        `database "${this.getDatabaseName()}" exists`,
       );
       return true;
     } else {
       DatabaseConnection.#logger.info(
-        `database "${this.getDatabaseName()}" don't exists`
+        `database "${this.getDatabaseName()}" don't exists`,
       );
       return false;
     }
@@ -89,7 +89,7 @@ export default class DatabaseConnection {
     const dbo = this.getDBO();
     const collections = await dbo.listCollections().toArray();
     collections.forEach((col) => {
-      dbo.command({ dropIndexes: col.name, index: '*' });
+      dbo.command({ dropIndexes: col.name, index: "*" });
     });
   }
 
