@@ -121,6 +121,10 @@ export default class ODM {
     return new mongodb.ObjectId(id);
   }
 
+  isObjectId(value: any): boolean {
+    return mongodb.ObjectId.isValid(value);
+  }
+
   #loadBuildInFieldTypes(): void {
     this.addFieldType(StringFieldType);
     this.addFieldType(IntegerFieldType);

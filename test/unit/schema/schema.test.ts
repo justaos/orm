@@ -8,7 +8,7 @@ import {
 } from "../../test.deps.ts";
 
 import { logger, Session } from "../../test.utils.ts";
-import { ObjectId, ODM, Record } from "../../../mod.ts";
+import { ODM, Record } from "../../../mod.ts";
 
 describe("Schema", {
   sanitizeResources: false,
@@ -163,7 +163,7 @@ describe("Schema", {
   it("#ODM::convertToObjectId", function () {
     const newId = odm.generateObjectId("569ed8269353e9f4c51617aa");
     assert(
-      ObjectId.isValid(newId),
+      odm.isObjectId(newId),
       "Collection should not extend, final schema",
     );
   });
