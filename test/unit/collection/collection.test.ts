@@ -4,7 +4,7 @@ import {
   assertEquals,
   beforeAll,
   describe,
-  it,
+  it
 } from "../../test.deps.ts";
 
 import { ODM, Record } from "../../../mod.ts";
@@ -29,43 +29,43 @@ describe({
           {
             name: "name",
             type: "string",
-            unique: true,
+            unique: true
           },
           {
             name: "emp_no",
-            type: "objectId",
+            type: "objectId"
           },
           {
             name: "salary",
             maximum: 10000,
-            type: "integer",
+            type: "integer"
           },
           {
             name: "birth_date",
-            type: "date",
+            type: "date"
           },
           {
             name: "created_on",
-            type: "datetime",
+            type: "datetime"
           },
           {
             name: "gender",
-            type: "boolean",
+            type: "boolean"
           },
           {
             name: "dynamic",
             type: "any",
-            default_value: 100,
+            default_value: 100
           },
           {
             name: "address",
-            type: "object",
+            type: "object"
           },
           {
             name: "rating",
-            type: "number",
-          },
-        ],
+            type: "number"
+          }
+        ]
       });
     });
 
@@ -77,7 +77,7 @@ describe({
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       assert(
         employeeCollection.getName() === EMPLOYEE_MODEL_NAME,
-        "Invalid collection-service name",
+        "Invalid collection-service name"
       );
     });
 
@@ -97,7 +97,7 @@ describe({
       empRecord.set("rating", 4.5);
       empRecord.set("address", {
         street: "test",
-        zipcode: 500000,
+        zipcode: 500000
       });
       const rec = await empRecord.insert();
 
@@ -105,7 +105,7 @@ describe({
       johnObject = rec.toObject();
       assert(
         johnObject._id + "" === empId,
-        "_id is expected to be same as initialized value",
+        "_id is expected to be same as initialized value"
       );
       assert(johnObject.name === "John", "name is expected to be John");
       assert(johnObject.dynamic === 100, "default is expected to be 100");
@@ -141,38 +141,40 @@ describe({
      */
     it("#Collection::find", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-      const employees: Record[] = await employeeCollection
-        .find()
-        .toArray();
+      const employees: Record[] = await employeeCollection.find().toArray();
       assertEquals(employees.length, 1);
     });
 
     it("#Collection::findById ObjectId", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-      const employee: Record | undefined = await employeeCollection
-        .findById(johnRecord.get("_id"));
+      const employee: Record | undefined = await employeeCollection.findById(
+        johnRecord.get("_id")
+      );
       assert(!!employee && employee.get("name") === "John");
     });
 
     it("#Collection::findById string", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-      const employee: Record | undefined = await employeeCollection
-        .findById(johnRecord.getID());
+      const employee: Record | undefined = await employeeCollection.findById(
+        johnRecord.getID()
+      );
       assert(!!employee && employee.get("name") === "John");
     });
 
     it("#Collection::findOne", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-      const employee: Record | undefined = await employeeCollection
-        .findOne({ name: "John" });
+      const employee: Record | undefined = await employeeCollection.findOne({
+        name: "John"
+      });
       assert(!!employee && employee.getID() === johnRecord.getID());
     });
 
     it("#Record::delete", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       await johnRecord.delete();
-      const employee: Record | undefined = await employeeCollection
-        .findById(johnRecord.getID());
+      const employee: Record | undefined = await employeeCollection.findById(
+        johnRecord.getID()
+      );
       assert(!employee);
     });
 
@@ -185,9 +187,9 @@ describe({
         fields: [
           {
             name: "number",
-            type: "integer",
-          },
-        ],
+            type: "integer"
+          }
+        ]
       });
       const sortCollection = odm.collection("sort_test");
       let rec = sortCollection.createNewRecord();
@@ -207,54 +209,46 @@ describe({
       });
     });
 
-    /*
-    it('#Collection::Cursor::sort 2', async () => {
-      this.timeout(MAX_TIMEOUT);
-      const sortCollection = odm.collection('sort_test');
-      sortCollection
+    it("#Collection::Cursor::sort 2", async () => {
+      const sortCollection = odm.collection("sort_test");
+      const recs: Record[] = await sortCollection
         .find({}, { sort: { number: 1 } })
-        .toArray()
-        .then(function(recs: Record[]) {
-          let expected = 1;
-          recs.forEach(function(rec: Record) {
-            assert( rec.get('number') == expected, 'Not expected value');
-            expected++;
-          });
-          done();
-        });
+        .toArray();
+
+      let expected = 1;
+      recs.forEach(function (rec: Record) {
+        assert(rec.get("number") == expected, "Not expected value");
+        expected++;
+      });
     });
 
-    it('#Collection::Aggregation', async () => {
-      this.timeout(MAX_TIMEOUT);
+    it("#Collection::Aggregation", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-      let empRecord = employeeCollection.createNewRecord();
-      const empId = empRecord.getID();
-      empRecord.set('name', 'John');
-      empRecord.set('emp_no', odm.generateObjectId());
-      empRecord.set('birth_date', new Date().toISOString());
-      empRecord.set('created_on', new Date().toISOString());
-      empRecord.set('gender', true);
-      empRecord.set('salary', 5000);
-      empRecord.set('rating', 4.5);
-      empRecord.set('address', {
-        street: 'test',
+      const empRecord = employeeCollection.createNewRecord();
+      empRecord.set("name", "John");
+      empRecord.set("emp_no", odm.generateObjectId());
+      empRecord.set("birth_date", new Date().toISOString());
+      empRecord.set("created_on", new Date().toISOString());
+      empRecord.set("gender", true);
+      empRecord.set("salary", 5000);
+      empRecord.set("rating", 4.5);
+      empRecord.set("address", {
+        street: "test",
         zipcode: 500000
       });
-      empRecord.insert().then(() => {
-        employeeCollection
-          .aggregate([{
+      await empRecord.insert();
+      const recs: any = await employeeCollection
+        .aggregate([
+          {
             $group: {
-              _id: '$name',
+              _id: "$name",
               count: { $count: {} }
             }
-          }])
-          .toArray()
-          .then(function(recs: any[]) {
-            console.log(recs);
-            assert( recs[0].count == 1, 'Not expected value');
-            done();
-          });
-      });
-    });*/
-  },
+          }
+        ])
+        .toArray();
+      console.log(recs);
+      assert(recs[0].count == 1, "Not expected value");
+    });
+  }
 });

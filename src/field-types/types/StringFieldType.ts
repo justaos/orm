@@ -1,5 +1,4 @@
 import FieldType from "../FieldType.ts";
-import FieldTypeUtils from "../FieldTypeUtils.ts";
 import ODM from "../../ODM.ts";
 import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 import Schema from "../../collection/Schema.ts";
@@ -27,8 +26,8 @@ export default class StringFieldType extends FieldType {
   }
 
   async validateValue(schema: Schema, fieldName: string, record: any) {
-    FieldTypeUtils.requiredValidation(schema, fieldName, record);
-    await FieldTypeUtils.uniqueValidation(
+    FieldType.requiredValidation(schema, fieldName, record);
+    await FieldType.uniqueValidation(
       this.getODM(),
       schema,
       fieldName,
@@ -36,7 +35,9 @@ export default class StringFieldType extends FieldType {
     );
   }
 
-  async getDisplayValue(schema: Schema, fieldName: string, record: any) {
+
+  // deno-lint-ignore require-await
+  async getDisplayValue(_schema: Schema, fieldName: string, record: any) {
     return this.getDataType().toJSON(record[fieldName]);
   }
 }

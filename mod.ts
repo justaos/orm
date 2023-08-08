@@ -8,7 +8,6 @@ import Field from './src/collection/Field.ts';
 
 import Record from './src/record/Record.ts';
 import FieldType from './src/field-types/FieldType.ts';
-import FieldTypeUtils from './src/field-types/FieldTypeUtils.ts';
 import OperationInterceptorInterface from './src/operation-interceptor/OperationInterceptor.interface.ts';
 
 import PrimitiveDataType from './src/core/data-types/PrimitiveDataType.ts';
@@ -28,7 +27,6 @@ export {
   PrimitiveDataType,
   OperationType,
   OperationWhen,
-  FieldTypeUtils,
   AggregationCursor,
   ObjectId
 };

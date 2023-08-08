@@ -1,5 +1,5 @@
 import { Logger, mongodb } from "../../../deps.ts";
-import DatabaseConfiguration from "./databaseConfiguration.ts";
+import DatabaseConfiguration from "./DatabaseConfiguration.ts";
 
 export default class DatabaseConnection {
   static #logger = Logger.createLogger({

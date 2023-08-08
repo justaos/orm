@@ -1,12 +1,6 @@
-import { assert } from "https://deno.land/std@0.135.0/testing/asserts.ts";
-import {
-  afterAll,
-  beforeAll,
-  describe,
-  it,
-} from "https://deno.land/std@0.166.0/testing/bdd.ts";
+import { assert, describe, it } from "./test.deps.ts";
 import { ODM } from "../mod.ts";
-import { MAX_TIMEOUT, Session } from "./test.utils.ts";
+import { Session } from "./test.utils.ts";
 
 describe({
   name: "Initial test setup",
@@ -18,13 +12,13 @@ describe({
 
       try {
         await Session.getODM().connect({
-          "host": "127.0.0.1",
-          "port": "27017",
-          "database": "odm-test-db",
-          "dialect": "mongodb",
+          host: "127.0.0.1",
+          port: "27017",
+          database: "odm-test-db",
+          dialect: "mongodb"
         });
         assert(true, "connection established");
-      } catch (error) {
+      } catch (_error) {
         assert(false, "connection failed");
       }
     });
@@ -42,7 +36,7 @@ describe({
           assert(false, "dropping failed");
         }
       }
-      odm.closeConnection();
+      await odm.closeConnection();
     });
-  },
+  }
 });

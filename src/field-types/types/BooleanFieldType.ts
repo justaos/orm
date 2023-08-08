@@ -1,6 +1,5 @@
 import FieldType from "../FieldType.ts";
 import Schema from "../../collection/Schema.ts";
-import FieldTypeUtils from "../FieldTypeUtils.ts";
 import ODM from "../../ODM.ts";
 import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 
@@ -19,8 +18,8 @@ export default class BooleanFieldType extends FieldType {
     value: any,
     context: any,
   ) {
-    FieldTypeUtils.requiredValidation(schema, fieldName, value);
-    await FieldTypeUtils.uniqueValidation(
+    FieldType.requiredValidation(schema, fieldName, value);
+    await FieldType.uniqueValidation(
       this.getODM(),
       schema,
       fieldName,

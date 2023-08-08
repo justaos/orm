@@ -1,7 +1,6 @@
 import FieldType from "../FieldType.ts";
 import Schema from "../../collection/Schema.ts";
 import ODM from "../../ODM.ts";
-import FieldTypeUtils from "../FieldTypeUtils.ts";
 import { DateUtils } from "../../../deps.ts";
 import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 
@@ -20,8 +19,8 @@ export default class DateTimeFieldType extends FieldType {
     record: any,
     context: any,
   ) {
-    FieldTypeUtils.requiredValidation(schema, fieldName, record);
-    await FieldTypeUtils.uniqueValidation(
+    FieldType.requiredValidation(schema, fieldName, record);
+    await FieldType.uniqueValidation(
       this.getODM(),
       schema,
       fieldName,

@@ -7,7 +7,7 @@ import {
   it,
 } from "../../test.deps.ts";
 
-import DatabaseConfiguration from "../../../src/core/connection/databaseConfiguration.ts";
+import DatabaseConfiguration from "../../../src/core/connection/DatabaseConfiguration.ts";
 import DatabaseConnection from "../../../src/core/connection/DatabaseConnection.ts";
 
 const defaultConfig: any = {
