@@ -1,20 +1,13 @@
-import {
-  afterAll,
-  assert,
-  assertEquals,
-  beforeAll,
-  describe,
-  it,
-} from "../../test.deps.ts";
+import { assert, assertEquals, describe, it } from "../../test.deps.ts";
 
-import DatabaseConfiguration from "../../../src/core/connection/DatabaseConfiguration.ts";
+import { DatabaseConfiguration } from "../../../src/core/connection/DatabaseConfiguration.ts";
 import DatabaseConnection from "../../../src/core/connection/DatabaseConnection.ts";
 
 const defaultConfig: any = {
   host: "127.0.0.1",
-  port: "27017",
+  port: 27017,
   database: "odm-conn-test",
-  dialect: "mongodb",
+  dialect: "mongodb"
 };
 
 describe({
@@ -28,16 +21,8 @@ describe({
         username: "admin",
         password: "admin",
       };
-      let dbConfig = new DatabaseConfiguration(
-        config.host,
-        config.port,
-        config.dialect,
-        config.database,
-        config.username,
-        config.password,
-      );
       assertEquals(
-        dbConfig.getUri(),
+        new DatabaseConfiguration(config).getUri(),
         "mongodb://admin:admin@127.0.0.1:27017/odm-conn-test",
         "Unexpected uri generated",
       );
@@ -47,16 +32,9 @@ describe({
       const config: any = {
         ...defaultConfig,
       };
-      let dbConfig = new DatabaseConfiguration(
-        config.host,
-        config.port,
-        config.dialect,
-        config.database,
-        config.username,
-        config.password,
-      );
+      console.log(new DatabaseConfiguration(config).getUri())
       assertEquals(
-        dbConfig.getUri(),
+        new DatabaseConfiguration(config).getUri(),
         "mongodb://127.0.0.1:27017/odm-conn-test",
         "Unexpected uri generated",
       );
@@ -67,16 +45,8 @@ describe({
         ...defaultConfig,
         database: "",
       };
-      let dbConfig = new DatabaseConfiguration(
-        config.host,
-        config.port,
-        config.dialect,
-        config.database,
-        config.username,
-        config.password,
-      );
       assertEquals(
-        dbConfig.getUri(),
+        new DatabaseConfiguration(config).getUri(),
         "mongodb://127.0.0.1:27017",
         "Unexpected uri generated",
       );
@@ -84,67 +54,47 @@ describe({
 
     it("#DatabaseConfiguration::getUri default params", function () {
       const config: any = {};
-      let dbConfig = new DatabaseConfiguration(
-        config.host,
-        config.port,
-        config.dialect,
-        config.database,
-        config.username,
-        config.password,
-      );
       assertEquals(
-        dbConfig.getUri(),
+        new DatabaseConfiguration(config).getUri(),
         "mongodb://127.0.0.1:27017",
         "Unexpected uri generated",
       );
     });
 
-    let defaultConfigInstance: DatabaseConfiguration;
-
     it("#DatabaseService::connect", async () => {
-      defaultConfigInstance = new DatabaseConfiguration(
-        defaultConfig.host,
-        defaultConfig.port,
-        defaultConfig.dialect,
-        defaultConfig.database,
-        defaultConfig.username,
-        defaultConfig.password,
-      );
 
-      const conn = await DatabaseConnection.connect(defaultConfigInstance);
+      const conn = await DatabaseConnection.connect({
+        ...defaultConfig,
+        port: null,
+        dialect: "mongodb"
+      });
+      await conn.connect();
       if (conn) {
-        conn.closeConnection();
+        await conn.closeConnection();
         assert(true, "connection established");
       } else {
         assert(false, "connection failed");
       }
     });
 
-    /*it('#DatabaseConnection::connect wrong config', async () => {
+    it('#DatabaseConnection::connect wrong config', async () => {
       const config: any = {
         ...defaultConfig,
         port: 80
       };
-      let dbConfig = new DatabaseConfiguration(
-        config.host,
-        config.port,
-        config.dialect,
-        config.database,
-        config.username,
-        config.password,
-        500
-      );
-
       try {
-        await DatabaseConnection.connect(dbConfig);
+        await DatabaseConnection.connect({
+          ...config.host,
+          connectTimeoutMS: 500
+        });
         assert( false, 'connection established');
       } catch (error) {
         assert( true, 'connection failed as expected');
       }
-    });*/
+    });
 
     it("#DatabaseConnection::databaseExists - without database", async () => {
-      const conn = await DatabaseConnection.connect(defaultConfigInstance);
+      const conn = await DatabaseConnection.connect(defaultConfig);
       const value = await conn.databaseExists();
       if (value) {
         assert(false, "Database should not exists");
@@ -155,7 +105,7 @@ describe({
     });
 
     it("#DatabaseConnection::getDBO - create record", async () => {
-      const conn = await DatabaseConnection.connect(defaultConfigInstance);
+      const conn = await DatabaseConnection.connect(defaultConfig);
       const res = await conn
         .getDBO()
         .collection("test")
@@ -165,7 +115,7 @@ describe({
     });
 
     it("#DatabaseService::databaseExists - with database", async () => {
-      const conn = await DatabaseConnection.connect(defaultConfigInstance);
+      const conn = await DatabaseConnection.connect(defaultConfig);
       const value = await conn.databaseExists();
       if (value) {
         assert(true, "Database should not exists");
@@ -177,7 +127,10 @@ describe({
 
     it("#DatabaseService::dropDatabase", async () => {
       try {
-        await DatabaseConnection.dropDatabase(defaultConfigInstance);
+        const dbConnection = await DatabaseConnection.connect(
+          defaultConfig,
+        );
+        await dbConnection.dropDatabase();
         assert(true, "Database dropped successfully");
       } catch (error) {
         assert(false, "Database dropping failed");
@@ -186,7 +139,7 @@ describe({
 
     it("#DatabaseService::closeConnection", async () => {
       const dbConnection = await DatabaseConnection.connect(
-        defaultConfigInstance,
+        defaultConfig,
       );
       dbConnection.closeConnection();
       try {

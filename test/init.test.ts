@@ -13,7 +13,7 @@ describe({
       try {
         await Session.getODM().connect({
           host: "127.0.0.1",
-          port: "27017",
+          port: 27017,
           database: "odm-test-db",
           dialect: "mongodb"
         });

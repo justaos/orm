@@ -8,6 +8,8 @@ import OperationInterceptorInterface from "./operation-interceptor/OperationInte
 
 import Schema from "./collection/Schema.ts";
 
+import { DatabaseConfigurationOptions, DatabaseConnection } from "./core/connection/index.ts";
+
 import FieldType from "./field-types/FieldType.ts";
 import StringFieldType from "./field-types/types/StringFieldType.ts";
 import IntegerFieldType from "./field-types/types/IntegerFieldType.ts";
@@ -18,8 +20,6 @@ import BooleanFieldType from "./field-types/types/BooleanFieldType.ts";
 import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType.ts";
 import DateTimeFieldType from "./field-types/types/DateTimeFieldType.ts";
 import AnyFieldType from "./field-types/types/AnyFieldType.ts";
-import DatabaseConfiguration from "./core/connection/DatabaseConfiguration.ts";
-import DatabaseConnection from "./core/connection/DatabaseConnection.ts";
 import NumberFieldType from "./field-types/types/NumberFieldType.ts";
 import ObjectId from "./record/ObjectId.ts";
 
@@ -34,26 +34,10 @@ export default class ODM {
     this.#loadBuildInFieldTypes();
   }
 
-  async connect(config: any): Promise<void> {
-    if (!config) throw new Error("ODM::connect -> There is no config provided");
-    const dbConfig = new DatabaseConfiguration(
-      config.host,
-      config.port,
-      config.dialect,
-      config.database,
-      config.username,
-      config.password,
-    );
-    const conn = await DatabaseConnection.connect(dbConfig);
-    await conn.deleteAllIndexes();
-    this.#conn = conn;
-  }
-
-  async connectByUri(uri: string): Promise<void> {
-    if (!uri) throw new Error("ODM::connect -> There is no config provided");
-    const conn = await DatabaseConnection.connectByUri(uri);
-    await conn.deleteAllIndexes();
-    this.#conn = conn;
+  async connect(config: string | DatabaseConfigurationOptions): Promise<void> {
+    this.#conn =  new DatabaseConnection(config);
+    await this.#conn.connect();
+    await this.#conn.deleteAllIndexes();
   }
 
   closeConnection(): Promise<void> {

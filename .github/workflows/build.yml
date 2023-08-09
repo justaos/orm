@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    if: ${{startsWith(github.event.head_commit.message, 'WIP') != true}}
 
     services:
       mongodb:
@@ -19,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        deno-version: [ 1.28.1 ]
+        deno-version: [ 1.36.0 ]
 
     steps:
       - uses: actions/checkout@v1

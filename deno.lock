@@ -7,14 +7,14 @@
     "https://deno.land/std@0.166.0/testing/_test_suite.ts": "2d07073d5460a4e3ec50c55ae822cd9bd136926d7363091379947fef9c73c3e4",
     "https://deno.land/std@0.166.0/testing/asserts.ts": "1e340c589853e82e0807629ba31a43c84ebdcdeca910c4a9705715dfdb0f5ce8",
     "https://deno.land/std@0.166.0/testing/bdd.ts": "35060cefd9cc21b414f4d89453b3551a3d52ec50aeff25db432503c5485b2f72",
-    "https://deno.land/x/justaos_utils@1.3.0/common-utils/mod.ts": "ffa40e5103db15c03ae2918476e4157b5588c3b54d21bf691f57b63aafd976f1",
-    "https://deno.land/x/justaos_utils@1.3.0/common-utils/src/CommonUtils.ts": "f685edb8becccf72e86f3369f5834c7519ba05674c302e09c206642362cda7d2",
-    "https://deno.land/x/justaos_utils@1.3.0/date-utils/mod.ts": "ee823c28f2020b1f7ef01ad445e3247fe6c94acbcdd47371ab243d0153838999",
-    "https://deno.land/x/justaos_utils@1.3.0/date-utils/src/DateUtils.ts": "6c62df2b13b370024afc3ef7444e0127c27fd0eddbb1e4369228300b8e16ac20",
-    "https://deno.land/x/justaos_utils@1.3.0/logger-utils/mod.ts": "0d9a93dee503339f86ed555181d53d4131e93abdc6f5903586beee94a2534061",
-    "https://deno.land/x/justaos_utils@1.3.0/logger-utils/src/Logger.ts": "30a38f19e32e324e05d9aa1c3a2294d9d4eca2a986faffbb5b310e3bb6db7ff5",
-    "https://deno.land/x/justaos_utils@1.3.0/logger-utils/src/LoggerLevel.ts": "7233d3b6951ca2dc4c61987f1e2dd481507e9e99f747b77549ee3cbbe0d7e91d",
-    "https://deno.land/x/justaos_utils@1.3.0/logger-utils/src/LoggerOptions.ts": "7dbfa2788d65a0c76b8caf0ae34e35e0a2020cb0d5b9a2ce888bffd13cdc0f0f",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/common-utils/mod.ts": "b03d035ee63087b3a110b303fea3a9069f0299eab6a3db36e324d4b3baf34f26",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/common-utils/src/CommonUtils.ts": "8c04ed0d0348254e11110ec72537a8e9d0c39fd26106e4f0b8def9b7cfdcecb6",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/date-utils/mod.ts": "619ab4509042fbe70263deccfd7733a3fb8162a9da6e6d679761382c58714e77",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/date-utils/src/DateUtils.ts": "9e897dc87efab18a18828b06b2c275142d2b0e1dfce8fdaa593935ebe26b60b2",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts": "d95270ae838412a8c4d934a64c6fa8cd6230af744065ec5d19cc25097af016ec",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/src/Logger.ts": "8d211a8946f89d218493df9827565d01bc59d4f4e3464e22ffca20d76c8b320d",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/src/LoggerLevel.ts": "70504a2e3a3e84f247aae5b5b2266f5d386d29a0218716984517ba45fafa3017",
+    "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/src/LoggerOptions.ts": "3a6cdeade17bf651cf13bd5a8ca9613573f9be19ed20daf6f481ac9cc577a347",
     "https://rymbxfxhuz2ounj2witgbci2f6arhb3gnyiudl22cru23qr4kufq.arweave.net/jhgbluemdOo1OrImYIkaL4ETh2ZuEUGvWhRprcI8VQs/mod.ts": "3be41c02500642bd3559b8ba99a79aa3c95c97cef284f06533dda81aaab0f06c",
     "https://rymbxfxhuz2ounj2witgbci2f6arhb3gnyiudl22cru23qr4kufq.arweave.net/jhgbluemdOo1OrImYIkaL4ETh2ZuEUGvWhRprcI8VQs/src/Houston.ts": "583d1900276b18efb8526f5ab703dafadde74cfcbcb5a06202aa5470741851eb",
     "https://rymbxfxhuz2ounj2witgbci2f6arhb3gnyiudl22cru23qr4kufq.arweave.net/jhgbluemdOo1OrImYIkaL4ETh2ZuEUGvWhRprcI8VQs/src/lib/prefix/Prefix.ts": "657e1bbfba85ce1a713b42c92703561cded50cfc6ccff2c4f3aa4ba550c7e2ef",
@@ -31,8 +31,8 @@
       "mongodb@5.7.0": "mongodb@5.7.0"
     },
     "packages": {
-      "@types/node@20.4.8": {
-        "integrity": "sha512-0mHckf6D2DiIAzh8fM8f3HQCvMKDpK94YQ0DSVkfWTG9BZleYIWudw9cJxX8oCk9bM+vAkDyujDV6dmKHbvQpg==",
+      "@types/node@18.16.19": {
+        "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
         "dependencies": {}
       },
       "@types/webidl-conversions@7.0.0": {
@@ -42,7 +42,7 @@
       "@types/whatwg-url@8.2.2": {
         "integrity": "sha512-FtQu10RWgn3D9U4aazdwIE2yzphmTJREDqNdODHrbrZmmMqI0vMheC/6NE/J1Yveaj8H+ela+YwWTjq5PGmuhA==",
         "dependencies": {
-          "@types/node": "@types/node@20.4.8",
+          "@types/node": "@types/node@18.16.19",
           "@types/webidl-conversions": "@types/webidl-conversions@7.0.0"
         }
       },

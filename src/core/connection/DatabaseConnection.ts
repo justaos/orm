@@ -1,88 +1,81 @@
 import { Logger, mongodb } from "../../../deps.ts";
-import DatabaseConfiguration from "./DatabaseConfiguration.ts";
+import { DatabaseConfiguration, DatabaseConfigurationOptions } from "./DatabaseConfiguration.ts";
 
+/**
+ * A class to handle the connection to the database.
+ * @param configuration A URI string from the user.
+ * @returns A connection object.
+ * example: new DatabaseConnection('mongodb+srv://example-uri');
+ */
 export default class DatabaseConnection {
-  static #logger = Logger.createLogger({
-    label: `ODM :: ${DatabaseConnection.name}`,
-  });
-  #conn: mongodb.MongoClient;
-  #uri: string;
+  readonly #uri: string;
+  #conn: mongodb.MongoClient | null;
+  public connected: boolean;
+  readonly #logger = Logger.createLogger({ label: DatabaseConnection.name });
+  readonly #databaseName: string;
 
-  constructor(conn: mongodb.MongoClient, uri: string) {
-    this.#conn = conn;
-    this.#uri = uri;
-  }
-
-  static async connect(
-    dbConfig: DatabaseConfiguration,
-  ): Promise<DatabaseConnection> {
-    return await this.connectByUri(dbConfig.getUri());
-  }
-
-  static async connectByUri(uri: string) {
-    try {
-      const conn = await this.#createConnectionByUri(uri);
-      DatabaseConnection.#logger.info("mongo db connection open");
-      return new DatabaseConnection(conn, uri);
-    } catch (err: any) {
-      DatabaseConnection.#logger.error(err.message + "");
-      throw err;
+  constructor(configuration: string | DatabaseConfigurationOptions) {
+    this.connected = false;
+    this.#conn = null;
+    if (typeof configuration === "string") {
+      this.#uri = configuration;
+      this.#databaseName = new URL(configuration).pathname.substring(1);
+    } else if (typeof configuration === "object") {
+      this.#uri = new DatabaseConfiguration(configuration).getUri();
+      this.#databaseName = configuration.database;
+    } else {
+      throw new Error("Invalid database configuration");
     }
   }
 
-  static async dropDatabase(dbConfig: DatabaseConfiguration): Promise<void> {
-    const c = await DatabaseConnection.connect(dbConfig);
+  async connect() {
     try {
-      await c.dropDatabase();
-      await c.closeConnection();
+      const client = new mongodb.MongoClient(this.#uri);
+      await client.connect();
+      this.#logger.info("Database connection established successfully");
+      this.connected = true;
+      this.#conn = client;
     } catch (err) {
-      await c.closeConnection();
+      this.#logger.error(err.message);
       throw err;
     }
   }
 
-  static #createConnectionByUri = async (
-    uri: string,
-  ): Promise<mongodb.MongoClient> => {
-    //@ts-ignore
-    const client = new mongodb.MongoClient(uri);
-    //@ts-ignore
-    await client.connect();
-    return client;
-  };
+  static async connect(configuration: DatabaseConfigurationOptions) {
+    const conn = new DatabaseConnection(configuration);
+    await conn.connect();
+    return conn;
+  }
 
   async dropDatabase(): Promise<boolean> {
-    return this.getDBO().dropDatabase();
+    return await this.getDBO().dropDatabase();
+  }
+
+  #getConnection(): mongodb.MongoClient {
+    if (!this.#conn) {
+      throw new Error("Database connection not established");
+    }
+    return this.#conn;
   }
 
   getDBO(): mongodb.Db {
-    return this.#conn.db(this.getDatabaseName());
+    return this.#getConnection().db(this.#databaseName);
   }
 
   getDatabaseName(): string {
-    return new URL(this.#uri).pathname.substring(1);
+    return this.#databaseName;
   }
 
   async databaseExists(): Promise<boolean> {
     // Use the admin database for the operation
-    const adminDb = this.#conn.db("test").admin();
+    const adminDb = this.#getConnection().db("test").admin();
 
     // List all the available databases
     const dbs = await adminDb.command({ listDatabases: 1 });
     const index = dbs.databases.findIndex(
-      (db: any) => db.name === this.getDatabaseName(),
+      (db: any) => db.name === this.#databaseName
     );
-    if (index !== -1) {
-      DatabaseConnection.#logger.info(
-        `database "${this.getDatabaseName()}" exists`,
-      );
-      return true;
-    } else {
-      DatabaseConnection.#logger.info(
-        `database "${this.getDatabaseName()}" don't exists`,
-      );
-      return false;
-    }
+    return index !== -1;
   }
 
   async deleteAllIndexes() {
@@ -94,6 +87,9 @@ export default class DatabaseConnection {
   }
 
   closeConnection(): Promise<void> {
+    if (!this.#conn) {
+      throw new Error(`No connection established to disconnect.`);
+    }
     return this.#conn.close();
   }
 }
