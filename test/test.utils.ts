@@ -34,7 +34,7 @@ class Session {
 const MAX_TIMEOUT = 10000;
 const logger = Logger.createLogger({
   label: "test",
-  filePath: "./test/test.log",
+  //filePath: "./test/test.log", cannot be used in github actions
 });
 
 export { logger, MAX_TIMEOUT, Session };
