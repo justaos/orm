@@ -7,9 +7,9 @@ odm.defineCollection({
   fields: [
     {
       name: "name",
-      type: "string",
-    },
-  ],
+      type: "string"
+    }
+  ]
 });
 
 const animalCol = odm.collection("animal");
@@ -24,9 +24,9 @@ odm.defineCollection({
   fields: [
     {
       name: "breed",
-      type: "string",
-    },
-  ],
+      type: "string"
+    }
+  ]
 });
 
 const dogCol = odm.collection("dog");
@@ -35,12 +35,9 @@ husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
 await husky.insert();
 
-animalCol
-  .find({})
-  .toArray()
-  .then(function (animals) {
-    animals.forEach((animal) => {
-      console.log(animal.toObject());
-    });
-    odm.closeConnection();
-  });
+const animals = await animalCol.find({}).toArray();
+
+animals.forEach((animal) => {
+  console.log(animal.toObject());
+});
+await odm.closeConnection();

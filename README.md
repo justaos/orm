@@ -14,44 +14,29 @@ import {ODM} from 'https://deno.land/x/justaos_odm@4.4.3/mod.ts';
 ```
 
 
-## Establishing database connection
+## Database connection
 ```ts
-import { ODM } from "../mod.ts";
-
 const odm = new ODM();
 
-const config = {
-  host: "127.0.0.1",
-  port: "27017",
-  database: "anysols-collection-service",
-  dialect: "mongodb"
-};
-
 try {
-  const output = await odm.connect(config);
+  await odm.connect("mongodb://127.0.0.1:27017/collection-service");
   console.log("connection success");
-  odm.databaseExists().then(
-    () => {
-      console.log("db exists");
-      odm.closeConnection();
-    },
-    () => {
-      console.log("db does not exists");
-      odm.closeConnection();
-    }
-  );
-} catch (e) {
-  console.log("connection failed");
-  odm.closeConnection();
-}
+  const isDbExists = await odm.databaseExists();
 
+  if (isDbExists) {
+    console.log("db exists");
+  } else {
+    console.log("db does not exists");
+  }
+} catch (_error) {
+  console.log("connection failed");
+} finally {
+  await odm.closeConnection();
+}
 ```
 
 ## Querying
 ```ts
-import getODM from "./getODM.ts";
-
-const odm = await getODM();
 odm.defineCollection({
   name: "teacher",
   fields: [

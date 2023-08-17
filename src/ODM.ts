@@ -8,7 +8,10 @@ import OperationInterceptorInterface from "./operation-interceptor/OperationInte
 
 import Schema from "./collection/Schema.ts";
 
-import { DatabaseConfigurationOptions, DatabaseConnection } from "./core/connection/index.ts";
+import {
+  DatabaseConfigurationOptions,
+  DatabaseConnection
+} from "./core/connection/index.ts";
 
 import FieldType from "./field-types/FieldType.ts";
 import StringFieldType from "./field-types/types/StringFieldType.ts";
@@ -35,9 +38,8 @@ export default class ODM {
   }
 
   async connect(config: string | DatabaseConfigurationOptions): Promise<void> {
-    this.#conn =  new DatabaseConnection(config);
+    this.#conn = new DatabaseConnection(config);
     await this.#conn.connect();
-    await this.#conn.deleteAllIndexes();
   }
 
   closeConnection(): Promise<void> {
@@ -59,15 +61,14 @@ export default class ODM {
     const schema = new Schema(
       schemaJson,
       this.#fieldTypeRegistry,
-      this.#schemaRegistry,
+      this.#schemaRegistry
     );
     this.#schemaRegistry.addSchema(schema);
   }
 
   collection(collectionName: string, context?: any): Collection {
-    const schema: Schema | undefined = this.#schemaRegistry.getSchema(
-      collectionName,
-    );
+    const schema: Schema | undefined =
+      this.#schemaRegistry.getSchema(collectionName);
     if (schema === undefined) {
       throw Error(`Collection with name '${collectionName}' is not defined`);
     }
@@ -75,7 +76,7 @@ export default class ODM {
       this.#getConnection().getDBO().collection(schema.getBaseName()),
       schema,
       this.#operationInterceptorService,
-      context,
+      context
     );
   }
 
@@ -97,7 +98,7 @@ export default class ODM {
 
   deleteInterceptor(operationInterceptorName: string): void {
     this.#operationInterceptorService.deleteInterceptor(
-      operationInterceptorName,
+      operationInterceptorName
     );
   }
 

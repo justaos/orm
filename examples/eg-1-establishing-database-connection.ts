@@ -2,27 +2,18 @@ import { ODM } from "../mod.ts";
 
 const odm = new ODM();
 
-const config = {
-  host: "127.0.0.1",
-  port: "27017",
-  database: "anysols-collection-service",
-  dialect: "mongodb",
-};
-
 try {
-  const output = await odm.connect(config);
+  await odm.connect("mongodb://127.0.0.1:27017/collection-service");
   console.log("connection success");
-  odm.databaseExists().then(
-    () => {
-      console.log("db exists");
-      odm.closeConnection();
-    },
-    () => {
-      console.log("db does not exists");
-      odm.closeConnection();
-    },
-  );
-} catch (e) {
+  const isDbExists = await odm.databaseExists();
+
+  if (isDbExists) {
+    console.log("db exists");
+  } else {
+    console.log("db does not exists");
+  }
+} catch (_error) {
   console.log("connection failed");
-  odm.closeConnection();
+} finally {
+  await odm.closeConnection();
 }
