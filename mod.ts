@@ -1,6 +1,6 @@
 import ODM from "./src/ODM.ts";
-import { DatabaseConfigurationOptions } from "./src/core/connection/index.ts";
-import FindCursor from "./src/collection/FindCursor.ts";
+
+/*import FindCursor from "./src/collection/FindCursor.ts";
 import AggregationCursor from "./src/collection/AggregationCursor.ts";
 import Schema from "./src/collection/Schema.ts";
 import Collection from "./src/collection/Collection.ts";
@@ -13,11 +13,11 @@ import OperationInterceptorInterface from "./src/operation-interceptor/Operation
 import PrimitiveDataType from "./src/core/data-types/PrimitiveDataType.ts";
 
 import { OperationType, OperationWhen } from "./src/constants.ts";
-import ObjectId from "./src/record/ObjectId.ts";
+import ObjectId from "./src/record/ObjectId.ts";*/
 
 export {
   ODM,
-  Collection,
+  /*Collection,
   Record,
   FindCursor,
   Schema,
@@ -28,8 +28,7 @@ export {
   OperationType,
   OperationWhen,
   AggregationCursor,
-  ObjectId
+  ObjectId*/
 };
 
-export type { Sort, SortDirection } from "./src/collection/Sort.ts";
-export type { DatabaseConfigurationOptions };
+export type { DatabaseConfigurationOptions } from "./src/core/connection/index.ts";

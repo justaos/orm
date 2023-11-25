@@ -1,13 +1,6 @@
-import {
-  afterAll,
-  assert,
-  assertEquals,
-  beforeAll,
-  describe,
-  it
-} from "../../test.deps.ts";
+import { afterAll, beforeAll, describe, it } from "../../test.deps.ts";
 
-import { ODM, Record } from "../../../mod.ts";
+import { ODM } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
 
 describe({
@@ -16,13 +9,32 @@ describe({
   sanitizeOps: false,
   fn: () => {
     let odm: ODM;
-    let johnRecord: Record;
-    let johnObject;
+    //let johnRecord: Record;
+    // let johnObject;
     const EMPLOYEE_MODEL_NAME = "employee";
 
     beforeAll(async () => {
       odm = await Session.getODMByForce();
+    });
 
+    afterAll(async () => {
+      await Session.getODM().closeConnection();
+    });
+
+    it("#defineCollection simple", function () {
+      odm.defineCollection({
+        name: "table_with_string_field",
+        fields: [
+          {
+            name: "name",
+            type: "string",
+            unique: true
+          }
+        ]
+      });
+    });
+
+    /* it("#defineCollection with different field types", function () {
       odm.defineCollection({
         name: EMPLOYEE_MODEL_NAME,
         fields: [
@@ -67,13 +79,9 @@ describe({
           }
         ]
       });
-    });
+    });*/
 
-    afterAll(async () => {
-      await Session.getODM().closeConnection();
-    });
-
-    it("#Collection::getCollectionName", function () {
+    /*it("#Collection::getCollectionName", function () {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       assert(
         employeeCollection.getName() === EMPLOYEE_MODEL_NAME,
@@ -81,9 +89,9 @@ describe({
       );
     });
 
-    /**
+    /!**
      * CREATE
-     */
+     *!/
     it("#Collection::insert", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const empRecord = employeeCollection.createNewRecord();
@@ -123,9 +131,9 @@ describe({
       }
     });
 
-    /**
+    /!**
      * UPDATE
-     */
+     *!/
     it("#Collection::update", async () => {
       johnRecord.set("salary", 200);
       try {
@@ -136,9 +144,9 @@ describe({
       }
     });
 
-    /**
+    /!**
      * READ
-     */
+     *!/
     it("#Collection::find", async () => {
       const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
       const employees: Record[] = await employeeCollection.find().toArray();
@@ -178,9 +186,9 @@ describe({
       assert(!employee);
     });
 
-    /**
+    /!**
      * SORT
-     */
+     *!/
     it("#Collection::Cursor::sort", async () => {
       odm.defineCollection({
         name: "sort_test",
@@ -249,6 +257,6 @@ describe({
         .toArray();
       console.log(recs);
       assert(recs[0].count == 1, "Not expected value");
-    });
+    });*/
   }
 });

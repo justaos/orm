@@ -1,60 +1,69 @@
-import { mongodb } from "../deps.ts";
-
-import Collection from "./collection/Collection.ts";
-import SchemaRegistry from "./collection/SchemaRegistry.ts";
-
+/*
 import OperationInterceptorService from "./operation-interceptor/OperationInterceptorService.ts";
 import OperationInterceptorInterface from "./operation-interceptor/OperationInterceptor.interface.ts";
-
+*/
+import { DatabaseConfigurationOptions, DatabaseConnection } from "./core/connection/index.ts";
+import Registry from "./collection/Registry.ts";
 import Schema from "./collection/Schema.ts";
-
-import {
-  DatabaseConfigurationOptions,
-  DatabaseConnection
-} from "./core/connection/index.ts";
-
+import FileType from "./field-types/FieldType.ts";
 import FieldType from "./field-types/FieldType.ts";
+
 import StringFieldType from "./field-types/types/StringFieldType.ts";
-import IntegerFieldType from "./field-types/types/IntegerFieldType.ts";
+/*import IntegerFieldType from "./field-types/types/IntegerFieldType.ts";
 import DateFieldType from "./field-types/types/DateFieldType.ts";
-import FieldTypeRegistry from "./field-types/FieldTypeRegistry.ts";
+
 import ObjectFieldType from "./field-types/types/ObjectFieldType.ts";
 import BooleanFieldType from "./field-types/types/BooleanFieldType.ts";
 import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType.ts";
 import DateTimeFieldType from "./field-types/types/DateTimeFieldType.ts";
 import AnyFieldType from "./field-types/types/AnyFieldType.ts";
-import NumberFieldType from "./field-types/types/NumberFieldType.ts";
-import ObjectId from "./record/ObjectId.ts";
+import NumberFieldType from "./field-types/types/NumberFieldType.ts";*/
 
 export default class ODM {
   #conn: DatabaseConnection | undefined;
-  #fieldTypeRegistry: FieldTypeRegistry = new FieldTypeRegistry();
-  #schemaRegistry: SchemaRegistry = new SchemaRegistry();
-  #operationInterceptorService: OperationInterceptorService =
-    new OperationInterceptorService();
+  #fieldTypeRegistry: Registry<FileType> = new Registry<FileType>();
+  #schemaRegistry: Registry<Schema> = new Registry<Schema>();
+
+  /*  #operationInterceptorService: OperationInterceptorService =
+      new OperationInterceptorService();*/
 
   constructor() {
     this.#loadBuildInFieldTypes();
   }
 
-  async connect(config: string | DatabaseConfigurationOptions): Promise<void> {
-    this.#conn = new DatabaseConnection(config);
-    await this.#conn.connect();
+  async connect(
+    config: DatabaseConfigurationOptions,
+    createDatabaseIfNotExists?: boolean
+  ): Promise<void> {
+    try {
+      this.#conn = new DatabaseConnection(config);
+      await this.#conn.connect();
+    } catch (error) {
+      if (
+        error.name === "PostgresError" &&
+        error.code === "3D000" &&
+        config.database &&
+        createDatabaseIfNotExists
+      ) {
+        const tempConn = new DatabaseConnection({
+          ...config,
+          database: "postgres"
+        });
+        await tempConn.connect();
+        await tempConn.createDatabase(config.database);
+        await this.connect(config, false);
+      } else {
+        throw error;
+      }
+    }
   }
 
   closeConnection(): Promise<void> {
-    const conn = this.#getConnection();
-    return conn.closeConnection();
-  }
-
-  databaseExists(): Promise<boolean> {
-    const conn = this.#getConnection();
-    return conn.databaseExists();
+    return this.#getConnection().closeConnection();
   }
 
   dropDatabase(): Promise<boolean> {
-    const conn = this.#getConnection();
-    return conn.dropDatabase();
+    return this.#getConnection().dropDatabase();
   }
 
   defineCollection(schemaJson: any): void {
@@ -63,10 +72,10 @@ export default class ODM {
       this.#fieldTypeRegistry,
       this.#schemaRegistry
     );
-    this.#schemaRegistry.addSchema(schema);
+    this.#schemaRegistry.add(schema);
   }
 
-  collection(collectionName: string, context?: any): Collection {
+  /*collection(collectionName: string, context?: any): Collection {
     const schema: Schema | undefined =
       this.#schemaRegistry.getSchema(collectionName);
     if (schema === undefined) {
@@ -78,48 +87,49 @@ export default class ODM {
       this.#operationInterceptorService,
       context
     );
-  }
+  }*/
 
   getSchema(name: string): Schema | undefined {
-    return this.#schemaRegistry.getSchema(name);
+    return this.#schemaRegistry.get(name);
   }
 
   isCollectionDefined(collectionName: string): boolean {
-    return this.#schemaRegistry.hasSchema(collectionName);
+    return this.#schemaRegistry.has(collectionName);
   }
 
   addFieldType(FieldTypeClass: new (odm: ODM) => FieldType): void {
-    this.#fieldTypeRegistry.addFieldType(new FieldTypeClass(this));
+    this.#fieldTypeRegistry.add(new FieldTypeClass(this));
   }
 
-  addInterceptor(operationInterceptor: OperationInterceptorInterface): void {
-    this.#operationInterceptorService.addInterceptor(operationInterceptor);
-  }
+  /* addInterceptor(operationInterceptor: OperationInterceptorInterface): void {
+     this.#operationInterceptorService.addInterceptor(operationInterceptor);
+   }
+ 
+   deleteInterceptor(operationInterceptorName: string): void {
+     this.#operationInterceptorService.deleteInterceptor(
+       operationInterceptorName
+     );
+   }
+ */
 
-  deleteInterceptor(operationInterceptorName: string): void {
-    this.#operationInterceptorService.deleteInterceptor(
-      operationInterceptorName
-    );
-  }
-
-  generateObjectId(id?: string): ObjectId {
+  /* generateObjectId(id?: string): ObjectId {
     return new mongodb.ObjectId(id);
   }
 
   isObjectId(value: any): boolean {
     return mongodb.ObjectId.isValid(value);
-  }
+  }*/
 
   #loadBuildInFieldTypes(): void {
     this.addFieldType(StringFieldType);
-    this.addFieldType(IntegerFieldType);
-    this.addFieldType(NumberFieldType);
-    this.addFieldType(DateFieldType);
-    this.addFieldType(ObjectFieldType);
-    this.addFieldType(BooleanFieldType);
-    this.addFieldType(ObjectIdFieldType);
-    this.addFieldType(DateTimeFieldType);
-    this.addFieldType(AnyFieldType);
+    /* this.addFieldType(IntegerFieldType);
+     this.addFieldType(NumberFieldType);
+     this.addFieldType(DateFieldType);
+     this.addFieldType(ObjectFieldType);
+     this.addFieldType(BooleanFieldType);
+     this.addFieldType(ObjectIdFieldType);
+     this.addFieldType(DateTimeFieldType);
+     this.addFieldType(AnyFieldType);*/
   }
 
   #getConnection(): DatabaseConnection {

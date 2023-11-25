@@ -20,12 +20,16 @@ class Session {
   static async getODMByForce(): Promise<ODM> {
     if (!this.#odm) {
       this.#odm = new ODM();
-      await this.#odm.connect({
-        host: "127.0.0.1",
-        port: 27017,
-        database: "odm-test-db",
-        dialect: "mongodb"
-      });
+      await this.#odm.connect(
+        {
+          hostname: "127.0.0.1",
+          port: 5432,
+          username: "postgres",
+          password: "admin",
+          database: "odm-test-db"
+        },
+        true
+      );
     }
     return this.#odm;
   }

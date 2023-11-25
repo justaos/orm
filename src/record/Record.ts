@@ -1,4 +1,3 @@
-import { mongodb } from "../../deps.ts";
 import Collection from "../collection/Collection.ts";
 import Field from "../collection/Field.ts";
 
@@ -25,7 +24,7 @@ export default class Record {
       .map((field: Field) => {
         this.set(field.getName(), field.getDefaultValue());
       });
-    this.#record["_id"] = new mongodb.ObjectId();
+    this.#record["_id"] = crypto.randomUUID();
     this.#record["_collection"] = this.#collection.getName();
     this.#isNew = true;
     return this;
@@ -53,7 +52,7 @@ export default class Record {
           this.#collection.getSchema(),
           key,
           value,
-          this.#record,
+          this.#record
         );
     }
   }
@@ -72,7 +71,7 @@ export default class Record {
         schema,
         key,
         this.#record,
-        this.#collection.getContext(),
+        this.#collection.getContext()
       );
   }
 

@@ -1,11 +1,11 @@
 import FieldType from "../FieldType.ts";
 import ODM from "../../ODM.ts";
-import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 import Schema from "../../collection/Schema.ts";
+import NativeDataType from "../../core/NativeDataType.ts";
 
 export default class StringFieldType extends FieldType {
   constructor(odm: ODM) {
-    super(odm, PrimitiveDataType.STRING);
+    super(odm, NativeDataType.STRING);
   }
 
   getName(): string {
@@ -20,24 +20,18 @@ export default class StringFieldType extends FieldType {
     schema: Schema,
     fieldName: string,
     value: any,
-    record: any,
+    record: any
   ): any {
     return value;
   }
 
   async validateValue(schema: Schema, fieldName: string, record: any) {
     FieldType.requiredValidation(schema, fieldName, record);
-    await FieldType.uniqueValidation(
-      this.getODM(),
-      schema,
-      fieldName,
-      record,
-    );
+    await FieldType.uniqueValidation(this.getODM(), schema, fieldName, record);
   }
-
 
   // deno-lint-ignore require-await
   async getDisplayValue(_schema: Schema, fieldName: string, record: any) {
-    return this.getDataType().toJSON(record[fieldName]);
+    return record[fieldName];
   }
 }
