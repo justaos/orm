@@ -1,8 +1,8 @@
 import { assert, describe, it } from "../../test.deps.ts";
 import DatabaseConnection from "../../../src/core/connection/DatabaseConnection.ts";
-import { DatabaseConfigurationOptions } from "../../../src/core/connection/index.ts";
+import { DatabaseConfiguration } from "../../../src/core/connection/index.ts";
 
-const defaultConfig: DatabaseConfigurationOptions = {
+const defaultConfig: DatabaseConfiguration = {
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",
@@ -43,7 +43,7 @@ describe({
       }
     });
 
-    /* it("#DatabaseConnection::getDBO - create record", async () => {
+    /* it("#getDBO - create record", async () => {
        const conn = await DatabaseConnection.connect(defaultConfig);
        const res = await conn
          .getDBO()
@@ -53,24 +53,25 @@ describe({
        conn.closeConnection();
      });*/
 
-    it("#DatabaseConnection::isDatabaseExist - without database", async () => {
+    it("#isDatabaseExist - without database", async () => {
       const conn = await DatabaseConnection.connect(defaultConfig);
       const output = await conn.isDatabaseExist("some-random-database");
       assert(!output, "Database should not exists");
       await conn.closeConnection();
     });
 
-    it("#DatabaseConnection::createDatabase", async () => {
+    it("#createDatabase", async () => {
       try {
         const conn = await DatabaseConnection.connect(defaultConfig);
         await conn.createDatabase("odm-created-database");
         await conn.closeConnection();
-      } catch (_error) {
+      } catch (error) {
+        console.log(error);
         assert(false, "Database dropping failed");
       }
     });
 
-    it("#DatabaseConnection::isDatabaseExist - with database", async () => {
+    it("#isDatabaseExist - with database", async () => {
       const conn = await DatabaseConnection.connect(defaultConfig);
       assert(
         await conn.isDatabaseExist("odm-created-database"),
@@ -79,23 +80,25 @@ describe({
       await conn.closeConnection();
     });
 
-    it("#DatabaseConnection::dropDatabase", async () => {
+    it("#dropDatabase", async () => {
       try {
         const dbConnection = await DatabaseConnection.connect({
           ...defaultConfig,
-          database: "odm-created-database"
+          database: ""
         });
-        await dbConnection.dropDatabase();
-      } catch (_error) {
+        await dbConnection.dropDatabase("odm-created-database");
+      } catch (error) {
+        console.log(error);
         assert(false, "Database dropping failed");
       }
     });
 
-    it("#DatabaseConnection::closeConnection", async () => {
+    it("#closeConnection", async () => {
       const dbConnection = await DatabaseConnection.connect(defaultConfig);
       try {
         await dbConnection.closeConnection();
-      } catch (_error) {
+      } catch (error) {
+        console.log(error);
         assert(false, "close connection failed");
       }
     });

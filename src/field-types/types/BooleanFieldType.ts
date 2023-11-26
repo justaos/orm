@@ -1,9 +1,9 @@
-import FieldType from "../FieldType.ts";
-import Schema from "../../collection/Schema.ts";
+import DataType from "../DataType.ts";
+import TableSchema from "../../table/TableSchema.ts";
 import ODM from "../../ODM.ts";
 import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 
-export default class BooleanFieldType extends FieldType {
+export default class BooleanFieldType extends DataType {
   constructor(odm: ODM) {
     super(odm, PrimitiveDataType.BOOLEAN);
   }
@@ -13,33 +13,28 @@ export default class BooleanFieldType extends FieldType {
   }
 
   async validateValue(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     value: any,
-    context: any,
+    context: any
   ) {
-    FieldType.requiredValidation(schema, fieldName, value);
-    await FieldType.uniqueValidation(
-      this.getODM(),
-      schema,
-      fieldName,
-      value,
-    );
+    DataType.requiredValidation(schema, fieldName, value);
+    await DataType.uniqueValidation(this.getODM(), schema, fieldName, value);
   }
 
   validateDefinition(fieldDefinition: any): boolean {
     return !!fieldDefinition.name;
   }
 
-  async getDisplayValue(schema: Schema, fieldName: string, record: any) {
+  async getDisplayValue(schema: TableSchema, fieldName: string, record: any) {
     return this.getDataType().toJSON(record[fieldName]);
   }
 
   setValueIntercept(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     value: any,
-    record: any,
+    record: any
   ): any {
     return value;
   }

@@ -1,10 +1,10 @@
-import FieldType from "../FieldType.ts";
-import Schema from "../../collection/Schema.ts";
+import DataType from "../DataType.ts";
+import TableSchema from "../../table/TableSchema.ts";
 import ODM from "../../ODM.ts";
 import { DateUtils } from "../../../deps.ts";
 import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 
-export default class DateFieldType extends FieldType {
+export default class DateFieldType extends DataType {
   constructor(odm: ODM) {
     super(odm, PrimitiveDataType.DATE);
   }
@@ -14,18 +14,13 @@ export default class DateFieldType extends FieldType {
   }
 
   async validateValue(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     record: any,
-    context: any,
+    context: any
   ) {
-    FieldType.requiredValidation(schema, fieldName, record);
-    await FieldType.uniqueValidation(
-      this.getODM(),
-      schema,
-      fieldName,
-      record,
-    );
+    DataType.requiredValidation(schema, fieldName, record);
+    await DataType.uniqueValidation(this.getODM(), schema, fieldName, record);
   }
 
   validateDefinition(fieldDefinition: any): boolean {
@@ -33,10 +28,10 @@ export default class DateFieldType extends FieldType {
   }
 
   setValueIntercept(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     value: any,
-    record: any,
+    record: any
   ): any {
     if (typeof value === "string" && DateUtils.isIsoDate(value)) {
       const date = new Date(value);
@@ -47,10 +42,10 @@ export default class DateFieldType extends FieldType {
   }
 
   async getDisplayValue(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     record: any,
-    context: any,
+    context: any
   ) {
     return this.getDataType().toJSON(record[fieldName]);
   }

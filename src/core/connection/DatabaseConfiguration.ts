@@ -1,4 +1,4 @@
-export type DatabaseConfigurationOptions = {
+type DatabaseConfiguration = {
   hostname?: string;
   port?: number;
   database?: string;
@@ -6,3 +6,5 @@ export type DatabaseConfigurationOptions = {
   password?: string;
   connect_timeout?: number;
 };
+
+export type { DatabaseConfiguration };

@@ -1,43 +1,35 @@
 import { Logger } from "../deps.ts";
 import { ODM } from "../mod.ts";
+import ODMConnection from "../src/ODMConnection.ts";
 
 class Session {
-  static #odm: undefined | ODM;
+  static #odm: ODM;
 
-  static getODM() {
-    if (!this.#odm) throw new Error("ODM is not initialized");
-    return this.#odm;
-  }
+  static #odmConnection: ODMConnection;
 
-  static hasODM() {
-    return !!this.#odm;
-  }
-
-  static setODM(odm: ODM) {
-    this.#odm = odm;
-  }
-
-  static async getODMByForce(): Promise<ODM> {
+  static async getConnection(
+    forceNewConnection: boolean = false
+  ): Promise<ODMConnection> {
     if (!this.#odm) {
-      this.#odm = new ODM();
-      await this.#odm.connect(
-        {
-          hostname: "127.0.0.1",
-          port: 5432,
-          username: "postgres",
-          password: "admin",
-          database: "odm-test-db"
-        },
-        true
-      );
+      this.#odm = new ODM({
+        hostname: "127.0.0.1",
+        port: 5432,
+        username: "postgres",
+        password: "admin",
+        database: "odm-test-db"
+      });
     }
-    return this.#odm;
+
+    if (forceNewConnection || !this.#odmConnection) {
+      this.#odmConnection = await this.#odm.connect(true);
+    }
+    return this.#odmConnection;
   }
 }
 
 const MAX_TIMEOUT = 10000;
 const logger = Logger.createLogger({
-  label: "test",
+  label: "test"
   //filePath: "./test/test.log", cannot be used in github actions
 });
 

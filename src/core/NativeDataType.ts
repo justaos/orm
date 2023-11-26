@@ -1,11 +1,11 @@
-enum NativeDataType {
-  STRING = "string",
-  NUMBER = "number",
-  INTEGER = "integer",
-  BOOLEAN = "boolean",
-  DATE = "date",
-  JSON = "json",
-  TIMESTAMP = "timestamp"
-}
+type NativeDataType =
+  | "VARCHAR"
+  | "TEXT"
+  | "number"
+  | "integer"
+  | "boolean"
+  | "date"
+  | "json"
+  | "timestamp";
 
-export default NativeDataType;
+export type { NativeDataType };

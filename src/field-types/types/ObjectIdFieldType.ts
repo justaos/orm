@@ -1,12 +1,12 @@
 import { mongodb } from "../../../deps.ts";
 
-import FieldType from "../FieldType.ts";
-import Schema from "../../collection/Schema.ts";
+import DataType from "../DataType.ts";
+import TableSchema from "../../table/TableSchema.ts";
 import ODM from "../../ODM.ts";
 import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
 import ObjectIdDataType from "../../core/data-types/types/ObjectIdDataType.ts";
 
-export default class ObjectIdFieldType extends FieldType {
+export default class ObjectIdFieldType extends DataType {
   constructor(odm: ODM) {
     super(odm, PrimitiveDataType.OBJECT_ID);
   }
@@ -16,18 +16,13 @@ export default class ObjectIdFieldType extends FieldType {
   }
 
   async validateValue(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     record: any,
-    context: any,
+    context: any
   ) {
-    FieldType.requiredValidation(schema, fieldName, record);
-    await FieldType.uniqueValidation(
-      this.getODM(),
-      schema,
-      fieldName,
-      record,
-    );
+    DataType.requiredValidation(schema, fieldName, record);
+    await DataType.uniqueValidation(this.getODM(), schema, fieldName, record);
   }
 
   validateDefinition(fieldDefinition: any): boolean {
@@ -35,19 +30,19 @@ export default class ObjectIdFieldType extends FieldType {
   }
 
   async getDisplayValue(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
-    record: any,
+    record: any
   ): Promise<string | null> {
-    const objectIdType = <ObjectIdDataType> this.getDataType();
+    const objectIdType = <ObjectIdDataType>this.getDataType();
     return objectIdType.toJSON(record[fieldName]);
   }
 
   setValueIntercept(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     value: any,
-    record: any,
+    record: any
   ): mongodb.ObjectId {
     if (typeof value === "string" && mongodb.ObjectId.isValid(value)) {
       return new mongodb.ObjectId(value);

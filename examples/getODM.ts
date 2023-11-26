@@ -1,9 +1,9 @@
-import { DatabaseConfigurationOptions, ODM } from "../mod.ts";
+import { DatabaseConfiguration, ODM } from "../mod.ts";
 
 export default async function () {
   const odm = new ODM();
 
-  const config: DatabaseConfigurationOptions = {
+  const config: DatabaseConfiguration = {
     host: "127.0.0.1",
     port: 27017,
     database: "odm-example-db",

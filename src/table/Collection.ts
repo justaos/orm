@@ -2,24 +2,24 @@ import { mongodb } from "../../deps.ts";
 
 import FindCursor from "./FindCursor.ts";
 import Record from "../record/Record.ts";
-import Schema from "./Schema.ts";
+import TableSchema from "./TableSchema.ts";
 import { OperationType, OperationWhen } from "../constants.ts";
 import AggregationCursor from "./AggregationCursor.ts";
-import OperationInterceptorService from "../operation-interceptor/OperationInterceptorService.ts";
+import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
 
 export default class Collection {
   readonly #collection: mongodb.Collection<any>;
-  readonly #schema: Schema;
+  readonly #schema: TableSchema;
   readonly #context: any;
-  readonly #operationInterceptorService: OperationInterceptorService;
+  readonly #operationInterceptorService: DatabaseOperationInterceptorService;
 
   #disableIntercepts: boolean | string[] = false;
 
   constructor(
     collection: mongodb.Collection,
-    schema: Schema,
-    operationInterceptorService: OperationInterceptorService,
-    context: any,
+    schema: TableSchema,
+    operationInterceptorService: DatabaseOperationInterceptorService,
+    context: any
   ) {
     this.#collection = collection;
     this.#operationInterceptorService = operationInterceptorService;
@@ -35,7 +35,7 @@ export default class Collection {
     return this.getSchema().getName();
   }
 
-  getSchema(): Schema {
+  getSchema(): TableSchema {
     return this.#schema;
   }
 
@@ -66,7 +66,7 @@ export default class Collection {
 
   async findOne(
     filter: any,
-    options?: mongodb.FindOptions<any>,
+    options?: mongodb.FindOptions<any>
   ): Promise<Record | undefined> {
     const schema = this.getSchema();
     if (!filter) filter = {};
@@ -88,19 +88,19 @@ export default class Collection {
     record = await this.#interceptRecord(
       OperationType.CREATE,
       OperationWhen.BEFORE,
-      record,
+      record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
     const response = await this.#collection.insertOne(record.toObject());
     const savedDoc = await this.#collection.findOne(
       { _id: response.insertedId },
-      {},
+      {}
     );
     const savedRecord = new Record(savedDoc, this);
     return await this.#interceptRecord(
       OperationType.CREATE,
       OperationWhen.AFTER,
-      savedRecord,
+      savedRecord
     );
   }
 
@@ -108,17 +108,17 @@ export default class Collection {
     record = await this.#interceptRecord(
       OperationType.UPDATE,
       OperationWhen.BEFORE,
-      record,
+      record
     );
     await this.getSchema().validateRecord(record.toObject(), this.getContext());
     await this.#collection.updateOne(
       { _id: record.get("_id") },
-      { $set: { ...record.toObject() } },
+      { $set: { ...record.toObject() } }
     );
     return await this.#interceptRecord(
       OperationType.UPDATE,
       OperationWhen.AFTER,
-      record,
+      record
     );
   }
 
@@ -131,15 +131,15 @@ export default class Collection {
     record = await this.#interceptRecord(
       OperationType.DELETE,
       OperationWhen.BEFORE,
-      record,
+      record
     );
     const deletedResult = await this.#collection.deleteOne({
-      _id: record.get("_id"),
+      _id: record.get("_id")
     });
     await this.#interceptRecord(
       OperationType.DELETE,
       OperationWhen.AFTER,
-      record,
+      record
     );
     return deletedResult;
   }
@@ -152,7 +152,7 @@ export default class Collection {
   async intercept(
     operation: OperationType,
     when: OperationWhen,
-    records: Record[],
+    records: Record[]
   ): Promise<Record[]> {
     return await this.#operationInterceptorService.intercept(
       this.getName(),
@@ -160,7 +160,7 @@ export default class Collection {
       when,
       records,
       this.#context,
-      this.#disableIntercepts,
+      this.#disableIntercepts
     );
   }
 
@@ -171,18 +171,18 @@ export default class Collection {
   async #interceptRecord(
     operation: OperationType,
     when: OperationWhen,
-    record: Record,
+    record: Record
   ): Promise<Record> {
     const records: Record[] = await this.intercept(operation, when, [record]);
     return records[0];
   }
 
-  #formatFilter(filter: any, schema: Schema): void {
+  #formatFilter(filter: any, schema: TableSchema): void {
     Object.keys(filter).forEach((key) => {
       const field = schema.getField(key);
       if (field && typeof filter[key] !== "object") {
         filter[key] = field
-          .getFieldType()
+          .getColumnType()
           .setValueIntercept(this.getSchema(), key, filter[key], filter);
       }
     });

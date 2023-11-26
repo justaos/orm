@@ -1,4 +1,5 @@
 import DatabaseConnection from "./DatabaseConnection.ts";
-import { DatabaseConfigurationOptions } from "./DatabaseConfiguration.ts";
+import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
 
-export { DatabaseConnection, type DatabaseConfigurationOptions };
+export { DatabaseConnection };
+export type { DatabaseConfiguration };

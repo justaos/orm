@@ -1,7 +1,7 @@
 import Record from "../record/Record.ts";
 import { OperationType, OperationWhen } from "../constants.ts";
 
-export default abstract class OperationInterceptorInterface {
+export default abstract class DatabaseOperationInterceptor {
   #order = 100;
 
   abstract getName(): string;
@@ -19,6 +19,6 @@ export default abstract class OperationInterceptorInterface {
     operation: OperationType,
     when: OperationWhen,
     records: Record[],
-    context: any,
+    context: any
   ): Promise<Record[]>;
 }

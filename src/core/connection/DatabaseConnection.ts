@@ -1,5 +1,5 @@
 import { Logger, postgres } from "../../../deps.ts";
-import { DatabaseConfigurationOptions } from "./DatabaseConfiguration.ts";
+import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
 
 /**
  * A class to handle the connection to the database.
@@ -14,26 +14,28 @@ import { DatabaseConfigurationOptions } from "./DatabaseConfiguration.ts";
  * });
  */
 export default class DatabaseConnection {
-  readonly #config: DatabaseConfigurationOptions;
+  readonly #config: DatabaseConfiguration;
   #sql: any;
   readonly #logger = Logger.createLogger({ label: DatabaseConnection.name });
 
-  constructor(configuration: DatabaseConfigurationOptions) {
+  constructor(configuration: DatabaseConfiguration) {
     this.#config = configuration;
   }
 
-  async connect() {
+  async connect(): Promise<void> {
     try {
-      this.#sql = postgres(this.#config);
+      this.#sql = postgres({ ...this.#config, max: 20 });
       await this.#sql`select 1`;
-      this.#logger.info(`Connected to ${this.#config.database} database successfully`)
+      this.#logger.info(
+        `Connected to ${this.#config.database} database successfully`
+      );
     } catch (err) {
       this.#logger.error(err.message);
       throw err;
     }
   }
 
-  static async connect(configuration: DatabaseConfigurationOptions) {
+  static async connect(configuration: DatabaseConfiguration) {
     const conn = new DatabaseConnection(configuration);
     await conn.connect();
     return conn;
@@ -43,15 +45,11 @@ export default class DatabaseConnection {
      return await this.getDBO().dropDatabase();
    }*/
 
-  #getNativeConnection(): any {
+  getNativeConnection(): any {
     if (!this.#sql) {
       throw new Error("Database connection not established");
     }
     return this.#sql;
-  }
-
-  getNativeConnection(): any {
-    return this.#getNativeConnection();
   }
 
   getDatabaseName(): string | undefined {
@@ -65,25 +63,21 @@ export default class DatabaseConnection {
     return output.exists;
   }
 
-  async createDatabase(databaseName: string): Promise<boolean> {
+  async createDatabase(databaseName: string): Promise<any> {
     if (!databaseName) throw new Error(`No database name provided to create.`);
-    const output =
-      await this.#getNativeConnection()`CREATE DATABASE ${this.#sql(
-        databaseName
-      )}`;
+    const output = await this.getNativeConnection()`CREATE DATABASE ${this.#sql(
+      databaseName
+    )}`;
     this.#logger.info(`Database ${databaseName} created successfully`);
     return output;
   }
 
-  async dropDatabase(): Promise<boolean> {
-    if (!this.getDatabaseName())
-      throw new Error(`No database name provided to drop.`);
-    const output = await this.#getNativeConnection()`DROP DATABASE ${this.#sql(
-      this.getDatabaseName()
+  async dropDatabase(databaseName: string): Promise<any> {
+    if (!databaseName) throw new Error(`No database name provided to drop.`);
+    const output = await this.getNativeConnection()`DROP DATABASE ${this.#sql(
+      databaseName
     )}`;
-    this.#logger.info(
-      `Database ${this.getDatabaseName()} dropped successfully`
-    );
+    this.#logger.info(`Database ${databaseName} dropped successfully`);
     return output;
   }
 

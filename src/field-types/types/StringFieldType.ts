@@ -1,11 +1,10 @@
-import FieldType from "../FieldType.ts";
+import DataType from "../DataType.ts";
 import ODM from "../../ODM.ts";
-import Schema from "../../collection/Schema.ts";
-import NativeDataType from "../../core/NativeDataType.ts";
+import TableSchema from "../../table/TableSchema.ts";
 
-export default class StringFieldType extends FieldType {
+export default class StringFieldType extends DataType {
   constructor(odm: ODM) {
-    super(odm, NativeDataType.STRING);
+    super("VARCHAR");
   }
 
   getName(): string {
@@ -17,7 +16,7 @@ export default class StringFieldType extends FieldType {
   }
 
   setValueIntercept(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     value: any,
     record: any
@@ -25,13 +24,13 @@ export default class StringFieldType extends FieldType {
     return value;
   }
 
-  async validateValue(schema: Schema, fieldName: string, record: any) {
-    FieldType.requiredValidation(schema, fieldName, record);
-    await FieldType.uniqueValidation(this.getODM(), schema, fieldName, record);
+  async validateValue(schema: TableSchema, fieldName: string, record: any) {
+    // DataType.requiredValidation(schema, fieldName, record);
+    // await DataType.uniqueValidation(this.getODM(), schema, fieldName, record);
   }
 
   // deno-lint-ignore require-await
-  async getDisplayValue(_schema: Schema, fieldName: string, record: any) {
+  async getDisplayValue(_schema: TableSchema, fieldName: string, record: any) {
     return record[fieldName];
   }
 }

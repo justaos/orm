@@ -1,13 +1,14 @@
-import NativeDataType from "../core/NativeDataType.ts";
-import Schema from "../collection/Schema.ts";
+import { NativeDataType } from "../core/NativeDataType.ts";
+import TableSchema from "../table/TableSchema.ts";
 
-export default abstract class FieldType {
+export default abstract class DataType {
   category: string[] = [];
   readonly #primitiveDataType: NativeDataType;
 
   protected constructor(primitiveDataType: NativeDataType) {
     this.#primitiveDataType = primitiveDataType;
   }
+
   getNativeType(): NativeDataType {
     return this.#primitiveDataType;
   }
@@ -21,21 +22,21 @@ export default abstract class FieldType {
   abstract validateDefinition(fieldDefinition: any): boolean;
 
   abstract setValueIntercept(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     value: any,
     record: any
   ): any;
 
   abstract validateValue(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     record: any,
     context: any
   ): Promise<any>;
 
   abstract getDisplayValue(
-    schema: Schema,
+    schema: TableSchema,
     fieldName: string,
     record: any,
     context: any

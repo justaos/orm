@@ -5,7 +5,7 @@ import {
   OperationInterceptorInterface,
   OperationType,
   OperationWhen,
-  Record,
+  Record
 } from "../../../mod.ts";
 import { logger, Session } from "../../test.utils.ts";
 
@@ -36,12 +36,12 @@ describe({
             collectionName: string,
             operation: OperationType,
             when: OperationWhen,
-            records: Record[],
+            records: Record[]
           ) {
             if (collectionName === MODEL_NAME) {
               if (operation === OperationType.CREATE) {
                 logger.info(
-                  `[collectionName=${collectionName}] [operation=${operation}] [when=${when}]`,
+                  `[collectionName=${collectionName}] [operation=${operation}] [when=${when}]`
                 );
                 if (when === OperationWhen.BEFORE) {
                   logger.info("before");
@@ -53,7 +53,7 @@ describe({
             }
             return records;
           }
-        })(),
+        })()
       );
 
       odm.defineCollection({
@@ -61,13 +61,13 @@ describe({
         fields: [
           {
             name: "name",
-            type: "string",
+            type: "string"
           },
           {
             name: "computed",
-            type: "string",
-          },
-        ],
+            type: "string"
+          }
+        ]
       });
 
       const interceptTestCollection = odm.collection(MODEL_NAME);
@@ -77,7 +77,7 @@ describe({
         const rec: Record = await s.insert();
         assert(
           rec.get("computed") === "this is computed",
-          "read interceptor not computed the value",
+          "read interceptor not computed the value"
         );
       } catch (err) {
         logger.info(err.message + "");
@@ -94,13 +94,13 @@ describe({
         function (rec: Record) {
           assert(
             rec.get("computed") !== "this is computed",
-            "read interceptor computed the value",
+            "read interceptor computed the value"
           );
         },
         function (err: Error) {
           console.log(err);
-        },
+        }
       );
     });
-  },
+  }
 });

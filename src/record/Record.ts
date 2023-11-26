@@ -1,5 +1,5 @@
-import Collection from "../collection/Collection.ts";
-import Field from "../collection/Field.ts";
+import Collection from "../table/Collection.ts";
+import ColumnSchema from "../table/ColumnSchema.ts";
 
 export default class Record {
   #isNew = false;
@@ -20,12 +20,12 @@ export default class Record {
     this.#record = {};
     this.#collection
       .getSchema()
-      .getFields()
-      .map((field: Field) => {
+      .getColumnSchemas()
+      .map((field: ColumnSchema) => {
         this.set(field.getName(), field.getDefaultValue());
       });
-    this.#record["_id"] = crypto.randomUUID();
-    this.#record["_collection"] = this.#collection.getName();
+    this.#record["id"] = crypto.randomUUID();
+    this.#record["_table"] = this.#collection.getName();
     this.#isNew = true;
     return this;
   }
@@ -47,7 +47,7 @@ export default class Record {
     const field = schema.getField(key);
     if (field) {
       this.#record[key] = field
-        .getFieldType()
+        .getColumnType()
         .setValueIntercept(
           this.#collection.getSchema(),
           key,
@@ -66,7 +66,7 @@ export default class Record {
     const schema = this.#collection.getSchema();
     const field = schema.getField(key);
     return field
-      ?.getFieldType()
+      ?.getColumnType()
       .getDisplayValue(
         schema,
         key,
@@ -77,14 +77,14 @@ export default class Record {
 
   async insert(): Promise<Record> {
     const record = await this.#collection.insertRecord(this);
-    this.#record = record.toObject();
+    this.#record = record.toJSON();
     this.#isNew = false;
     return this;
   }
 
   async update(): Promise<Record> {
     const record = await this.#collection.updateRecord(this);
-    this.#record = record.toObject();
+    this.#record = record.toJSON();
     this.#isNew = false;
     return this;
   }
@@ -97,14 +97,14 @@ export default class Record {
     return this;
   }
 
-  toObject(): any {
-    const obj: any = {};
+  toJSON(): any {
+    const jsonObject: any = {};
     this.#collection
       .getSchema()
-      .getFields()
-      .map((field: Field) => {
-        obj[field.getName()] = this.get(field.getName());
+      .getColumnSchemas()
+      .map((field: ColumnSchema) => {
+        jsonObject[field.getName()] = this.get(field.getName());
       });
-    return obj;
+    return jsonObject;
   }
 }

@@ -1,30 +1,30 @@
-import OperationInterceptorInterface from "./OperationInterceptor.interface.ts";
+import DatabaseOperationInterceptor from "./DatabaseOperationInterceptor.ts";
 import Record from "../record/Record.ts";
 import { OperationType, OperationWhen } from "../constants.ts";
 
-export default class OperationInterceptorService {
-  #interceptors: Map<string, OperationInterceptorInterface>;
+export default class DatabaseOperationInterceptorService {
+  #interceptors: Map<string, DatabaseOperationInterceptor>;
 
   constructor() {
-    this.#interceptors = new Map<string, OperationInterceptorInterface>();
+    this.#interceptors = new Map<string, DatabaseOperationInterceptor>();
   }
 
-  addInterceptor = (operationInterceptor: OperationInterceptorInterface) =>
+  addInterceptor = (operationInterceptor: DatabaseOperationInterceptor) =>
     this.#interceptors.set(
       operationInterceptor.getName(),
-      operationInterceptor,
+      operationInterceptor
     );
 
   deleteInterceptor = (name: string) => this.#interceptors.delete(name);
 
-  getInterceptor = (name: string): OperationInterceptorInterface | undefined =>
+  getInterceptor = (name: string): DatabaseOperationInterceptor | undefined =>
     this.#interceptors.get(name);
 
   hasInterceptors(): boolean {
     return this.#interceptors.size !== 0;
   }
 
-  #getSortedIntercepts(): OperationInterceptorInterface[] {
+  #getSortedIntercepts(): DatabaseOperationInterceptor[] {
     const intercepts = [];
     for (const interceptor of this.#interceptors.values()) {
       intercepts.push(interceptor);
@@ -38,7 +38,7 @@ export default class OperationInterceptorService {
     when: OperationWhen,
     records: Record[],
     context: any,
-    disabledIntercepts: boolean | string[],
+    disabledIntercepts: boolean | string[]
   ): Promise<Record[]> {
     if (disabledIntercepts === true) {
       return records;
@@ -54,7 +54,7 @@ export default class OperationInterceptorService {
             operation,
             when,
             records,
-            context,
+            context
           );
           if (!records) break;
         }

@@ -1,7 +1,10 @@
 # JUSTAOS's ODM
-JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to MongoDB database.
+JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
 
-Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete).
+- Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
+- Supports custom data types.
+- Supports table with multi-level inheritance.
+- Also supports interception on operations (create, read, update and delete).
 
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/justaos/odm?label=Release)
 [![Build](https://github.com/justaos/odm/workflows/Build/badge.svg)](https://github.com/justaos/odm/actions?workflow=Build)
@@ -10,7 +13,7 @@ Supports schemas with multi-level inheritance. Also supports interception on ope
 
 
 ```ts
-import {ODM} from 'https://deno.land/x/justaos_odm@4.4.3/mod.ts';
+import {ODM} from 'https://deno.land/x/justaos_odm@$VERSION/mod.ts';
 ```
 
 

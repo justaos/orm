@@ -2,7 +2,7 @@ import ODM from "./src/ODM.ts";
 
 /*import FindCursor from "./src/collection/FindCursor.ts";
 import AggregationCursor from "./src/collection/AggregationCursor.ts";
-import Schema from "./src/collection/Schema.ts";
+
 import Collection from "./src/collection/Collection.ts";
 import Field from "./src/collection/Field.ts";
 
@@ -31,4 +31,6 @@ export {
   ObjectId*/
 };
 
-export type { DatabaseConfigurationOptions } from "./src/core/connection/index.ts";
+export type { DatabaseConfiguration } from "./src/core/connection/index.ts";
+export type { TableSchemaDefinition } from "./src/table/definitions/TableSchemaDefinition.ts";
+export type { ColumnSchemaDefinition } from "./src/table/definitions/ColumnSchemaDefinition.ts";
