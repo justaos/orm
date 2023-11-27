@@ -1,15 +1,16 @@
-import Collection from "../table/Collection.ts";
+import Table from "../table/Table.ts";
 import ColumnSchema from "../table/ColumnSchema.ts";
+import { RawRecord } from "./RawRecord.ts";
 
 export default class Record {
   #isNew = false;
 
-  #record: any;
+  #record: RawRecord | undefined;
 
-  readonly #collection: Collection;
+  readonly #table: Table;
 
-  constructor(record: any, collection: Collection) {
-    this.#collection = collection;
+  constructor(record: any, table: Table) {
+    this.#table = table;
     if (typeof record !== "undefined") {
       this.#record = {};
       for (const key of Object.keys(record)) this.set(key, record[key]);
@@ -18,14 +19,14 @@ export default class Record {
 
   initialize(): Record {
     this.#record = {};
-    this.#collection
-      .getSchema()
-      .getColumnSchemas()
+    this.#table
+      .getTableSchema()
+      .getAllColumnSchemas()
       .map((field: ColumnSchema) => {
-        this.set(field.getName(), field.getDefaultValue());
+        this.set(field.getName(), field.getDefaultValue() || null);
       });
     this.#record["id"] = crypto.randomUUID();
-    this.#record["_table"] = this.#collection.getName();
+    this.#record["_table"] = this.#table.getName();
     this.#isNew = true;
     return this;
   }
@@ -34,22 +35,25 @@ export default class Record {
     return this.#isNew;
   }
 
-  getCollection(): Collection {
-    return this.#collection;
+  getCollection(): Table {
+    return this.#table;
   }
 
   getID(): string {
-    return this.get("_id").toString();
+    return this.get("id");
   }
 
   set(key: string, value: any): void {
-    const schema = this.#collection.getSchema();
-    const field = schema.getField(key);
-    if (field) {
+    if (typeof this.#record === "undefined")
+      throw new Error("Record not initialized");
+
+    const schema = this.#table.getTableSchema();
+    const field = schema.getColumnSchema(key);
+    if (field && this.#record) {
       this.#record[key] = field
         .getColumnType()
         .setValueIntercept(
-          this.#collection.getSchema(),
+          this.#table.getTableSchema(),
           key,
           value,
           this.#record
@@ -58,32 +62,43 @@ export default class Record {
   }
 
   get(key: string): any {
-    const schema = this.#collection.getSchema();
-    if (schema.getField(key)) return this.#record[key];
+    if (typeof this.#record === "undefined")
+      throw new Error("Record not initialized");
+    const schema = this.#table.getTableSchema();
+    if (schema.getColumnSchema(key) && this.#record[key])
+      return this.#record[key];
+    return null;
+  }
+
+  getNativeValue(key: string): any {
+    if (typeof this.#record === "undefined")
+      throw new Error("Record not initialized");
+    const schema = this.#table.getTableSchema();
+    const dataType = schema.getColumnSchema(key).getColumnType();
+    if (dataType && this.#record[key])
+      return dataType.getNativeValue(this.#record[key]);
+    return null;
   }
 
   async getDisplayValue(key: string) {
-    const schema = this.#collection.getSchema();
-    const field = schema.getField(key);
+    if (typeof this.#record === "undefined")
+      throw new Error("Record not initialized");
+    const schema = this.#table.getTableSchema();
+    const field = schema.getColumnSchema(key);
     return field
       ?.getColumnType()
-      .getDisplayValue(
-        schema,
-        key,
-        this.#record,
-        this.#collection.getContext()
-      );
+      .getDisplayValue(schema, key, this.#record, this.#table.getContext());
   }
 
   async insert(): Promise<Record> {
-    const record = await this.#collection.insertRecord(this);
+    const record = await this.#table.insertRecord(this);
     this.#record = record.toJSON();
     this.#isNew = false;
     return this;
   }
 
-  async update(): Promise<Record> {
-    const record = await this.#collection.updateRecord(this);
+  /* async update(): Promise<Record> {
+    const record = await this.#table.updateRecord(this);
     this.#record = record.toJSON();
     this.#isNew = false;
     return this;
@@ -93,17 +108,23 @@ export default class Record {
     if (this.#isNew) {
       throw Error("[Record::remove] Cannot remove unsaved record");
     }
-    await this.#collection.deleteOne(this);
+    await this.#table.deleteOne(this);
     return this;
-  }
+  }*/
 
-  toJSON(): any {
+  toJSON(columns?: string[]): any {
     const jsonObject: any = {};
-    this.#collection
-      .getSchema()
-      .getColumnSchemas()
+    this.#table
+      .getTableSchema()
+      .getAllColumnSchemas()
+      .filter((field: ColumnSchema) => {
+        if (columns) {
+          return columns.includes(field.getName());
+        }
+        return true;
+      })
       .map((field: ColumnSchema) => {
-        jsonObject[field.getName()] = this.get(field.getName());
+        jsonObject[field.getName()] = this.getNativeValue(field.getName());
       });
     return jsonObject;
   }

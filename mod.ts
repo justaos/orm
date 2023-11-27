@@ -32,5 +32,5 @@ export {
 };
 
 export type { DatabaseConfiguration } from "./src/core/connection/index.ts";
-export type { TableSchemaDefinition } from "./src/table/definitions/TableSchemaDefinition.ts";
-export type { ColumnSchemaDefinition } from "./src/table/definitions/ColumnSchemaDefinition.ts";
+export type { TableDefinitionRaw } from "./src/table/definitions/TableDefinition.ts";
+export type { ColumnDefinitionRaw } from "./src/table/definitions/ColumnDefinition.ts";

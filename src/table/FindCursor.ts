@@ -1,26 +1,26 @@
 import { mongodb } from "../../deps.ts";
 
-import Collection from "./Collection.ts";
+import Table from "./Table.ts";
 import Record from "../record/Record.ts";
-import { OperationType, OperationWhen } from "../constants.ts";
+import { DatabaseOperationType, DatabaseOperationWhen } from "../constants.ts";
 
 export default class FindCursor {
   readonly #cursor: mongodb.FindCursor;
 
-  readonly #collection: Collection;
+  readonly #collection: Table;
 
-  constructor(cursor: mongodb.FindCursor, collection: Collection) {
+  constructor(cursor: mongodb.FindCursor, collection: Table) {
     this.#cursor = cursor;
     this.#collection = collection;
   }
 
-  getCollection(): Collection {
+  getCollection(): Table {
     return this.#collection;
   }
 
   sort(
     keyOrList: mongodb.Sort | string,
-    direction?: mongodb.SortDirection,
+    direction?: mongodb.SortDirection
   ): FindCursor {
     this.#cursor.sort(keyOrList, direction);
     return this;
@@ -39,12 +39,16 @@ export default class FindCursor {
   async toArray(): Promise<Record[]> {
     const odmCollection = this.#collection;
     const docs = await this.#cursor.toArray();
-    await odmCollection.intercept(OperationType.READ, OperationWhen.BEFORE, []);
+    await odmCollection.intercept(
+      DatabaseOperationType.READ,
+      DatabaseOperationWhen.BEFORE,
+      []
+    );
     const records = docs.map((doc: any) => new Record(doc, odmCollection));
     return await odmCollection.intercept(
-      OperationType.READ,
-      OperationWhen.AFTER,
-      records,
+      DatabaseOperationType.READ,
+      DatabaseOperationWhen.AFTER,
+      records
     );
   }
 }

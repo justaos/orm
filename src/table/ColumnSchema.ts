@@ -1,53 +1,53 @@
-import DataType from "../field-types/DataType.ts";
+import DataType from "../data-types/DataType.ts";
 import TableSchema from "./TableSchema.ts";
 import {
-  ColumnSchemaDefinition,
-  ColumnSchemaDefinitionStrict
-} from "./definitions/ColumnSchemaDefinition.ts";
+  ColumnDefinition,
+  ColumnDefinitionRaw
+} from "./definitions/ColumnDefinition.ts";
 
 export default class ColumnSchema {
   readonly #tableSchema: TableSchema;
 
-  readonly #columnSchemaDefinition: ColumnSchemaDefinitionStrict;
+  readonly #columnDefinition: ColumnDefinition;
 
   readonly #fieldType?: DataType;
 
   constructor(
     schema: TableSchema,
-    columnSchemaDefinition: ColumnSchemaDefinitionStrict,
+    columnDefinition: ColumnDefinition,
     dataType?: DataType
   ) {
     this.#tableSchema = schema;
-    this.#columnSchemaDefinition = columnSchemaDefinition;
+    this.#columnDefinition = columnDefinition;
     this.#fieldType = dataType;
   }
 
   static setDefaults(
-    columnSchemaDefinition: ColumnSchemaDefinition
-  ): ColumnSchemaDefinition {
+    columnDefinition: ColumnDefinitionRaw
+  ): ColumnDefinitionRaw {
     return {
       not_null: false,
       unique: false,
-      ...columnSchemaDefinition
+      ...columnDefinition
     };
   }
 
   getName(): string {
-    return this.#columnSchemaDefinition.name;
+    return this.#columnDefinition.name;
   }
 
   getType(): string {
-    return this.#columnSchemaDefinition.type;
+    return this.#columnDefinition.type;
   }
 
-  getDefinition(): ColumnSchemaDefinitionStrict {
+  getDefinition(): ColumnDefinition {
     return {
-      ...this.#columnSchemaDefinition
+      ...this.#columnDefinition
     };
   }
 
   getDefaultValue(): any {
-    return this.#columnSchemaDefinition.default;
+    return this.#columnDefinition.default;
   }
 
   getColumnType(): DataType {
@@ -64,12 +64,12 @@ export default class ColumnSchema {
      * Validate column name
      */
     if (!this.getName() || typeof this.getName() !== "string") {
-      errorMessages.push(`Invalid column not provided`);
+      errorMessages.push(`Invalid column name provided`);
     } else if (!/^[a-z0-9_]+$/i.test(this.getName())) {
       errorMessages.push(`Column name should be alphanumeric`);
     }
 
-    if (!this.#columnSchemaDefinition || !this.getType()) {
+    if (!this.#columnDefinition || !this.getType()) {
       errorMessages.push(
         `[Column :: ${this.getName()}] Column type not provided`
       );
@@ -79,32 +79,10 @@ export default class ColumnSchema {
         `[Column :: ${this.getName()}] No such column type "${this.getType()}"`
       );
     } else if (
-      !this.getColumnType().validateDefinition(this.#columnSchemaDefinition)
+      !this.getColumnType().validateDefinition(this.#columnDefinition)
     ) {
       errorMessages.push("Invalid field definition");
     }
     return errorMessages;
   }
-
-  /* async validateValue(recordObject: any, context: any) {
-    const value = recordObject[this.getName()];
-    const fieldType = this.getFieldType();
-    if (!fieldType.getDataType().validate(value)) {
-      throw new FieldValidationError(
-        this.getDefinition(),
-        value,
-        "NOT_VALID_TYPE"
-      );
-    }
-    try {
-      await fieldType.validateValue(
-        this.tableSchema,
-        this.getName(),
-        recordObject,
-        context
-      );
-    } catch (err: any) {
-      throw new FieldValidationError(this.getDefinition(), value, err.message);
-    }
-  }*/
 }

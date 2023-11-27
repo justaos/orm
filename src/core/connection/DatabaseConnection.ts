@@ -1,5 +1,6 @@
 import { Logger, postgres } from "../../../deps.ts";
 import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
+import { NativeSQL } from "../NativeSQL.ts";
 
 /**
  * A class to handle the connection to the database.
@@ -45,7 +46,7 @@ export default class DatabaseConnection {
      return await this.getDBO().dropDatabase();
    }*/
 
-  getNativeConnection(): any {
+  getNativeConnection(): NativeSQL {
     if (!this.#sql) {
       throw new Error("Database connection not established");
     }

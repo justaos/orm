@@ -9,15 +9,16 @@ const sql = postgres({
 
 
 
-//const output = await sql`SELECT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'tesaaaa');`
+//const output = await sql`SELECT EXISTS(SELECT * FROM _schema_registry WHERE nspname = 'tesaaaa');`
 
-const query= sql`CREATE DATABASE ${ sql('tesssssss')}`;
+const cursor = await sql`SELECT * FROM _schema_registry`.cursor();
 
 
-console.log(query);
+console.log(cursor);
 
-const output = await query;
+for await (const [row] of cursor) {
+  console.log(row);
+}
 
-console.log(output);
 
 sql.end();

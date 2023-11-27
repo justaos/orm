@@ -1,4 +1,4 @@
-type ColumnSchemaDefinition = {
+type ColumnDefinitionRaw = {
   name: string;
   type?: string;
   not_null?: boolean;
@@ -6,7 +6,7 @@ type ColumnSchemaDefinition = {
   unique?: boolean;
 };
 
-type ColumnSchemaDefinitionStrict = {
+type ColumnDefinition = {
   name: string;
   type: string;
   not_null: boolean;
@@ -14,4 +14,4 @@ type ColumnSchemaDefinitionStrict = {
   unique: boolean;
 };
 
-export type { ColumnSchemaDefinition, ColumnSchemaDefinitionStrict };
+export type { ColumnDefinitionRaw, ColumnDefinition };

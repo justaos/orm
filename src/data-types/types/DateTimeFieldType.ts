@@ -1,19 +1,17 @@
 import DataType from "../DataType.ts";
 import TableSchema from "../../table/TableSchema.ts";
 import ODM from "../../ODM.ts";
+import { DateUtils } from "../../../deps.ts";
 import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
+import { RawRecord } from "../../record/RawRecord.ts";
 
-export default class AnyFieldType extends DataType {
+export default class DateTimeFieldType extends DataType {
   constructor(odm: ODM) {
-    super(odm, PrimitiveDataType.ANY);
+    super(odm, PrimitiveDataType.DATE_TIME);
   }
 
   getName(): string {
-    return "any";
-  }
-
-  validateDefinition(fieldDefinition: any): boolean {
-    return !!fieldDefinition.name;
+    return "datetime";
   }
 
   async validateValue(
@@ -26,13 +24,8 @@ export default class AnyFieldType extends DataType {
     await DataType.uniqueValidation(this.getODM(), schema, fieldName, record);
   }
 
-  async getDisplayValue(
-    schema: TableSchema,
-    fieldName: string,
-    record: any,
-    context: any
-  ) {
-    return this.getDataType().toJSON(record[fieldName]);
+  validateDefinition(fieldDefinition: any): boolean {
+    return !!fieldDefinition.name;
   }
 
   setValueIntercept(
@@ -41,6 +34,18 @@ export default class AnyFieldType extends DataType {
     value: any,
     record: any
   ): any {
+    if (typeof value === "string" && DateUtils.isIsoDate(value)) {
+      return new Date(value);
+    }
     return value;
+  }
+
+  async getDisplayValue(
+    schema: TableSchema,
+    fieldName: string,
+    record: RawRecord,
+    context: any
+  ) {
+    return this.getDataType().toJSON(record[fieldName]);
   }
 }

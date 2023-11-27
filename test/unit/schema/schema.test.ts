@@ -32,10 +32,6 @@ describe(
             {
               name: "name",
               type: "string"
-            },
-            {
-              name: "new",
-              type: "string"
             }
           ]
         });
@@ -46,16 +42,16 @@ describe(
       }
     });
 
-    /* it("#collection - negative check", function () {
-       try {
-         conn.collection("unknown_collection");
-         assert(false, "Collection should not exists");
-       } catch (e) {
-         assert(true, "Collection should not exists");
-       }
-     });*/
+    it("#table - negative check", function () {
+      try {
+        conn.table("unknown_table");
+        assert(false, "Table should not exists");
+      } catch (e) {
+        assert(true, "Table should not exists");
+      }
+    });
 
-    /*it("#ODM::defineCollection - simple", function () {
+    /*it("#ODM::defineTable - simple", function () {
       conn.defineTable({
         name: MODEL_NAME,
         columns: [
@@ -77,19 +73,21 @@ describe(
           },
         ],
       });
-      assert(true, "Collection not create as expected");
+      assert(true, "Table not create as expected");
     });
+    */
 
-    it("#ODM::defineCollection - extends negative check", function() {
+    it("#ODM::defineTable - extends negative check", function () {
       let assertValue = false;
       try {
-        conn.defineCollection({
+        conn.defineTable({
+          schema: "testing_schema",
           name: MODEL_EXTENDS,
-          extends: MODEL_NAME,
+          inherits: "testing_schema." + MODEL_NAME,
           final: true,
-          fields: [
+          columns: [
             {
-              name: "name",
+              name: "testing",
               type: "string"
             }
           ]
@@ -97,111 +95,108 @@ describe(
       } catch (err) {
         assertValue = true;
       }
-      assert(
-        assertValue,
-        "Collection should not get extended, with name fields"
-      );
+      assert(assertValue, "Table should not get extended, with name fields");
     });
 
-    it("#ODM::defineCollection - extends positive check", function() {
-      conn.defineCollection({
-        name: MODEL_EXTENDS,
-        extends: MODEL_NAME,
-        final: true,
-        fields: [
-          {
-            name: "address",
-            type: "string"
-          }
-        ]
-      });
-      assert(true, "Collection should get extended");
-    });
+    /* it("#ODM::defineTable - extends positive check", function() {
+       conn.defineTable({
+         name: MODEL_EXTENDS,
+         extends: MODEL_NAME,
+         final: true,
+         fields: [
+           {
+             name: "address",
+             type: "string"
+           }
+         ]
+       });
+       assert(true, "Table should get extended");
+     });
 
-    it("#ODM::defineCollection - extends positive check", function() {
-      let assertValue = false;
-      try {
-        conn.defineCollection({
-          name: "EXTEND_FINAL",
-          extends: MODEL_EXTENDS,
-          fields: [
-            {
-              name: "address",
-              type: "string"
-            }
-          ]
-        });
-      } catch (err) {
-        assertValue = true;
-      }
-      assert(assertValue, "Collection should not extend, final schema");
-    });
+     it("#ODM::defineTable - extends positive check", function() {
+       let assertValue = false;
+       try {
+         conn.defineTable({
+           name: "EXTEND_FINAL",
+           extends: MODEL_EXTENDS,
+           fields: [
+             {
+               name: "address",
+               type: "string"
+             }
+           ]
+         });
+       } catch (err) {
+         assertValue = true;
+       }
+       assert(assertValue, "Table should not extend, final schema");
+     });
 
-    it("#ODM::collection - normal schema record", async () => {
-      let assertValue = false;
-      try {
-        const extendsCol = conn.collection(MODEL_NAME);
-        const extendsRec = extendsCol.createNewRecord();
-        await extendsRec.insert();
-        assertValue = true;
-      } catch (err) {
-        logger.error(err.message);
-      }
-      assert(assertValue);
-    });
+     it("#ODM::table - normal schema record", async () => {
+       let assertValue = false;
+       try {
+         const extendsCol = conn.table(MODEL_NAME);
+         const extendsRec = extendsCol.createNewRecord();
+         await extendsRec.insert();
+         assertValue = true;
+       } catch (err) {
+         logger.error(err.message);
+       }
+       assert(assertValue);
+     });
 
-    it("#ODM::collection - extends schema record", async () => {
-      let assertValue = false;
-      try {
-        const extendsCol = conn.collection(MODEL_EXTENDS);
-        const extendsRec = extendsCol.createNewRecord();
-        await extendsRec.insert();
-        assertValue = true;
-      } catch (err) {
-        logger.error(err.message);
-      }
-      assert(assertValue);
-    });
+     it("#ODM::table - extends schema record", async () => {
+       let assertValue = false;
+       try {
+         const extendsCol = conn.table(MODEL_EXTENDS);
+         const extendsRec = extendsCol.createNewRecord();
+         await extendsRec.insert();
+         assertValue = true;
+       } catch (err) {
+         logger.error(err.message);
+       }
+       assert(assertValue);
+     });
 
-    it("#Collection::find extends", async () => {
-      const employeeCollection = conn.collection(MODEL_EXTENDS);
-      const employees: Record[] = await employeeCollection
-        .find()
-        .toArray();
-      assertEquals(employees.length, 1);
-    });
+     it("#Table::find extends", async () => {
+       const employeeTable = conn.table(MODEL_EXTENDS);
+       const employees: Record[] = await employeeTable
+         .find()
+         .toArray();
+       assertEquals(employees.length, 1);
+     });
 
-    it("#Collection::find normal", async () => {
-      const employeeCollection = conn.collection(MODEL_NAME);
-      const employees: Record[] = await employeeCollection
-        .find()
-        .toArray();
-      assertEquals(employees.length, 2);
-    });
+     it("#Table::find normal", async () => {
+       const employeeTable = conn.table(MODEL_NAME);
+       const employees: Record[] = await employeeTable
+         .find()
+         .toArray();
+       assertEquals(employees.length, 2);
+     });
 
-    it("#ODM::convertToObjectId", function() {
-      const newId = conn.generateObjectId("569ed8269353e9f4c51617aa");
-      assert(
-        conn.isObjectId(newId),
-        "Collection should not extend, final schema"
-      );
-    });
+     it("#ODM::convertToObjectId", function() {
+       const newId = conn.generateObjectId("569ed8269353e9f4c51617aa");
+       assert(
+         conn.isObjectId(newId),
+         "Table should not extend, final schema"
+       );
+     });
 
-    it("#ODM::defineCollection - unknown field type", function() {
-      try {
-        conn.defineCollection({
-          name: "unknown",
-          fields: [
-            {
-              name: "unknown",
-              type: "unknown"
-            }
-          ]
-        });
-      } catch (e) {
-        assert(true, "Collection not create as expected");
-      }
-    });
-  */
+     it("#ODM::defineTable - unknown field type", function() {
+       try {
+         conn.defineTable({
+           name: "unknown",
+           fields: [
+             {
+               name: "unknown",
+               type: "unknown"
+             }
+           ]
+         });
+       } catch (e) {
+         assert(true, "Table not create as expected");
+       }
+     });
+   */
   }
 );

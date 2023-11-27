@@ -1,7 +1,6 @@
 interface Type {
-  name?: string;
-
-  getName?(): string;
+  getRegistryKey?(): string;
+  [key: string]: any;
 }
 
 export default class Registry<T extends Type> {
@@ -20,15 +19,15 @@ export default class Registry<T extends Type> {
     if (!item) {
       throw Error("Registry item must not be null");
     }
-    if (item.getName) {
-      this.registry.set(item.getName(), item);
+    if (item.getRegistryKey) {
+      this.registry.set(item.getRegistryKey(), item);
       return;
     }
     if (item.name) {
       this.registry.set(item.name, item);
       return;
     }
-    throw Error("Registry item must have a name");
+    throw Error("Registry item must have a name or getRegistryKey method");
   };
 
   delete = (collectionName: string): boolean =>

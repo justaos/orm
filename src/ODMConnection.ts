@@ -4,20 +4,23 @@ import {
 } from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
 import TableSchema from "./table/TableSchema.ts";
-import DataType from "./field-types/DataType.ts";
+import DataType from "./data-types/DataType.ts";
 import {
-  TableSchemaDefinition,
-  TableSchemaDefinitionStrict
-} from "./table/definitions/TableSchemaDefinition.ts";
-import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
+  TableDefinition,
+  TableDefinitionRaw
+} from "./table/definitions/TableDefinition.ts";
+import { Logger } from "../deps.ts";
+import Table from "./table/Table.ts";
+import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 
 export default class ODMConnection {
   readonly #config: DatabaseConfiguration;
   readonly #conn: DatabaseConnection;
   readonly #fieldTypeRegistry: Registry<DataType>;
   readonly #schemaRegistry: Map<string, null>;
-  readonly #tableDefinitionRegistry: Registry<TableSchemaDefinitionStrict>;
+  readonly #tableDefinitionRegistry: Registry<TableDefinition>;
   readonly #logger = Logger.createLogger({ label: DatabaseConnection.name });
+  readonly #operationInterceptorService: DatabaseOperationInterceptorService;
 
   /*  #operationInterceptorService: OperationInterceptorService =
       new OperationInterceptorService();*/
@@ -25,14 +28,16 @@ export default class ODMConnection {
   constructor(
     config: DatabaseConfiguration,
     fieldTypeRegistry: Registry<DataType>,
-    tableDefinitionRegistry: Registry<TableSchemaDefinitionStrict>,
-    schemaRegistry: Map<string, null>
+    tableDefinitionRegistry: Registry<TableDefinition>,
+    schemaRegistry: Map<string, null>,
+    operationInterceptorService: DatabaseOperationInterceptorService
   ) {
     this.#config = config;
     this.#conn = new DatabaseConnection(config);
     this.#fieldTypeRegistry = fieldTypeRegistry;
     this.#tableDefinitionRegistry = tableDefinitionRegistry;
     this.#schemaRegistry = schemaRegistry;
+    this.#operationInterceptorService = operationInterceptorService;
   }
 
   async connect(): Promise<void> {
@@ -56,9 +61,9 @@ export default class ODMConnection {
     return tempConn.dropDatabase(databaseName);
   }
 
-  async defineTable(tableSchemaDefinition: TableSchemaDefinition) {
+  async defineTable(tableDefinition: TableDefinitionRaw) {
     const tableSchema = new TableSchema(
-      tableSchemaDefinition,
+      tableDefinition,
       this.#fieldTypeRegistry,
       this.#tableDefinitionRegistry
     );
@@ -68,7 +73,7 @@ export default class ODMConnection {
       this.#logger.error(error.message);
       throw error;
     }
-    const tableSchemaDefinitionStrict = tableSchema.getDefinition();
+    const tableDefinitionStrict = tableSchema.getDefinition();
     this.#tableDefinitionRegistry.add(tableSchema.getDefinition());
 
     const sql = this.#conn.getNativeConnection();
@@ -77,49 +82,53 @@ export default class ODMConnection {
     try {
       const [{ exists: schemaExists }] = await reserved`SELECT EXISTS(SELECT
                     FROM information_schema.schemata
-                    WHERE schema_name = ${tableSchemaDefinitionStrict.schema}
+                    WHERE schema_name = ${tableDefinitionStrict.schema}
                     LIMIT 1);`;
 
       if (!schemaExists) {
         await reserved`CREATE SCHEMA IF NOT EXISTS ${sql(
-          tableSchemaDefinitionStrict.schema
+          tableDefinitionStrict.schema
         )};`;
-        this.#logger.info(
-          `Schema ${tableSchemaDefinitionStrict.schema} created`
-        );
-        this.#schemaRegistry.set(tableSchemaDefinitionStrict.schema, null);
+        this.#logger.info(`Schema ${tableDefinitionStrict.schema} created`);
+        this.#schemaRegistry.set(tableDefinitionStrict.schema, null);
       }
 
       const [{ exists: tableExists }] = await reserved`SELECT EXISTS(SELECT
                     FROM information_schema.tables
-                    WHERE table_name = ${tableSchemaDefinitionStrict.name} AND table_schema = ${tableSchemaDefinitionStrict.schema}
+                    WHERE table_name = ${tableDefinitionStrict.name} AND table_schema = ${tableDefinitionStrict.schema}
                     LIMIT 1);`;
 
       if (!tableExists) {
-        const query = `CREATE TABLE IF NOT EXISTS ${
-          tableSchemaDefinitionStrict.schema
-        }.${tableSchemaDefinitionStrict.name} (\n\t${tableSchema
-          .getColumnSchemas()
+        let query = `CREATE TABLE IF NOT EXISTS ${
+          tableDefinitionStrict.schema
+        }.${tableDefinitionStrict.name} (\n\t${tableSchema
+          .getOwnColumnSchemas()
           .map((column) => {
-            return `${column.getName()} ${column
+            const columnDef = `${column.getName()} ${column
               .getColumnType()
               .getNativeType()}`;
+            if (column.getName() == "id") {
+              return columnDef + " PRIMARY KEY";
+            }
+            return columnDef;
           })
-          .join(",\n\t")}\n);`;
-        this.#logger.info(`creating table ${tableSchemaDefinitionStrict.name}`);
+          .join(",\n\t")}\n)`;
+        if (tableDefinitionStrict.inherits) {
+          query = `${query} INHERITS (${tableDefinitionStrict.schema}.${tableDefinitionStrict.inherits})`;
+        }
         this.#logger.info(`Create Query -> \n ${query}`);
         await reserved.unsafe(query);
       } else {
         const columns =
-          await reserved`SELECT column_name FROM information_schema.columns WHERE table_schema = ${tableSchemaDefinitionStrict.schema} AND table_name = ${tableSchemaDefinitionStrict.name};`;
+          await reserved`SELECT column_name FROM information_schema.columns WHERE table_schema = ${tableDefinitionStrict.schema} AND table_name = ${tableDefinitionStrict.name};`;
         const columnNames = columns.map((column: any) => column.column_name);
         const newColumns = tableSchema
-          .getColumnSchemas()
+          .getOwnColumnSchemas()
           .filter((column) => !columnNames.includes(column.getName()));
         // Create new columns
         if (newColumns.length > 0) {
-          const query = `ALTER TABLE ${tableSchemaDefinitionStrict.schema}.${
-            tableSchemaDefinitionStrict.name
+          const query = `ALTER TABLE ${tableDefinitionStrict.schema}.${
+            tableDefinitionStrict.name
           } \n\t${newColumns
             .map((column) => {
               return `ADD COLUMN ${column.getName()} ${column
@@ -127,7 +136,7 @@ export default class ODMConnection {
                 .getNativeType()}`;
             })
             .join(",\n\t")}\n`;
-          this.#logger.info(`alter table ${tableSchemaDefinitionStrict.name}`);
+          this.#logger.info(`alter table ${tableDefinitionStrict.name}`);
           this.#logger.info(`Alter Query -> \n ${query}`);
           await reserved.unsafe(query);
         }
@@ -142,19 +151,28 @@ export default class ODMConnection {
    * @param name Table name
    * @param context Context object
    */
-  /* table(name: string, context?: any): Collection {
-    const schema: Schema | undefined =
-      this.#tableDefinitionRegistry.getSchema(name);
-    if (schema === undefined) {
+  table(nameWithSchema: string, context?: any): Table {
+    const [schema, name] = nameWithSchema.split(".");
+    if (!schema) {
+      throw Error(`Schema is not defined in table name '${nameWithSchema}'`);
+    }
+    const tableDefinitionStrict: TableDefinition | undefined =
+      this.#tableDefinitionRegistry.get(name);
+    if (typeof tableDefinitionStrict === "undefined") {
       throw Error(`Collection with name '${name}' is not defined`);
     }
-    return new Collection(
-      this.#getConnection().getDBO().collection(schema.getBaseName()),
-      schema,
+    const tableSchema = new TableSchema(
+      tableDefinitionStrict,
+      this.#fieldTypeRegistry,
+      this.#tableDefinitionRegistry
+    );
+    return new Table(
+      this.#conn.getNativeConnection(),
+      tableSchema,
       this.#operationInterceptorService,
       context
     );
-  }*/
+  }
 
   /* getSchema(name: string): TableSchema | undefined {
     return this.#tableDefinitionRegistry.get(name);

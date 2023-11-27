@@ -1,20 +1,26 @@
 import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
-import FileType from "./field-types/DataType.ts";
-import DataType from "./field-types/DataType.ts";
+import FileType from "./data-types/DataType.ts";
+import DataType from "./data-types/DataType.ts";
 
-import StringFieldType from "./field-types/types/StringFieldType.ts";
+import StringDataType from "./data-types/types/StringFieldType.ts";
 import ODMConnection from "./ODMConnection.ts";
-import { TableSchemaDefinitionStrict } from "./table/definitions/TableSchemaDefinition.ts";
-/*import IntegerFieldType from "./field-types/types/IntegerFieldType.ts";
-import DateFieldType from "./field-types/types/DateFieldType.ts";
+import { TableDefinition } from "./table/definitions/TableDefinition.ts";
+import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
+import IntegerDataType from "./data-types/types/IntegerFieldType.ts";
+import NumberDataType from "./data-types/types/NumberFieldType.ts";
+import JSONDataType from "./data-types/types/JSONFieldType.ts";
+import BooleanDataType from "./data-types/types/BooleanFieldType.ts";
+import DateDataType from "./data-types/types/DateFieldType.ts";
+/*import IntegerDataType from "./field-types/types/IntegerDataType.ts";
+import DateDataType from "./field-types/types/DateDataType.ts";
 
 import ObjectFieldType from "./field-types/types/ObjectFieldType.ts";
-import BooleanFieldType from "./field-types/types/BooleanFieldType.ts";
+import BooleanDataType from "./field-types/types/BooleanDataType.ts";
 import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType.ts";
 import DateTimeFieldType from "./field-types/types/DateTimeFieldType.ts";
 import AnyFieldType from "./field-types/types/AnyFieldType.ts";
-import NumberFieldType from "./field-types/types/NumberFieldType.ts";*/
+import NumberDataType from "./field-types/types/NumberDataType.ts";*/
 
 /*
  *
@@ -45,12 +51,11 @@ import NumberFieldType from "./field-types/types/NumberFieldType.ts";*/
 export default class ODM {
   readonly #config: DatabaseConfiguration;
   readonly #fieldTypeRegistry: Registry<FileType> = new Registry<FileType>();
-  readonly #tableDefinitionRegistry: Registry<TableSchemaDefinitionStrict> =
-    new Registry<TableSchemaDefinitionStrict>();
+  readonly #tableDefinitionRegistry: Registry<TableDefinition> =
+    new Registry<TableDefinition>();
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
-
-  /*  #operationInterceptorService: OperationInterceptorService =
-      new OperationInterceptorService();*/
+  readonly #operationInterceptorService =
+    new DatabaseOperationInterceptorService();
 
   constructor(config: DatabaseConfiguration) {
     this.#loadBuildInFieldTypes();
@@ -63,7 +68,8 @@ export default class ODM {
         this.#config,
         this.#fieldTypeRegistry,
         this.#tableDefinitionRegistry,
-        this.#schemaRegistry
+        this.#schemaRegistry,
+        this.#operationInterceptorService
       );
       await conn.connect();
       return conn;
@@ -96,14 +102,13 @@ export default class ODM {
   }
 
   #loadBuildInFieldTypes(): void {
-    this.addFieldType(StringFieldType);
-    /* this.addFieldType(IntegerFieldType);
-     this.addFieldType(NumberFieldType);
-     this.addFieldType(DateFieldType);
-     this.addFieldType(ObjectFieldType);
-     this.addFieldType(BooleanFieldType);
-     this.addFieldType(ObjectIdFieldType);
-     this.addFieldType(DateTimeFieldType);
-     this.addFieldType(AnyFieldType);*/
+    this.addFieldType(StringDataType);
+     this.addFieldType(IntegerDataType);
+    this.addFieldType(NumberDataType);
+    this.addFieldType(JSONDataType);
+    this.addFieldType(BooleanDataType);
+    this.addFieldType(DateDataType);
+    /*this.addFieldType(ObjectIdFieldType);
+    this.addFieldType(DateTimeFieldType);*/
   }
 }

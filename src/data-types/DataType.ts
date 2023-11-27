@@ -1,5 +1,7 @@
 import { NativeDataType } from "../core/NativeDataType.ts";
 import TableSchema from "../table/TableSchema.ts";
+import { RawRecord } from "../record/RawRecord.ts";
+import { ColumnDefinition } from "../table/definitions/ColumnDefinition.ts";
 
 export default abstract class DataType {
   category: string[] = [];
@@ -19,26 +21,34 @@ export default abstract class DataType {
 
   abstract getName(): string;
 
-  abstract validateDefinition(fieldDefinition: any): boolean;
+  getRegistryKey(): string {
+    return this.getName();
+  }
+
+  getNativeValue(value: any): any {
+    return value;
+  }
+
+  abstract validateDefinition(definition: ColumnDefinition): boolean;
 
   abstract setValueIntercept(
     schema: TableSchema,
     fieldName: string,
     value: any,
-    record: any
+    record: RawRecord | undefined
   ): any;
 
   abstract validateValue(
     schema: TableSchema,
     fieldName: string,
-    record: any,
+    record: RawRecord | undefined,
     context: any
-  ): Promise<any>;
+  ): Promise<void>;
 
   abstract getDisplayValue(
     schema: TableSchema,
     fieldName: string,
-    record: any,
+    record: RawRecord,
     context: any
   ): Promise<any>;
 }
