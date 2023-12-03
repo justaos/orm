@@ -1,8 +1,9 @@
 type NativeDataType =
   | "VARCHAR"
+  | "UUID"
   | "CHAR"
   | "TEXT"
-  | "number"
+  | "decimal"
   | "integer"
   | "boolean"
   | "date"
@@ -11,6 +12,7 @@ type NativeDataType =
 
 enum NATIVE_DATA_TYPES {
   VARCHAR = "VARCHAR",
+  UUID = "UUID",
   CHAR = "CHAR",
   TEXT = "TEXT",
   NUMBER = "number",

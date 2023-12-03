@@ -10,7 +10,7 @@ export default class JSONFieldType extends DataType {
   }
 
   getName(): string {
-    return "object";
+    return "json";
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {

@@ -8,15 +8,18 @@ describe({
   sanitizeOps: false,
   fn: () => {
     it("#connect()", async () => {
-      Session.setODM(new ODM());
+      Session.setODM(
+        new ODM({
+          hostname: "127.0.0.1",
+          port: 5432,
+          username: "postgres",
+          password: "admin",
+          database: "odm-test-db"
+        })
+      );
 
       try {
-        await Session.getODM().connect({
-          host: "127.0.0.1",
-          port: 27017,
-          database: "odm-test-db",
-          dialect: "mongodb"
-        });
+        await Session.getConnection();
         assert(true, "connection established");
       } catch (_error) {
         assert(false, "connection failed");
@@ -24,9 +27,9 @@ describe({
     });
 
     it("#clear existing database", async () => {
-      const odm = Session.getODM();
+      const conn = await Session.getConnection();
 
-      const exists = await odm.databaseExists();
+      /* const exists = await odm.databaseExists();
 
       if (exists) {
         const result = await odm.dropDatabase();
@@ -35,8 +38,8 @@ describe({
         } else {
           assert(false, "dropping failed");
         }
-      }
-      await odm.closeConnection();
+      }*/
+      await conn.closeConnection();
     });
   }
 });

@@ -1,23 +1,25 @@
 # JUSTAOS's ODM
-JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
+
+![GitHub release (with filter)](https://img.shields.io/github/v/release/justaos/odm?label=Release)
+[![Build](https://github.com/justaos/odm/workflows/Build/badge.svg)](https://github.com/justaos/odm/actions?workflow=Build)
+[![Coverage](https://codecov.io/gh/justaos/odm/branch/main/graph/badge.svg?token=OzlniGFmNp)](https://codecov.io/gh/justaos/odm)
+[![License](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
+[![Contributors](https://img.shields.io/github/contributors/justaos/odm.svg)]()
+
+JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to
+Postgres database.
 
 - Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
 - Supports custom data types.
 - Supports table with multi-level inheritance.
 - Also supports interception on operations (create, read, update and delete).
 
-![GitHub release (with filter)](https://img.shields.io/github/v/release/justaos/odm?label=Release)
-[![Build](https://github.com/justaos/odm/workflows/Build/badge.svg)](https://github.com/justaos/odm/actions?workflow=Build)
-[![Coverage](https://codecov.io/gh/justaos/odm/branch/main/graph/badge.svg?token=OzlniGFmNp)](https://codecov.io/gh/justaos/odm)
-[![License](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
-
-
 ```ts
-import {ODM} from 'https://deno.land/x/justaos_odm@$VERSION/mod.ts';
+import { ODM } from 'https://deno.land/x/justaos_odm@$VERSION/mod.ts';
 ```
 
-
 ## Database connection
+
 ```ts
 const odm = new ODM();
 
@@ -38,7 +40,34 @@ try {
 }
 ```
 
+## Defining models
+
+Justaos ODM models following snake case naming convention. If you want to use camel case naming convention, you can
+use `@Table` decorator.
+
+```ts
+
+// Table name will be "comment"
+@Table()
+class Comment {
+  // Fields
+}
+
+// Table name will be "blog_post"
+@Table()
+class BlogPost {
+  // Fields
+}
+
+// Table name will be "blog_custom_post"
+@Table({ name: "blog_custom_post" })
+class BlogPost {
+  // Fields
+}
+```
+
 ## Querying
+
 ```ts
 odm.defineCollection({
   name: "teacher",
@@ -65,18 +94,18 @@ for (let i = 0; i < 10; i++) {
 teacherCollection
   .find({}, { sort: { roll_no: -1 } })
   .toArray()
-  .then(function (records) {
-    records.forEach(async function (rec) {
+  .then(function(records) {
+    records.forEach(async function(rec) {
       console.log(
         (await rec.getDisplayValue("name")) +
-          " :: " +
-          (await rec.getDisplayValue("roll_no"))
+        " :: " +
+        (await rec.getDisplayValue("roll_no"))
       );
       console.log(JSON.stringify(await rec.toObject(), null, 4));
     });
   });
 
-teacherCollection.count().then(function (count) {
+teacherCollection.count().then(function(count) {
   console.log(count);
   odm.closeConnection();
 });
@@ -84,6 +113,7 @@ teacherCollection.count().then(function (count) {
 ```
 
 ## Intercepting database operations
+
 ```ts
 import getODM from "./getODM.ts";
 import {
@@ -112,12 +142,12 @@ odm.addInterceptor(
         if (operation === "CREATE") {
           console.log(
             "[collectionName=" +
-              collectionName +
-              ", operation=" +
-              operation +
-              ", when=" +
-              when +
-              "]"
+            collectionName +
+            ", operation=" +
+            operation +
+            ", when=" +
+            when +
+            "]"
           );
           if (when === "BEFORE") {
             for (let record of records) {
@@ -131,12 +161,12 @@ odm.addInterceptor(
         if (operation === "READ") {
           console.log(
             "[collectionName=" +
-              collectionName +
-              ", operation=" +
-              operation +
-              ", when=" +
-              when +
-              "]"
+            collectionName +
+            ", operation=" +
+            operation +
+            ", when=" +
+            when +
+            "]"
           );
           if (when === "AFTER") {
             for (const record of records)
@@ -166,11 +196,11 @@ odm.defineCollection({
 const studentCollection = odm.collection("student");
 const studentRecord = studentCollection.createNewRecord();
 studentRecord.set("name", "John " + new Date().toISOString());
-studentRecord.insert().then(function () {
+studentRecord.insert().then(function() {
   studentCollection
     .find()
     .toArray()
-    .then(function () {
+    .then(function() {
       odm.closeConnection();
     });
 });
@@ -178,7 +208,9 @@ studentRecord.insert().then(function () {
 ```
 
 ## Define custom field type
+
 After connection established, you can define custom field type.
+
 ```ts
 import getODM from "./getODM.ts";
 import { FieldType, PrimitiveDataType, Schema, ODM } from "../mod.ts";
@@ -255,12 +287,12 @@ const studentRecord = studentCollection.createNewRecord();
 studentRecord.set("personal_contact", "test");
 studentRecord.set("birth_date", new Date());
 studentRecord.insert().then(
-  function () {
+  function() {
     console.log("Student created");
   },
   (err) => {
     console.log(err.toJSON());
-    odm.closeConnection().then(function () {
+    odm.closeConnection().then(function() {
       console.log("Connection closed");
     });
   }
@@ -269,6 +301,7 @@ studentRecord.insert().then(
 ```
 
 ## Inheritance
+
 ```ts
 import getODM from "./getODM.ts";
 
@@ -310,7 +343,7 @@ await husky.insert();
 animalCol
   .find({})
   .toArray()
-  .then(function (animals) {
+  .then(function(animals) {
     animals.forEach((animal) => {
       console.log(animal.toObject());
     });
@@ -319,7 +352,14 @@ animalCol
 
  ```
 
+| Database Data type | get    | getDisplayValue | getObject          |
+|--------------------|--------|-----------------|--------------------|
+| **string**         | string | string          | string             |
+| **integer**        | number | number          | number             |
+| **date**           | string | string          | Temporal.PlainDate |
+
 Check the examples >> [here](./examples) <<
 
 ## Code of Conduct
+
 [Contributor Covenant](/CODE_OF_CONDUCT.md)

@@ -1,5 +1,6 @@
 interface Type {
   getRegistryKey?(): string;
+
   [key: string]: any;
 }
 
@@ -12,19 +13,19 @@ export default class Registry<T extends Type> {
 
   get = (name: string): T | undefined => this.registry.get(name);
 
-  add = (item: T): void => {
+  add = (item: T, key?: string): void => {
     if (typeof item !== "object") {
       throw Error("Registry item must be an object");
     }
     if (!item) {
       throw Error("Registry item must not be null");
     }
-    if (item.getRegistryKey) {
-      this.registry.set(item.getRegistryKey(), item);
+    if (key) {
+      this.registry.set(key, item);
       return;
     }
-    if (item.name) {
-      this.registry.set(item.name, item);
+    if (item.getRegistryKey) {
+      this.registry.set(item.getRegistryKey(), item);
       return;
     }
     throw Error("Registry item must have a name or getRegistryKey method");

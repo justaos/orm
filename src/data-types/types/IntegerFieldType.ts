@@ -23,6 +23,10 @@ export default class IntegerFieldType extends DataType {
     value: any,
     _record: RawRecord | undefined
   ): any {
+    if (typeof value === "string") {
+      // @ts-ignore
+      return value * 1;
+    }
     return value;
   }
 

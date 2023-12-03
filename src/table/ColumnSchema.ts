@@ -6,20 +6,13 @@ import {
 } from "./definitions/ColumnDefinition.ts";
 
 export default class ColumnSchema {
-  readonly #tableSchema: TableSchema;
-
   readonly #columnDefinition: ColumnDefinition;
 
   readonly #fieldType?: DataType;
 
-  constructor(
-    schema: TableSchema,
-    columnDefinition: ColumnDefinition,
-    dataType?: DataType
-  ) {
-    this.#tableSchema = schema;
+  constructor(schema: TableSchema, columnDefinition: ColumnDefinition) {
     this.#columnDefinition = columnDefinition;
-    this.#fieldType = dataType;
+    this.#fieldType = schema.getDataType(columnDefinition.type);
   }
 
   static setDefaults(
@@ -30,6 +23,14 @@ export default class ColumnSchema {
       unique: false,
       ...columnDefinition
     };
+  }
+
+  isUnique(): boolean {
+    return !!this.#columnDefinition.unique;
+  }
+
+  isNotNull(): boolean {
+    return !!this.#columnDefinition.not_null;
   }
 
   getName(): string {

@@ -1,11 +1,10 @@
-import { afterAll, assert, beforeAll, describe, it } from "./test.deps.ts";
+import { assert, describe, it } from "./test.deps.ts";
 import { Session } from "./test.utils.ts";
 
 describe("End test cleanup", () => {
   it("disconnect check", async () => {
-    if (Session.hasODM()) {
-      Session.getODM().closeConnection();
-    }
+    const conn = await Session.getConnection();
+    await conn.closeConnection();
     assert(true, "close connection success");
   });
 });

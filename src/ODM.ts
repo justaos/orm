@@ -12,6 +12,9 @@ import NumberDataType from "./data-types/types/NumberFieldType.ts";
 import JSONDataType from "./data-types/types/JSONFieldType.ts";
 import BooleanDataType from "./data-types/types/BooleanFieldType.ts";
 import DateDataType from "./data-types/types/DateFieldType.ts";
+import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
+import UUIDFieldType from "./data-types/types/UUIDFieldType.ts";
+import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 /*import IntegerDataType from "./field-types/types/IntegerDataType.ts";
 import DateDataType from "./field-types/types/DateDataType.ts";
 
@@ -36,7 +39,7 @@ import NumberDataType from "./field-types/types/NumberDataType.ts";*/
  * @example
  * Get connection to database
  * ```ts
- * import {ODM} from 'https://deno.land/x/justaos_odm@$VERSION/mod.ts';
+ * import {ODM} from "https://deno.land/x/justaos_odm@$VERSION/mod.ts";
  * const odm = new ODM({
  *  hostname: "localhost",
  *  port: 5432,
@@ -49,6 +52,7 @@ import NumberDataType from "./field-types/types/NumberDataType.ts";*/
  * @param config Database configuration
  */
 export default class ODM {
+  readonly #logger = Logger.createLogger({ label: ODM.name });
   readonly #config: DatabaseConfiguration;
   readonly #fieldTypeRegistry: Registry<FileType> = new Registry<FileType>();
   readonly #tableDefinitionRegistry: Registry<TableDefinition> =
@@ -65,6 +69,7 @@ export default class ODM {
   async connect(createDatabaseIfNotExists?: boolean): Promise<ODMConnection> {
     try {
       const conn = new ODMConnection(
+        this.#logger,
         this.#config,
         this.#fieldTypeRegistry,
         this.#tableDefinitionRegistry,
@@ -101,6 +106,16 @@ export default class ODM {
     this.#fieldTypeRegistry.add(new FieldTypeClass(this));
   }
 
+  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
+    this.#operationInterceptorService.addInterceptor(operationInterceptor);
+  }
+
+  deleteInterceptor(operationInterceptorName: string): void {
+    this.#operationInterceptorService.deleteInterceptor(
+      operationInterceptorName
+    );
+  }
+
   #loadBuildInFieldTypes(): void {
     this.addFieldType(StringDataType);
      this.addFieldType(IntegerDataType);
@@ -108,6 +123,8 @@ export default class ODM {
     this.addFieldType(JSONDataType);
     this.addFieldType(BooleanDataType);
     this.addFieldType(DateDataType);
+    this.addFieldType(UUIDFieldType);
+    //this.addFieldType()
     /*this.addFieldType(ObjectIdFieldType);
     this.addFieldType(DateTimeFieldType);*/
   }

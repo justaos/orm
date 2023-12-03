@@ -12,11 +12,12 @@ import SelectQuery from "./query/SelectQuery.ts";
 import { RecordValidationError } from "../errors/RecordValidationError.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { RawRecord } from "../record/RawRecord.ts";
+import { DatabaseOperationContext } from "../operation-interceptor/DatabaseOperationContext.ts";
 
 export default class Table {
   readonly #sql: any;
   readonly #schema: TableSchema;
-  readonly #context: any;
+  readonly #context?: DatabaseOperationContext;
   readonly #logger = Logger.createLogger({ label: Table.name });
   readonly #operationInterceptorService: DatabaseOperationInterceptorService;
 
@@ -26,7 +27,7 @@ export default class Table {
     sql: any,
     schema: TableSchema,
     operationInterceptorService: DatabaseOperationInterceptorService,
-    context: any
+    context?: DatabaseOperationContext
   ) {
     this.#sql = sql;
     this.#operationInterceptorService = operationInterceptorService;
@@ -34,7 +35,7 @@ export default class Table {
     this.#context = context;
   }
 
-  getContext(): any {
+  getContext(): DatabaseOperationContext | undefined {
     return this.#context;
   }
 
@@ -60,11 +61,12 @@ export default class Table {
     return selectQuery;
   }
 
-  /*async findById(id: string): Promise<Record | undefined> {
-    this.select("id", id);
-    this.limit(1);
-    this.runQuery();
-  }*/
+  async findById(id: string): Promise<Record | undefined> {
+    const selectQuery = this.select();
+    selectQuery.where("id", id);
+    const [record] = await selectQuery.toArray();
+    return record;
+  }
 
   convertRawRecordsToRecords(rawRecords: RawRecord[]): Record[] {
     return rawRecords.map((rawRecord) => {
@@ -88,85 +90,59 @@ export default class Table {
     this.#disableIntercepts.push(interceptName);
   }
 
-  /* async findOne(
-     filter: any,
-     options?: mongodb.FindOptions<any>
-   ): Promise<Record | undefined> {
-     // const schema = this.getSchema();
-     // if (!filter) filter = {};
-     //this.#formatFilter(filter, schema);
-     //const doc = await this.#collection.findOne(filter, options);
-     //if (doc) return new Record(doc, this);
-   }*/
-
-  /*
-   * The where function can be used in several ways:
-   * The most basic is `where(key, value)`, which expands to
-   * where key = value.
-   */
-
-  /*  find(filter: any = {}, options?: any): FindCursor {
-      const schema = this.getSchema();
-      this.#formatFilter(filter, schema);
-      if (schema.getInherits()) filter._collection = schema.getName();
-      const cursor = this.#collection.find(filter, options);
-      return new FindCursor(cursor, this);
-    }*/
-
-  async insertRecord(record: Record): Promise<Record> {
+  async insertRecords(records: Record[]): Promise<Record[]> {
     const reserve = await this.#sql.reserve();
 
-    [record] = await this.intercept(
+    records = await this.intercept(
       OPERATION_TYPES.CREATE,
       OPERATION_WHENS.BEFORE,
-      [record]
+      records
     );
-    await this.validateRecord(record.toJSON(), this.getContext());
 
-    const validColumns = this.getTableSchema()
-      .getAllColumnSchemas()
-      .filter((column) => !!record.get(column.getName()))
-      .map((column) => column.getName());
+    for (const record of records) {
+      await this.validateRecord(record.toJSON(), this.getContext());
+    }
 
-    const insertQuery = `INSERT INTO ${this.getSchemaName()}.${this.getName()} (${validColumns.join(
-      ", "
-    )}) VALUES (${validColumns
-      .map((columnName) => `'${record.get(columnName)}'`)
-      .join(", ")})`;
+    const rawRecords = records.map((record) => record.toJSON());
 
-    this.#logger.info(`[Query] ${insertQuery}`);
-
-    let savedRawRecord: RawRecord;
+    for (const record of records) {
+      await this.validateRecord(record.toJSON(), this.getContext());
+    }
+    let savedRawRecords: RawRecord;
     try {
-      [savedRawRecord] = await reserve`INSERT INTO ${reserve(
-        this.getSchemaName()
-      )}.${reserve(this.getName())} ${reserve(
-        record.toJSON(validColumns)
-      )} RETURNING *`.execute();
+      const command = reserve`INSERT INTO ${reserve(
+        this.getTableSchema().getFullName()
+      )} ${reserve(rawRecords)} RETURNING *`;
+      savedRawRecords = await command.execute();
     } catch (err) {
       reserve.release();
       this.#logger.error(err);
       throw new RecordValidationError(
         this.getTableSchema().getDefinition(),
-        record.getID(),
+        "test",
         [],
         err.message
       );
     } finally {
       reserve.release();
     }
-
     reserve.release();
-    let savedRecord = new Record(savedRawRecord, this);
-    [savedRecord] = await this.intercept(
+
+    let savedRecords = savedRawRecords.map((savedRawRecord: RawRecord) => {
+      return new Record(savedRawRecord, this);
+    });
+    savedRecords = await this.intercept(
       OPERATION_TYPES.CREATE,
       OPERATION_WHENS.AFTER,
-      [savedRecord]
+      savedRecords
     );
-    return savedRecord;
+    return savedRecords;
   }
 
-  async validateRecord(rawRecord: RawRecord, context: any) {
+  async validateRecord(
+    rawRecord: RawRecord,
+    context?: DatabaseOperationContext
+  ) {
     const fieldErrors: any[] = [];
     for (const columnSchema of this.getTableSchema().getAllColumnSchemas()) {
       const value = rawRecord[columnSchema.getName()];
@@ -198,25 +174,50 @@ export default class Table {
     }
   }
 
-  /*async updateRecord(record: Record): Promise<Record> {
-    record = await this.#interceptRecord(
-      OperationType.UPDATE,
-      OperationWhen.BEFORE,
-      record
+  async updateRecord(record: Record): Promise<Record> {
+    const reserve = await this.#sql.reserve();
+    [record] = await this.intercept(
+      OPERATION_TYPES.UPDATE,
+      OPERATION_WHENS.BEFORE,
+      [record]
     );
-    await this.getSchema().validateRecord(record.toObject(), this.getContext());
-    await this.#collection.updateOne(
-      { _id: record.get("_id") },
-      { $set: { ...record.toObject() } }
+
+    await this.validateRecord(record.toJSON(), this.getContext());
+
+    const rawRecord = record.toJSON();
+
+    await this.validateRecord(record.toJSON(), this.getContext());
+
+    let savedRawRecord: RawRecord;
+    try {
+      const command = reserve`UPDATE ${reserve(
+        this.getTableSchema().getFullName()
+      )} set ${reserve(rawRecord)}   where id = ${rawRecord.id} RETURNING *`;
+      [savedRawRecord] = await command.execute();
+    } catch (err) {
+      reserve.release();
+      this.#logger.error(err);
+      throw new RecordValidationError(
+        this.getTableSchema().getDefinition(),
+        "test",
+        [],
+        err.message
+      );
+    } finally {
+      reserve.release();
+    }
+    reserve.release();
+
+    let savedRecord = new Record(savedRawRecord, this);
+    [savedRecord] = await this.intercept(
+      OPERATION_TYPES.UPDATE,
+      OPERATION_WHENS.AFTER,
+      [savedRecord]
     );
-    return await this.#interceptRecord(
-      OperationType.UPDATE,
-      OperationWhen.AFTER,
-      record
-    );
+    return savedRecord;
   }
 
-  async deleteOne(record: Record): Promise<{
+  /*async deleteOne(record: Record): Promise<{
     /!** Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined. *!/
     acknowledged: boolean;
     /!** The number of documents that were deleted *!/

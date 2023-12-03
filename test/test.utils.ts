@@ -7,6 +7,14 @@ class Session {
 
   static #odmConnection: ODMConnection;
 
+  static setODM(odm: ODM) {
+    Session.#odm = odm;
+  }
+
+  static getOdm(): ODM {
+    return Session.#odm;
+  }
+
   static async getConnection(
     forceNewConnection: boolean = false
   ): Promise<ODMConnection> {

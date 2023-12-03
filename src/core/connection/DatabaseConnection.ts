@@ -19,8 +19,11 @@ export default class DatabaseConnection {
   #sql: any;
   readonly #logger = Logger.createLogger({ label: DatabaseConnection.name });
 
-  constructor(configuration: DatabaseConfiguration) {
+  constructor(configuration: DatabaseConfiguration, logger?: Logger) {
     this.#config = configuration;
+    if (logger) {
+      this.#logger = logger;
+    }
   }
 
   async connect(): Promise<void> {

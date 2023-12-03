@@ -1,13 +1,12 @@
 import DataType from "../DataType.ts";
 import TableSchema from "../../table/TableSchema.ts";
-import ODM from "../../ODM.ts";
-import { DateUtils } from "../../../deps.ts";
-import PrimitiveDataType from "../../core/data-types/PrimitiveDataType.ts";
+import { DateUtils, Temporal } from "../../../deps.ts";
 import { RawRecord } from "../../record/RawRecord.ts";
+import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 
 export default class DateTimeFieldType extends DataType {
-  constructor(odm: ODM) {
-    super(odm, PrimitiveDataType.DATE_TIME);
+  constructor() {
+    super(NATIVE_DATA_TYPES.DATE);
   }
 
   getName(): string {
@@ -15,14 +14,10 @@ export default class DateTimeFieldType extends DataType {
   }
 
   async validateValue(
-    schema: TableSchema,
-    fieldName: string,
-    record: any,
-    context: any
-  ) {
-    DataType.requiredValidation(schema, fieldName, record);
-    await DataType.uniqueValidation(this.getODM(), schema, fieldName, record);
-  }
+    _schema: TableSchema,
+    _fieldName: string,
+    _record: RawRecord
+  ) {}
 
   validateDefinition(fieldDefinition: any): boolean {
     return !!fieldDefinition.name;
@@ -40,12 +35,18 @@ export default class DateTimeFieldType extends DataType {
     return value;
   }
 
+  getNativeValue(value: any): any {
+    if (value instanceof Temporal.PlainDate) {
+      return value.toString();
+    }
+    return value;
+  }
+
   async getDisplayValue(
-    schema: TableSchema,
+    _schema: TableSchema,
     fieldName: string,
-    record: RawRecord,
-    context: any
+    record: RawRecord
   ) {
-    return this.getDataType().toJSON(record[fieldName]);
+    return record[fieldName];
   }
 }

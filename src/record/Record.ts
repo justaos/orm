@@ -74,7 +74,7 @@ export default class Record {
     if (typeof this.#record === "undefined")
       throw new Error("Record not initialized");
     const schema = this.#table.getTableSchema();
-    const dataType = schema.getColumnSchema(key).getColumnType();
+    const dataType = schema.getColumnSchema(key)?.getColumnType();
     if (dataType && this.#record[key])
       return dataType.getNativeValue(this.#record[key]);
     return null;
@@ -91,27 +91,27 @@ export default class Record {
   }
 
   async insert(): Promise<Record> {
-    const record = await this.#table.insertRecord(this);
+    const [record] = await this.#table.insertRecords([this]);
     this.#record = record.toJSON();
     this.#isNew = false;
     return this;
   }
 
-  /* async update(): Promise<Record> {
+  async update(): Promise<Record> {
     const record = await this.#table.updateRecord(this);
     this.#record = record.toJSON();
     this.#isNew = false;
     return this;
   }
 
-  async delete(): Promise<Record> {
+  /* async delete(): Promise<Record> {
     if (this.#isNew) {
       throw Error("[Record::remove] Cannot remove unsaved record");
     }
     await this.#table.deleteOne(this);
     return this;
-  }*/
-
+  }
+*/
   toJSON(columns?: string[]): any {
     const jsonObject: any = {};
     this.#table

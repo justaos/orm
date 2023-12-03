@@ -1,7 +1,7 @@
 import Table from "../Table.ts";
 
 export default class RecordQuery {
-  #table: Table;
+  readonly #table: Table;
 
   constructor(table: Table) {
     this.#table = table;
@@ -10,7 +10,8 @@ export default class RecordQuery {
   getTable(): Table {
     return this.#table;
   }
-  execute(): void {
+
+  execute() {
     throw new Error("Method not implemented.");
   }
 }

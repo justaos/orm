@@ -53,8 +53,24 @@ export default class TableSchema {
     return this.#definition.schema;
   }
 
+  getFullName(): string {
+    return `${this.getSchemaName()}.${this.getName()}`;
+  }
+
   getInherits(): string | undefined {
-    return this.#definition.inherits;
+    if (this.#definition.inherits)
+      return TableSchema.getSchemaAndTableName(this.#definition.inherits);
+  }
+
+  static getSchemaAndTableName(fullName: string): string {
+    const parts = fullName.split(".");
+    let schemaName = "public";
+    let tableName = fullName;
+    if (parts.length == 2) {
+      schemaName = parts[0];
+      tableName = parts[1];
+    }
+    return `${schemaName}.${tableName}`;
   }
 
   isFinal(): boolean {
@@ -94,40 +110,32 @@ export default class TableSchema {
     return hostName;
   }
 
+  getDataType(name: string): DataType | undefined {
+    return this.#fieldTypeRegistry.get(name);
+  }
+
   getOwnColumnSchemas(): ColumnSchema[] {
     const columns: ColumnSchema[] = [];
     const extendsTableName = this.getInherits();
     if (!extendsTableName) {
       columns.push(
-        new ColumnSchema(
-          this,
-          {
-            name: "id",
-            type: "string",
-            not_null: true,
-            unique: true
-          },
-          this.#fieldTypeRegistry.get("string")
-        ),
-        new ColumnSchema(
-          this,
-          {
-            name: "_table",
-            type: "string",
-            not_null: true,
-            unique: false
-          },
-          this.#fieldTypeRegistry.get("string")
-        )
+        new ColumnSchema(this, {
+          name: "id",
+          type: "string",
+          not_null: true,
+          unique: true
+        }),
+        new ColumnSchema(this, {
+          name: "_table",
+          type: "string",
+          not_null: true,
+          unique: false
+        })
       );
     }
     columns.push(
       ...this.#definition.columns.map((column: ColumnDefinition) => {
-        return new ColumnSchema(
-          this,
-          column,
-          this.#fieldTypeRegistry.get(column.type)
-        );
+        return new ColumnSchema(this, column);
       })
     );
     return columns;
@@ -137,7 +145,10 @@ export default class TableSchema {
     const allFields: ColumnSchema[] = this.getOwnColumnSchemas();
 
     const extendsTableName = this.getInherits();
-    if (extendsTableName) {
+    if (
+      extendsTableName &&
+      this.#tableDefinitionRegistry.has(extendsTableName)
+    ) {
       const extendedSchema = this.#getTableSchema(extendsTableName);
       allFields.push(...extendedSchema.getAllColumnSchemas());
     }
@@ -171,12 +182,13 @@ export default class TableSchema {
         errorMessages.push(
           `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' does not exists.`
         );
-      }
-      const extendsCol: TableSchema = this.#getTableSchema(extendsTableName);
-      if (extendsCol.isFinal()) {
-        errorMessages.push(
-          `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' is final table schema.`
-        );
+      } else {
+        const extendsCol: TableSchema = this.#getTableSchema(extendsTableName);
+        if (extendsCol.isFinal()) {
+          errorMessages.push(
+            `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' is final table schema.`
+          );
+        }
       }
     }
 
@@ -201,9 +213,10 @@ export default class TableSchema {
     }
   }
 
-  #getTableSchema(schemaName: string): TableSchema {
-    const schema = this.#tableDefinitionRegistry.get(schemaName);
-    if (!schema) throw Error("[Schema::_getSchema] Schema not found");
+  #getTableSchema(fullName: string): TableSchema {
+    const schema = this.#tableDefinitionRegistry.get(fullName);
+    if (!schema)
+      throw Error(`[Schema::_getSchema] Schema not found :: ${fullName}`);
     return new TableSchema(
       schema,
       this.#fieldTypeRegistry,
