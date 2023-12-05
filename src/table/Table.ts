@@ -91,8 +91,6 @@ export default class Table {
   }
 
   async insertRecords(records: Record[]): Promise<Record[]> {
-    const reserve = await this.#sql.reserve();
-
     records = await this.intercept(
       OPERATION_TYPES.CREATE,
       OPERATION_WHENS.BEFORE,
@@ -109,6 +107,7 @@ export default class Table {
       await this.validateRecord(record.toJSON(), this.getContext());
     }
     let savedRawRecords: RawRecord;
+    const reserve = await this.#sql.reserve();
     try {
       const command = reserve`INSERT INTO ${reserve(
         this.getTableSchema().getFullName()
@@ -175,7 +174,6 @@ export default class Table {
   }
 
   async updateRecord(record: Record): Promise<Record> {
-    const reserve = await this.#sql.reserve();
     [record] = await this.intercept(
       OPERATION_TYPES.UPDATE,
       OPERATION_WHENS.BEFORE,
@@ -189,6 +187,7 @@ export default class Table {
     await this.validateRecord(record.toJSON(), this.getContext());
 
     let savedRawRecord: RawRecord;
+    const reserve = await this.#sql.reserve();
     try {
       const command = reserve`UPDATE ${reserve(
         this.getTableSchema().getFullName()

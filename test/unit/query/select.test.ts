@@ -8,7 +8,6 @@ import {
 
 import { Session } from "../../test.utils.ts";
 import { ODMConnection } from "../../../mod.ts";
-import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
 
 describe(
   "Schema",
@@ -18,7 +17,6 @@ describe(
   },
   () => {
     let conn: ODMConnection;
-    let logger = Logger.createLogger();
 
     beforeAll(async () => {
       conn = await Session.getConnection();

@@ -93,7 +93,6 @@ export default class ODMConnection {
 
     const sql = this.#conn.getNativeConnection();
     const reserved = await sql.reserve();
-
     try {
       const [{ exists: schemaExists }] = await reserved`SELECT EXISTS(SELECT
                     FROM information_schema.schemata

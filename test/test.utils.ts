@@ -11,7 +11,7 @@ class Session {
     Session.#odm = odm;
   }
 
-  static getOdm(): ODM {
+  static getODM(): ODM {
     return Session.#odm;
   }
 

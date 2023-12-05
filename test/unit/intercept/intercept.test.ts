@@ -31,7 +31,7 @@ describe({
 
     beforeAll(async () => {
       conn = await Session.getConnection();
-      odm = Session.getOdm();
+      odm = Session.getODM();
     });
 
     afterAll(async () => {

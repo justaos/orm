@@ -1,19 +1,18 @@
 import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
-import FileType from "./data-types/DataType.ts";
 import DataType from "./data-types/DataType.ts";
 
-import StringDataType from "./data-types/types/StringFieldType.ts";
+import StringDataType from "./data-types/types/StringDataType.ts";
 import ODMConnection from "./ODMConnection.ts";
 import { TableDefinition } from "./table/definitions/TableDefinition.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
-import IntegerDataType from "./data-types/types/IntegerFieldType.ts";
-import NumberDataType from "./data-types/types/NumberFieldType.ts";
-import JSONDataType from "./data-types/types/JSONFieldType.ts";
-import BooleanDataType from "./data-types/types/BooleanFieldType.ts";
-import DateDataType from "./data-types/types/DateFieldType.ts";
+import IntegerDataType from "./data-types/types/IntegerDataType.ts";
+import NumberDataType from "./data-types/types/NumberDataType.ts";
+import JSONDataType from "./data-types/types/JSONDataType.ts";
+import BooleanDataType from "./data-types/types/BooleanDataType.ts";
+import DateDataType from "./data-types/types/DateDataType.ts";
 import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
-import UUIDFieldType from "./data-types/types/UUIDFieldType.ts";
+import UUIDDataType from "./data-types/types/UUIDDataType.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 /*import IntegerDataType from "./field-types/types/IntegerDataType.ts";
 import DateDataType from "./field-types/types/DateDataType.ts";
@@ -54,7 +53,7 @@ import NumberDataType from "./field-types/types/NumberDataType.ts";*/
 export default class ODM {
   readonly #logger = Logger.createLogger({ label: ODM.name });
   readonly #config: DatabaseConfiguration;
-  readonly #fieldTypeRegistry: Registry<FileType> = new Registry<FileType>();
+  readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>();
   readonly #tableDefinitionRegistry: Registry<TableDefinition> =
     new Registry<TableDefinition>();
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
@@ -71,7 +70,7 @@ export default class ODM {
       const conn = new ODMConnection(
         this.#logger,
         this.#config,
-        this.#fieldTypeRegistry,
+        this.#dataTypeRegistry,
         this.#tableDefinitionRegistry,
         this.#schemaRegistry,
         this.#operationInterceptorService
@@ -91,6 +90,7 @@ export default class ODM {
         });
         await tempConn.connect();
         await tempConn.createDatabase(this.#config.database);
+        await tempConn.closeConnection();
         return await this.connect(false);
       } else {
         throw error;
@@ -102,8 +102,8 @@ export default class ODM {
     return this.#tableDefinitionRegistry.has(tableName);
   }
 
-  addFieldType(FieldTypeClass: new (odm: ODM) => DataType): void {
-    this.#fieldTypeRegistry.add(new FieldTypeClass(this));
+  addDataType(DataTypeClass: new (odm: ODM) => DataType): void {
+    this.#dataTypeRegistry.add(new DataTypeClass(this));
   }
 
   addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
@@ -117,13 +117,13 @@ export default class ODM {
   }
 
   #loadBuildInFieldTypes(): void {
-    this.addFieldType(StringDataType);
-     this.addFieldType(IntegerDataType);
-    this.addFieldType(NumberDataType);
-    this.addFieldType(JSONDataType);
-    this.addFieldType(BooleanDataType);
-    this.addFieldType(DateDataType);
-    this.addFieldType(UUIDFieldType);
+    this.addDataType(StringDataType);
+     this.addDataType(IntegerDataType);
+    this.addDataType(NumberDataType);
+    this.addDataType(JSONDataType);
+    this.addDataType(BooleanDataType);
+    this.addDataType(DateDataType);
+    this.addDataType(UUIDDataType);
     //this.addFieldType()
     /*this.addFieldType(ObjectIdFieldType);
     this.addFieldType(DateTimeFieldType);*/

@@ -1,16 +1,16 @@
 import DataType from "../DataType.ts";
 import TableSchema from "../../table/TableSchema.ts";
-import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
 import { RawRecord } from "../../record/RawRecord.ts";
+import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 
-export default class BooleanFieldType extends DataType {
+export default class IntegerDataType extends DataType {
   constructor() {
-    super(NATIVE_DATA_TYPES.BOOLEAN);
+    super(NATIVE_DATA_TYPES.INTEGER);
   }
 
   getName(): string {
-    return "boolean";
+    return "integer";
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
@@ -21,8 +21,12 @@ export default class BooleanFieldType extends DataType {
     _schema: TableSchema,
     _fieldName: string,
     value: any,
-    _record: RawRecord | undefined
+    _record: RawRecord
   ): any {
+    if (typeof value === "string") {
+      // @ts-ignore
+      return value * 1;
+    }
     return value;
   }
 
@@ -32,7 +36,6 @@ export default class BooleanFieldType extends DataType {
     _record: RawRecord
   ) {}
 
-  // deno-lint-ignore require-await
   async getDisplayValue(
     _schema: TableSchema,
     fieldName: string,

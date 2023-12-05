@@ -1,19 +1,20 @@
 import { ODM } from "../mod.ts";
+import ODMConnection from "../src/ODMConnection.ts";
 
-const odm = new ODM();
+const odm = new ODM({
+  database: "collection-service",
+  username: "postgres",
+  password: "admin",
+  hostname: "localhost",
+  port: 5432
+});
 
+let conn: ODMConnection | undefined;
 try {
-  await odm.connect("mongodb://127.0.0.1:27017/collection-service");
+  conn = await odm.connect(true /* create database if not exists */);
   console.log("connection success");
-  const isDbExists = await odm.databaseExists();
-
-  if (isDbExists) {
-    console.log("db exists");
-  } else {
-    console.log("db does not exists");
-  }
 } catch (_error) {
   console.log("connection failed");
 } finally {
-  await odm.closeConnection();
+  if (conn) await conn.closeConnection();
 }

@@ -28,14 +28,14 @@ describe({
     });
 
     it("#connect wrong config", async () => {
-      const config: any = {
+      const config: DatabaseConfiguration = {
         ...defaultConfig,
         port: 80
       };
       try {
         await DatabaseConnection.connect({
           ...config,
-          connectTimeoutMS: 500
+          connect_timeout: 500
         });
         assert(false, "Connection should fail");
       } catch (_error) {

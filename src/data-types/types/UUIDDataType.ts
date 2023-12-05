@@ -1,16 +1,16 @@
 import DataType from "../DataType.ts";
 import TableSchema from "../../table/TableSchema.ts";
+import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
 import { RawRecord } from "../../record/RawRecord.ts";
-import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 
-export default class JSONFieldType extends DataType {
+export default class UUIDDataType extends DataType {
   constructor() {
-    super(NATIVE_DATA_TYPES.JSON);
+    super(NATIVE_DATA_TYPES.UUID);
   }
 
   getName(): string {
-    return "json";
+    return "uuid";
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
@@ -21,7 +21,7 @@ export default class JSONFieldType extends DataType {
     _schema: TableSchema,
     _fieldName: string,
     value: any,
-    _record: RawRecord | undefined
+    _record: RawRecord
   ): any {
     return value;
   }

@@ -10,7 +10,6 @@ import {
 
 import { ODMConnection, Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
-import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
 
 describe({
   name: "Collection",
@@ -18,7 +17,6 @@ describe({
   sanitizeOps: false,
   fn: () => {
     let conn: ODMConnection;
-    let logger = Logger.createLogger();
     const cleanTableList: string[] = [];
     let johnRecord: Record;
 

@@ -1,4 +1,4 @@
-import { ODM } from "./mod.ts";
+import { ODM } from "../mod.ts";
 
 const conn = await new ODM({
   hostname: "127.0.0.1",
@@ -8,8 +8,22 @@ const conn = await new ODM({
   database: "odm-test-db"
 }).connect(true);
 
+/*@Table()
+class TestingTable {
+
+  @DataTypeString()
+  name;
+
+  @DataTypeInteger()
+  age;
+
+  @DataTypeInteger()
+  test;
+}*/
+
+//await conn.defineTable(TestingTable);
+
 await conn.defineTable({
-  schema: "testing_schema",
   name: "testing_table",
   columns: [
     {
@@ -18,20 +32,22 @@ await conn.defineTable({
     },
     {
       name: "age",
-      type: "date"
+      type: "integer"
     }
   ]
 });
 
-const table = conn.table("testing_schema.testing_table");
+const table = conn.table("testing_table");
 
-const record = table.createNewRecord();
 
-record.set("name", "1992");
-record.set("age", "1992-10-01");
 
+for(let i = 0; i < 1000; i++) {
+  const record = table.createNewRecord();
+
+  record.set("name", "1992");
+  record.set("age", "199201");
   await record.insert();
-
+}
 
 
 const selectQuery = table.select();

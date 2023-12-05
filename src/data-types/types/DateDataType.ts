@@ -3,27 +3,19 @@ import TableSchema from "../../table/TableSchema.ts";
 import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
 import { RawRecord } from "../../record/RawRecord.ts";
+import { Temporal } from "../../../deps.ts";
 
-export default class UUIDFieldType extends DataType {
+export default class DateDataType extends DataType {
   constructor() {
-    super(NATIVE_DATA_TYPES.UUID);
+    super(NATIVE_DATA_TYPES.DATE);
   }
 
   getName(): string {
-    return "uuid";
+    return "date";
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
     return true;
-  }
-
-  setValueIntercept(
-    _schema: TableSchema,
-    _fieldName: string,
-    value: any,
-    _record: RawRecord | undefined
-  ): any {
-    return value;
   }
 
   async validateValue(
@@ -32,7 +24,25 @@ export default class UUIDFieldType extends DataType {
     _record: RawRecord
   ) {}
 
-  // deno-lint-ignore require-await
+  setValueIntercept(
+    _schema: TableSchema,
+    _fieldName: string,
+    value: any,
+    _record: any
+  ): Temporal.PlainDate {
+    if (typeof value === "string") {
+      return Temporal.PlainDate.from(value);
+    }
+    return value;
+  }
+
+  getNativeValue(value: any): any {
+    if (value instanceof Temporal.PlainDate) {
+      return value.toString();
+    }
+    return value;
+  }
+
   async getDisplayValue(
     _schema: TableSchema,
     fieldName: string,

@@ -24,10 +24,10 @@ export default class DateTimeFieldType extends DataType {
   }
 
   setValueIntercept(
-    schema: TableSchema,
-    fieldName: string,
+    _schema: TableSchema,
+    _fieldName: string,
     value: any,
-    record: any
+    _record: any
   ): any {
     if (typeof value === "string" && DateUtils.isIsoDate(value)) {
       return new Date(value);

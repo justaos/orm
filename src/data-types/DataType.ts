@@ -2,9 +2,9 @@ import { NativeDataType } from "../core/NativeDataType.ts";
 import TableSchema from "../table/TableSchema.ts";
 import { RawRecord } from "../record/RawRecord.ts";
 import { ColumnDefinition } from "../table/definitions/ColumnDefinition.ts";
+import { DatabaseOperationContext } from "../operation-interceptor/DatabaseOperationContext.ts";
 
 export default abstract class DataType {
-  category: string[] = [];
   readonly #primitiveDataType: NativeDataType;
 
   protected constructor(primitiveDataType: NativeDataType) {
@@ -13,10 +13,6 @@ export default abstract class DataType {
 
   getNativeType(): NativeDataType {
     return this.#primitiveDataType;
-  }
-
-  is(category: string): boolean {
-    return this.category.includes(category);
   }
 
   abstract getName(): string;
@@ -35,20 +31,20 @@ export default abstract class DataType {
     schema: TableSchema,
     fieldName: string,
     value: any,
-    record: RawRecord | undefined
+    record: RawRecord
   ): any;
 
   abstract validateValue(
     schema: TableSchema,
     fieldName: string,
     record: RawRecord | undefined,
-    context: any
+    context?: DatabaseOperationContext
   ): Promise<void>;
 
   abstract getDisplayValue(
     schema: TableSchema,
     fieldName: string,
     record: RawRecord,
-    context: any
+    context?: DatabaseOperationContext
   ): Promise<any>;
 }

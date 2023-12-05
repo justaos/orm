@@ -1,16 +1,16 @@
 import DataType from "../DataType.ts";
 import TableSchema from "../../table/TableSchema.ts";
-import { RawRecord } from "../../record/RawRecord.ts";
 import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
+import { RawRecord } from "../../record/RawRecord.ts";
 
-export default class StringFieldType extends DataType {
+export default class BooleanDataType extends DataType {
   constructor() {
-    super(NATIVE_DATA_TYPES.CHAR);
+    super(NATIVE_DATA_TYPES.BOOLEAN);
   }
 
   getName(): string {
-    return "char";
+    return "boolean";
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
@@ -21,7 +21,7 @@ export default class StringFieldType extends DataType {
     _schema: TableSchema,
     _fieldName: string,
     value: any,
-    _record: RawRecord | undefined
+    _record: RawRecord
   ): any {
     return value;
   }

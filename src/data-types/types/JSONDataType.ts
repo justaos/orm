@@ -2,14 +2,15 @@ import DataType from "../DataType.ts";
 import TableSchema from "../../table/TableSchema.ts";
 import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
 import { RawRecord } from "../../record/RawRecord.ts";
+import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 
-export default class NumberFieldType extends DataType {
+export default class JSONDataType extends DataType {
   constructor() {
-    super("decimal");
+    super(NATIVE_DATA_TYPES.JSON);
   }
 
   getName(): string {
-    return "number";
+    return "json";
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
@@ -20,12 +21,8 @@ export default class NumberFieldType extends DataType {
     _schema: TableSchema,
     _fieldName: string,
     value: any,
-    _record: RawRecord | undefined
+    _record: RawRecord
   ): any {
-    if (typeof value === "string") {
-      // @ts-ignore
-      return value * 1;
-    }
     return value;
   }
 

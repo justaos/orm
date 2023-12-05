@@ -81,7 +81,7 @@ export default class TableSchema {
   getDefinition(): TableDefinition {
     return {
       ...this.#definition,
-      columns: this.#definition.columns?.map((column: any) => {
+      columns: this.#definition.columns?.map((column: ColumnDefinition) => {
         return {
           ...column
         };

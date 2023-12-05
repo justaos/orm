@@ -1,41 +1,38 @@
 import getODM from "./getODM.ts";
 import {
-  OperationInterceptorInterface,
-  OperationType,
-  OperationWhen,
-  Record,
+  DatabaseOperationContext,
+  DatabaseOperationInterceptor,
+  DatabaseOperationType,
+  DatabaseOperationWhen,
+  Record
 } from "../mod.ts";
 
-const odm = await getODM();
+const odm = getODM();
+
+const conn = await odm.connect(true);
 
 odm.addInterceptor(
-  new (class extends OperationInterceptorInterface {
+  new (class extends DatabaseOperationInterceptor {
     getName() {
       return "my-intercept";
     }
 
     async intercept(
       collectionName: string,
-      operation: OperationType,
-      when: OperationWhen,
+      operation: DatabaseOperationType,
+      when: DatabaseOperationWhen,
       records: Record[],
-      context: any,
+      _context: DatabaseOperationContext
     ) {
       if (collectionName === "student") {
         if (operation === "CREATE") {
           console.log(
-            "[collectionName=" +
-              collectionName +
-              ", operation=" +
-              operation +
-              ", when=" +
-              when +
-              "]",
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );
           if (when === "BEFORE") {
             for (let record of records) {
               console.log(
-                "computed field updated for :: " + record.get("name"),
+                "computed field updated for :: " + record.get("name")
               );
               record.set("computed", record.get("name") + " +++ computed");
             }
@@ -43,48 +40,52 @@ odm.addInterceptor(
         }
         if (operation === "READ") {
           console.log(
-            "[collectionName=" +
-              collectionName +
-              ", operation=" +
-              operation +
-              ", when=" +
-              when +
-              "]",
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );
           if (when === "AFTER") {
             for (const record of records) {
-              console.log(JSON.stringify(record.toObject(), null, 4));
+              console.log(JSON.stringify(record.toJSON(), null, 4));
             }
           }
         }
       }
       return records;
     }
-  })(),
+  })()
 );
 
-odm.defineCollection({
+await conn.defineTable({
   name: "student",
-  fields: [
+  columns: [
     {
       name: "name",
-      type: "string",
+      type: "string"
     },
     {
       name: "computed",
-      type: "string",
-    },
-  ],
+      type: "string"
+    }
+  ]
 });
 
-const studentCollection = odm.collection("student");
-const studentRecord = studentCollection.createNewRecord();
+const studentTable = conn.table("student");
+const studentRecord = studentTable.createNewRecord();
 studentRecord.set("name", "John " + new Date().toISOString());
-studentRecord.insert().then(function () {
-  studentCollection
-    .find()
-    .toArray()
-    .then(function () {
-      odm.closeConnection();
-    });
-});
+await studentRecord.insert();
+await studentTable.select().toArray();
+/* This will print the following:
+[collectionName=student, operation=CREATE, when=BEFORE]
+computed field updated for :: John 2023-12-05T13:57:21.418Z
+[collectionName=student, operation=CREATE, when=AFTER]
+
+[collectionName=student, operation=READ, when=BEFORE]
+[collectionName=student, operation=READ, when=AFTER]
+{
+    "id": "e5d8a03e-7511-45c6-96ad-31a6fa833696",
+    "_table": "student",
+    "name": "John 2023-12-05T13:31:13.313Z",
+    "computed": "John 2023-12-05T13:31:13.313Z +++ computed"
+}
+*/
+
+await conn.closeConnection();

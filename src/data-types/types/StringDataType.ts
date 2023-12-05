@@ -4,7 +4,7 @@ import { RawRecord } from "../../record/RawRecord.ts";
 import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
 import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
 
-export default class StringFieldType extends DataType {
+export default class StringDataType extends DataType {
   constructor() {
     super(NATIVE_DATA_TYPES.VARCHAR);
   }
@@ -21,7 +21,7 @@ export default class StringFieldType extends DataType {
     _schema: TableSchema,
     _fieldName: string,
     value: any,
-    _record: RawRecord | undefined
+    _record: RawRecord
   ): any {
     return value;
   }
