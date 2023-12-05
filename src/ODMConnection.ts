@@ -15,6 +15,7 @@ import DatabaseOperationInterceptorService from "./operation-interceptor/Databas
 import { DatabaseErrorCode, ODMError } from "./errors/ODMError.ts";
 import { DatabaseOperationContext } from "./operation-interceptor/DatabaseOperationContext.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
+import { UUID, UUIDUtils } from "./core/UUID.ts";
 
 export default class ODMConnection {
   readonly #config: DatabaseConfiguration;
@@ -118,7 +119,7 @@ export default class ODMConnection {
         query = `${query} ${tableSchema
           .getOwnColumnSchemas()
           .map((column) => {
-            return `${column.getName()} ${column
+            return `"${column.getName()}" ${column
               .getColumnType()
               .getNativeType()} ${column.isNotNull() ? "NOT NULL" : ""} ${
               column.isUnique() ? "UNIQUE" : ""
@@ -219,8 +220,12 @@ export default class ODMConnection {
     );
   }
 
-  generateRecordId(): string {
-    return crypto.randomUUID();
+  generateRecordId(): UUID {
+    return UUIDUtils.generateId();
+  }
+
+  validateRecordId(id: UUID): boolean {
+    return UUIDUtils.isValidId(id);
   }
 
   #getConnection(): DatabaseConnection {

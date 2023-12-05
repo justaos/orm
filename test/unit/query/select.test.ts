@@ -40,6 +40,11 @@ describe(
             default: 0
           },
           {
+            name: "order",
+            type: "integer",
+            default: 100
+          },
+          {
             name: "active",
             type: "boolean",
             default: true
@@ -49,14 +54,16 @@ describe(
       const taskTable = conn.table("task");
       for (let i = 0; i < 20; i++) {
         const taskRecord = taskTable.createNewRecord();
-        taskRecord.set("description", `Task ${i}`);
+        taskRecord.set("description", `Task [priority 1] ${i}`);
         taskRecord.set("priority", 1);
+        taskRecord.set("order", Math.floor(Math.random() * 100));
         await taskRecord.insert();
       }
       for (let i = 0; i < 20; i++) {
         const taskRecord = taskTable.createNewRecord();
-        taskRecord.set("description", `Task priority 2 ${i}`);
+        taskRecord.set("description", `Task [priority 2] ${i}`);
         taskRecord.set("priority", 2);
+        taskRecord.set("order", Math.floor(Math.random() * 100));
         await taskRecord.insert();
       }
     });
@@ -83,8 +90,13 @@ describe(
       const taskTable = conn.table("task");
       const taskSelectQuery = taskTable.select();
       taskSelectQuery.where("priority", 1);
+      taskSelectQuery.offset(5);
+      taskSelectQuery.orderBy("order", "ASC");
       const taskCursor = await taskSelectQuery.execute();
       for await (const taskRecord of taskCursor()) {
+        console.log(
+          taskRecord.get("description") + " - " + taskRecord.get("order")
+        );
         assertStrictEquals(taskRecord.get("priority"), 1, "Should be 1");
       }
     });

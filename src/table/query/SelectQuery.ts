@@ -5,16 +5,22 @@ import { NativeSQL } from "../../core/NativeSQL.ts";
 import { RawRecord } from "../../record/RawRecord.ts";
 import Record from "../../record/Record.ts";
 import { OPERATION_TYPES, OPERATION_WHENS } from "../../constants.ts";
+import { OrderByDirectionType, OrderByType } from "./OrderByType.ts";
 
 export default class SelectQuery extends RecordQuery {
   readonly #logger = Logger.createLogger({ label: SelectQuery.name });
+
+  readonly #sql: NativeSQL;
+
   #columns: string[] = ["*"];
 
   #where: any[] = [];
 
+  #offset: number | undefined;
+
   #limit: number | undefined;
 
-  #sql: NativeSQL;
+  #sortList: OrderByType[] = [];
 
   constructor(table: Table, sql: NativeSQL) {
     super(table);
@@ -68,6 +74,38 @@ export default class SelectQuery extends RecordQuery {
     return this;
   }
 
+  offset(offset: number): SelectQuery {
+    this.#offset = offset;
+    return this;
+  }
+
+  /*
+   * [
+      { column: 'firstName', order: 'ASC' },
+      { column: 'lastName', order: 'DESC' }
+    ]
+   */
+  orderBy(
+    columnNameOrOrderList?: string | OrderByType[],
+    direction?: OrderByDirectionType
+  ): SelectQuery {
+    if (typeof columnNameOrOrderList === "undefined") {
+      return this;
+    }
+    if (typeof columnNameOrOrderList === "string") {
+      this.#sortList.push({
+        column: columnNameOrOrderList,
+        order: direction || "ASC"
+      });
+      return this;
+    }
+    if (Array.isArray(columnNameOrOrderList)) {
+      this.#sortList.push(...columnNameOrOrderList);
+      return this;
+    }
+    return this;
+  }
+
   #prepareWhereClause(): string {
     if (this.#where.length === 0) {
       return "";
@@ -76,7 +114,7 @@ export default class SelectQuery extends RecordQuery {
       " WHERE " +
       this.#where
         .map((where) => {
-          return `${where.column} ${where.operator} '${where.value}'`;
+          return `"${where.column}" ${where.operator} '${where.value}'`;
         })
         .join(" AND ")
     );
@@ -87,6 +125,40 @@ export default class SelectQuery extends RecordQuery {
       return "";
     }
     return ` LIMIT ${this.#limit}`;
+  }
+
+  #prepareOffsetClause(): string {
+    if (typeof this.#offset === "undefined") {
+      return "";
+    }
+    return ` OFFSET ${this.#offset}`;
+  }
+
+  #prepareOrderByClause(): string {
+    if (this.#sortList.length === 0) {
+      return "";
+    }
+    return (
+      " ORDER BY " +
+      this.#sortList
+        .map((sort) => {
+          return `"${sort.column}" ${sort.order}`;
+        })
+        .join(", ")
+    );
+  }
+
+  #buildQuery(): string {
+    const schemaName = this.getTable().getSchemaName();
+    const tableName = this.getTable().getName();
+
+    let query = `SELECT ${this.#columns} FROM ${schemaName}.${tableName}`;
+    query = query + this.#prepareWhereClause();
+    query = query + this.#prepareOrderByClause();
+    query = query + this.#prepareLimitClause();
+    query = query + this.#prepareOffsetClause();
+
+    return query;
   }
 
   async getCount(): Promise<number> {
@@ -103,16 +175,6 @@ export default class SelectQuery extends RecordQuery {
     const rawRecords: RawRecord[] = await reserve.unsafe(query);
     reserve.release();
     return parseInt(rawRecords[0]["count"]);
-  }
-
-  #buildQuery(): string {
-    const schemaName = this.getTable().getSchemaName();
-    const tableName = this.getTable().getName();
-
-    let query = `SELECT ${this.#columns} FROM ${schemaName}.${tableName}`;
-    query = query + this.#prepareWhereClause();
-    query = query + this.#prepareLimitClause();
-    return query;
   }
 
   async toArray(): Promise<Record[]> {
@@ -142,12 +204,7 @@ export default class SelectQuery extends RecordQuery {
     const table = this.getTable();
     const reserve = await this.#sql.reserve();
 
-    const schemaName = this.getTable().getSchemaName();
-    const tableName = this.getTable().getName();
-
-    let query = `SELECT ${this.#columns} FROM ${schemaName}.${tableName}`;
-    query = query + this.#prepareWhereClause();
-    query = query + this.#prepareLimitClause();
+    const query = this.#buildQuery();
     this.#logger.info(`[Query] ${query}`);
 
     await this.getTable().intercept(

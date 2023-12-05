@@ -1,6 +1,7 @@
 import Table from "../table/Table.ts";
 import ColumnSchema from "../table/ColumnSchema.ts";
 import { RawRecord } from "./RawRecord.ts";
+import { UUIDUtils } from "../core/UUID.ts";
 
 export default class Record {
   #isNew = false;
@@ -25,7 +26,7 @@ export default class Record {
       .map((field: ColumnSchema) => {
         this.set(field.getName(), field.getDefaultValue() || null);
       });
-    this.#record["id"] = crypto.randomUUID();
+    this.#record["id"] = UUIDUtils.generateId();
     this.#record["_table"] = this.#table.getName();
     this.#isNew = true;
     return this;
@@ -65,7 +66,7 @@ export default class Record {
     if (typeof this.#record === "undefined")
       throw new Error("Record not initialized");
     const schema = this.#table.getTableSchema();
-    if (schema.getColumnSchema(key) && this.#record[key])
+    if (schema.getColumnSchema(key) && typeof this.#record[key] !== "undefined")
       return this.#record[key];
     return null;
   }
@@ -75,7 +76,7 @@ export default class Record {
       throw new Error("Record not initialized");
     const schema = this.#table.getTableSchema();
     const dataType = schema.getColumnSchema(key)?.getColumnType();
-    if (dataType && this.#record[key])
+    if (dataType && typeof this.#record[key] !== "undefined")
       return dataType.getNativeValue(this.#record[key]);
     return null;
   }
