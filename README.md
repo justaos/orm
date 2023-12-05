@@ -63,7 +63,7 @@ await odm.defineTable({
     {
       name: "blog_post",
       type: "reference"
-      
+
     },
     {
       name: "message",
@@ -72,8 +72,6 @@ await odm.defineTable({
   ]
 });
 ```
-
-
 
 ## Querying
 
@@ -91,7 +89,7 @@ const records = await teacherTable
   .orderBy("roll_no", "DESC")
   .toArray();
 
-records.forEach(async function (rec) {
+records.forEach(async function(rec) {
   console.log(
     `${await rec.getDisplayValue("name")} :: ${await rec.getDisplayValue(
       "roll_no"
@@ -329,11 +327,11 @@ animals.forEach((animal) => {
 });
  ```
 
-| Database Data type | get    | getDisplayValue | getObject          |
-|--------------------|--------|-----------------|--------------------|
-| **string**         | string | string          | string             |
-| **integer**        | number | number          | number             |
-| **date**           | string | string          | Temporal.PlainDate |
+| Data type   | getNativeValue | getDisplayValue | get                |
+|-------------|----------------|-----------------|--------------------|
+| **string**  | string         | string          | string             |
+| **integer** | number         | number          | number             |
+| **date**    | string         | string          | Temporal.PlainDate |
 
 Check the examples >> [here](./examples) <<
 
