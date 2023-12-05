@@ -1,120 +1,127 @@
 # JUSTAOS's ODM
-JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to MongoDB database.
-
-Supports schemas with multi-level inheritance. Also supports interception on operations (create, read, update and delete).
 
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/justaos/odm?label=Release)
 [![Build](https://github.com/justaos/odm/workflows/Build/badge.svg)](https://github.com/justaos/odm/actions?workflow=Build)
 [![Coverage](https://codecov.io/gh/justaos/odm/branch/main/graph/badge.svg?token=OzlniGFmNp)](https://codecov.io/gh/justaos/odm)
 [![License](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
+[![Contributors](https://img.shields.io/github/contributors/justaos/odm.svg)]()
 
+JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to
+Postgres database.
+
+- Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
+- Supports custom data types.
+- Supports table with multi-level inheritance.
+- Also supports interception on operations (create, read, update and delete).
 
 ```ts
-import {ODM} from 'https://deno.land/x/justaos_odm@4.4.3/mod.ts';
+import { ODM } from 'https://deno.land/x/justaos_odm@$VERSION/mod.ts';
 ```
 
-
 ## Database connection
+
 ```ts
-const odm = new ODM();
+const odm = new ODM({
+  database: "collection-service",
+  username: "postgres",
+  password: "admin",
+  hostname: "localhost",
+  port: 5432
+});
 
+let conn: ODMConnection | undefined;
 try {
-  await odm.connect("mongodb://127.0.0.1:27017/collection-service");
+  conn = await odm.connect(true /* create database if not exists */);
   console.log("connection success");
-  const isDbExists = await odm.databaseExists();
-
-  if (isDbExists) {
-    console.log("db exists");
-  } else {
-    console.log("db does not exists");
-  }
 } catch (_error) {
   console.log("connection failed");
 } finally {
-  await odm.closeConnection();
+  if (conn) await conn.closeConnection();
 }
 ```
 
-## Querying
+## Defining models
+
 ```ts
-odm.defineCollection({
-  name: "teacher",
-  fields: [
+await odm.defineTable({
+  name: "blog_post",
+  columns: [
     {
-      name: "name",
+      name: "title",
       type: "string"
     },
     {
-      name: "roll_no",
-      type: "integer"
+      name: "content",
+      type: "string"
     }
   ]
 });
 
-let teacherCollection = odm.collection("teacher");
+await odm.defineTable({
+  name: "comment",
+  columns: [
+    {
+      name: "blog_post",
+      type: "reference"
+
+    },
+    {
+      name: "message",
+      type: "string"
+    }
+  ]
+});
+```
+
+## Querying
+
+```ts
+const teacherTable = conn.table("teacher");
 for (let i = 0; i < 10; i++) {
-  let teacherRecord = teacherCollection.createNewRecord();
-  teacherRecord.set("name", "a" + (i + 1));
-  teacherRecord.set("roll_no", i + 1);
-  await teacherRecord.insert();
+  const teacher = teacherTable.createNewRecord();
+  teacher.set("name", "a" + (i + 1));
+  teacher.set("roll_no", i + 1);
+  await teacher.insert();
 }
 
-teacherCollection
-  .find({}, { sort: { roll_no: -1 } })
-  .toArray()
-  .then(function (records) {
-    records.forEach(async function (rec) {
-      console.log(
-        (await rec.getDisplayValue("name")) +
-          " :: " +
-          (await rec.getDisplayValue("roll_no"))
-      );
-      console.log(JSON.stringify(await rec.toObject(), null, 4));
-    });
-  });
+const records = await teacherTable
+  .select()
+  .orderBy("roll_no", "DESC")
+  .toArray();
 
-teacherCollection.count().then(function (count) {
-  console.log(count);
-  odm.closeConnection();
+records.forEach(async function(rec) {
+  console.log(
+    `${await rec.getDisplayValue("name")} :: ${await rec.getDisplayValue(
+      "roll_no"
+    )}`
+  );
+  console.log(JSON.stringify(await rec.toJSON(), null, 4));
 });
 
+const count = await teacherTable.select().getCount();
+console.log(count);
 ```
 
 ## Intercepting database operations
+
 ```ts
-import getODM from "./getODM.ts";
-import {
-  OperationInterceptorInterface,
-  OperationType,
-  OperationWhen,
-  Record
-} from "../mod.ts";
-
-const odm = await getODM();
-
 odm.addInterceptor(
-  new (class extends OperationInterceptorInterface {
+  new (class extends DatabaseOperationInterceptor {
     getName() {
       return "my-intercept";
     }
 
     async intercept(
       collectionName: string,
-      operation: OperationType,
-      when: OperationWhen,
+      operation: DatabaseOperationType,
+      when: DatabaseOperationWhen,
       records: Record[],
-      context: any
+      _context: DatabaseOperationContext
     ) {
       if (collectionName === "student") {
         if (operation === "CREATE") {
           console.log(
-            "[collectionName=" +
-              collectionName +
-              ", operation=" +
-              operation +
-              ", when=" +
-              when +
-              "]"
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );
           if (when === "BEFORE") {
             for (let record of records) {
@@ -127,17 +134,12 @@ odm.addInterceptor(
         }
         if (operation === "READ") {
           console.log(
-            "[collectionName=" +
-              collectionName +
-              ", operation=" +
-              operation +
-              ", when=" +
-              when +
-              "]"
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );
           if (when === "AFTER") {
-            for (const record of records)
-              console.log(JSON.stringify(record.toObject(), null, 4));
+            for (const record of records) {
+              console.log(JSON.stringify(record.toJSON(), null, 4));
+            }
           }
         }
       }
@@ -146,9 +148,9 @@ odm.addInterceptor(
   })()
 );
 
-odm.defineCollection({
+await conn.defineTable({
   name: "student",
-  fields: [
+  columns: [
     {
       name: "name",
       type: "string"
@@ -160,62 +162,88 @@ odm.defineCollection({
   ]
 });
 
-const studentCollection = odm.collection("student");
-const studentRecord = studentCollection.createNewRecord();
+const studentTable = conn.table("student");
+const studentRecord = studentTable.createNewRecord();
 studentRecord.set("name", "John " + new Date().toISOString());
-studentRecord.insert().then(function () {
-  studentCollection
-    .find()
-    .toArray()
-    .then(function () {
-      odm.closeConnection();
-    });
-});
+await studentRecord.insert();
+await studentTable.select().toArray();
 
+/* This will print the following:
+[collectionName=student, operation=CREATE, when=BEFORE]
+computed field updated for :: John 2023-12-05T13:57:21.418Z
+[collectionName=student, operation=CREATE, when=AFTER]
+
+[collectionName=student, operation=READ, when=BEFORE]
+[collectionName=student, operation=READ, when=AFTER]
+{
+    "id": "e5d8a03e-7511-45c6-96ad-31a6fa833696",
+    "_table": "student",
+    "name": "John 2023-12-05T13:31:13.313Z",
+    "computed": "John 2023-12-05T13:31:13.313Z +++ computed"
+}
+*/
 ```
 
 ## Define custom field type
+
 After connection established, you can define custom field type.
+
 ```ts
-import getODM from "./getODM.ts";
-import { FieldType, PrimitiveDataType, Schema, ODM } from "../mod.ts";
-
-const odm = await getODM();
-
-odm.addFieldType(
-  class extends FieldType {
-    constructor(odm: ODM) {
-      super(odm, PrimitiveDataType.STRING);
+odm.addDataType(
+  class extends DataType {
+    constructor() {
+      super(NATIVE_DATA_TYPES.VARCHAR);
     }
 
     getName() {
       return "email";
     }
 
-    async validateValue(schema: Schema, fieldName: string, record: any, context: any) {
-      const pattern = "(.+)@(.+){2,}\.(.+){2,}";
+    async validateValue(
+      _schema: TableSchema,
+      fieldName: string,
+      record: RawRecord
+    ) {
+      const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
       if (!new RegExp(pattern).test(record[fieldName]))
         throw new Error("Not a valid email");
     }
 
-    validateDefinition(fieldDefinition: any) {
+    validateDefinition(fieldDefinition: ColumnDefinition) {
       return !!fieldDefinition.name;
     }
 
-    async getDisplayValue(schema: Schema, fieldName: string, record: any) {
+    getValueIntercept(
+      _schema: TableSchema,
+      fieldName: string,
+      record: RawRecord
+    ): any {
       return record[fieldName];
     }
 
-    setValueIntercept(schema: Schema, fieldName: string, newValue: any): any {
+    setValueIntercept(
+      _schema: TableSchema,
+      _fieldName: string,
+      newValue: any,
+      _record: RawRecord
+    ): any {
       return newValue;
+    }
+
+    async getDisplayValue(
+      _schema: TableSchema,
+      fieldName: string,
+      record: RawRecord,
+      _context: DatabaseOperationContext
+    ) {
+      return record[fieldName];
     }
   }
 );
 
-odm.defineCollection({
-  label: "Student",
+await conn.defineTable({
   name: "student",
-  fields: [
+  columns: [
     {
       name: "name",
       type: "string"
@@ -226,7 +254,7 @@ odm.defineCollection({
     },
     {
       name: "emp_no",
-      type: "objectId"
+      type: "uuid"
     },
     {
       name: "salary",
@@ -239,41 +267,29 @@ odm.defineCollection({
     {
       name: "gender",
       type: "boolean"
-    },
-    {
-      name: "address",
-      type: "object"
     }
   ]
 });
 
-const studentCollection = odm.collection("student");
-const studentRecord = studentCollection.createNewRecord();
-studentRecord.set("personal_contact", "test");
-studentRecord.set("birth_date", new Date());
-studentRecord.insert().then(
-  function () {
-    console.log("Student created");
-  },
-  (err) => {
-    console.log(err.toJSON());
-    odm.closeConnection().then(function () {
-      console.log("Connection closed");
-    });
-  }
-);
+const studentTable = conn.table("student");
+const student = studentTable.createNewRecord();
+student.set("personal_contact", "test");
+student.set("birth_date", new Date());
 
+try {
+  await student.insert();
+  console.log("Student created");
+} catch (_error) {
+  console.log(_error.toJSON());
+}
 ```
 
 ## Inheritance
+
 ```ts
-import getODM from "./getODM.ts";
-
-const odm = await getODM();
-
-odm.defineCollection({
+await conn.defineTable({
   name: "animal",
-  fields: [
+  columns: [
     {
       name: "name",
       type: "string"
@@ -281,16 +297,16 @@ odm.defineCollection({
   ]
 });
 
-const animalCol = odm.collection("animal");
-const animal = animalCol.createNewRecord();
+const animalTable = conn.table("animal");
+const animal = animalTable.createNewRecord();
 animal.set("name", "Puppy");
 await animal.insert();
 
-odm.defineCollection({
+await conn.defineTable({
   name: "dog",
-  extends: "animal",
+  inherits: "animal",
   final: true,
-  fields: [
+  columns: [
     {
       name: "breed",
       type: "string"
@@ -298,25 +314,27 @@ odm.defineCollection({
   ]
 });
 
-const dogCol = odm.collection("dog");
-const husky = dogCol.createNewRecord();
+const dogTable = conn.table("dog");
+const husky = dogTable.createNewRecord();
 husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
 await husky.insert();
 
-animalCol
-  .find({})
-  .toArray()
-  .then(function (animals) {
-    animals.forEach((animal) => {
-      console.log(animal.toObject());
-    });
-    odm.closeConnection();
-  });
+const animals = await animalTable.select().toArray();
 
+animals.forEach((animal) => {
+  console.log(animal.toJSON());
+});
  ```
+
+| Data type   | getNativeValue | getDisplayValue | get                |
+|-------------|----------------|-----------------|--------------------|
+| **string**  | string         | string          | string             |
+| **integer** | number         | number          | number             |
+| **date**    | string         | string          | Temporal.PlainDate |
 
 Check the examples >> [here](./examples) <<
 
 ## Code of Conduct
+
 [Contributor Covenant](/CODE_OF_CONDUCT.md)

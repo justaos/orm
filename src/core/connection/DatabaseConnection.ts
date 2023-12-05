@@ -1,95 +1,94 @@
-import { Logger, mongodb } from "../../../deps.ts";
-import { DatabaseConfiguration, DatabaseConfigurationOptions } from "./DatabaseConfiguration.ts";
+import { Logger, postgres } from "../../../deps.ts";
+import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
+import { NativeSQL } from "../NativeSQL.ts";
 
 /**
  * A class to handle the connection to the database.
  * @param configuration A URI string from the user.
  * @returns A connection object.
- * example: new DatabaseConnection('mongodb+srv://example-uri');
+ * example: new DatabaseConnection({
+ *   host: "127.0.0.1",
+ *   port: 5432,
+ *   username: "postgres",
+ *   password: "admin",
+ *   database: "odm-test"
+ * });
  */
 export default class DatabaseConnection {
-  readonly #uri: string;
-  #conn: mongodb.MongoClient | null;
-  public connected: boolean;
+  readonly #config: DatabaseConfiguration;
+  #sql: any;
   readonly #logger = Logger.createLogger({ label: DatabaseConnection.name });
-  readonly #databaseName: string;
 
-  constructor(configuration: string | DatabaseConfigurationOptions) {
-    this.connected = false;
-    this.#conn = null;
-    if (typeof configuration === "string") {
-      this.#uri = configuration;
-      this.#databaseName = new URL(configuration).pathname.substring(1);
-    } else if (typeof configuration === "object") {
-      this.#uri = new DatabaseConfiguration(configuration).getUri();
-      this.#databaseName = configuration.database;
-    } else {
-      throw new Error("Invalid database configuration");
+  constructor(configuration: DatabaseConfiguration, logger?: Logger) {
+    this.#config = configuration;
+    if (logger) {
+      this.#logger = logger;
     }
   }
 
-  async connect() {
+  async connect(): Promise<void> {
     try {
-      const client = new mongodb.MongoClient(this.#uri);
-      await client.connect();
-      this.#logger.info("Database connection established successfully");
-      this.connected = true;
-      this.#conn = client;
+      this.#sql = postgres({ ...this.#config, max: 20 });
+      await this.#sql`select 1`;
+      this.#logger.info(
+        `Connected to ${this.#config.database} database successfully`
+      );
     } catch (err) {
       this.#logger.error(err.message);
       throw err;
     }
   }
 
-  static async connect(configuration: DatabaseConfigurationOptions) {
+  static async connect(configuration: DatabaseConfiguration) {
     const conn = new DatabaseConnection(configuration);
     await conn.connect();
     return conn;
   }
 
-  async dropDatabase(): Promise<boolean> {
-    return await this.getDBO().dropDatabase();
-  }
+  /* async dropDatabase(): Promise<boolean> {
+     return await this.getDBO().dropDatabase();
+   }*/
 
-  #getConnection(): mongodb.MongoClient {
-    if (!this.#conn) {
+  getNativeConnection(): NativeSQL {
+    if (!this.#sql) {
       throw new Error("Database connection not established");
     }
-    return this.#conn;
+    return this.#sql;
   }
 
-  getDBO(): mongodb.Db {
-    return this.#getConnection().db(this.#databaseName);
+  getDatabaseName(): string | undefined {
+    return this.#config.database;
   }
 
-  getDatabaseName(): string {
-    return this.#databaseName;
+  async isDatabaseExist(databaseName: string): Promise<boolean> {
+    if (!databaseName) throw new Error(`No database name provided to check.`);
+    const [output] = await this
+      .#sql`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`;
+    return output.exists;
   }
 
-  async databaseExists(): Promise<boolean> {
-    // Use the admin database for the operation
-    const adminDb = this.#getConnection().db("test").admin();
-
-    // List all the available databases
-    const dbs = await adminDb.command({ listDatabases: 1 });
-    const index = dbs.databases.findIndex(
-      (db: any) => db.name === this.#databaseName
-    );
-    return index !== -1;
+  async createDatabase(databaseName: string): Promise<any> {
+    if (!databaseName) throw new Error(`No database name provided to create.`);
+    const output = await this.getNativeConnection()`CREATE DATABASE ${this.#sql(
+      databaseName
+    )}`;
+    this.#logger.info(`Database ${databaseName} created successfully`);
+    return output;
   }
 
-  async deleteAllIndexes() {
-    const dbo = this.getDBO();
-    const collections = await dbo.listCollections().toArray();
-    collections.forEach((col) => {
-      dbo.command({ dropIndexes: col.name, index: "*" });
-    });
+  async dropDatabase(databaseName: string): Promise<any> {
+    if (!databaseName) throw new Error(`No database name provided to drop.`);
+    const output = await this.getNativeConnection()`DROP DATABASE ${this.#sql(
+      databaseName
+    )}`;
+    this.#logger.info(`Database ${databaseName} dropped successfully`);
+    return output;
   }
 
   closeConnection(): Promise<void> {
-    if (!this.#conn) {
+    if (!this.#sql) {
       throw new Error(`No connection established to disconnect.`);
     }
-    return this.#conn.close();
+    return this.#sql.end();
   }
 }

@@ -1,10 +1,11 @@
 import getODM from "./getODM.ts";
 
-const odm = await getODM();
+const odm = getODM();
+const conn = await odm.connect(true);
 
-odm.defineCollection({
+await conn.defineTable({
   name: "animal",
-  fields: [
+  columns: [
     {
       name: "name",
       type: "string"
@@ -12,16 +13,16 @@ odm.defineCollection({
   ]
 });
 
-const animalCol = odm.collection("animal");
-const animal = animalCol.createNewRecord();
+const animalTable = conn.table("animal");
+const animal = animalTable.createNewRecord();
 animal.set("name", "Puppy");
 await animal.insert();
 
-odm.defineCollection({
+await conn.defineTable({
   name: "dog",
-  extends: "animal",
+  inherits: "animal",
   final: true,
-  fields: [
+  columns: [
     {
       name: "breed",
       type: "string"
@@ -29,15 +30,16 @@ odm.defineCollection({
   ]
 });
 
-const dogCol = odm.collection("dog");
-const husky = dogCol.createNewRecord();
+const dogTable = conn.table("dog");
+const husky = dogTable.createNewRecord();
 husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
 await husky.insert();
 
-const animals = await animalCol.find({}).toArray();
+const animals = await animalTable.select().toArray();
 
 animals.forEach((animal) => {
-  console.log(animal.toObject());
+  console.log(animal.toJSON());
 });
-await odm.closeConnection();
+
+await conn.closeConnection();

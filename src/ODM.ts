@@ -1,98 +1,112 @@
-import { mongodb } from "../deps.ts";
+import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
+import Registry from "./core/Registry.ts";
+import DataType from "./data-types/DataType.ts";
 
-import Collection from "./collection/Collection.ts";
-import SchemaRegistry from "./collection/SchemaRegistry.ts";
+import StringDataType from "./data-types/types/StringDataType.ts";
+import ODMConnection from "./ODMConnection.ts";
+import { TableDefinition } from "./table/definitions/TableDefinition.ts";
+import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
+import IntegerDataType from "./data-types/types/IntegerDataType.ts";
+import NumberDataType from "./data-types/types/NumberDataType.ts";
+import JSONDataType from "./data-types/types/JSONDataType.ts";
+import BooleanDataType from "./data-types/types/BooleanDataType.ts";
+import DateDataType from "./data-types/types/DateDataType.ts";
+import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
+import UUIDDataType from "./data-types/types/UUIDDataType.ts";
+import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
+/*import IntegerDataType from "./field-types/types/IntegerDataType.ts";
+import DateDataType from "./field-types/types/DateDataType.ts";
 
-import OperationInterceptorService from "./operation-interceptor/OperationInterceptorService.ts";
-import OperationInterceptorInterface from "./operation-interceptor/OperationInterceptor.interface.ts";
-
-import Schema from "./collection/Schema.ts";
-
-import {
-  DatabaseConfigurationOptions,
-  DatabaseConnection
-} from "./core/connection/index.ts";
-
-import FieldType from "./field-types/FieldType.ts";
-import StringFieldType from "./field-types/types/StringFieldType.ts";
-import IntegerFieldType from "./field-types/types/IntegerFieldType.ts";
-import DateFieldType from "./field-types/types/DateFieldType.ts";
-import FieldTypeRegistry from "./field-types/FieldTypeRegistry.ts";
 import ObjectFieldType from "./field-types/types/ObjectFieldType.ts";
-import BooleanFieldType from "./field-types/types/BooleanFieldType.ts";
+import BooleanDataType from "./field-types/types/BooleanDataType.ts";
 import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType.ts";
 import DateTimeFieldType from "./field-types/types/DateTimeFieldType.ts";
 import AnyFieldType from "./field-types/types/AnyFieldType.ts";
-import NumberFieldType from "./field-types/types/NumberFieldType.ts";
-import ObjectId from "./record/ObjectId.ts";
+import NumberDataType from "./field-types/types/NumberDataType.ts";*/
 
+/*
+ *
+ */
+
+/**
+ * JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
+ * - Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
+ * - Supports custom data types.
+ * - Supports table with multi-level inheritance.
+ * - Also supports interception on operations (create, read, update and delete).
+ *
+ * @example
+ * Get connection to database
+ * ```ts
+ * import {ODM} from "https://deno.land/x/justaos_odm@$VERSION/mod.ts";
+ * const odm = new ODM({
+ *  hostname: "localhost",
+ *  port: 5432,
+ *  username: "postgres",
+ *  password: "postgres"
+ * });
+ * odm.connect();
+ * ```
+ *
+ * @param config Database configuration
+ */
 export default class ODM {
-  #conn: DatabaseConnection | undefined;
-  #fieldTypeRegistry: FieldTypeRegistry = new FieldTypeRegistry();
-  #schemaRegistry: SchemaRegistry = new SchemaRegistry();
-  #operationInterceptorService: OperationInterceptorService =
-    new OperationInterceptorService();
+  readonly #logger = Logger.createLogger({ label: ODM.name });
+  readonly #config: DatabaseConfiguration;
+  readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>();
+  readonly #tableDefinitionRegistry: Registry<TableDefinition> =
+    new Registry<TableDefinition>();
+  readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
+  readonly #operationInterceptorService =
+    new DatabaseOperationInterceptorService();
 
-  constructor() {
+  constructor(config: DatabaseConfiguration) {
     this.#loadBuildInFieldTypes();
+    this.#config = config;
   }
 
-  async connect(config: string | DatabaseConfigurationOptions): Promise<void> {
-    this.#conn = new DatabaseConnection(config);
-    await this.#conn.connect();
-  }
-
-  closeConnection(): Promise<void> {
-    const conn = this.#getConnection();
-    return conn.closeConnection();
-  }
-
-  databaseExists(): Promise<boolean> {
-    const conn = this.#getConnection();
-    return conn.databaseExists();
-  }
-
-  dropDatabase(): Promise<boolean> {
-    const conn = this.#getConnection();
-    return conn.dropDatabase();
-  }
-
-  defineCollection(schemaJson: any): void {
-    const schema = new Schema(
-      schemaJson,
-      this.#fieldTypeRegistry,
-      this.#schemaRegistry
-    );
-    this.#schemaRegistry.addSchema(schema);
-  }
-
-  collection(collectionName: string, context?: any): Collection {
-    const schema: Schema | undefined =
-      this.#schemaRegistry.getSchema(collectionName);
-    if (schema === undefined) {
-      throw Error(`Collection with name '${collectionName}' is not defined`);
+  async connect(createDatabaseIfNotExists?: boolean): Promise<ODMConnection> {
+    try {
+      const conn = new ODMConnection(
+        this.#logger,
+        this.#config,
+        this.#dataTypeRegistry,
+        this.#tableDefinitionRegistry,
+        this.#schemaRegistry,
+        this.#operationInterceptorService
+      );
+      await conn.connect();
+      return conn;
+    } catch (error) {
+      if (
+        error.name === "PostgresError" &&
+        error.code === "3D000" &&
+        this.#config.database &&
+        createDatabaseIfNotExists
+      ) {
+        const tempConn = new DatabaseConnection({
+          ...this.#config,
+          database: "postgres"
+        });
+        await tempConn.connect();
+        await tempConn.createDatabase(this.#config.database);
+        await tempConn.closeConnection();
+        return await this.connect(false);
+      } else {
+        throw error;
+      }
     }
-    return new Collection(
-      this.#getConnection().getDBO().collection(schema.getBaseName()),
-      schema,
-      this.#operationInterceptorService,
-      context
-    );
   }
 
-  getSchema(name: string): Schema | undefined {
-    return this.#schemaRegistry.getSchema(name);
+  isTableDefined(tableName: string): boolean {
+    return this.#tableDefinitionRegistry.has(tableName);
   }
 
-  isCollectionDefined(collectionName: string): boolean {
-    return this.#schemaRegistry.hasSchema(collectionName);
+  addDataType(DataTypeClass: new (odm: ODM) => DataType): void {
+    this.#dataTypeRegistry.add(new DataTypeClass(this));
   }
 
-  addFieldType(FieldTypeClass: new (odm: ODM) => FieldType): void {
-    this.#fieldTypeRegistry.addFieldType(new FieldTypeClass(this));
-  }
-
-  addInterceptor(operationInterceptor: OperationInterceptorInterface): void {
+  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
     this.#operationInterceptorService.addInterceptor(operationInterceptor);
   }
 
@@ -102,30 +116,16 @@ export default class ODM {
     );
   }
 
-  generateObjectId(id?: string): ObjectId {
-    return new mongodb.ObjectId(id);
-  }
-
-  isObjectId(value: any): boolean {
-    return mongodb.ObjectId.isValid(value);
-  }
-
   #loadBuildInFieldTypes(): void {
-    this.addFieldType(StringFieldType);
-    this.addFieldType(IntegerFieldType);
-    this.addFieldType(NumberFieldType);
-    this.addFieldType(DateFieldType);
-    this.addFieldType(ObjectFieldType);
-    this.addFieldType(BooleanFieldType);
-    this.addFieldType(ObjectIdFieldType);
-    this.addFieldType(DateTimeFieldType);
-    this.addFieldType(AnyFieldType);
-  }
-
-  #getConnection(): DatabaseConnection {
-    if (!this.#conn) {
-      throw new Error("ODM::#getConnection -> There is no active connection");
-    }
-    return this.#conn;
+    this.addDataType(StringDataType);
+     this.addDataType(IntegerDataType);
+    this.addDataType(NumberDataType);
+    this.addDataType(JSONDataType);
+    this.addDataType(BooleanDataType);
+    this.addDataType(DateDataType);
+    this.addDataType(UUIDDataType);
+    //this.addFieldType()
+    /*this.addFieldType(ObjectIdFieldType);
+    this.addFieldType(DateTimeFieldType);*/
   }
 }

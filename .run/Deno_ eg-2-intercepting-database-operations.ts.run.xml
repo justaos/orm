@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Deno: eg-2-intercepting-database-operations.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/examples/eg-2-intercepting-database-operations.ts" programParameters="run -A" workingDirectory="$PROJECT_DIR$/examples">
+    <method v="2" />
+  </configuration>
+</component>

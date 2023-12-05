@@ -1,43 +1,44 @@
 import getODM from "./getODM.ts";
 
-const odm = await getODM();
-odm.defineCollection({
+const odm = getODM();
+const conn = await odm.connect(true);
+
+await conn.defineTable({
   name: "teacher",
-  fields: [
+  columns: [
     {
       name: "name",
-      type: "string",
+      type: "string"
     },
     {
       name: "roll_no",
-      type: "integer",
-    },
-  ],
+      type: "integer"
+    }
+  ]
 });
 
-let teacherCollection = odm.collection("teacher");
+const teacherTable = conn.table("teacher");
 for (let i = 0; i < 10; i++) {
-  let teacherRecord = teacherCollection.createNewRecord();
-  teacherRecord.set("name", "a" + (i + 1));
-  teacherRecord.set("roll_no", i + 1);
-  await teacherRecord.insert();
+  const teacher = teacherTable.createNewRecord();
+  teacher.set("name", "a" + (i + 1));
+  teacher.set("roll_no", i + 1);
+  await teacher.insert();
 }
 
-teacherCollection
-  .find({}, { sort: { roll_no: -1 } })
-  .toArray()
-  .then(function (records) {
-    records.forEach(async function (rec) {
-      console.log(
-        (await rec.getDisplayValue("name")) +
-          " :: " +
-          (await rec.getDisplayValue("roll_no")),
-      );
-      console.log(JSON.stringify(await rec.toObject(), null, 4));
-    });
-  });
+const records = await teacherTable
+  .select()
+  .orderBy("roll_no", "DESC")
+  .toArray();
 
-teacherCollection.count().then(function (count) {
-  console.log(count);
-  odm.closeConnection();
+records.forEach(async function (rec) {
+  console.log(
+    `${await rec.getDisplayValue("name")} :: ${await rec.getDisplayValue(
+      "roll_no"
+    )}`
+  );
+  console.log(JSON.stringify(await rec.toJSON(), null, 4));
 });
+
+const count = await teacherTable.select().getCount();
+console.log(count);
+await conn.closeConnection();
