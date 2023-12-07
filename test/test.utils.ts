@@ -21,7 +21,10 @@ class Session {
     if (!this.#odm) {
       this.#odm = new ODM({
         hostname: Deno.env.get("POSTGRES_HOST") || "127.0.0.1",
-        port: Deno.env.get("POSTGRES_PORT") * 1 || 5432,
+        port:
+          typeof Deno.env.get("POSTGRES_PORT") == "string"
+            ? parseInt(Deno.env.get("POSTGRES_PORT") * 1)
+            : 5432,
         username: "postgres",
         password: "admin",
         database: "odm-test-db"
