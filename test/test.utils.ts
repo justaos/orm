@@ -20,8 +20,8 @@ class Session {
   ): Promise<ODMConnection> {
     if (!this.#odm) {
       this.#odm = new ODM({
-        hostname: "127.0.0.1",
-        port: 5432,
+        hostname: Deno.env.get("POSTGRES_HOST") || "127.0.0.1",
+        port: Deno.env.get("POSTGRES_PORT") || 5432,
         username: "postgres",
         password: "admin",
         database: "odm-test-db"

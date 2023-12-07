@@ -35,6 +35,10 @@ jobs:
           deno task coverage
         env:
           CI: true
+          # The hostname used to communicate with the PostgreSQL service container
+          POSTGRES_HOST: localhost
+          # The default PostgreSQL port
+          POSTGRES_PORT: 5432
       - name: Codecov
         uses: codecov/codecov-action@v3
         with:
