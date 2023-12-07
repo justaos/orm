@@ -86,10 +86,7 @@ export default class ODMConnection {
       this.#logger.error(error.message);
       throw error;
     }
-    this.#tableDefinitionRegistry.add(
-      tableSchema.getDefinition(),
-      tableSchema.getFullName()
-    );
+    this.#tableDefinitionRegistry.add(tableSchema.getDefinition());
 
     const sql = this.#conn.getNativeConnection();
     const reserved = await sql.reserve();
@@ -205,8 +202,8 @@ export default class ODMConnection {
     return this.#tableDefinitionRegistry.get(name);
   }*/
 
-  isTableDefined(collectionName: string): boolean {
-    return this.#tableDefinitionRegistry.has(collectionName);
+  isTableDefined(tableName: string): boolean {
+    return this.#tableDefinitionRegistry.has(tableName);
   }
 
   addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {

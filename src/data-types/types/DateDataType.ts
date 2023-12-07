@@ -28,7 +28,7 @@ export default class DateDataType extends DataType {
     _schema: TableSchema,
     _fieldName: string,
     value: any,
-    _record: any
+    _record: RawRecord
   ): Temporal.PlainDate {
     if (typeof value === "string") {
       return Temporal.PlainDate.from(value);
@@ -41,13 +41,5 @@ export default class DateDataType extends DataType {
       return value.toString();
     }
     return value;
-  }
-
-  async getDisplayValue(
-    _schema: TableSchema,
-    fieldName: string,
-    record: RawRecord
-  ) {
-    return record[fieldName];
   }
 }

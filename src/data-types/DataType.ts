@@ -5,27 +5,25 @@ import { ColumnDefinition } from "../table/definitions/ColumnDefinition.ts";
 import { DatabaseOperationContext } from "../operation-interceptor/DatabaseOperationContext.ts";
 
 export default abstract class DataType {
-  readonly #primitiveDataType: NativeDataType;
+  readonly #nativeDataType: NativeDataType;
 
   protected constructor(primitiveDataType: NativeDataType) {
-    this.#primitiveDataType = primitiveDataType;
+    this.#nativeDataType = primitiveDataType;
   }
 
   getNativeType(): NativeDataType {
-    return this.#primitiveDataType;
+    return this.#nativeDataType;
   }
 
   abstract getName(): string;
-
-  getRegistryKey(): string {
-    return this.getName();
-  }
-
+  
   getNativeValue(value: any): any {
     return value;
   }
 
-  abstract validateDefinition(definition: ColumnDefinition): boolean;
+  validateDefinition(definition: ColumnDefinition): boolean {
+    throw new Error("Method not implemented.");
+  }
 
   abstract setValueIntercept(
     schema: TableSchema,
@@ -40,11 +38,4 @@ export default abstract class DataType {
     record: RawRecord | undefined,
     context?: DatabaseOperationContext
   ): Promise<void>;
-
-  abstract getDisplayValue(
-    schema: TableSchema,
-    fieldName: string,
-    record: RawRecord,
-    context?: DatabaseOperationContext
-  ): Promise<any>;
 }

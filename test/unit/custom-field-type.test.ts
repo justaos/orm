@@ -45,53 +45,53 @@ describe(
     });
 
     it("#addDataType - Registering Custom data type", async function () {
-      odm.addDataType(
-        class extends DataType {
-          constructor() {
-            super(NATIVE_DATA_TYPES.VARCHAR);
-          }
-
-          getName() {
-            return "email";
-          }
-
-          async validateValue(_schema: TableSchema, fieldName: string, record: RawRecord) {
-            const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
-            if (!new RegExp(pattern).test(record[fieldName]))
-              throw new Error("Not a valid email");
-          }
-
-          validateDefinition(fieldDefinition: ColumnDefinition) {
-            return !!fieldDefinition.name;
-          }
-
-          getValueIntercept(
-            _schema: TableSchema,
-            fieldName: string,
-            record: RawRecord
-          ): any {
-            return record[fieldName];
-          }
-
-          setValueIntercept(
-            _schema: TableSchema,
-            _fieldName: string,
-            newValue: any,
-            _record: RawRecord
-          ): any {
-            return newValue;
-          }
-
-          async getDisplayValue(
-            _schema: TableSchema,
-            fieldName: string,
-            record: any,
-            _context: DatabaseOperationContext
-          ) {
-            return record[fieldName];
-          }
+      class EmailType extends DataType {
+        constructor() {
+          super(NATIVE_DATA_TYPES.VARCHAR);
         }
-      );
+
+        getName() {
+          return "email";
+        }
+
+        async validateValue(_schema: TableSchema, fieldName: string, record: RawRecord) {
+          const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
+          if (!new RegExp(pattern).test(record[fieldName]))
+            throw new Error("Not a valid email");
+        }
+
+        validateDefinition(fieldDefinition: ColumnDefinition) {
+          return !!fieldDefinition.name;
+        }
+
+        getValueIntercept(
+          _schema: TableSchema,
+          fieldName: string,
+          record: RawRecord
+        ): any {
+          return record[fieldName];
+        }
+
+        setValueIntercept(
+          _schema: TableSchema,
+          _fieldName: string,
+          newValue: any,
+          _record: RawRecord
+        ): any {
+          return newValue;
+        }
+
+        async getDisplayValue(
+          _schema: TableSchema,
+          fieldName: string,
+          record: any,
+          _context: DatabaseOperationContext
+        ) {
+          return record[fieldName];
+        }
+      }
+
+      odm.addDataType(new EmailType());
 
       try {
         await conn.defineTable({

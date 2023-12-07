@@ -26,7 +26,7 @@ export class RecordValidationError extends Error {
     message?: string
   ) {
     super(
-      `Record validation error in collection ${tableDefinition.name} with id ${recordId}. ${message}`
+      `Record validation error in table ${tableDefinition.name} with id ${recordId}. ${message}`
     );
     this.name = "RecordValidationError";
     this.#tableDefinition = tableDefinition;

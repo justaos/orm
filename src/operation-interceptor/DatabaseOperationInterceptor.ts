@@ -15,7 +15,7 @@ export default abstract class DatabaseOperationInterceptor {
   }
 
   abstract intercept(
-    collectionName: string,
+    tableName: string,
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],

@@ -7,6 +7,7 @@ import {
   describe,
   it
 } from "../../test.deps.ts";
+import { Temporal } from "npm:@js-temporal/polyfill";
 
 import { ODMConnection, Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
@@ -57,7 +58,7 @@ describe({
           },
           {
             name: "created_on",
-            type: "date"
+            type: "datetime"
           },
           {
             name: "gender",
@@ -91,8 +92,8 @@ describe({
       const empId = student.getID();
       student.set("name", "John");
       student.set("emp_no", conn.generateRecordId());
-      student.set("birth_date", new Date());
-      student.set("created_on", new Date());
+      student.set("birth_date", Temporal.Now.plainDateISO());
+      student.set("created_on", Temporal.Now.plainDateTimeISO());
       student.set("gender", true);
       student.set("salary", 5000);
       student.set("address", {

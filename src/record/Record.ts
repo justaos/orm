@@ -81,16 +81,6 @@ export default class Record {
     return null;
   }
 
-  async getDisplayValue(key: string) {
-    if (typeof this.#record === "undefined")
-      throw new Error("Record not initialized");
-    const schema = this.#table.getTableSchema();
-    const field = schema.getColumnSchema(key);
-    return field
-      ?.getColumnType()
-      .getDisplayValue(schema, key, this.#record, this.#table.getContext());
-  }
-
   async insert(): Promise<Record> {
     const [record] = await this.#table.insertRecords([this]);
     this.#record = record.toJSON();

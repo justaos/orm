@@ -35,12 +35,4 @@ export default class IntegerDataType extends DataType {
     _fieldName: string,
     _record: RawRecord
   ) {}
-
-  async getDisplayValue(
-    _schema: TableSchema,
-    fieldName: string,
-    record: RawRecord
-  ) {
-    return record[fieldName];
-  }
 }

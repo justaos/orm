@@ -11,22 +11,10 @@ import NumberDataType from "./data-types/types/NumberDataType.ts";
 import JSONDataType from "./data-types/types/JSONDataType.ts";
 import BooleanDataType from "./data-types/types/BooleanDataType.ts";
 import DateDataType from "./data-types/types/DateDataType.ts";
+import DateTimeDataType from "./data-types/types/DateTimeDataType.ts";
 import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
 import UUIDDataType from "./data-types/types/UUIDDataType.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
-/*import IntegerDataType from "./field-types/types/IntegerDataType.ts";
-import DateDataType from "./field-types/types/DateDataType.ts";
-
-import ObjectFieldType from "./field-types/types/ObjectFieldType.ts";
-import BooleanDataType from "./field-types/types/BooleanDataType.ts";
-import ObjectIdFieldType from "./field-types/types/ObjectIdFieldType.ts";
-import DateTimeFieldType from "./field-types/types/DateTimeFieldType.ts";
-import AnyFieldType from "./field-types/types/AnyFieldType.ts";
-import NumberDataType from "./field-types/types/NumberDataType.ts";*/
-
-/*
- *
- */
 
 /**
  * JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -53,9 +41,15 @@ import NumberDataType from "./field-types/types/NumberDataType.ts";*/
 export default class ODM {
   readonly #logger = Logger.createLogger({ label: ODM.name });
   readonly #config: DatabaseConfiguration;
-  readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>();
+  readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
+    function (dataType) {
+      return dataType.getName();
+    }
+  );
   readonly #tableDefinitionRegistry: Registry<TableDefinition> =
-    new Registry<TableDefinition>();
+    new Registry<TableDefinition>(function (tableDefinition) {
+      return `${tableDefinition.schema}.${tableDefinition.name}`;
+    });
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
   readonly #operationInterceptorService =
     new DatabaseOperationInterceptorService();
@@ -102,8 +96,8 @@ export default class ODM {
     return this.#tableDefinitionRegistry.has(tableName);
   }
 
-  addDataType(DataTypeClass: new (odm: ODM) => DataType): void {
-    this.#dataTypeRegistry.add(new DataTypeClass(this));
+  addDataType(dataType: DataType): void {
+    this.#dataTypeRegistry.add(dataType);
   }
 
   addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
@@ -117,15 +111,13 @@ export default class ODM {
   }
 
   #loadBuildInFieldTypes(): void {
-    this.addDataType(StringDataType);
-     this.addDataType(IntegerDataType);
-    this.addDataType(NumberDataType);
-    this.addDataType(JSONDataType);
-    this.addDataType(BooleanDataType);
-    this.addDataType(DateDataType);
-    this.addDataType(UUIDDataType);
-    //this.addFieldType()
-    /*this.addFieldType(ObjectIdFieldType);
-    this.addFieldType(DateTimeFieldType);*/
+    this.addDataType(new StringDataType());
+    this.addDataType(new IntegerDataType());
+    this.addDataType(new NumberDataType());
+    this.addDataType(new JSONDataType());
+    this.addDataType(new BooleanDataType());
+    this.addDataType(new DateDataType());
+    this.addDataType(new UUIDDataType());
+    this.addDataType(new DateTimeDataType());
   }
 }

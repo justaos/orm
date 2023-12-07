@@ -33,7 +33,7 @@ export default class DatabaseOperationInterceptorService {
   }
 
   async intercept(
-    collectionName: string,
+    tableName: string,
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],
@@ -50,7 +50,7 @@ export default class DatabaseOperationInterceptorService {
           !disabledIntercepts.includes(interceptor.getName())
         ) {
           records = await interceptor.intercept(
-            collectionName,
+            tableName,
             operation,
             when,
             records,

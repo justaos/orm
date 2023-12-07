@@ -34,13 +34,4 @@ export default class NumberDataType extends DataType {
     _fieldName: string,
     _record: RawRecord
   ) {}
-
-  // deno-lint-ignore require-await
-  async getDisplayValue(
-    _schema: TableSchema,
-    fieldName: string,
-    record: RawRecord
-  ) {
-    return record[fieldName];
-  }
 }
