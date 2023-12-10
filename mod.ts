@@ -10,6 +10,7 @@ import TableSchema from "./src/table/TableSchema.ts";
 import ColumnSchema from "./src/table/ColumnSchema.ts";
 import { NATIVE_DATA_TYPES } from "./src/core/NativeDataType.ts";
 import DataType from "./src/data-types/DataType.ts";
+import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 
 export {
   ODM,
@@ -24,7 +25,8 @@ export {
   SelectQuery,
   TableSchema,
   ColumnSchema,
-  DataType
+  DataType,
+  RecordSaveError
 };
 
 export type { DatabaseConfiguration } from "./src/core/connection/index.ts";

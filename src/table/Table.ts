@@ -9,8 +9,6 @@ import {
   OPERATION_WHENS
 } from "../constants.ts";
 import SelectQuery from "./query/SelectQuery.ts";
-import { RecordValidationError } from "../errors/RecordValidationError.ts";
-import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { RawRecord } from "../record/RawRecord.ts";
 import { DatabaseOperationContext } from "../operation-interceptor/DatabaseOperationContext.ts";
 
@@ -23,15 +21,19 @@ export default class Table {
 
   #disableIntercepts: boolean | string[] = false;
 
+  #selectQuery: SelectQuery | undefined;
+
   constructor(
     sql: any,
     schema: TableSchema,
     operationInterceptorService: DatabaseOperationInterceptorService,
+    logger: Logger,
     context?: DatabaseOperationContext
   ) {
     this.#sql = sql;
     this.#operationInterceptorService = operationInterceptorService;
     this.#schema = schema;
+    this.#logger = logger;
     this.#context = context;
   }
 
@@ -52,26 +54,103 @@ export default class Table {
   }
 
   createNewRecord(): Record {
-    return new Record(undefined, this).initialize();
+    return new Record(this.#sql, this, this.#logger).initialize();
   }
 
-  select(...args: any[]): SelectQuery {
-    const selectQuery = new SelectQuery(this, this.#sql);
-    selectQuery.columns(...args);
-    return selectQuery;
+  select(...args: any[]): Table {
+    this.#selectQuery = new SelectQuery(this);
+    this.#selectQuery.columns(...args);
+    return this;
   }
 
-  async findById(id: string): Promise<Record | undefined> {
-    const selectQuery = this.select();
-    selectQuery.where("id", id);
-    const [record] = await selectQuery.toArray();
-    return record;
+  where(...args: any[]): Table {
+    if (!this.#selectQuery) throw new Error("Select query not defined");
+    // @ts-ignore
+    this.#selectQuery.where.apply(this.#selectQuery, args);
+    return this;
+  }
+
+  limit(limit: number): Table {
+    if (!this.#selectQuery) throw new Error("Select query not defined");
+    this.#selectQuery.limit(limit);
+    return this;
+  }
+
+  offset(offset: number): Table {
+    if (!this.#selectQuery) throw new Error("Select query not defined");
+    this.#selectQuery.offset(offset);
+    return this;
+  }
+
+  orderBy(column: string, direction: "ASC" | "DESC"): Table {
+    if (!this.#selectQuery) throw new Error("Select query not defined");
+    this.#selectQuery.orderBy(column, direction);
+    return this;
+  }
+
+  async count(): Promise<number> {
+    if (!this.#selectQuery) throw new Error("Select query not defined");
+    const query = this.#selectQuery.buildCountQuery();
+    this.#logger.info(`[Query] ${query}`);
+    const reserve = await this.#sql.reserve();
+    const [result] = await reserve.unsafe(query);
+    reserve.release();
+    return parseInt(result.count);
+  }
+
+  async runQuery(): Promise<any> {
+    if (!this.#selectQuery) throw new Error("Select query not defined");
+    const table = this;
+    const logger = this.#logger;
+
+    const query = this.#selectQuery.buildSelectQuery();
+    this.#logger.info(`[Query] ${query}`);
+
+    await this.intercept(OPERATION_TYPES.READ, OPERATION_WHENS.BEFORE, []);
+
+    const reserve = await this.#sql.reserve();
+    const cursor = await reserve.unsafe(query).cursor();
+    reserve.release();
+
+    return async function* () {
+      for await (const [row] of cursor) {
+        const [record] = await table.intercept(
+          OPERATION_TYPES.READ,
+          OPERATION_WHENS.AFTER,
+          [new Record(table.#sql, table, logger, row)]
+        );
+        yield record;
+      }
+    };
+  }
+
+  async toArray(): Promise<Record[]> {
+    if (!this.#selectQuery) throw new Error("Select query not defined");
+    const query = this.#selectQuery.buildSelectQuery();
+    this.#logger.info(`[Query] ${query}`);
+
+    await this.intercept(OPERATION_TYPES.READ, OPERATION_WHENS.BEFORE, []);
+
+    const reserve = await this.#sql.reserve();
+    const rawRecords: RawRecord[] = await reserve.unsafe(query);
+    reserve.release();
+
+    const records = this.convertRawRecordsToRecords(rawRecords);
+    await this.intercept(OPERATION_TYPES.READ, OPERATION_WHENS.AFTER, records);
+    return records;
   }
 
   convertRawRecordsToRecords(rawRecords: RawRecord[]): Record[] {
     return rawRecords.map((rawRecord) => {
-      return new Record(rawRecord, this);
+      return new Record(this.#sql, this, this.#logger, rawRecord);
     });
+  }
+
+  async findById(id: string): Promise<Record | undefined> {
+    this.#selectQuery = new SelectQuery(this);
+    this.#selectQuery.where("id", id);
+    const [record] = await this.toArray();
+    return record;
   }
 
   disableIntercepts(): void {
@@ -90,7 +169,7 @@ export default class Table {
     this.#disableIntercepts.push(interceptName);
   }
 
-  async insertRecords(records: Record[]): Promise<Record[]> {
+  /*async bulkInsert(records: Record[]): Promise<Record[]> {
     records = await this.intercept(
       OPERATION_TYPES.CREATE,
       OPERATION_WHENS.BEFORE,
@@ -116,12 +195,12 @@ export default class Table {
     } catch (err) {
       reserve.release();
       this.#logger.error(err);
-      throw new RecordValidationError(
+      /!* throw new RecordValidationError(
         this.getTableSchema().getDefinition(),
         "test",
         [],
         err.message
-      );
+      );*!/
     } finally {
       reserve.release();
     }
@@ -138,65 +217,27 @@ export default class Table {
     return savedRecords;
   }
 
-  async validateRecord(
-    rawRecord: RawRecord,
-    context?: DatabaseOperationContext
-  ) {
-    const fieldErrors: any[] = [];
-    for (const columnSchema of this.getTableSchema().getAllColumnSchemas()) {
-      const value = rawRecord[columnSchema.getName()];
-      try {
-        await columnSchema
-          .getColumnType()
-          .validateValue(
-            this.getTableSchema(),
-            columnSchema.getName(),
-            rawRecord,
-            context
-          );
-      } catch (err) {
-        fieldErrors.push(
-          new FieldValidationError(
-            columnSchema.getDefinition(),
-            value,
-            err.message
-          )
-        );
-      }
-    }
-    if (fieldErrors.length) {
-      throw new RecordValidationError(
-        this.getTableSchema().getDefinition(),
-        rawRecord.id,
-        fieldErrors
-      );
-    }
-  }
+  async bulkUpdate(records: Record[]): Promise<Record> {}
 
-  async updateRecord(record: Record): Promise<Record> {
-    [record] = await this.intercept(
-      OPERATION_TYPES.UPDATE,
+  async deleteRecords(records: Record[]): Promise<any> {
+    records = await this.intercept(
+      OPERATION_TYPES.DELETE,
       OPERATION_WHENS.BEFORE,
-      [record]
+      records
     );
 
-    await this.validateRecord(record.toJSON(), this.getContext());
+    const ids = records.map((record) => record.getID());
 
-    const rawRecord = record.toJSON();
-
-    await this.validateRecord(record.toJSON(), this.getContext());
-
-    let savedRawRecord: RawRecord;
     const reserve = await this.#sql.reserve();
     try {
-      const command = reserve`UPDATE ${reserve(
+      const command = reserve`DELETE FROM ${reserve(
         this.getTableSchema().getFullName()
-      )} set ${reserve(rawRecord)}   where id = ${rawRecord.id} RETURNING *`;
-      [savedRawRecord] = await command.execute();
+      )} where id in ${ids}`;
+      await command.execute();
     } catch (err) {
       reserve.release();
       this.#logger.error(err);
-      throw new RecordValidationError(
+      throw new RecordSaveError(
         this.getTableSchema().getDefinition(),
         "test",
         [],
@@ -205,40 +246,15 @@ export default class Table {
     } finally {
       reserve.release();
     }
-    reserve.release();
 
-    let savedRecord = new Record(savedRawRecord, this);
-    [savedRecord] = await this.intercept(
-      OPERATION_TYPES.UPDATE,
+    await this.intercept(
+      OPERATION_TYPES.DELETE,
       OPERATION_WHENS.AFTER,
-      [savedRecord]
+      records
     );
-    return savedRecord;
-  }
+  }*/
 
-  /*async deleteOne(record: Record): Promise<{
-    /!** Indicates whether this write result was acknowledged. If not, then all other members of this result will be undefined. *!/
-    acknowledged: boolean;
-    /!** The number of documents that were deleted *!/
-    deletedCount: number;
-  }> {
-    record = await this.#interceptRecord(
-      OperationType.DELETE,
-      OperationWhen.BEFORE,
-      record
-    );
-    const deletedResult = await this.#collection.deleteOne({
-      _id: record.get("_id")
-    });
-    await this.#interceptRecord(
-      OperationType.DELETE,
-      OperationWhen.AFTER,
-      record
-    );
-    return deletedResult;
-  }
-
-  aggregate(pipeline: any[]): AggregationCursor {
+  /* aggregate(pipeline: any[]): AggregationCursor {
     const cursor = this.#collection.aggregate(pipeline);
     return new AggregationCursor(cursor, this);
   }*/

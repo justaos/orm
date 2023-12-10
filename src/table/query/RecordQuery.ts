@@ -10,8 +10,4 @@ export default class RecordQuery {
   getTable(): Table {
     return this.#table;
   }
-
-  execute() {
-    throw new Error("Method not implemented.");
-  }
 }

@@ -12,7 +12,7 @@ type RecordValidationErrorObject = {
 
 export type { RecordValidationErrorObject };
 
-export class RecordValidationError extends Error {
+export class RecordSaveError extends Error {
   readonly #tableDefinition: TableDefinition;
 
   readonly #recordId: string | undefined;
@@ -32,7 +32,7 @@ export class RecordValidationError extends Error {
     this.#tableDefinition = tableDefinition;
     this.#recordId = recordId;
     this.#fieldErrors = fieldErrors;
-    Object.setPrototypeOf(this, RecordValidationError.prototype);
+    Object.setPrototypeOf(this, RecordSaveError.prototype);
   }
 
   toJSON(): RecordValidationErrorObject {

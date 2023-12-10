@@ -74,23 +74,21 @@ describe(
 
     it("#simple select query", async () => {
       const taskTable = conn.table("task");
-      let taskSelectQuery = taskTable.select();
-      let count = await taskSelectQuery.getCount();
+      let count = await taskTable.select().count();
       assertStrictEquals(count, 40, "Should be 40 records");
 
-      taskSelectQuery = taskTable.select();
-      taskSelectQuery.where("priority", 1);
-      count = await taskSelectQuery.getCount();
+      taskTable.select().where("priority", 1);
+      count = await taskTable.count();
       assertStrictEquals(count, 20, "Should be 20 records");
     });
 
     it("#select query using cursor", async () => {
       const taskTable = conn.table("task");
-      const taskSelectQuery = taskTable.select();
-      taskSelectQuery.where("priority", 1);
-      taskSelectQuery.offset(5);
-      taskSelectQuery.orderBy("order", "ASC");
-      const taskCursor = await taskSelectQuery.execute();
+      taskTable.select();
+      taskTable.where("priority", 1);
+      taskTable.offset(5);
+      taskTable.orderBy("order", "ASC");
+      const taskCursor = await taskTable.runQuery();
       for await (const taskRecord of taskCursor()) {
         console.log(
           taskRecord.get("description") + " - " + taskRecord.get("order")

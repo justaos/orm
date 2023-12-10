@@ -1,17 +1,8 @@
 import RecordQuery from "./RecordQuery.ts";
 import Table from "../Table.ts";
-import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
-import { NativeSQL } from "../../core/NativeSQL.ts";
-import { RawRecord } from "../../record/RawRecord.ts";
-import Record from "../../record/Record.ts";
-import { OPERATION_TYPES, OPERATION_WHENS } from "../../constants.ts";
 import { OrderByDirectionType, OrderByType } from "./OrderByType.ts";
 
 export default class SelectQuery extends RecordQuery {
-  readonly #logger = Logger.createLogger({ label: SelectQuery.name });
-
-  readonly #sql: NativeSQL;
-
   #columns: string[] = ["*"];
 
   #where: any[] = [];
@@ -22,9 +13,8 @@ export default class SelectQuery extends RecordQuery {
 
   #sortList: OrderByType[] = [];
 
-  constructor(table: Table, sql: NativeSQL) {
+  constructor(table: Table) {
     super(table);
-    this.#sql = sql;
   }
 
   getSelectedColumns(): string[] | undefined {
@@ -148,7 +138,7 @@ export default class SelectQuery extends RecordQuery {
     );
   }
 
-  #buildQuery(): string {
+  buildSelectQuery(): string {
     const schemaName = this.getTable().getSchemaName();
     const tableName = this.getTable().getName();
 
@@ -161,71 +151,15 @@ export default class SelectQuery extends RecordQuery {
     return query;
   }
 
-  async getCount(): Promise<number> {
-    const reserve = await this.#sql.reserve();
-
+  buildCountQuery(): string {
     const schemaName = this.getTable().getSchemaName();
     const tableName = this.getTable().getName();
 
     let query = `SELECT COUNT(*) as count FROM ${schemaName}.${tableName}`;
     query = query + this.#prepareWhereClause();
     query = query + this.#prepareLimitClause();
-    this.#logger.info(`[Query] ${query}`);
+    query = query + this.#prepareOffsetClause();
 
-    const rawRecords: RawRecord[] = await reserve.unsafe(query);
-    reserve.release();
-    return parseInt(rawRecords[0]["count"]);
-  }
-
-  async toArray(): Promise<Record[]> {
-    const reserve = await this.#sql.reserve();
-    const query = this.#buildQuery();
-    this.#logger.info(`[Query] ${query}`);
-
-    await this.getTable().intercept(
-      OPERATION_TYPES.READ,
-      OPERATION_WHENS.BEFORE,
-      []
-    );
-
-    const rawRecords: RawRecord[] = await reserve.unsafe(query);
-    reserve.release();
-
-    const records = this.getTable().convertRawRecordsToRecords(rawRecords);
-    await this.getTable().intercept(
-      OPERATION_TYPES.READ,
-      OPERATION_WHENS.AFTER,
-      records
-    );
-    return records;
-  }
-
-  async execute() {
-    const table = this.getTable();
-    const reserve = await this.#sql.reserve();
-
-    const query = this.#buildQuery();
-    this.#logger.info(`[Query] ${query}`);
-
-    await this.getTable().intercept(
-      OPERATION_TYPES.READ,
-      OPERATION_WHENS.BEFORE,
-      []
-    );
-
-    const cursor = await reserve.unsafe(query).cursor();
-    reserve.release();
-    // return new RecordCursor(cursor, this.getTable());
-
-    return async function* generator() {
-      for await (const [row] of cursor) {
-        const [record] = await table.intercept(
-          OPERATION_TYPES.READ,
-          OPERATION_WHENS.AFTER,
-          [new Record(row, table)]
-        );
-        yield record;
-      }
-    };
+    return query;
   }
 }

@@ -26,9 +26,6 @@ export default class ODMConnection {
   readonly #logger: Logger;
   readonly #operationInterceptorService: DatabaseOperationInterceptorService;
 
-  /*  #operationInterceptorService: OperationInterceptorService =
-      new OperationInterceptorService();*/
-
   constructor(
     logger: Logger,
     config: DatabaseConfiguration,
@@ -182,7 +179,7 @@ export default class ODMConnection {
     if (typeof tableDefinitionStrict === "undefined") {
       throw new ODMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
-        `Collection with name '${nameWithSchema}' is not defined`
+        `Table with name '${nameWithSchema}' is not defined`
       );
     }
     const tableSchema = new TableSchema(
@@ -194,6 +191,7 @@ export default class ODMConnection {
       this.#conn.getNativeConnection(),
       tableSchema,
       this.#operationInterceptorService,
+      this.#logger,
       context
     );
   }
