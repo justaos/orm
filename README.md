@@ -1,4 +1,4 @@
-# JUSTAOS's ODM
+# JUSTAOS's ORM
 
 ![GitHub release (with filter)](https://img.shields.io/github/v/release/justaos/odm?label=Release)
 [![Build](https://github.com/justaos/odm/workflows/Build/badge.svg)](https://github.com/justaos/odm/actions?workflow=Build)
@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
 [![Contributors](https://img.shields.io/github/contributors/justaos/odm.svg)]()
 
-JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to
+JUSTAOS's ORM (Object Relational Mapping) tool is built for Deno and provides transparent persistence for JavaScript objects to
 Postgres database.
 
 - Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
