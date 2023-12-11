@@ -5,7 +5,7 @@ import Table from "./src/table/Table.ts";
 import { ODMError } from "./src/errors/ODMError.ts";
 import { OPERATION_TYPES, OPERATION_WHENS } from "./src/constants.ts";
 import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOperationInterceptor.ts";
-import SelectQuery from "./src/table/query/SelectQuery.ts";
+import SelectQuery from "./src/query/SelectQuery.ts";
 import TableSchema from "./src/table/TableSchema.ts";
 import ColumnSchema from "./src/table/ColumnSchema.ts";
 import { NATIVE_DATA_TYPES } from "./src/core/NativeDataType.ts";

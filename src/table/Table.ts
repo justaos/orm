@@ -8,7 +8,7 @@ import {
   OPERATION_TYPES,
   OPERATION_WHENS
 } from "../constants.ts";
-import SelectQuery from "./query/SelectQuery.ts";
+import SelectQuery from "../query/SelectQuery.ts";
 import { RawRecord } from "../record/RawRecord.ts";
 import { DatabaseOperationContext } from "../operation-interceptor/DatabaseOperationContext.ts";
 
@@ -21,7 +21,9 @@ export default class Table {
 
   #disableIntercepts: boolean | string[] = false;
 
-  #selectQuery: SelectQuery | undefined;
+  #selectQuery?: SelectQuery;
+
+  #queryType?: "select" | "update" | "delete" | "insert";
 
   constructor(
     sql: any,

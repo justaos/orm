@@ -1,8 +1,9 @@
-import RecordQuery from "./RecordQuery.ts";
-import Table from "../Table.ts";
-import { OrderByDirectionType, OrderByType } from "./OrderByType.ts";
+import {
+  OrderByDirectionType,
+  OrderByType
+} from "../table/query/OrderByType.ts";
 
-export default class SelectQuery extends RecordQuery {
+export default class SelectQuery {
   #columns: string[] = ["*"];
 
   #where: any[] = [];
@@ -13,8 +14,13 @@ export default class SelectQuery extends RecordQuery {
 
   #sortList: OrderByType[] = [];
 
-  constructor(table: Table) {
-    super(table);
+  #from?: string;
+
+  constructor() {}
+
+  from(nameWithSchema: string): SelectQuery {
+    this.#from = nameWithSchema;
+    return this;
   }
 
   getSelectedColumns(): string[] | undefined {
@@ -139,10 +145,7 @@ export default class SelectQuery extends RecordQuery {
   }
 
   buildSelectQuery(): string {
-    const schemaName = this.getTable().getSchemaName();
-    const tableName = this.getTable().getName();
-
-    let query = `SELECT ${this.#columns} FROM ${schemaName}.${tableName}`;
+    let query = `SELECT ${this.#columns} FROM ${this.#from}`;
     query = query + this.#prepareWhereClause();
     query = query + this.#prepareOrderByClause();
     query = query + this.#prepareLimitClause();
@@ -152,10 +155,16 @@ export default class SelectQuery extends RecordQuery {
   }
 
   buildCountQuery(): string {
-    const schemaName = this.getTable().getSchemaName();
-    const tableName = this.getTable().getName();
+    let query = `SELECT COUNT(*) as count FROM ${this.#from}`;
+    query = query + this.#prepareWhereClause();
+    query = query + this.#prepareLimitClause();
+    query = query + this.#prepareOffsetClause();
 
-    let query = `SELECT COUNT(*) as count FROM ${schemaName}.${tableName}`;
+    return query;
+  }
+
+  buildDeleteQuery(): string {
+    let query = `DELETE FROM ${this.#from}`;
     query = query + this.#prepareWhereClause();
     query = query + this.#prepareLimitClause();
     query = query + this.#prepareOffsetClause();
