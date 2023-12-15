@@ -10,13 +10,14 @@ import { Session } from "../../test.utils.ts";
 import { ODMConnection } from "../../../mod.ts";
 
 describe(
-  "Schema",
+  "SELECT Query",
   {
     sanitizeResources: false,
     sanitizeOps: false
   },
   () => {
     let conn: ODMConnection;
+    const logger = Session.getLogger();
 
     beforeAll(async () => {
       conn = await Session.getConnection();
@@ -74,7 +75,7 @@ describe(
 
     it("#simple select query", async () => {
       const taskTable = conn.table("task");
-      let count = await taskTable.select().count();
+      let count = await taskTable.count();
       assertStrictEquals(count, 40, "Should be 40 records");
 
       taskTable.select().where("priority", 1);
@@ -88,11 +89,8 @@ describe(
       taskTable.where("priority", 1);
       taskTable.offset(5);
       taskTable.orderBy("order", "ASC");
-      const taskCursor = await taskTable.runQuery();
+      const taskCursor = await taskTable.execute();
       for await (const taskRecord of taskCursor()) {
-        console.log(
-          taskRecord.get("description") + " - " + taskRecord.get("order")
-        );
         assertStrictEquals(taskRecord.get("priority"), 1, "Should be 1");
       }
     });

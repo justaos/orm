@@ -23,12 +23,6 @@ export default class SelectQuery {
     return this;
   }
 
-  getSelectedColumns(): string[] | undefined {
-    if (this.#columns.length >= 1 && this.#columns[0] !== "*") {
-      return this.#columns;
-    }
-  }
-
   columns(...args: string[]): SelectQuery {
     if (args.length === 0) {
       this.#columns = ["*"];
@@ -47,12 +41,16 @@ export default class SelectQuery {
     return this;
   }
 
-  where(column: any, operator: any, value?: any): SelectQuery {
+  where(
+    column: string | number | boolean,
+    operator: any,
+    value?: any
+  ): SelectQuery {
     // Support "where true || where false"
     if (column === false || column === true) {
       return this.where(1, "=", column ? 1 : 0);
     }
-    if (arguments.length === 2) {
+    if (typeof value === "undefined") {
       return this.where(column, "=", operator);
     }
 
@@ -67,6 +65,11 @@ export default class SelectQuery {
 
   limit(limit: number): SelectQuery {
     this.#limit = limit;
+    return this;
+  }
+
+  count(): SelectQuery {
+    this.#columns = ["COUNT(*) as count"];
     return this;
   }
 
@@ -144,28 +147,10 @@ export default class SelectQuery {
     );
   }
 
-  buildSelectQuery(): string {
+  buildQuery(): string {
     let query = `SELECT ${this.#columns} FROM ${this.#from}`;
     query = query + this.#prepareWhereClause();
     query = query + this.#prepareOrderByClause();
-    query = query + this.#prepareLimitClause();
-    query = query + this.#prepareOffsetClause();
-
-    return query;
-  }
-
-  buildCountQuery(): string {
-    let query = `SELECT COUNT(*) as count FROM ${this.#from}`;
-    query = query + this.#prepareWhereClause();
-    query = query + this.#prepareLimitClause();
-    query = query + this.#prepareOffsetClause();
-
-    return query;
-  }
-
-  buildDeleteQuery(): string {
-    let query = `DELETE FROM ${this.#from}`;
-    query = query + this.#prepareWhereClause();
     query = query + this.#prepareLimitClause();
     query = query + this.#prepareOffsetClause();
 

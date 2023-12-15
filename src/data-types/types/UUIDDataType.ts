@@ -1,34 +1,26 @@
 import DataType from "../DataType.ts";
-import TableSchema from "../../table/TableSchema.ts";
-import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
-import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
-import { RawRecord } from "../../record/RawRecord.ts";
+import { ColumnDefinition, UUID } from "../../types.ts";
+import { UUIDUtils } from "../../utils.ts";
 
 export default class UUIDDataType extends DataType {
   constructor() {
-    super(NATIVE_DATA_TYPES.UUID);
-  }
-
-  getName(): string {
-    return "uuid";
+    super("uuid", "UUID");
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
     return true;
   }
 
-  setValueIntercept(
-    _schema: TableSchema,
-    _fieldName: string,
-    value: any,
-    _record: RawRecord
-  ): any {
+  toJSONValue(value: UUID | null): string | null {
     return value;
   }
 
-  async validateValue(
-    _schema: TableSchema,
-    _fieldName: string,
-    _record: RawRecord
-  ) {}
+  setValueIntercept(value: string | UUID | null): UUID | null {
+    return value;
+  }
+
+  async validateValue(value: any) {
+    if (!UUIDUtils.isValidId(value))
+      throw new Error(`Invalid UUID value: ${value}`);
+  }
 }

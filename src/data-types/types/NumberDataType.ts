@@ -1,37 +1,27 @@
 import DataType from "../DataType.ts";
-import TableSchema from "../../table/TableSchema.ts";
-import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
-import { RawRecord } from "../../record/RawRecord.ts";
+import { ColumnDefinition } from "../../types.ts";
 
 export default class NumberDataType extends DataType {
   constructor() {
-    super("decimal");
-  }
-
-  getName(): string {
-    return "number";
+    super("number", "DECIMAL");
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
     return true;
   }
 
-  setValueIntercept(
-    _schema: TableSchema,
-    _fieldName: string,
-    value: any,
-    _record: RawRecord
-  ): any {
-    if (typeof value === "string") {
-      // @ts-ignore
-      return value * 1;
-    }
+  toJSONValue(value: number | null): number | null {
     return value;
   }
 
-  async validateValue(
-    _schema: TableSchema,
-    _fieldName: string,
-    _record: RawRecord
-  ) {}
+  setValueIntercept(value: number | string | null): number | null {
+    //@ts-ignore
+    if (typeof value === "string") return value * 1;
+    return value;
+  }
+
+  async validateValue(value: any) {
+    if (value !== null && typeof value !== "number")
+      throw new Error(`Invalid integer value: ${value}`);
+  }
 }

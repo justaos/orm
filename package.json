@@ -20,6 +20,7 @@
   "license": "Apache-2.0",
   "contributors": [],
   "scripts": {
+    "test:debug": "deno task test:debug",
     "test": "deno task test",
     "coverage": "deno task coverage"
   },

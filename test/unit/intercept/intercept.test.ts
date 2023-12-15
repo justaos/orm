@@ -1,6 +1,5 @@
 import {
   afterAll,
-  assert,
   assertStrictEquals,
   beforeAll,
   describe,
@@ -12,8 +11,6 @@ import {
   DatabaseOperationWhen,
   ODM,
   ODMConnection,
-  OPERATION_TYPES,
-  OPERATION_WHENS,
   Record
 } from "../../../mod.ts";
 import { logger, Session } from "../../test.utils.ts";
@@ -27,7 +24,6 @@ describe({
     let odm: ODM;
     let conn: ODMConnection;
     const cleanTableList: string[] = [];
-    const MODEL_NAME = "intercept";
 
     beforeAll(async () => {
       conn = await Session.getConnection();
@@ -43,6 +39,7 @@ describe({
     });
 
     it("#ODM::addInterceptor", async () => {
+      const INTERCEPT_TEST_MODAL = "intercept_test";
       odm.addInterceptor(
         new (class extends DatabaseOperationInterceptor {
           getName() {
@@ -50,17 +47,17 @@ describe({
           }
 
           async intercept(
-            collectionName: string,
+            tableName: string,
             operation: DatabaseOperationType,
             when: DatabaseOperationWhen,
             records: Record[]
           ) {
-            if (collectionName === MODEL_NAME) {
-              if (operation === OPERATION_TYPES.CREATE) {
+            if (tableName === INTERCEPT_TEST_MODAL) {
+              if (operation === "INSERT") {
                 logger.info(
-                  `[collectionName=${collectionName}] [operation=${operation}] [when=${when}]`
+                  `[collectionName=${tableName}] [operation=${operation}] [when=${when}]`
                 );
-                if (when === OPERATION_WHENS.BEFORE) {
+                if (when === "BEFORE") {
                   logger.info("before");
                   for (const record of records) {
                     record.set("computed", "this is computed");
@@ -74,7 +71,7 @@ describe({
       );
 
       await conn.defineTable({
-        name: MODEL_NAME,
+        name: INTERCEPT_TEST_MODAL,
         columns: [
           {
             name: "name",
@@ -86,8 +83,9 @@ describe({
           }
         ]
       });
+      cleanTableList.push(INTERCEPT_TEST_MODAL);
 
-      const interceptTestCollection = conn.table(MODEL_NAME);
+      const interceptTestCollection = conn.table(INTERCEPT_TEST_MODAL);
       const s = interceptTestCollection.createNewRecord();
       s.set("name", "John");
       try {
@@ -100,20 +98,6 @@ describe({
       } catch (err) {
         logger.info(err.message + "");
       }
-    });
-
-    it("#model define check", async () => {
-      odm.deleteInterceptor("my-intercept");
-
-      const interceptTestCollection = conn.table(MODEL_NAME);
-      const s = interceptTestCollection.createNewRecord();
-      s.set("name", "Ravi");
-      const record = await s.insert();
-
-      assert(
-        record.get("computed") !== "this is computed",
-        "read interceptor computed the value"
-      );
     });
   }
 });

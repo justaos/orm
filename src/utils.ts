@@ -1,6 +1,5 @@
-import * as uuid from "https://deno.land/std@0.208.0/uuid/mod.ts";
-
-type UUID = string;
+import { UUID } from "./types.ts";
+import { uuid } from "../deps.ts";
 
 export class UUIDUtils {
   static generateId(): UUID {
@@ -11,5 +10,3 @@ export class UUIDUtils {
     return uuid.validate(id);
   }
 }
-
-export type { UUID };

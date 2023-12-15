@@ -1,41 +1,39 @@
+import { Logger } from "../../deps.ts";
+import {
+  DatabaseOperationContext,
+  DatabaseOperationType,
+  DatabaseOperationWhen,
+  RawRecord
+} from "../types.ts";
 import Record from "../record/Record.ts";
 import TableSchema from "./TableSchema.ts";
 import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
-import { Logger } from "../../deps.ts";
-import {
-  DatabaseOperationType,
-  DatabaseOperationWhen,
-  OPERATION_TYPES,
-  OPERATION_WHENS
-} from "../constants.ts";
-import SelectQuery from "../query/SelectQuery.ts";
-import { RawRecord } from "../record/RawRecord.ts";
-import { DatabaseOperationContext } from "../operation-interceptor/DatabaseOperationContext.ts";
+import Query from "../query/Query.ts";
 
 export default class Table {
-  readonly #sql: any;
   readonly #schema: TableSchema;
   readonly #context?: DatabaseOperationContext;
   readonly #logger = Logger.createLogger({ label: Table.name });
   readonly #operationInterceptorService: DatabaseOperationInterceptorService;
+  #queryBuilder: Query;
 
   #disableIntercepts: boolean | string[] = false;
 
-  #selectQuery?: SelectQuery;
-
-  #queryType?: "select" | "update" | "delete" | "insert";
+  readonly #sql: any;
 
   constructor(
-    sql: any,
+    queryBuilder: Query,
     schema: TableSchema,
     operationInterceptorService: DatabaseOperationInterceptorService,
     logger: Logger,
+    sql: any,
     context?: DatabaseOperationContext
   ) {
-    this.#sql = sql;
+    this.#queryBuilder = queryBuilder;
     this.#operationInterceptorService = operationInterceptorService;
     this.#schema = schema;
     this.#logger = logger;
+    this.#sql = sql;
     this.#context = context;
   }
 
@@ -56,101 +54,99 @@ export default class Table {
   }
 
   createNewRecord(): Record {
-    return new Record(this.#sql, this, this.#logger).initialize();
+    return new Record(this.#queryBuilder, this, this.#logger).initialize();
   }
 
   select(...args: any[]): Table {
-    this.#selectQuery = new SelectQuery(this);
-    this.#selectQuery.columns(...args);
+    this.#queryBuilder = this.#queryBuilder.getInstance();
+    this.#queryBuilder.select.apply(this.#queryBuilder, args);
+    this.#queryBuilder.from(this.getTableSchema().getFullName());
     return this;
   }
 
-  where(...args: any[]): Table {
-    if (!this.#selectQuery) throw new Error("Select query not defined");
-    // @ts-ignore
-    this.#selectQuery.where.apply(this.#selectQuery, args);
+  where(column: any, operator: any, value?: any): Table {
+    this.#queryBuilder.where(column, operator, value);
     return this;
   }
 
   limit(limit: number): Table {
-    if (!this.#selectQuery) throw new Error("Select query not defined");
-    this.#selectQuery.limit(limit);
+    this.#queryBuilder.limit(limit);
     return this;
   }
 
   offset(offset: number): Table {
-    if (!this.#selectQuery) throw new Error("Select query not defined");
-    this.#selectQuery.offset(offset);
+    this.#queryBuilder.offset(offset);
     return this;
   }
 
   orderBy(column: string, direction: "ASC" | "DESC"): Table {
-    if (!this.#selectQuery) throw new Error("Select query not defined");
-    this.#selectQuery.orderBy(column, direction);
+    this.#queryBuilder.orderBy(column, direction);
     return this;
   }
 
   async count(): Promise<number> {
-    if (!this.#selectQuery) throw new Error("Select query not defined");
-    const query = this.#selectQuery.buildCountQuery();
+    if (!this.#queryBuilder.getType()) {
+      this.#queryBuilder = this.#queryBuilder.getInstance();
+      this.#queryBuilder.select();
+      this.#queryBuilder.from(this.getTableSchema().getFullName());
+    }
+    if (this.#queryBuilder.getType() !== "select") {
+      throw new Error("Count can only be called on select query");
+    }
+    this.#queryBuilder.count();
+    const query = this.#queryBuilder.getSQLQuery();
     this.#logger.info(`[Query] ${query}`);
-    const reserve = await this.#sql.reserve();
-    const [result] = await reserve.unsafe(query);
-    reserve.release();
-    return parseInt(result.count);
+    const [row] = await this.#queryBuilder.execute();
+    return parseInt(row.count, 10);
   }
 
-  async runQuery(): Promise<any> {
-    if (!this.#selectQuery) throw new Error("Select query not defined");
+  async execute(): Promise<any> {
+    // deno-lint-ignore no-this-alias
     const table = this;
-    const logger = this.#logger;
 
-    const query = this.#selectQuery.buildSelectQuery();
+    const query = this.#queryBuilder.getSQLQuery();
     this.#logger.info(`[Query] ${query}`);
 
-    await this.intercept(OPERATION_TYPES.READ, OPERATION_WHENS.BEFORE, []);
+    await this.intercept("SELECT", "BEFORE", []);
 
-    const reserve = await this.#sql.reserve();
-    const cursor = await reserve.unsafe(query).cursor();
-    reserve.release();
+    const cursor = await this.#queryBuilder.cursor();
 
     return async function* () {
       for await (const [row] of cursor) {
-        const [record] = await table.intercept(
-          OPERATION_TYPES.READ,
-          OPERATION_WHENS.AFTER,
-          [new Record(table.#sql, table, logger, row)]
-        );
+        const [record] = await table.intercept("SELECT", "AFTER", [
+          table.convertRawRecordToRecord(row)
+        ]);
         yield record;
       }
     };
   }
 
   async toArray(): Promise<Record[]> {
-    if (!this.#selectQuery) throw new Error("Select query not defined");
-    const query = this.#selectQuery.buildSelectQuery();
+    const query = this.#queryBuilder.getSQLQuery();
     this.#logger.info(`[Query] ${query}`);
 
-    await this.intercept(OPERATION_TYPES.READ, OPERATION_WHENS.BEFORE, []);
+    await this.intercept("SELECT", "BEFORE", []);
 
-    const reserve = await this.#sql.reserve();
-    const rawRecords: RawRecord[] = await reserve.unsafe(query);
-    reserve.release();
+    const rawRecords = await this.#queryBuilder.execute();
 
-    const records = this.convertRawRecordsToRecords(rawRecords);
-    await this.intercept(OPERATION_TYPES.READ, OPERATION_WHENS.AFTER, records);
+    const records: Record[] = [];
+
+    for (const row of rawRecords) {
+      const [record] = await this.intercept("SELECT", "AFTER", [
+        this.convertRawRecordToRecord(row)
+      ]);
+      records.push(record);
+    }
     return records;
   }
 
-  convertRawRecordsToRecords(rawRecords: RawRecord[]): Record[] {
-    return rawRecords.map((rawRecord) => {
-      return new Record(this.#sql, this, this.#logger, rawRecord);
-    });
+  convertRawRecordToRecord(rawRecord: RawRecord): Record {
+    return new Record(this.#queryBuilder, this, this.#logger, rawRecord);
   }
 
-  async findById(id: string): Promise<Record | undefined> {
-    this.#selectQuery = new SelectQuery(this);
-    this.#selectQuery.where("id", id);
+  async getRecordById(id: string): Promise<Record | undefined> {
+    this.select();
+    this.#queryBuilder.where("id", id);
     const [record] = await this.toArray();
     return record;
   }
@@ -173,7 +169,7 @@ export default class Table {
 
   /*async bulkInsert(records: Record[]): Promise<Record[]> {
     records = await this.intercept(
-      OPERATION_TYPES.CREATE,
+      "CREATE",
       OPERATION_WHENS.BEFORE,
       records
     );
@@ -212,7 +208,7 @@ export default class Table {
       return new Record(savedRawRecord, this);
     });
     savedRecords = await this.intercept(
-      OPERATION_TYPES.CREATE,
+      "CREATE",
       OPERATION_WHENS.AFTER,
       savedRecords
     );
@@ -223,7 +219,7 @@ export default class Table {
 
   async deleteRecords(records: Record[]): Promise<any> {
     records = await this.intercept(
-      OPERATION_TYPES.DELETE,
+      "DELETE",
       OPERATION_WHENS.BEFORE,
       records
     );
@@ -250,7 +246,7 @@ export default class Table {
     }
 
     await this.intercept(
-      OPERATION_TYPES.DELETE,
+      "DELETE",
       OPERATION_WHENS.AFTER,
       records
     );

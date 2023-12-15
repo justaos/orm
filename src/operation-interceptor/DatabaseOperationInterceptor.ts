@@ -1,5 +1,5 @@
 import Record from "../record/Record.ts";
-import { DatabaseOperationType, DatabaseOperationWhen } from "../constants.ts";
+import { DatabaseOperationType, DatabaseOperationWhen } from "../types.ts";
 
 export default abstract class DatabaseOperationInterceptor {
   #order = 100;

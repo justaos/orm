@@ -2,7 +2,8 @@
   "version": "3",
   "packages": {
     "specifiers": {
-      "npm:@js-temporal/polyfill": "npm:@js-temporal/polyfill@0.4.4"
+      "npm:@js-temporal/polyfill": "npm:@js-temporal/polyfill@0.4.4",
+      "npm:sqlstring": "npm:sqlstring@2.3.3"
     },
     "npm": {
       "@js-temporal/polyfill@0.4.4": {
@@ -14,6 +15,10 @@
       },
       "jsbi@4.3.0": {
         "integrity": "sha512-SnZNcinB4RIcnEyZqFPdGPVgrg2AcnykiBy0sHVJQKHYeaLUvi3Exj+iaPpLnFVkDPZIV4U0yvgC9/R4uEAZ9g==",
+        "dependencies": {}
+      },
+      "sqlstring@2.3.3": {
+        "integrity": "sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==",
         "dependencies": {}
       },
       "tslib@2.6.1": {

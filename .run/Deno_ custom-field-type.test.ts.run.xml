@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Deno: custom-field-type.test.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/test/unit/custom-field-type.test.ts" programParameters="test -A" workingDirectory="$PROJECT_DIR$/test/unit">
+    <method v="2" />
+  </configuration>
+</component>

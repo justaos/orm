@@ -3,8 +3,12 @@ export default class DeleteQuery {
 
   #from?: string;
 
-  constructor(nameWithSchema: string) {
+  constructor() {
+  }
+
+  from(nameWithSchema: string): DeleteQuery {
     this.#from = nameWithSchema;
+    return this;
   }
 
   where(column: any, operator: any, value?: any): DeleteQuery {
@@ -39,7 +43,7 @@ export default class DeleteQuery {
     );
   }
 
-  buildDeleteQuery(): string {
+  buildQuery(): string {
     let query = `DELETE FROM ${this.#from}`;
     query = query + this.#prepareWhereClause();
     return query;

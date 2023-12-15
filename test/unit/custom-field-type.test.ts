@@ -1,17 +1,8 @@
 import { afterAll, assert, beforeAll, describe, it } from "../test.deps.ts";
 
-import {
-  DatabaseOperationContext,
-  DataType,
-  NATIVE_DATA_TYPES,
-  ODM,
-  ODMConnection,
-  RawRecord
-} from "../../mod.ts";
+import { ColumnDefinition, DataType, ODM, ODMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
 import { Logger } from "../../deps.ts";
-import TableSchema from "../../src/table/TableSchema.ts";
-import { ColumnDefinition } from "../../src/table/definitions/ColumnDefinition.ts";
 
 const logger = Logger.createLogger({ label: "FieldType" });
 
@@ -47,47 +38,29 @@ describe(
     it("#addDataType - Registering Custom data type", async function () {
       class EmailType extends DataType {
         constructor() {
-          super(NATIVE_DATA_TYPES.VARCHAR);
+          super("email", "VARCHAR");
         }
 
-        getName() {
-          return "email";
-        }
-
-        async validateValue(_schema: TableSchema, fieldName: string, record: RawRecord) {
-          const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
-          if (!new RegExp(pattern).test(record[fieldName]))
-            throw new Error("Not a valid email");
+        toJSONValue(value: string | null): string | null {
+          return value;
         }
 
         validateDefinition(fieldDefinition: ColumnDefinition) {
-          return !!fieldDefinition.name;
+          return true;
         }
 
-        getValueIntercept(
-          _schema: TableSchema,
-          fieldName: string,
-          record: RawRecord
-        ): any {
-          return record[fieldName];
-        }
-
-        setValueIntercept(
-          _schema: TableSchema,
-          _fieldName: string,
-          newValue: any,
-          _record: RawRecord
-        ): any {
+        setValueIntercept(newValue: any): any {
           return newValue;
         }
 
-        async getDisplayValue(
-          _schema: TableSchema,
-          fieldName: string,
-          record: any,
-          _context: DatabaseOperationContext
-        ) {
-          return record[fieldName];
+        async validateValue(value: unknown): Promise<void> {
+          const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
+          if (
+            value &&
+            typeof value === "string" &&
+            !new RegExp(pattern).test(value)
+          )
+            throw new Error("Not a valid email");
         }
       }
 

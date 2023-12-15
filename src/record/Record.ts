@@ -1,26 +1,31 @@
+import { Logger } from "../../deps.ts";
+import { JSONObject, RawRecord } from "../types.ts";
+import { UUIDUtils } from "../utils.ts";
 import Table from "../table/Table.ts";
 import ColumnSchema from "../table/ColumnSchema.ts";
-import { RawRecord } from "./RawRecord.ts";
-import { UUIDUtils } from "../core/UUID.ts";
 import { DatabaseErrorCode, ODMError } from "../errors/ODMError.ts";
-import { OPERATION_TYPES, OPERATION_WHENS } from "../constants.ts";
 import { RecordSaveError } from "../errors/RecordSaveError.ts";
+import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
-import { Logger } from "../../deps.ts";
 
 export default class Record {
   #isNew = false;
 
-  readonly #sql: any;
-
-  #logger: Logger;
+  readonly #logger: Logger;
 
   #record: RawRecord | undefined;
 
+  readonly #queryBuilder: Query;
+
   readonly #table: Table;
 
-  constructor(sql: any, table: Table, logger: Logger, record?: RawRecord) {
-    this.#sql = sql;
+  constructor(
+    queryBuilder: Query,
+    table: Table,
+    logger: Logger,
+    record?: RawRecord
+  ) {
+    this.#queryBuilder = queryBuilder;
     this.#logger = logger;
     this.#table = table;
     if (typeof record !== "undefined") {
@@ -33,7 +38,7 @@ export default class Record {
     this.#record = {};
     this.#table
       .getTableSchema()
-      .getAllColumnSchemas()
+      .getColumnSchemas()
       .map((field: ColumnSchema) => {
         this.set(field.getName(), field.getDefaultValue() || null);
       });
@@ -56,60 +61,50 @@ export default class Record {
   }
 
   set(key: string, value: any): void {
-    if (typeof this.#record === "undefined")
-      throw new Error("Record not initialized");
-
+    const record = this.#getRawRecord();
     const schema = this.#table.getTableSchema();
     const field = schema.getColumnSchema(key);
-    if (field && this.#record) {
-      this.#record[key] = field
-        .getColumnType()
-        .setValueIntercept(
-          this.#table.getTableSchema(),
-          key,
-          value,
-          this.#record
-        );
+    if (field) {
+      record[key] = field.getColumnType().setValueIntercept(value);
     }
   }
 
   get(key: string): any {
-    if (typeof this.#record === "undefined")
-      throw new Error("Record not initialized");
+    const record = this.#getRawRecord();
     const schema = this.#table.getTableSchema();
-    if (schema.getColumnSchema(key) && typeof this.#record[key] !== "undefined")
-      return this.#record[key];
+    if (schema.getColumnSchema(key)) return record[key];
     return null;
   }
 
-  getNativeValue(key: string): any {
-    if (typeof this.#record === "undefined")
-      throw new Error("Record not initialized");
+  getJSONValue(key: string): any {
+    const record = this.#getRawRecord();
     const schema = this.#table.getTableSchema();
     const dataType = schema.getColumnSchema(key)?.getColumnType();
-    if (dataType && typeof this.#record[key] !== "undefined")
-      return dataType.getNativeValue(this.#record[key]);
+    if (dataType && typeof record[key] !== "undefined")
+      return dataType.toJSONValue(record[key]);
     return null;
   }
 
   async insert(): Promise<Record> {
-    let [record] = await this.#table.intercept(
-      OPERATION_TYPES.CREATE,
-      OPERATION_WHENS.BEFORE,
-      [this]
-    );
+    const tableSchema = this.#table.getTableSchema();
+    let [record] = await this.#table.intercept("INSERT", "BEFORE", [this]);
 
     await this.#validateRecord(record.toJSON());
 
+    const insertQueryBuilder = this.#queryBuilder.insert();
+    insertQueryBuilder.into(tableSchema.getFullName());
+    const recordJson = record.toJSON();
+    insertQueryBuilder.columns(tableSchema.getColumnNames());
+    insertQueryBuilder.values([recordJson]);
+    insertQueryBuilder.returning("*");
+
+    const query = this.#queryBuilder.getSQLQuery();
+    this.#logger.info(`[Query] ${query}`);
+
     let savedRawRecord: RawRecord;
-    const reserve = await this.#sql.reserve();
     try {
-      const command = reserve`INSERT INTO ${reserve(
-        this.#table.getTableSchema().getFullName()
-      )} ${reserve(record.toJSON())} RETURNING *`;
-      [savedRawRecord] = await command.execute();
+      [savedRawRecord] = await this.#queryBuilder.execute();
     } catch (err) {
-      reserve.release();
       this.#logger.error(err);
       throw new RecordSaveError(
         this.#table.getTableSchema().getDefinition(),
@@ -117,40 +112,36 @@ export default class Record {
         [],
         err.message
       );
-    } finally {
-      reserve.release();
     }
 
-    [record] = await this.#table.intercept(
-      OPERATION_TYPES.CREATE,
-      OPERATION_WHENS.AFTER,
-      [new Record(this.#sql, this.#table, this.#logger, savedRawRecord)]
-    );
+    [record] = await this.#table.intercept("INSERT", "AFTER", [
+      new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord)
+    ]);
     this.#record = record.toJSON();
     this.#isNew = false;
     return this;
   }
 
   async update(): Promise<Record> {
-    let [record] = await this.#table.intercept(
-      OPERATION_TYPES.UPDATE,
-      OPERATION_WHENS.BEFORE,
-      [this]
-    );
+    const tableSchema = this.#table.getTableSchema();
+    let [record] = await this.#table.intercept("UPDATE", "BEFORE", [this]);
 
     await this.#validateRecord(record.toJSON());
 
+    const updateQueryBuilder = this.#queryBuilder.update();
+    updateQueryBuilder.into(tableSchema.getFullName());
+    const recordJson = record.toJSON();
+    updateQueryBuilder.columns(tableSchema.getColumnNames());
+    updateQueryBuilder.value(recordJson);
+    updateQueryBuilder.returning("*");
+
+    const query = this.#queryBuilder.getSQLQuery();
+    this.#logger.info(`[Query] ${query}`);
+
     let savedRawRecord: RawRecord;
-    const reserve = await this.#sql.reserve();
     try {
-      const command = reserve`UPDATE ${reserve(
-        this.#table.getTableSchema().getFullName()
-      )} set ${reserve(
-        record.toJSON()
-      )}   where id = ${record.getID()} RETURNING *`;
-      [savedRawRecord] = await command.execute();
+      [savedRawRecord] = await this.#queryBuilder.execute();
     } catch (err) {
-      reserve.release();
       this.#logger.error(err);
       throw new RecordSaveError(
         this.#table.getTableSchema().getDefinition(),
@@ -158,15 +149,11 @@ export default class Record {
         [],
         err.message
       );
-    } finally {
-      reserve.release();
     }
 
-    [record] = await this.#table.intercept(
-      OPERATION_TYPES.UPDATE,
-      OPERATION_WHENS.AFTER,
-      [new Record(this.#sql, this.#table, this.#logger, savedRawRecord)]
-    );
+    [record] = await this.#table.intercept("UPDATE", "AFTER", [
+      new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord)
+    ]);
     this.#record = record.toJSON();
     return this;
   }
@@ -178,52 +165,57 @@ export default class Record {
         "Cannot remove unsaved record"
       );
     }
-    const [record] = await this.#table.intercept(
-      OPERATION_TYPES.DELETE,
-      OPERATION_WHENS.BEFORE,
-      [this]
-    );
+    const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
-    const reserve = await this.#sql.reserve();
+    const query = this.#queryBuilder.getSQLQuery();
+    this.#logger.info(`[Query] ${query}`);
+
     try {
-      const command = reserve`DELETE FROM ${reserve(
-        this.#table.getTableSchema().getFullName()
-      )} where id = ${this.getID()}`;
-      await command.execute();
+      await this.#queryBuilder.execute();
     } catch (err) {
-      reserve.release();
       this.#logger.error(err);
       throw new RecordSaveError(
         this.#table.getTableSchema().getDefinition(),
-        this.getID(),
+        record.getID(),
         [],
         err.message
       );
-    } finally {
-      reserve.release();
     }
 
-    await this.#table.intercept(OPERATION_TYPES.DELETE, OPERATION_WHENS.AFTER, [
-      record
-    ]);
+    await this.#table.intercept("DELETE", "AFTER", [record]);
     return this;
+  }
+
+  toJSON(columns?: string[]): JSONObject {
+    const jsonObject: JSONObject = {};
+    this.#table
+      .getTableSchema()
+      .getColumnSchemas()
+      .filter((field: ColumnSchema) => {
+        return !columns || columns.includes(field.getName());
+      })
+      .map((columnSchema: ColumnSchema) => {
+        jsonObject[columnSchema.getName()] = columnSchema
+          .getColumnType()
+          .toJSONValue(this.get(columnSchema.getName()));
+      });
+    return jsonObject;
+  }
+
+  #getRawRecord(): RawRecord {
+    if (typeof this.#record === "undefined")
+      throw new Error("Record not initialized");
+    return this.#record;
   }
 
   async #validateRecord(rawRecord: RawRecord) {
     const tableSchema = this.#table.getTableSchema();
     const context = this.#table.getContext();
     const fieldErrors: any[] = [];
-    for (const columnSchema of tableSchema.getAllColumnSchemas()) {
+    for (const columnSchema of tableSchema.getColumnSchemas()) {
       const value = rawRecord[columnSchema.getName()];
       try {
-        await columnSchema
-          .getColumnType()
-          .validateValue(
-            tableSchema,
-            columnSchema.getName(),
-            rawRecord,
-            context
-          );
+        await columnSchema.getColumnType().validateValue(value);
       } catch (err) {
         fieldErrors.push(
           new FieldValidationError(
@@ -241,22 +233,5 @@ export default class Record {
         fieldErrors
       );
     }
-  }
-
-  toJSON(columns?: string[]): any {
-    const jsonObject: any = {};
-    this.#table
-      .getTableSchema()
-      .getAllColumnSchemas()
-      .filter((field: ColumnSchema) => {
-        if (columns) {
-          return columns.includes(field.getName());
-        }
-        return true;
-      })
-      .map((field: ColumnSchema) => {
-        jsonObject[field.getName()] = this.getNativeValue(field.getName());
-      });
-    return jsonObject;
   }
 }

@@ -1,3 +1,11 @@
+import { Logger } from "../deps.ts";
+import {
+  DatabaseOperationContext,
+  TableDefinition,
+  TableDefinitionRaw,
+  UUID
+} from "./types.ts";
+import { UUIDUtils } from "./utils.ts";
 import {
   DatabaseConfiguration,
   DatabaseConnection
@@ -5,17 +13,13 @@ import {
 import Registry from "./core/Registry.ts";
 import TableSchema from "./table/TableSchema.ts";
 import DataType from "./data-types/DataType.ts";
-import {
-  TableDefinition,
-  TableDefinitionRaw
-} from "./table/definitions/TableDefinition.ts";
-import { Logger } from "../deps.ts";
+
 import Table from "./table/Table.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 import { DatabaseErrorCode, ODMError } from "./errors/ODMError.ts";
-import { DatabaseOperationContext } from "./operation-interceptor/DatabaseOperationContext.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
-import { UUID, UUIDUtils } from "./core/UUID.ts";
+
+import Query from "./query/Query.ts";
 
 export default class ODMConnection {
   readonly #config: DatabaseConfiguration;
@@ -107,30 +111,21 @@ export default class ODMConnection {
                     LIMIT 1);`;
 
       if (!tableExists) {
-        let query = `CREATE TABLE IF NOT EXISTS ${tableSchema.getFullName()}`;
-        query = `${query} (\n\t`;
-        query = `${query} ${tableSchema
-          .getOwnColumnSchemas()
-          .map((column) => {
-            return `"${column.getName()}" ${column
-              .getColumnType()
-              .getNativeType()} ${column.isNotNull() ? "NOT NULL" : ""} ${
-              column.isUnique() ? "UNIQUE" : ""
-            }`;
-          })
-          .join(",\n\t")}`;
-        if (!tableSchema.getInherits()) {
-          query = `${query},
-          \t PRIMARY KEY (id)
-          \t`;
+        const query = new Query(this.#conn.getNativeConnection());
+        query.create(tableSchema.getFullName());
+        for (const column of tableSchema.getOwnColumnSchemas()) {
+          const columnDefinition = column.getDefinition();
+          query.addColumn({
+            name: column.getName(),
+            data_type: column.getColumnType().getNativeType(),
+            not_null: column.isNotNull(),
+            unique: column.isUnique(),
+            foreign_key: columnDefinition.foreign_key
+          });
         }
-        query = `${query} \n)`;
-        if (tableSchema.getInherits()) {
-          query = `${query}
-          INHERITS (${tableSchema.getInherits()})`;
-        }
-        this.#logger.info(`Create Query -> \n ${query}`);
-        await reserved.unsafe(query);
+        query.inherits(tableSchema.getInherits());
+        this.#logger.info(`Create Query -> \n ${query.getSQLQuery()}`);
+        await reserved.unsafe(query.getSQLQuery());
       } else {
         const columns =
           await reserved`SELECT column_name FROM information_schema.columns WHERE table_schema = ${tableSchema.getSchemaName()} AND table_name = ${tableSchema.getName()};`;
@@ -187,11 +182,13 @@ export default class ODMConnection {
       this.#fieldTypeRegistry,
       this.#tableDefinitionRegistry
     );
+    const queryBuilder = new Query(this.#conn.getNativeConnection());
     return new Table(
-      this.#conn.getNativeConnection(),
+      queryBuilder,
       tableSchema,
       this.#operationInterceptorService,
       this.#logger,
+      this.#conn.getNativeConnection(),
       context
     );
   }

@@ -1,4 +1,4 @@
-import { ColumnDefinition } from "../table/definitions/ColumnDefinition.ts";
+import { ColumnDefinition } from "../types.ts";
 
 type FieldValidationErrorObject = {
   code: string;

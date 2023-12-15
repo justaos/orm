@@ -1,5 +1,5 @@
 import DatabaseOperationInterceptor from "./DatabaseOperationInterceptor.ts";
-import { DatabaseOperationType, DatabaseOperationWhen } from "../constants.ts";
+import { DatabaseOperationType, DatabaseOperationWhen } from "../types.ts";
 import Record from "../record/Record.ts";
 
 export default class DatabaseOperationInterceptorService {

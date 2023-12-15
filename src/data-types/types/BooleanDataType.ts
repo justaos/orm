@@ -1,34 +1,32 @@
 import DataType from "../DataType.ts";
-import TableSchema from "../../table/TableSchema.ts";
-import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
-import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
-import { RawRecord } from "../../record/RawRecord.ts";
+import { ColumnDefinition } from "../../types.ts";
 
 export default class BooleanDataType extends DataType {
   constructor() {
-    super(NATIVE_DATA_TYPES.BOOLEAN);
-  }
-
-  getName(): string {
-    return "boolean";
+    super("boolean", "BOOLEAN");
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
     return true;
   }
 
-  setValueIntercept(
-    _schema: TableSchema,
-    _fieldName: string,
-    value: any,
-    _record: RawRecord
-  ): any {
+  toJSONValue(value: boolean | null): boolean | null {
     return value;
   }
 
-  async validateValue(
-    _schema: TableSchema,
-    _fieldName: string,
-    _record: RawRecord
-  ) {}
+  setValueIntercept(
+    value: boolean | number | string | null
+  ): boolean | string | number | null {
+    if (typeof value === "string") {
+      if (value === "true") return true;
+      if (value === "false") return false;
+    }
+    if (typeof value === "number") {
+      if (value === 0) return false;
+      if (value === 1) return true;
+    }
+    return value;
+  }
+
+  async validateValue() {}
 }

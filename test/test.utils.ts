@@ -33,6 +33,10 @@ class Session {
     }
     return this.#odmConnection;
   }
+
+  static getLogger() {
+    return logger;
+  }
 }
 
 const MAX_TIMEOUT = 10000;

@@ -1,6 +1,7 @@
 {
   "tasks": {
     "build:docs": "deno run build.ts",
+    "test:debug": "deno test --inspect-brk --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts",
     "test": "deno test --coverage=docs/reports/coverage --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts",
     "coverage": "deno coverage docs/reports/coverage/ --lcov > docs/reports/coverage/lcov.info"
   },

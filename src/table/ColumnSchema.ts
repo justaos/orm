@@ -1,9 +1,6 @@
 import DataType from "../data-types/DataType.ts";
 import TableSchema from "./TableSchema.ts";
-import {
-  ColumnDefinition,
-  ColumnDefinitionRaw
-} from "./definitions/ColumnDefinition.ts";
+import { ColumnDefinition, ColumnDefinitionRaw } from "../types.ts";
 
 export default class ColumnSchema {
   readonly #columnDefinition: ColumnDefinition;
@@ -13,6 +10,7 @@ export default class ColumnSchema {
   constructor(schema: TableSchema, columnDefinition: ColumnDefinition) {
     this.#columnDefinition = columnDefinition;
     this.#fieldType = schema.getDataType(columnDefinition.type);
+    this.#columnDefinition.data_type = this.#fieldType?.getName();
   }
 
   static setDefaults(

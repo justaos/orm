@@ -1,34 +1,25 @@
 import DataType from "../DataType.ts";
-import TableSchema from "../../table/TableSchema.ts";
-import { ColumnDefinition } from "../../table/definitions/ColumnDefinition.ts";
-import { RawRecord } from "../../record/RawRecord.ts";
-import { NATIVE_DATA_TYPES } from "../../core/NativeDataType.ts";
+import { ColumnDefinition, JSONValue } from "../../types.ts";
 
 export default class JSONDataType extends DataType {
   constructor() {
-    super(NATIVE_DATA_TYPES.JSON);
-  }
-
-  getName(): string {
-    return "json";
+    super("json", "JSON");
   }
 
   validateDefinition(_definition: ColumnDefinition): boolean {
     return true;
   }
 
-  setValueIntercept(
-    _schema: TableSchema,
-    _fieldName: string,
-    value: any,
-    _record: RawRecord
-  ): any {
+  toJSONValue(value: JSONValue | null): JSONValue | null {
     return value;
   }
 
-  async validateValue(
-    _schema: TableSchema,
-    _fieldName: string,
-    _record: RawRecord
-  ) {}
+  setValueIntercept(value: JSONValue | null): JSONValue | null {
+    return value;
+  }
+
+  async validateValue(value: any) {
+    if (value === null || typeof value === "object") return;
+    throw new Error(`Invalid JSON value: ${value}`);
+  }
 }

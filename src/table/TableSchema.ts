@@ -1,12 +1,13 @@
 import { CommonUtils } from "../../deps.ts";
+import {
+  ColumnDefinition,
+  TableDefinition,
+  TableDefinitionRaw
+} from "../types.ts";
 import Registry from "../core/Registry.ts";
 import ColumnSchema from "./ColumnSchema.ts";
 import DataType from "../data-types/DataType.ts";
-import {
-  TableDefinition,
-  TableDefinitionRaw
-} from "./definitions/TableDefinition.ts";
-import { ColumnDefinition } from "./definitions/ColumnDefinition.ts";
+
 import TableDefinitionError from "../errors/TableDefinitionError.ts";
 
 export default class TableSchema {
@@ -45,6 +46,17 @@ export default class TableSchema {
     return <TableDefinition>tableDefinition;
   }
 
+  static getSchemaAndTableName(fullName: string): string {
+    const parts = fullName.split(".");
+    let schemaName = "public";
+    let tableName = fullName;
+    if (parts.length == 2) {
+      schemaName = parts[0];
+      tableName = parts[1];
+    }
+    return `${schemaName}.${tableName}`;
+  }
+
   getName(): string {
     return this.#definition.name;
   }
@@ -60,17 +72,6 @@ export default class TableSchema {
   getInherits(): string | undefined {
     if (this.#definition.inherits)
       return TableSchema.getSchemaAndTableName(this.#definition.inherits);
-  }
-
-  static getSchemaAndTableName(fullName: string): string {
-    const parts = fullName.split(".");
-    let schemaName = "public";
-    let tableName = fullName;
-    if (parts.length == 2) {
-      schemaName = parts[0];
-      tableName = parts[1];
-    }
-    return `${schemaName}.${tableName}`;
   }
 
   isFinal(): boolean {
@@ -121,7 +122,7 @@ export default class TableSchema {
       columns.push(
         new ColumnSchema(this, {
           name: "id",
-          type: "string",
+          type: "uuid",
           not_null: true,
           unique: true
         }),
@@ -141,7 +142,7 @@ export default class TableSchema {
     return columns;
   }
 
-  getAllColumnSchemas(): ColumnSchema[] {
+  getColumnSchemas(): ColumnSchema[] {
     const allFields: ColumnSchema[] = this.getOwnColumnSchemas();
 
     const extendsTableName = this.getInherits();
@@ -150,13 +151,21 @@ export default class TableSchema {
       this.#tableDefinitionRegistry.has(extendsTableName)
     ) {
       const extendedSchema = this.#getTableSchema(extendsTableName);
-      allFields.push(...extendedSchema.getAllColumnSchemas());
+      allFields.push(...extendedSchema.getColumnSchemas());
     }
     return allFields;
   }
 
+  getColumnNames(): string[] {
+    return this.getColumnSchemas().map((f) => f.getName());
+  }
+
+  getOwnColumnNames(): string[] {
+    return this.getOwnColumnSchemas().map((f) => f.getName());
+  }
+
   getColumnSchema(name: string): ColumnSchema | undefined {
-    return this.getAllColumnSchemas().find((field) => field.getName() === name);
+    return this.getColumnSchemas().find((field) => field.getName() === name);
   }
 
   validate() {
@@ -200,7 +209,7 @@ export default class TableSchema {
       errorMessages = errorMessages.concat(columnSchema.validate());
     }
 
-    const allColumnNames: string[] = this.getAllColumnSchemas().map((f) =>
+    const allColumnNames: string[] = this.getColumnSchemas().map((f) =>
       f.getName()
     );
     const duplicates = CommonUtils.findDuplicates(allColumnNames);

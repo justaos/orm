@@ -4,7 +4,7 @@ import DataType from "./data-types/DataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
 import ODMConnection from "./ODMConnection.ts";
-import { TableDefinition } from "./table/definitions/TableDefinition.ts";
+import { TableDefinition } from "./types.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 import IntegerDataType from "./data-types/types/IntegerDataType.ts";
 import NumberDataType from "./data-types/types/NumberDataType.ts";

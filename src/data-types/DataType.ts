@@ -1,41 +1,27 @@
-import { NativeDataType } from "../core/NativeDataType.ts";
-import TableSchema from "../table/TableSchema.ts";
-import { RawRecord } from "../record/RawRecord.ts";
-import { ColumnDefinition } from "../table/definitions/ColumnDefinition.ts";
-import { DatabaseOperationContext } from "../operation-interceptor/DatabaseOperationContext.ts";
+import { ColumnDefinition, JSONValue, NativeDataType } from "../types.ts";
 
 export default abstract class DataType {
   readonly #nativeDataType: NativeDataType;
+  readonly #name: string;
 
-  protected constructor(primitiveDataType: NativeDataType) {
+  protected constructor(name: string, primitiveDataType: NativeDataType) {
+    this.#name = name;
     this.#nativeDataType = primitiveDataType;
+  }
+
+  getName(): string {
+    return this.#name;
   }
 
   getNativeType(): NativeDataType {
     return this.#nativeDataType;
   }
 
-  abstract getName(): string;
-  
-  getNativeValue(value: any): any {
-    return value;
-  }
+  abstract validateDefinition(definition: ColumnDefinition): boolean;
 
-  validateDefinition(definition: ColumnDefinition): boolean {
-    throw new Error("Method not implemented.");
-  }
+  abstract toJSONValue(value: unknown): JSONValue;
 
-  abstract setValueIntercept(
-    schema: TableSchema,
-    fieldName: string,
-    value: any,
-    record: RawRecord
-  ): any;
+  abstract setValueIntercept(value: unknown): unknown;
 
-  abstract validateValue(
-    schema: TableSchema,
-    fieldName: string,
-    record: RawRecord | undefined,
-    context?: DatabaseOperationContext
-  ): Promise<void>;
+  abstract validateValue(value: unknown): Promise<void>;
 }
