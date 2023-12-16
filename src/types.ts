@@ -54,6 +54,7 @@ export type NativeDataType =
   | "BOOLEAN"
   | "DATE"
   | "JSON"
+  | "TIME"
   | "TIMESTAMP";
 
 export type UUID = string;

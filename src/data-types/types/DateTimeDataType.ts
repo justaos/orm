@@ -25,14 +25,7 @@ export default class DateTimeDataType extends DataType {
       return Temporal.PlainDateTime.from(value);
     }
     if (value instanceof Date) {
-      return Temporal.PlainDateTime.from({
-        year: value.getUTCFullYear(),
-        month: value.getUTCMonth(),
-        day: value.getUTCDate(),
-        hour: value.getUTCHours(),
-        minute: value.getUTCMinutes(),
-        second: value.getUTCSeconds()
-      });
+      return Temporal.PlainDateTime.from(value.toISOString().replace("Z", ""));
     }
     return value;
   }
