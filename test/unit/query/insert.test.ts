@@ -133,6 +133,14 @@ describe({
         street: "test",
         zipcode: 500000
       });
+
+      assertStrictEquals(employee.isNew(), true, "record is not new");
+      assertStrictEquals(
+        employee.getTable().getName(),
+        "employee",
+        "record is not new"
+      );
+
       johnRecord = await employee.insert();
 
       const johnObject = johnRecord.toJSON();

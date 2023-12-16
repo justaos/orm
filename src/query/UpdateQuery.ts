@@ -1,6 +1,6 @@
 import { SqlString } from "../../deps.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
-import { JSONObject } from "../types.ts";
+import QueryUtils from "./QueryUtils.ts";
 
 export default class UpdateQuery {
   #tableName?: string;
@@ -89,7 +89,7 @@ export default class UpdateQuery {
     if (typeof this.#row !== "undefined") {
       const row: any = this.#row;
       query += ` SET ${this.#columns.map((column) => {
-        return `${column} = ${this.#escapeValue(row[column])}`;
+        return `${column} = ${QueryUtils.escapeValue(row[column])}`;
       })}`;
     }
     if (this.#where.length > 0) {
@@ -105,41 +105,5 @@ export default class UpdateQuery {
       query += ` RETURNING ${this.#returning.join(", ")}`;
     }
     return query;
-  }
-
-  #escapeValue(value: any): string {
-    if (
-      typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean" ||
-      value === null
-    ) {
-      return SqlString.escape(value);
-    }
-    if (typeof value === "object") {
-      return `'${JSON.stringify(value)}'`;
-    }
-    return String(value);
-  }
-
-  #getRowWithSelectedColumns(row: JSONObject): string[] {
-    const newRow: string[] = [];
-    this.#columns?.forEach((column: string) => {
-      if (
-        typeof row[column] === "string" ||
-        typeof row[column] === "number" ||
-        typeof row[column] === "boolean" ||
-        row[column] === null
-      ) {
-        newRow.push(SqlString.escape(row[column]));
-        return;
-      }
-      if (typeof row[column] === "object") {
-        newRow.push(`'${JSON.stringify(row[column])}'`);
-        return;
-      }
-      newRow.push(row[column] + "");
-    });
-    return newRow;
   }
 }

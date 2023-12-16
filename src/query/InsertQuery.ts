@@ -1,6 +1,6 @@
-import { SqlString } from "../../deps.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { JSONObject } from "../types.ts";
+import QueryUtils from "./QueryUtils.ts";
 
 export default class InsertQuery {
   #tableName?: string;
@@ -79,25 +79,10 @@ export default class InsertQuery {
     return query;
   }
 
-  #escapeValue(value: any): string {
-    if (
-      typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean" ||
-      value === null
-    ) {
-      return SqlString.escape(value);
-    }
-    if (typeof value === "object") {
-      return `'${JSON.stringify(value)}'`;
-    }
-    return String(value);
-  }
-
   #getRowWithSelectedColumns(row: JSONObject): string[] {
     const newRow: string[] = [];
     this.#columns?.forEach((column: string) => {
-      newRow.push(this.#escapeValue(row[column]));
+      newRow.push(QueryUtils.escapeValue(row[column]));
     });
     return newRow;
   }
