@@ -1,11 +1,11 @@
 {
   "name": "@justaos/odm",
   "private": false,
-  "description": "JUST A OS's ODM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to MongoDB database",
+  "description": "JUST A OS's ORM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to Postgres database",
   "keywords": [
     "justaos",
     "justaos odm",
-    "mongodb wrapper",
+    "postgres wrapper",
     "object document mapper"
   ],
   "homepage": "https://justaos.com",

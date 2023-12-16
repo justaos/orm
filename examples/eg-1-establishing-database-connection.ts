@@ -1,7 +1,7 @@
-import { ODM } from "../mod.ts";
-import ODMConnection from "../src/ODMConnection.ts";
+import { ORM } from "../mod.ts";
+import ORMConnection from "../src/ORMConnection.ts";
 
-const odm = new ODM({
+const odm = new ORM({
   database: "collection-service",
   username: "postgres",
   password: "admin",
@@ -9,7 +9,7 @@ const odm = new ODM({
   port: 5432
 });
 
-let conn: ODMConnection | undefined;
+let conn: ORMConnection | undefined;
 try {
   conn = await odm.connect(true /* create database if not exists */);
   console.log("connection success");

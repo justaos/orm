@@ -9,8 +9,8 @@ import {
 import {
   DatabaseOperationType,
   DatabaseOperationWhen,
-  ODM,
-  ODMConnection,
+  ORM,
+  ORMConnection,
   Record
 } from "../../../mod.ts";
 import { logger, Session } from "../../test.utils.ts";
@@ -21,13 +21,13 @@ describe({
   sanitizeResources: false,
   sanitizeOps: false,
   fn: () => {
-    let odm: ODM;
-    let conn: ODMConnection;
+    let odm: ORM;
+    let conn: ORMConnection;
     const cleanTableList: string[] = [];
 
     beforeAll(async () => {
       conn = await Session.getConnection();
-      odm = Session.getODM();
+      odm = Session.getORM();
     });
 
     afterAll(async () => {
@@ -38,8 +38,8 @@ describe({
       await (await Session.getConnection()).closeConnection();
     });
 
-    it("#ODM::addInterceptor", async () => {
-      const INTERCEPT_TEST_MODAL = "intercept_test";
+    it("#ORM::addInterceptor", async () => {
+      const INTERCEPT_TEST_MODEL = "intercept_test";
       odm.addInterceptor(
         new (class extends DatabaseOperationInterceptor {
           getName() {
@@ -52,10 +52,10 @@ describe({
             when: DatabaseOperationWhen,
             records: Record[]
           ) {
-            if (tableName === INTERCEPT_TEST_MODAL) {
+            if (tableName === INTERCEPT_TEST_MODEL) {
               if (operation === "INSERT") {
                 logger.info(
-                  `[collectionName=${tableName}] [operation=${operation}] [when=${when}]`
+                  `[tableName=${tableName}] [operation=${operation}] [when=${when}]`
                 );
                 if (when === "BEFORE") {
                   logger.info("before");
@@ -71,7 +71,7 @@ describe({
       );
 
       await conn.defineTable({
-        name: INTERCEPT_TEST_MODAL,
+        name: INTERCEPT_TEST_MODEL,
         columns: [
           {
             name: "name",
@@ -83,15 +83,15 @@ describe({
           }
         ]
       });
-      cleanTableList.push(INTERCEPT_TEST_MODAL);
+      cleanTableList.push(INTERCEPT_TEST_MODEL);
 
-      const interceptTestCollection = conn.table(INTERCEPT_TEST_MODAL);
-      const s = interceptTestCollection.createNewRecord();
+      const interceptTestTable = conn.table(INTERCEPT_TEST_MODEL);
+      const s = interceptTestTable.createNewRecord();
       s.set("name", "John");
       try {
-        const rec: Record = await s.insert();
+        const interceptRecord: Record = await s.insert();
         assertStrictEquals(
-          rec.get("computed"),
+          interceptRecord.get("computed"),
           "this is computed",
           "read interceptor not computed the value"
         );

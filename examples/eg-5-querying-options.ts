@@ -1,6 +1,6 @@
-import getODM from "./getODM.ts";
+import getORM from "./getORM.ts";
 
-const odm = getODM();
+const odm = getORM();
 const conn = await odm.connect(true);
 
 await conn.defineTable({

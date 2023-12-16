@@ -1,8 +1,15 @@
-import { afterAll, assert, beforeAll, describe, it } from "../../test.deps.ts";
+import {
+  afterAll,
+  assert,
+  assertEquals,
+  beforeAll,
+  describe,
+  it
+} from "../../test.deps.ts";
 
 import { Session } from "../../test.utils.ts";
 import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
-import { ODMConnection, ODMError } from "../../../mod.ts";
+import { ORMConnection, ORMError } from "../../../mod.ts";
 
 describe(
   "TableCreate",
@@ -11,7 +18,7 @@ describe(
     sanitizeOps: false
   },
   () => {
-    let conn: ODMConnection;
+    let conn: ORMConnection;
     const logger = Logger.createLogger();
     const cleanTableList: string[] = [];
 
@@ -33,7 +40,7 @@ describe(
         assert(false, "Table should not exists");
       } catch (error) {
         assert(
-          error instanceof ODMError && error.code === "SCHEMA_VALIDATION_ERROR",
+          error instanceof ORMError && error.code === "SCHEMA_VALIDATION_ERROR",
           "Table should not exists"
         );
       }
@@ -60,11 +67,12 @@ describe(
         });
         cleanTableList.push("person");
       } catch (_error) {
-        assert(false, "Table not create as expected");
+        assert(false, "Table has not been created");
       }
+      assertEquals(conn.isTableDefined("person"), true, "Table should exists");
     });
 
-    it("#ODM::defineTable - unknown field type", async () => {
+    it("#ORM::defineTable - unknown field type", async () => {
       try {
         await conn.defineTable({
           name: "unknown",

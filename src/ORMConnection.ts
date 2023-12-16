@@ -16,12 +16,12 @@ import DataType from "./data-types/DataType.ts";
 
 import Table from "./table/Table.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
-import { DatabaseErrorCode, ODMError } from "./errors/ODMError.ts";
+import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 
 import Query from "./query/Query.ts";
 
-export default class ODMConnection {
+export default class ORMConnection {
   readonly #config: DatabaseConfiguration;
   readonly #conn: DatabaseConnection;
   readonly #fieldTypeRegistry: Registry<DataType>;
@@ -60,6 +60,7 @@ export default class ODMConnection {
     if (!databaseName) {
       throw new Error("Database name is not defined");
     }
+    await this.closeConnection();
     const tempConn = new DatabaseConnection(
       {
         ...this.#config,
@@ -68,7 +69,9 @@ export default class ODMConnection {
       this.#logger
     );
     await tempConn.connect();
-    return tempConn.dropDatabase(databaseName);
+    const result = await tempConn.dropDatabase(databaseName);
+    await tempConn.closeConnection();
+    return result;
   }
 
   async defineTable(tableDefinition: TableDefinitionRaw | Function) {
@@ -172,7 +175,7 @@ export default class ODMConnection {
         TableSchema.getSchemaAndTableName(nameWithSchema)
       );
     if (typeof tableDefinitionStrict === "undefined") {
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
         `Table with name '${nameWithSchema}' is not defined`
       );
@@ -193,12 +196,10 @@ export default class ODMConnection {
     );
   }
 
-  /* getSchema(name: string): TableSchema | undefined {
-    return this.#tableDefinitionRegistry.get(name);
-  }*/
-
   isTableDefined(tableName: string): boolean {
-    return this.#tableDefinitionRegistry.has(tableName);
+    return this.#tableDefinitionRegistry.has(
+      TableSchema.getSchemaAndTableName(tableName)
+    );
   }
 
   addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
@@ -221,7 +222,7 @@ export default class ODMConnection {
 
   #getConnection(): DatabaseConnection {
     if (!this.#conn) {
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         "There is no active connection"
       );

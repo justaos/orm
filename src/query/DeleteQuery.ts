@@ -11,12 +11,16 @@ export default class DeleteQuery {
     return this;
   }
 
-  where(column: any, operator: any, value?: any): DeleteQuery {
+  where(
+    column: string | number | boolean,
+    operator: any,
+    value?: any
+  ): DeleteQuery {
     // Support "where true || where false"
     if (column === false || column === true) {
       return this.where(1, "=", column ? 1 : 0);
     }
-    if (arguments.length === 2) {
+    if (typeof value === "undefined") {
       return this.where(column, "=", operator);
     }
 

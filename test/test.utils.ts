@@ -1,25 +1,25 @@
 import { Logger } from "../deps.ts";
-import { ODM } from "../mod.ts";
-import ODMConnection from "../src/ODMConnection.ts";
+import { ORM } from "../mod.ts";
+import ORMConnection from "../src/ORMConnection.ts";
 
 class Session {
-  static #odm: ODM;
+  static #odm: ORM;
 
-  static #odmConnection: ODMConnection;
+  static #odmConnection: ORMConnection;
 
-  static setODM(odm: ODM) {
+  static setORM(odm: ORM) {
     Session.#odm = odm;
   }
 
-  static getODM(): ODM {
+  static getORM(): ORM {
     return Session.#odm;
   }
 
   static async getConnection(
     forceNewConnection: boolean = false
-  ): Promise<ODMConnection> {
+  ): Promise<ORMConnection> {
     if (!this.#odm) {
-      this.#odm = new ODM({
+      this.#odm = new ORM({
         hostname: Deno.env.get("POSTGRES_HOST") || "127.0.0.1",
         port: 5432,
         username: "postgres",

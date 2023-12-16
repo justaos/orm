@@ -104,3 +104,4 @@ docs/reports/coverage
 playground.js
 .coveralls.yml
 lib
+coverage

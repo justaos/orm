@@ -1,5 +1,5 @@
 import SelectQuery from "./SelectQuery.ts";
-import { DatabaseErrorCode, ODMError } from "../errors/ODMError.ts";
+import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import DeleteQuery from "./DeleteQuery.ts";
 import { ColumnDefinitionNative, CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
@@ -100,12 +100,12 @@ export default class Query {
 
   from(nameWithSchema: string): Query {
     if (!this.#query)
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         "Query not initialized"
       );
     if (!nameWithSchema)
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         "Table name not provided"
       );
@@ -165,7 +165,7 @@ export default class Query {
 
   async cursor(): Promise<any[]> {
     if (this.getType() !== "select")
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         "Query type not supported"
       );
@@ -183,7 +183,7 @@ export default class Query {
     | InsertQuery
     | UpdateQuery {
     if (!this.#query)
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         "Query not initialized"
       );

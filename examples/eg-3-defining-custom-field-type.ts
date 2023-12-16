@@ -4,11 +4,11 @@ import {
   NATIVE_DATA_TYPES,
   RawRecord
 } from "../mod.ts";
-import getODM from "./getODM.ts";
+import getORM from "./getORM.ts";
 import TableSchema from "../src/table/TableSchema.ts";
 import { ColumnDefinition } from "../src/table/definitions/ColumnDefinition.ts";
 
-const odm = getODM();
+const odm = getORM();
 const conn = await odm.connect(true);
 
 try {

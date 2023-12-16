@@ -4,7 +4,10 @@ import { Session } from "./test.utils.ts";
 describe("End test cleanup", () => {
   it("disconnect check", async () => {
     const conn = await Session.getConnection();
-    await conn.closeConnection();
-    assert(true, "close connection success");
+    try {
+      await conn.dropDatabase();
+    } catch (error) {
+      assert(false, "Database does not exist");
+    }
   });
 });

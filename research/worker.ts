@@ -1,6 +1,6 @@
-import { ODM } from "../mod.ts";
+import { ORM } from "../mod.ts";
 
-const odm = new ODM({
+const odm = new ORM({
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",

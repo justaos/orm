@@ -1,7 +1,7 @@
 import { Logger, postgres } from "../../../deps.ts";
 import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
 import { NativeSQL } from "../NativeSQL.ts";
-import { DatabaseErrorCode, ODMError } from "../../errors/ODMError.ts";
+import { DatabaseErrorCode, ORMError } from "../../errors/ORMError.ts";
 
 /**
  * A class to handle the connection to the database.
@@ -48,7 +48,7 @@ export default class DatabaseConnection {
 
   getNativeConnection(): NativeSQL {
     if (!this.#sql) {
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         `Database connection not established`
       );
@@ -86,12 +86,6 @@ export default class DatabaseConnection {
   }
 
   closeConnection(): Promise<void> {
-    if (!this.#sql) {
-      throw new ODMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        `No connection established to disconnect`
-      );
-    }
-    return this.#sql.end();
+    return this.getNativeConnection().end();
   }
 }

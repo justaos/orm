@@ -1,12 +1,13 @@
 # JUSTAOS's ORM
 
-![GitHub release (with filter)](https://img.shields.io/github/v/release/justaos/odm?label=Release)
-[![Build](https://github.com/justaos/odm/workflows/Build/badge.svg)](https://github.com/justaos/odm/actions?workflow=Build)
-[![Coverage](https://codecov.io/gh/justaos/odm/branch/main/graph/badge.svg?token=OzlniGFmNp)](https://codecov.io/gh/justaos/odm)
-[![License](https://img.shields.io/github/license/justaos/odm.svg)](/LICENSE)
-[![Contributors](https://img.shields.io/github/contributors/justaos/odm.svg)]()
+![GitHub release (with filter)](https://img.shields.io/github/v/release/justaos/orm?label=Release)
+[![Build](https://github.com/justaos/orm/workflows/Build/badge.svg)](https://github.com/justaos/orm/actions?workflow=Build)
+[![Coverage](https://codecov.io/gh/justaos/orm/branch/main/graph/badge.svg?token=OzlniGFmNp)](https://codecov.io/gh/justaos/orm)
+[![License](https://img.shields.io/github/license/justaos/orm.svg)](/LICENSE)
+[![Contributors](https://img.shields.io/github/contributors/justaos/orm.svg)]()
 
-JUSTAOS's ORM (Object Relational Mapping) tool is built for Deno and provides transparent persistence for JavaScript objects to
+JUSTAOS's ORM (Object Relational Mapping) tool is built for Deno and provides transparent persistence for JavaScript
+objects to
 Postgres database.
 
 - Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
@@ -15,13 +16,13 @@ Postgres database.
 - Also supports interception on operations (create, read, update and delete).
 
 ```ts
-import { ODM } from 'https://deno.land/x/justaos_odm@$VERSION/mod.ts';
+import { ORM } from 'https://deno.land/x/justaos_orm@$VERSION/mod.ts';
 ```
 
 ## Database connection
 
 ```ts
-const odm = new ODM({
+const orm = new ORM({
   database: "collection-service",
   username: "postgres",
   password: "admin",
@@ -29,9 +30,9 @@ const odm = new ODM({
   port: 5432
 });
 
-let conn: ODMConnection | undefined;
+let conn: ORMConnection | undefined;
 try {
-  conn = await odm.connect(true /* create database if not exists */);
+  conn = await orm.connect(true /* create database if not exists */);
   console.log("connection success");
 } catch (_error) {
   console.log("connection failed");
@@ -43,7 +44,7 @@ try {
 ## Defining models
 
 ```ts
-await odm.defineTable({
+await orm.defineTable({
   name: "blog_post",
   columns: [
     {
@@ -57,7 +58,7 @@ await odm.defineTable({
   ]
 });
 
-await odm.defineTable({
+await orm.defineTable({
   name: "comment",
   columns: [
     {
@@ -105,7 +106,7 @@ console.log(count);
 ## Intercepting database operations
 
 ```ts
-odm.addInterceptor(
+orm.addInterceptor(
   new (class extends DatabaseOperationInterceptor {
     getName() {
       return "my-intercept";
@@ -189,7 +190,7 @@ computed field updated for :: John 2023-12-05T13:57:21.418Z
 After connection established, you can define custom field type.
 
 ```ts
-odm.addDataType(
+orm.addDataType(
   class extends DataType {
     constructor() {
       super(NATIVE_DATA_TYPES.VARCHAR);
@@ -327,11 +328,11 @@ animals.forEach((animal) => {
 });
  ```
 
-| Data type   | getNativeValue | getDisplayValue | get                |
-|-------------|----------------|-----------------|--------------------|
-| **string**  | string         | string          | string             |
-| **integer** | number         | number          | number             |
-| **date**    | string         | string          | Temporal.PlainDate |
+| Data type | get                  | getJSONValue |
+|-----------|----------------------|--------------|
+| string    | _string_             | _string_     |
+| integer   | _number_             | _number_     |
+| date      | _Temporal.PlainDate_ | _string_     |
 
 Check the examples >> [here](./examples) <<
 

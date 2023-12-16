@@ -1,5 +1,9 @@
 import DatabaseOperationInterceptor from "./DatabaseOperationInterceptor.ts";
-import { DatabaseOperationType, DatabaseOperationWhen } from "../types.ts";
+import {
+  DatabaseOperationContext,
+  DatabaseOperationType,
+  DatabaseOperationWhen
+} from "../types.ts";
 import Record from "../record/Record.ts";
 
 export default class DatabaseOperationInterceptorService {
@@ -9,16 +13,16 @@ export default class DatabaseOperationInterceptorService {
     this.#interceptors = new Map<string, DatabaseOperationInterceptor>();
   }
 
-  addInterceptor = (operationInterceptor: DatabaseOperationInterceptor) =>
+  addInterceptor = (
+    operationInterceptor: DatabaseOperationInterceptor
+  ): void => {
     this.#interceptors.set(
       operationInterceptor.getName(),
       operationInterceptor
     );
+  };
 
   deleteInterceptor = (name: string) => this.#interceptors.delete(name);
-
-  getInterceptor = (name: string): DatabaseOperationInterceptor | undefined =>
-    this.#interceptors.get(name);
 
   hasInterceptors(): boolean {
     return this.#interceptors.size !== 0;
@@ -37,8 +41,8 @@ export default class DatabaseOperationInterceptorService {
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],
-    context: any,
-    disabledIntercepts: boolean | string[]
+    context?: DatabaseOperationContext,
+    disabledIntercepts?: boolean | string[]
   ): Promise<Record[]> {
     if (disabledIntercepts === true) {
       return records;

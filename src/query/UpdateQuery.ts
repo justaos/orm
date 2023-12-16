@@ -1,5 +1,5 @@
 import { SqlString } from "../../deps.ts";
-import { DatabaseErrorCode, ODMError } from "../errors/ODMError.ts";
+import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { JSONObject } from "../types.ts";
 
 export default class UpdateQuery {
@@ -79,7 +79,7 @@ export default class UpdateQuery {
 
   buildQuery(): string {
     if (typeof this.#columns === "undefined") {
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         "Columns not defined"
       );

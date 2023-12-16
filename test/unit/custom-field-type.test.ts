@@ -1,6 +1,6 @@
 import { afterAll, assert, beforeAll, describe, it } from "../test.deps.ts";
 
-import { ColumnDefinition, DataType, ODM, ODMConnection } from "../../mod.ts";
+import { ColumnDefinition, DataType, ORM, ORMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
 import { Logger } from "../../deps.ts";
 
@@ -13,8 +13,8 @@ describe(
     sanitizeOps: false
   },
   () => {
-    let odm: ODM;
-    let conn: ODMConnection;
+    let odm: ORM;
+    let conn: ORMConnection;
     const cleanTableList: string[] = [];
 
     const MODEL_NAME = "field_definition_test";
@@ -24,7 +24,7 @@ describe(
 
     beforeAll(async () => {
       conn = await Session.getConnection();
-      odm = Session.getODM();
+      odm = Session.getORM();
     });
 
     afterAll(async () => {

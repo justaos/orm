@@ -9,7 +9,7 @@ import {
 } from "../../test.deps.ts";
 import { Temporal } from "npm:@js-temporal/polyfill";
 
-import { ODMConnection, Record } from "../../../mod.ts";
+import { ORMConnection, Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
 
 describe({
@@ -17,7 +17,7 @@ describe({
   sanitizeResources: false,
   sanitizeOps: false,
   fn: () => {
-    let conn: ODMConnection;
+    let conn: ORMConnection;
     const cleanTableList: string[] = [];
     let johnRecord: Record;
 
@@ -183,12 +183,6 @@ describe({
       }
     });
 
-    /* it("#findById", async () => {
-      const employeeTable = conn.table("employee");
-      const employee: Record = await employeeTable.findById(johnRecord.getID());
-      assertEquals(employee.length, 1);
-    });*/
-
     it("#getRecordById", async () => {
       const employeeTable = conn.table("employee");
       const employee: Record | undefined = await employeeTable.getRecordById(
@@ -202,6 +196,15 @@ describe({
       );
     });
 
+    it("#Record::delete", async () => {
+      const employeeTable = conn.table("employee");
+      await johnRecord.delete();
+      const employee: Record | undefined = await employeeTable.getRecordById(
+        johnRecord.getID()
+      );
+      assert(!employee);
+    });
+
     /*
    it("#Collection::findOne", async () => {
    const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
@@ -211,14 +214,6 @@ describe({
    assert(!!employee && employee.getID() === johnRecord.getID());
    });
 
-   it("#Record::delete", async () => {
-   const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-   await johnRecord.delete();
-   const employee: Record | undefined = await employeeCollection.findById(
-   johnRecord.getID()
-   );
-   assert(!employee);
-   });
 
    /!**
    * SORT

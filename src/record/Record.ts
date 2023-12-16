@@ -3,7 +3,7 @@ import { JSONObject, RawRecord } from "../types.ts";
 import { UUIDUtils } from "../utils.ts";
 import Table from "../table/Table.ts";
 import ColumnSchema from "../table/ColumnSchema.ts";
-import { DatabaseErrorCode, ODMError } from "../errors/ODMError.ts";
+import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
@@ -89,17 +89,15 @@ export default class Record {
     const tableSchema = this.#table.getTableSchema();
     let [record] = await this.#table.intercept("INSERT", "BEFORE", [this]);
 
-    await this.#validateRecord(record.toJSON());
-
-    const insertQueryBuilder = this.#queryBuilder.insert();
-    insertQueryBuilder.into(tableSchema.getFullName());
     const recordJson = record.toJSON();
-    insertQueryBuilder.columns(tableSchema.getColumnNames());
-    insertQueryBuilder.values([recordJson]);
-    insertQueryBuilder.returning("*");
+    await this.#validateRecord(recordJson);
+    this.#queryBuilder.insert();
+    this.#queryBuilder.into(tableSchema.getFullName());
+    this.#queryBuilder.columns(tableSchema.getColumnNames());
+    this.#queryBuilder.values([recordJson]);
+    this.#queryBuilder.returning("*");
 
-    const query = this.#queryBuilder.getSQLQuery();
-    this.#logger.info(`[Query] ${query}`);
+    this.#logger.info(`[Query] ${this.#queryBuilder.getSQLQuery()}`);
 
     let savedRawRecord: RawRecord;
     try {
@@ -126,17 +124,16 @@ export default class Record {
     const tableSchema = this.#table.getTableSchema();
     let [record] = await this.#table.intercept("UPDATE", "BEFORE", [this]);
 
-    await this.#validateRecord(record.toJSON());
-
-    const updateQueryBuilder = this.#queryBuilder.update();
-    updateQueryBuilder.into(tableSchema.getFullName());
     const recordJson = record.toJSON();
-    updateQueryBuilder.columns(tableSchema.getColumnNames());
-    updateQueryBuilder.value(recordJson);
-    updateQueryBuilder.returning("*");
+    await this.#validateRecord(recordJson);
+    this.#queryBuilder.update();
+    this.#queryBuilder.into(tableSchema.getFullName());
+    this.#queryBuilder.columns(tableSchema.getColumnNames());
+    this.#queryBuilder.where("id", record.getID());
+    this.#queryBuilder.value(recordJson);
+    this.#queryBuilder.returning("*");
 
-    const query = this.#queryBuilder.getSQLQuery();
-    this.#logger.info(`[Query] ${query}`);
+    this.#logger.info(`[Query] ${this.#queryBuilder.getSQLQuery()}`);
 
     let savedRawRecord: RawRecord;
     try {
@@ -160,15 +157,19 @@ export default class Record {
 
   async delete(): Promise<Record> {
     if (this.#isNew) {
-      throw new ODMError(
+      throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         "Cannot remove unsaved record"
       );
     }
+    const tableSchema = this.#table.getTableSchema();
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
-    const query = this.#queryBuilder.getSQLQuery();
-    this.#logger.info(`[Query] ${query}`);
+    this.#queryBuilder.delete();
+    this.#queryBuilder.from(tableSchema.getFullName());
+    this.#queryBuilder.where("id", record.getID());
+
+    this.#logger.info(`[Query] ${this.#queryBuilder.getSQLQuery()}`);
 
     try {
       await this.#queryBuilder.execute();

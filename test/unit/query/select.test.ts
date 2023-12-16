@@ -7,7 +7,7 @@ import {
 } from "../../test.deps.ts";
 
 import { Session } from "../../test.utils.ts";
-import { ODMConnection } from "../../../mod.ts";
+import { ORMConnection } from "../../../mod.ts";
 
 describe(
   "SELECT Query",
@@ -16,7 +16,7 @@ describe(
     sanitizeOps: false
   },
   () => {
-    let conn: ODMConnection;
+    let conn: ORMConnection;
     const logger = Session.getLogger();
 
     beforeAll(async () => {

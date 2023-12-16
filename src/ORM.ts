@@ -3,7 +3,7 @@ import Registry from "./core/Registry.ts";
 import DataType from "./data-types/DataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
-import ODMConnection from "./ODMConnection.ts";
+import ORMConnection from "./ORMConnection.ts";
 import { TableDefinition } from "./types.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 import IntegerDataType from "./data-types/types/IntegerDataType.ts";
@@ -17,7 +17,7 @@ import UUIDDataType from "./data-types/types/UUIDDataType.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 
 /**
- * JUSTAOS's ODM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
+ * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
  * - Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
  * - Supports custom data types.
  * - Supports table with multi-level inheritance.
@@ -26,8 +26,8 @@ import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperat
  * @example
  * Get connection to database
  * ```ts
- * import {ODM} from "https://deno.land/x/justaos_odm@$VERSION/mod.ts";
- * const odm = new ODM({
+ * import {ORM} from "https://deno.land/x/justaos_odm@$VERSION/mod.ts";
+ * const odm = new ORM({
  *  hostname: "localhost",
  *  port: 5432,
  *  username: "postgres",
@@ -38,8 +38,8 @@ import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperat
  *
  * @param config Database configuration
  */
-export default class ODM {
-  readonly #logger = Logger.createLogger({ label: ODM.name });
+export default class ORM {
+  readonly #logger = Logger.createLogger({ label: ORM.name });
   readonly #config: DatabaseConfiguration;
   readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
     function (dataType) {
@@ -59,9 +59,9 @@ export default class ODM {
     this.#config = config;
   }
 
-  async connect(createDatabaseIfNotExists?: boolean): Promise<ODMConnection> {
+  async connect(createDatabaseIfNotExists?: boolean): Promise<ORMConnection> {
     try {
-      const conn = new ODMConnection(
+      const conn = new ORMConnection(
         this.#logger,
         this.#config,
         this.#dataTypeRegistry,

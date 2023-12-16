@@ -1,4 +1,4 @@
-import { DatabaseConfiguration, ODM } from "../mod.ts";
+import { DatabaseConfiguration, ORM } from "../mod.ts";
 
 export default function () {
   const config: DatabaseConfiguration = {
@@ -8,5 +8,5 @@ export default function () {
     hostname: "localhost",
     port: 5432
   };
-  return new ODM(config);
+  return new ORM(config);
 }

@@ -1,8 +1,8 @@
-import ODM from "./src/ODM.ts";
-import ODMConnection from "./src/ODMConnection.ts";
+import ORM from "./src/ORM.ts";
+import ORMConnection from "./src/ORMConnection.ts";
 import Record from "./src/record/Record.ts";
 import Table from "./src/table/Table.ts";
-import { ODMError } from "./src/errors/ODMError.ts";
+import { ORMError } from "./src/errors/ORMError.ts";
 import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOperationInterceptor.ts";
 import SelectQuery from "./src/query/SelectQuery.ts";
 import TableSchema from "./src/table/TableSchema.ts";
@@ -11,11 +11,11 @@ import DataType from "./src/data-types/DataType.ts";
 import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 
 export {
-  ODM,
-  ODMConnection,
+  ORM,
+  ORMConnection,
   Record,
   Table,
-  ODMError,
+  ORMError,
   DatabaseOperationInterceptor,
   SelectQuery,
   TableSchema,

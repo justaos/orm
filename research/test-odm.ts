@@ -1,6 +1,6 @@
-import { ODM } from "../mod.ts";
+import { ORM } from "../mod.ts";
 
-const conn = await new ODM({
+const conn = await new ORM({
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",
