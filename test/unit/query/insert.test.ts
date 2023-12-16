@@ -123,7 +123,7 @@ describe({
       const employee = employeeTable.createNewRecord();
       const empId = employee.getID();
       employee.set("name", "John");
-      employee.set("emp_no", conn.generateRecordId());
+      employee.set("emp_no", ORMConnection.generateRecordId());
       employee.set("department", itDepartment.getID());
       employee.set("birth_date", Temporal.Now.plainDateISO());
       employee.set("created_on", Temporal.Now.plainDateTimeISO());

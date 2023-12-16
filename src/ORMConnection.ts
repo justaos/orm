@@ -212,11 +212,11 @@ export default class ORMConnection {
     );
   }
 
-  generateRecordId(): UUID {
+  static generateRecordId(): UUID {
     return UUIDUtils.generateId();
   }
 
-  validateRecordId(id: UUID): boolean {
+  static validateRecordId(id: UUID): boolean {
     return UUIDUtils.isValidId(id);
   }
 
