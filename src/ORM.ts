@@ -15,6 +15,8 @@ import DateTimeDataType from "./data-types/types/DateTimeDataType.ts";
 import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
 import UUIDDataType from "./data-types/types/UUIDDataType.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
+import TimeDataType from "./data-types/types/TimeDataType.ts";
+import CharDataType from "./data-types/types/CharDataType.ts";
 
 /**
  * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -111,13 +113,15 @@ export default class ORM {
   }
 
   #loadBuildInFieldTypes(): void {
-    this.addDataType(new StringDataType());
-    this.addDataType(new IntegerDataType());
-    this.addDataType(new NumberDataType());
-    this.addDataType(new JSONDataType());
     this.addDataType(new BooleanDataType());
+    this.addDataType(new CharDataType());
     this.addDataType(new DateDataType());
-    this.addDataType(new UUIDDataType());
     this.addDataType(new DateTimeDataType());
+    this.addDataType(new IntegerDataType());
+    this.addDataType(new JSONDataType());
+    this.addDataType(new NumberDataType());
+    this.addDataType(new StringDataType());
+    this.addDataType(new TimeDataType());
+    this.addDataType(new UUIDDataType());
   }
 }
