@@ -1,15 +1,7 @@
 import { Logger } from "../deps.ts";
-import {
-  DatabaseOperationContext,
-  TableDefinition,
-  TableDefinitionRaw,
-  UUID
-} from "./types.ts";
+import { DatabaseOperationContext, TableDefinition, TableDefinitionRaw, UUID } from "./types.ts";
 import { UUIDUtils } from "./utils.ts";
-import {
-  DatabaseConfiguration,
-  DatabaseConnection
-} from "./core/connection/index.ts";
+import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
 import TableSchema from "./table/TableSchema.ts";
 import DataType from "./data-types/DataType.ts";
@@ -47,6 +39,14 @@ export default class ORMConnection {
     this.#operationInterceptorService = operationInterceptorService;
   }
 
+  static generateRecordId(): UUID {
+    return UUIDUtils.generateId();
+  }
+
+  static validateRecordId(id: UUID): boolean {
+    return UUIDUtils.isValidId(id);
+  }
+
   async connect(): Promise<void> {
     return await this.#conn.connect();
   }
@@ -74,13 +74,13 @@ export default class ORMConnection {
     return result;
   }
 
-  async defineTable(tableDefinition: TableDefinitionRaw | Function) {
-    if (typeof tableDefinition === "function") {
+  async defineTable(tableDefinitionRaw: TableDefinitionRaw | Function) {
+    if (typeof tableDefinitionRaw === "function") {
       // @ts-ignore
-      tableDefinition = tableDefinition.__tableDefinition;
+      tableDefinitionRaw = tableDefinitionRaw.__tableDefinition;
     }
     const tableSchema = new TableSchema(
-      tableDefinition,
+      tableDefinitionRaw,
       this.#fieldTypeRegistry,
       this.#tableDefinitionRegistry
     );
@@ -132,7 +132,7 @@ export default class ORMConnection {
       } else {
         const columns =
           await reserved`SELECT column_name FROM information_schema.columns WHERE table_schema = ${tableSchema.getSchemaName()} AND table_name = ${tableSchema.getName()};`;
-        const columnNames = columns.map((column: any) => column.column_name);
+        const columnNames = columns.map((column: { column_name: string }) => column.column_name);
         const newColumns = tableSchema
           .getOwnColumnSchemas()
           .filter((column) => !columnNames.includes(column.getName()));
@@ -170,21 +170,13 @@ export default class ORMConnection {
    * @param context Context object
    */
   table(nameWithSchema: string, context?: DatabaseOperationContext): Table {
-    const tableDefinitionStrict: TableDefinition | undefined =
-      this.#tableDefinitionRegistry.get(
-        TableSchema.getSchemaAndTableName(nameWithSchema)
-      );
-    if (typeof tableDefinitionStrict === "undefined") {
+    const tableSchema: TableSchema | undefined = this.getTableSchema(nameWithSchema);
+    if (typeof tableSchema === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
         `Table with name '${nameWithSchema}' is not defined`
       );
     }
-    const tableSchema = new TableSchema(
-      tableDefinitionStrict,
-      this.#fieldTypeRegistry,
-      this.#tableDefinitionRegistry
-    );
     const queryBuilder = new Query(this.#conn.getNativeConnection());
     return new Table(
       queryBuilder,
@@ -194,6 +186,20 @@ export default class ORMConnection {
       this.#conn.getNativeConnection(),
       context
     );
+  }
+
+  getTableSchema(tableName: string): TableSchema | undefined {
+    const tableDefinition: TableDefinition | undefined =
+      this.#tableDefinitionRegistry.get(
+        TableSchema.getSchemaAndTableName(tableName)
+      );
+    if (tableDefinition) {
+      return new TableSchema(
+        tableDefinition,
+        this.#fieldTypeRegistry,
+        this.#tableDefinitionRegistry
+      );
+    }
   }
 
   isTableDefined(tableName: string): boolean {
@@ -210,14 +216,6 @@ export default class ORMConnection {
     this.#operationInterceptorService.deleteInterceptor(
       operationInterceptorName
     );
-  }
-
-  static generateRecordId(): UUID {
-    return UUIDUtils.generateId();
-  }
-
-  static validateRecordId(id: UUID): boolean {
-    return UUIDUtils.isValidId(id);
   }
 
   #getConnection(): DatabaseConnection {
