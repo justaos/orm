@@ -9,7 +9,7 @@ import {
 
 import { Session } from "../../test.utils.ts";
 import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
-import { ORMConnection, ORMError } from "../../../mod.ts";
+import { ORMConnection, ORMError, ORM } from "../../../mod.ts";
 
 describe(
   "TableCreate",
@@ -19,11 +19,13 @@ describe(
   },
   () => {
     let conn: ORMConnection;
+    let odm: ORM;
     const logger = Logger.createLogger();
     const cleanTableList: string[] = [];
 
     beforeAll(async () => {
       conn = await Session.getConnection();
+      odm = Session.getORM();
     });
 
     afterAll(async () => {
@@ -69,7 +71,7 @@ describe(
       } catch (_error) {
         assert(false, "Table has not been created");
       }
-      assertEquals(conn.isTableDefined("person"), true, "Table should exists");
+      assertEquals(odm.isTableDefined("person"), true, "Table should exists");
     });
 
     it("#ORM::defineTable - unknown field type", async () => {

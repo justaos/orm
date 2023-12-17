@@ -252,11 +252,6 @@ export default class Table {
     );
   }*/
 
-  /* aggregate(pipeline: any[]): AggregationCursor {
-    const cursor = this.#collection.aggregate(pipeline);
-    return new AggregationCursor(cursor, this);
-  }*/
-
   async intercept(
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,

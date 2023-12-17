@@ -4,7 +4,7 @@ import DataType from "./data-types/DataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
 import ORMConnection from "./ORMConnection.ts";
-import { TableDefinition } from "./types.ts";
+import { TableDefinition, UUID } from "./types.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 import IntegerDataType from "./data-types/types/IntegerDataType.ts";
 import NumberDataType from "./data-types/types/NumberDataType.ts";
@@ -17,6 +17,8 @@ import UUIDDataType from "./data-types/types/UUIDDataType.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
+import TableSchema from "./table/TableSchema.ts";
+import { UUIDUtils } from "./utils.ts";
 
 /**
  * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -64,6 +66,7 @@ export default class ORM {
   async connect(createDatabaseIfNotExists?: boolean): Promise<ORMConnection> {
     try {
       const conn = new ORMConnection(
+        this,
         this.#logger,
         this.#config,
         this.#dataTypeRegistry,
@@ -95,7 +98,29 @@ export default class ORM {
   }
 
   isTableDefined(tableName: string): boolean {
-    return this.#tableDefinitionRegistry.has(tableName);
+    return this.#tableDefinitionRegistry.has(TableSchema.getSchemaAndTableName(tableName));
+  }
+
+  getTableSchema(tableName: string): TableSchema | undefined {
+    const tableDefinition: TableDefinition | undefined =
+      this.#tableDefinitionRegistry.get(
+        TableSchema.getSchemaAndTableName(tableName)
+      );
+    if (tableDefinition) {
+      return new TableSchema(
+        tableDefinition,
+        this.#dataTypeRegistry,
+        this.#tableDefinitionRegistry
+      );
+    }
+  }
+
+  static generateRecordId(): UUID {
+    return UUIDUtils.generateId();
+  }
+
+  static validateRecordId(id: UUID): boolean {
+    return UUIDUtils.isValidId(id);
   }
 
   addDataType(dataType: DataType): void {

@@ -1,6 +1,5 @@
 import { Logger } from "../deps.ts";
-import { DatabaseOperationContext, TableDefinition, TableDefinitionRaw, UUID } from "./types.ts";
-import { UUIDUtils } from "./utils.ts";
+import { DatabaseOperationContext, TableDefinition, TableDefinitionRaw } from "./types.ts";
 import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
 import TableSchema from "./table/TableSchema.ts";
@@ -9,42 +8,37 @@ import DataType from "./data-types/DataType.ts";
 import Table from "./table/Table.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
-import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 
 import Query from "./query/Query.ts";
+import ORM from "./ORM.ts";
 
 export default class ORMConnection {
+  readonly #orm: ORM;
   readonly #config: DatabaseConfiguration;
   readonly #conn: DatabaseConnection;
-  readonly #fieldTypeRegistry: Registry<DataType>;
+  readonly #dataTypeRegistry: Registry<DataType>;
   readonly #schemaRegistry: Map<string, null>;
   readonly #tableDefinitionRegistry: Registry<TableDefinition>;
   readonly #logger: Logger;
   readonly #operationInterceptorService: DatabaseOperationInterceptorService;
 
   constructor(
+    orm: ORM,
     logger: Logger,
     config: DatabaseConfiguration,
-    fieldTypeRegistry: Registry<DataType>,
+    dataTypeRegistry: Registry<DataType>,
     tableDefinitionRegistry: Registry<TableDefinition>,
     schemaRegistry: Map<string, null>,
     operationInterceptorService: DatabaseOperationInterceptorService
   ) {
+    this.#orm = orm;
     this.#logger = logger;
     this.#config = config;
     this.#conn = new DatabaseConnection(config, logger);
-    this.#fieldTypeRegistry = fieldTypeRegistry;
+    this.#dataTypeRegistry = dataTypeRegistry;
     this.#tableDefinitionRegistry = tableDefinitionRegistry;
     this.#schemaRegistry = schemaRegistry;
     this.#operationInterceptorService = operationInterceptorService;
-  }
-
-  static generateRecordId(): UUID {
-    return UUIDUtils.generateId();
-  }
-
-  static validateRecordId(id: UUID): boolean {
-    return UUIDUtils.isValidId(id);
   }
 
   async connect(): Promise<void> {
@@ -81,7 +75,7 @@ export default class ORMConnection {
     }
     const tableSchema = new TableSchema(
       tableDefinitionRaw,
-      this.#fieldTypeRegistry,
+      this.#dataTypeRegistry,
       this.#tableDefinitionRegistry
     );
     try {
@@ -170,7 +164,7 @@ export default class ORMConnection {
    * @param context Context object
    */
   table(nameWithSchema: string, context?: DatabaseOperationContext): Table {
-    const tableSchema: TableSchema | undefined = this.getTableSchema(nameWithSchema);
+    const tableSchema: TableSchema | undefined = this.#orm.getTableSchema(nameWithSchema);
     if (typeof tableSchema === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
@@ -185,36 +179,6 @@ export default class ORMConnection {
       this.#logger,
       this.#conn.getNativeConnection(),
       context
-    );
-  }
-
-  getTableSchema(tableName: string): TableSchema | undefined {
-    const tableDefinition: TableDefinition | undefined =
-      this.#tableDefinitionRegistry.get(
-        TableSchema.getSchemaAndTableName(tableName)
-      );
-    if (tableDefinition) {
-      return new TableSchema(
-        tableDefinition,
-        this.#fieldTypeRegistry,
-        this.#tableDefinitionRegistry
-      );
-    }
-  }
-
-  isTableDefined(tableName: string): boolean {
-    return this.#tableDefinitionRegistry.has(
-      TableSchema.getSchemaAndTableName(tableName)
-    );
-  }
-
-  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
-    this.#operationInterceptorService.addInterceptor(operationInterceptor);
-  }
-
-  deleteInterceptor(operationInterceptorName: string): void {
-    this.#operationInterceptorService.deleteInterceptor(
-      operationInterceptorName
     );
   }
 

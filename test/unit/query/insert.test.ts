@@ -9,7 +9,7 @@ import {
 } from "../../test.deps.ts";
 import { Temporal } from "npm:@js-temporal/polyfill";
 
-import { ORMConnection, Record } from "../../../mod.ts";
+import { ORM, ORMConnection, Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
 
 describe({
@@ -123,7 +123,7 @@ describe({
       const employee = employeeTable.createNewRecord();
       const empId = employee.getID();
       employee.set("name", "John");
-      employee.set("emp_no", ORMConnection.generateRecordId());
+      employee.set("emp_no", ORM.generateRecordId());
       employee.set("department", itDepartment.getID());
       employee.set("birth_date", Temporal.Now.plainDateISO());
       employee.set("created_on", Temporal.Now.plainDateTimeISO());
