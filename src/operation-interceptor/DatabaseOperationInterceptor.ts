@@ -1,5 +1,5 @@
 import Record from "../record/Record.ts";
-import { DatabaseOperationType, DatabaseOperationWhen } from "../types.ts";
+import { DatabaseOperationContext, DatabaseOperationType, DatabaseOperationWhen } from "../types.ts";
 
 export default abstract class DatabaseOperationInterceptor {
   #order = 100;
@@ -19,6 +19,6 @@ export default abstract class DatabaseOperationInterceptor {
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],
-    context: any
+    context?: DatabaseOperationContext
   ): Promise<Record[]>;
 }
