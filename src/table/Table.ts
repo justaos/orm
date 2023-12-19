@@ -146,6 +146,7 @@ export default class Table {
     } else {
       this.#queryBuilder.where(idOrColumnName, value);
     }
+    this.#queryBuilder.limit(1);
     const [record] = await this.toArray();
     return record;
   }
