@@ -89,7 +89,7 @@ export default class UpdateQuery {
     if (typeof this.#row !== "undefined") {
       const row: any = this.#row;
       query += ` SET ${this.#columns.map((column) => {
-        return `${column} = ${QueryUtils.escapeValue(row[column])}`;
+        return `"${column}" = ${QueryUtils.escapeValue(row[column])}`;
       })}`;
     }
     if (this.#where.length > 0) {
