@@ -115,7 +115,7 @@ export default class Query {
     return this;
   }
 
-  where(column: any, operator: any, value?: any): Query {
+  where(column: string | number | boolean, operator: any, value?: any): Query {
     const query = <SelectQuery>this.#getQuery();
     query.where(column, operator, value);
     return this;

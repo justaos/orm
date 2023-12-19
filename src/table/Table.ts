@@ -59,7 +59,7 @@ export default class Table {
     return this;
   }
 
-  where(column: any, operator: any, value?: any): Table {
+  where(column: string | number | boolean, operator: any, value?: any): Table {
     this.#queryBuilder.where(column, operator, value);
     return this;
   }
@@ -139,7 +139,7 @@ export default class Table {
     return new Record(this.#queryBuilder, this, this.#logger, rawRecord);
   }
 
-  async getRecord(idOrColumnName: UUID | string, value: any): Promise<Record | undefined> {
+  async getRecord(idOrColumnName: UUID | string, value?: any): Promise<Record | undefined> {
     this.select();
     if (typeof value === "undefined") {
       this.#queryBuilder.where("id", idOrColumnName);

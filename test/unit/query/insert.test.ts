@@ -193,7 +193,7 @@ describe({
 
     it("#getRecordById", async () => {
       const employeeTable = conn.table("employee");
-      const employee: Record | undefined = await employeeTable.getRecordById(
+      const employee: Record | undefined = await employeeTable.getRecord(
         johnRecord.getID()
       );
       assert(!!employee, "record not found");
@@ -207,7 +207,7 @@ describe({
     it("#Record::delete", async () => {
       const employeeTable = conn.table("employee");
       await johnRecord.delete();
-      const employee: Record | undefined = await employeeTable.getRecordById(
+      const employee: Record | undefined = await employeeTable.getRecord(
         johnRecord.getID()
       );
       assert(!employee);
