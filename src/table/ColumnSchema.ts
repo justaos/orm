@@ -63,9 +63,9 @@ export default class ColumnSchema {
      * Validate column name
      */
     if (!this.getName() || typeof this.getName() !== "string") {
-      errorMessages.push(`Invalid column name provided`);
+      errorMessages.push(`[Column :: ${this.getName()}] Invalid column name provided`);
     } else if (!/^[a-z0-9_]+$/i.test(this.getName())) {
-      errorMessages.push(`Column name should be alphanumeric`);
+      errorMessages.push(`[Column :: ${this.getName()}] Column name should be alphanumeric`);
     }
 
     if (!this.#columnDefinition || !this.getType()) {
@@ -80,7 +80,7 @@ export default class ColumnSchema {
     } else if (
       !this.getColumnType().validateDefinition(this.#columnDefinition)
     ) {
-      errorMessages.push("Invalid field definition");
+      errorMessages.push(`[Column :: ${this.getName()}] Invalid field definition`);
     }
     return errorMessages;
   }
