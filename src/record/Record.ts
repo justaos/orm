@@ -129,7 +129,7 @@ export default class Record {
     this.#queryBuilder.update();
     this.#queryBuilder.into(tableSchema.getFullName());
     this.#queryBuilder.columns(tableSchema.getColumnNames().filter((col) => {
-      return col === "id";
+      return col !== "id";
     }));
     this.#queryBuilder.where("id", record.getID());
     this.#queryBuilder.value(recordJson);
