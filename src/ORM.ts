@@ -119,7 +119,7 @@ export default class ORM {
     return UUIDUtils.generateId();
   }
 
-  static validateRecordId(id: UUID): boolean {
+  static isValidRecordId(id: UUID): boolean {
     return UUIDUtils.isValidId(id);
   }
 

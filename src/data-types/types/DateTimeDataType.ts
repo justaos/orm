@@ -30,5 +30,6 @@ export default class DateTimeDataType extends DataType {
     return value;
   }
 
-  async validateValue() {}
+  async validateValue() {
+  }
 }

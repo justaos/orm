@@ -1,10 +1,5 @@
 import { Logger } from "../../deps.ts";
-import {
-  DatabaseOperationContext,
-  DatabaseOperationType,
-  DatabaseOperationWhen,
-  RawRecord
-} from "../types.ts";
+import { DatabaseOperationContext, DatabaseOperationType, DatabaseOperationWhen, RawRecord, UUID } from "../types.ts";
 import Record from "../record/Record.ts";
 import TableSchema from "./TableSchema.ts";
 import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
@@ -144,9 +139,13 @@ export default class Table {
     return new Record(this.#queryBuilder, this, this.#logger, rawRecord);
   }
 
-  async getRecordById(id: string): Promise<Record | undefined> {
+  async getRecord(idOrColumnName: UUID | string, value: any): Promise<Record | undefined> {
     this.select();
-    this.#queryBuilder.where("id", id);
+    if (typeof value === "undefined") {
+      this.#queryBuilder.where("id", idOrColumnName);
+    } else {
+      this.#queryBuilder.where(idOrColumnName, value);
+    }
     const [record] = await this.toArray();
     return record;
   }
