@@ -74,6 +74,36 @@ describe(
       assertEquals(odm.isTableDefined("person"), true, "Table should exists");
     });
 
+    it("#defineTable - alter", async () => {
+      try {
+        conn.deregisterTable("person");
+        await conn.defineTable({
+          name: "person",
+          columns: [
+            {
+              name: "name",
+              type: "string"
+            },
+            {
+              name: "dob",
+              type: "date"
+            },
+            {
+              name: "gender",
+              type: "boolean"
+            },
+            {
+              name: "color",
+              type: "string"
+            }
+          ]
+        });
+      } catch (_error) {
+        assert(false, "Table has not been created");
+      }
+      assertEquals(odm.isTableDefined("person"), true, "Table should exists");
+    });
+
     it("#ORM::defineTable - unknown field type", async () => {
       try {
         await conn.defineTable({

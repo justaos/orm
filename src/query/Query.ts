@@ -4,11 +4,12 @@ import DeleteQuery from "./DeleteQuery.ts";
 import { ColumnDefinitionNative, CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
 import UpdateQuery from "./UpdateQuery.ts";
+import { AlterQuery } from "./AlterQuery.ts";
 
 export default class Query {
   readonly #sql: any;
 
-  #query?: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery;
+  #query?: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery | AlterQuery;
 
   constructor(sql: any) {
     this.#sql = sql;
@@ -28,6 +29,11 @@ export default class Query {
   /* Create query */
   create(nameWithSchema: string): Query {
     this.#query = new CreateQuery(nameWithSchema);
+    return this;
+  }
+
+  alter(nameWithSchema: string): Query {
+    this.#query = new AlterQuery(nameWithSchema);
     return this;
   }
 
@@ -181,7 +187,8 @@ export default class Query {
     | DeleteQuery
     | CreateQuery
     | InsertQuery
-    | UpdateQuery {
+    | UpdateQuery
+    | AlterQuery {
     if (!this.#query)
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,

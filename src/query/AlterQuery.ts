@@ -13,10 +13,10 @@ type ColumnDefinitionNative = {
 
 export type { ColumnDefinitionNative };
 
-export class CreateQuery {
+export class AlterQuery {
   readonly #tableName: string;
 
-  #columns: ColumnDefinitionNative[] = [];
+  #addColumns: ColumnDefinitionNative[] = [];
 
   #inherits?: string;
 
@@ -24,29 +24,21 @@ export class CreateQuery {
     this.#tableName = nameWithSchema;
   }
 
-  addColumn(column: ColumnDefinitionNative): CreateQuery {
+  addColumn(column: ColumnDefinitionNative): AlterQuery {
     column = { not_null: false, unique: false, ...column };
-    this.#columns.push(column);
+    this.#addColumns.push(column);
     return this;
   }
 
-  inherits(nameWithSchema: string): CreateQuery {
-    this.#inherits = nameWithSchema;
-    return this;
-  }
 
   buildQuery(): string {
-    let query = `CREATE TABLE ${this.#tableName}`;
-    query += ` (`;
+    let query = `ALTER TABLE ${this.#tableName} \n\t`;
     query += this.#prepareColumns();
-    query += this.#preparePrimaryKey();
-    query += `)`;
-    query += this.#prepareInherits();
     return query;
   }
 
   #prepareColumn(column: ColumnDefinitionNative): string {
-    let query = `"${column.name}" ${column.data_type}`;
+    let query = `ADD COLUMN "${column.name}" ${column.data_type}`;
     if (column.foreign_key) {
       const onDelete = column.foreign_key.on_delete
         ? ` ON DELETE ${column.foreign_key.on_delete}`
@@ -60,11 +52,11 @@ export class CreateQuery {
   }
 
   #prepareColumns(): string {
-    return this.#columns
+    return this.#addColumns
       .map((column) => {
         return this.#prepareColumn(column);
       })
-      .join(",\n\t");
+      .join("\n\t");
   }
 
   #prepareInherits(): string {

@@ -86,14 +86,13 @@ export default class Record {
   }
 
   async insert(): Promise<Record> {
-    const tableSchema = this.#table.getTableSchema();
     let [record] = await this.#table.intercept("INSERT", "BEFORE", [this]);
 
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.insert();
-    this.#queryBuilder.into(tableSchema.getFullName());
-    this.#queryBuilder.columns(tableSchema.getColumnNames());
+    this.#queryBuilder.into(this.#table.getTableNameWithSchema());
+    this.#queryBuilder.columns(this.#table.getColumnNames());
     this.#queryBuilder.values([recordJson]);
     this.#queryBuilder.returning("*");
 
@@ -121,14 +120,13 @@ export default class Record {
   }
 
   async update(): Promise<Record> {
-    const tableSchema = this.#table.getTableSchema();
     let [record] = await this.#table.intercept("UPDATE", "BEFORE", [this]);
 
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.update();
-    this.#queryBuilder.into(tableSchema.getFullName());
-    this.#queryBuilder.columns(tableSchema.getColumnNames().filter((col) => {
+    this.#queryBuilder.into(this.#table.getTableNameWithSchema());
+    this.#queryBuilder.columns(this.#table.getColumnNames().filter((col) => {
       return col !== "id";
     }));
     this.#queryBuilder.where("id", record.getID());
@@ -168,7 +166,7 @@ export default class Record {
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
     this.#queryBuilder.delete();
-    this.#queryBuilder.from(tableSchema.getFullName());
+    this.#queryBuilder.from(this.#table.getTableNameWithSchema());
     this.#queryBuilder.where("id", record.getID());
 
     this.#logger.info(`[Query] ${this.#queryBuilder.getSQLQuery()}`);

@@ -1,14 +1,11 @@
 import { CommonUtils } from "../../deps.ts";
-import {
-  ColumnDefinition,
-  TableDefinition,
-  TableDefinitionRaw
-} from "../types.ts";
+import { ColumnDefinition, TableDefinition, TableDefinitionRaw } from "../types.ts";
 import Registry from "../core/Registry.ts";
 import ColumnSchema from "./ColumnSchema.ts";
 import DataType from "../data-types/DataType.ts";
 
 import TableDefinitionError from "../errors/TableDefinitionError.ts";
+import TableNameUtils from "./TableNameUtils.ts";
 
 export default class TableSchema {
   readonly #definition: TableDefinition;
@@ -35,6 +32,10 @@ export default class TableSchema {
       ...tableDefinition
     };
 
+    if (tableDefinition.inherits) {
+      tableDefinition.inherits = TableNameUtils.getFullFormTableName(tableDefinition.inherits);
+    }
+
     if (tableDefinition.columns) {
       for (let i = 0; i < tableDefinition.columns.length; i++) {
         tableDefinition.columns[i] = ColumnSchema.setDefaults(
@@ -46,15 +47,13 @@ export default class TableSchema {
     return <TableDefinition>tableDefinition;
   }
 
-  static getSchemaAndTableName(fullName: string): string {
+  static getTableName(fullName: string): string {
     const parts = fullName.split(".");
-    let schemaName = "public";
     let tableName = fullName;
     if (parts.length == 2) {
-      schemaName = parts[0];
       tableName = parts[1];
     }
-    return `${schemaName}.${tableName}`;
+    return tableName;
   }
 
   getName(): string {
@@ -65,13 +64,12 @@ export default class TableSchema {
     return this.#definition.schema;
   }
 
-  getFullName(): string {
+  getTableNameWithSchema(): string {
     return `${this.getSchemaName()}.${this.getName()}`;
   }
 
   getInherits(): string | undefined {
-    if (this.#definition.inherits)
-      return TableSchema.getSchemaAndTableName(this.#definition.inherits);
+    return this.#definition.inherits;
   }
 
   isFinal(): boolean {
@@ -147,9 +145,7 @@ export default class TableSchema {
 
     const extendsTableName = this.getInherits();
     if (
-      extendsTableName &&
-      this.#tableDefinitionRegistry.has(extendsTableName)
-    ) {
+      extendsTableName && this.#tableDefinitionRegistry.has(extendsTableName)) {
       const extendedSchema = this.#getTableSchema(extendsTableName);
       allFields.push(...extendedSchema.getColumnSchemas());
     }
@@ -178,7 +174,7 @@ export default class TableSchema {
       errorMessages.push(`Invalid table name provided`);
     } else if (!/^[a-z0-9_]+$/i.test(this.getName())) {
       errorMessages.push(`Table name should be alphanumeric`);
-    } else if (this.#tableDefinitionRegistry.has(this.getName())) {
+    } else if (this.#tableDefinitionRegistry.has(this.getTableNameWithSchema())) {
       errorMessages.push(`Table name already exists`);
     }
 
@@ -187,6 +183,7 @@ export default class TableSchema {
      */
     const extendsTableName = this.getInherits();
     if (typeof extendsTableName === "string") {
+
       if (!this.#tableDefinitionRegistry.has(extendsTableName)) {
         errorMessages.push(
           `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' does not exists.`
@@ -222,10 +219,10 @@ export default class TableSchema {
     }
   }
 
-  #getTableSchema(fullName: string): TableSchema {
-    const schema = this.#tableDefinitionRegistry.get(fullName);
+  #getTableSchema(tableName: string): TableSchema {
+    const schema = this.#tableDefinitionRegistry.get(TableNameUtils.getFullFormTableName(tableName));
     if (!schema)
-      throw Error(`[Schema::_getSchema] Schema not found :: ${fullName}`);
+      throw Error(`[Schema::_getSchema] Schema not found :: ${tableName}`);
     return new TableSchema(
       schema,
       this.#fieldTypeRegistry,

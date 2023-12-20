@@ -11,6 +11,7 @@ import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
 
 import Query from "./query/Query.ts";
 import ORM from "./ORM.ts";
+import TableNameUtils from "./table/TableNameUtils.ts";
 
 export default class ORMConnection {
   readonly #orm: ORM;
@@ -68,6 +69,10 @@ export default class ORMConnection {
     return result;
   }
 
+  deregisterTable(tableName: string) {
+    this.#tableDefinitionRegistry.delete(TableNameUtils.getFullFormTableName(tableName));
+  }
+
   async defineTable(tableDefinitionRaw: TableDefinitionRaw | Function) {
     if (typeof tableDefinitionRaw === "function") {
       // @ts-ignore
@@ -108,11 +113,11 @@ export default class ORMConnection {
                     LIMIT 1);`;
 
       if (!tableExists) {
-        const query = new Query(this.#conn.getNativeConnection());
-        query.create(tableSchema.getFullName());
+        const createQuery = new Query(this.#conn.getNativeConnection());
+        createQuery.create(tableSchema.getTableNameWithSchema());
         for (const column of tableSchema.getOwnColumnSchemas()) {
           const columnDefinition = column.getDefinition();
-          query.addColumn({
+          createQuery.addColumn({
             name: column.getName(),
             data_type: column.getColumnType().getNativeType(),
             not_null: column.isNotNull(),
@@ -120,27 +125,33 @@ export default class ORMConnection {
             foreign_key: columnDefinition.foreign_key
           });
         }
-        query.inherits(tableSchema.getInherits());
-        this.#logger.info(`Create Query -> \n ${query.getSQLQuery()}`);
-        await reserved.unsafe(query.getSQLQuery());
+        const inherits = tableSchema.getInherits();
+        if (inherits)
+          createQuery.inherits(TableNameUtils.getFullFormTableName(inherits));
+        this.#logger.info(`Create Query -> \n ${createQuery.getSQLQuery()}`);
+        await createQuery.execute();
       } else {
         const columns =
           await reserved`SELECT column_name FROM information_schema.columns WHERE table_schema = ${tableSchema.getSchemaName()} AND table_name = ${tableSchema.getName()};`;
-        const columnNames = columns.map((column: { column_name: string }) => column.column_name);
-        const newColumns = tableSchema
-          .getOwnColumnSchemas()
-          .filter((column) => !columnNames.includes(column.getName()));
+        const existingColumnNames = columns.map((column: { column_name: string }) => column.column_name);
+        const columnSchemas = tableSchema.getOwnColumnSchemas();
         // Create new columns
-        if (newColumns.length > 0) {
-          const query = `ALTER TABLE ${tableSchema.getFullName()} \n\t${newColumns
-            .map((column) => {
-              return `ADD COLUMN ${column.getName()} ${column
-                .getColumnType()
-                .getNativeType()}`;
-            })
-            .join(",\n\t")}\n`;
-          this.#logger.info(`Alter Query -> \n ${query}`);
-          await reserved.unsafe(query);
+        if (columnSchemas.length > existingColumnNames.length) {
+          const alterQuery = new Query(this.#conn.getNativeConnection());
+          alterQuery.alter(tableSchema.getTableNameWithSchema());
+          for (const column of tableSchema.getOwnColumnSchemas()) {
+            const columnDefinition = column.getDefinition();
+            if (!existingColumnNames.includes(column.getName()))
+              alterQuery.addColumn({
+                name: column.getName(),
+                data_type: column.getColumnType().getNativeType(),
+                not_null: column.isNotNull(),
+                unique: column.isUnique(),
+                foreign_key: columnDefinition.foreign_key
+              });
+          }
+          this.#logger.info(`Alter Query -> \n ${alterQuery.getSQLQuery()}`);
+          await alterQuery.execute();
         }
       }
     } finally {

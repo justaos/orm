@@ -19,6 +19,7 @@ import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
 import TableSchema from "./table/TableSchema.ts";
 import { UUIDUtils } from "./utils.ts";
+import TableNameUtils from "./table/TableNameUtils.ts";
 
 /**
  * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -46,12 +47,12 @@ export default class ORM {
   readonly #logger = Logger.createLogger({ label: ORM.name });
   readonly #config: DatabaseConfiguration;
   readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
-    function (dataType) {
+    function(dataType) {
       return dataType.getName();
     }
   );
   readonly #tableDefinitionRegistry: Registry<TableDefinition> =
-    new Registry<TableDefinition>(function (tableDefinition) {
+    new Registry<TableDefinition>(function(tableDefinition) {
       return `${tableDefinition.schema}.${tableDefinition.name}`;
     });
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
@@ -61,6 +62,14 @@ export default class ORM {
   constructor(config: DatabaseConfiguration) {
     this.#loadBuildInFieldTypes();
     this.#config = config;
+  }
+
+  static generateRecordId(): UUID {
+    return UUIDUtils.generateId();
+  }
+
+  static isValidRecordId(id: UUID): boolean {
+    return UUIDUtils.isValidId(id);
   }
 
   async connect(createDatabaseIfNotExists?: boolean): Promise<ORMConnection> {
@@ -98,14 +107,13 @@ export default class ORM {
   }
 
   isTableDefined(tableName: string): boolean {
-    return this.#tableDefinitionRegistry.has(TableSchema.getSchemaAndTableName(tableName));
+    return this.#tableDefinitionRegistry.has(TableNameUtils.getFullFormTableName(tableName));
   }
 
   getTableSchema(tableName: string): TableSchema | undefined {
+    tableName = TableNameUtils.getFullFormTableName(tableName);
     const tableDefinition: TableDefinition | undefined =
-      this.#tableDefinitionRegistry.get(
-        TableSchema.getSchemaAndTableName(tableName)
-      );
+      this.#tableDefinitionRegistry.get(tableName);
     if (tableDefinition) {
       return new TableSchema(
         tableDefinition,
@@ -113,14 +121,6 @@ export default class ORM {
         this.#tableDefinitionRegistry
       );
     }
-  }
-
-  static generateRecordId(): UUID {
-    return UUIDUtils.generateId();
-  }
-
-  static isValidRecordId(id: UUID): boolean {
-    return UUIDUtils.isValidId(id);
   }
 
   addDataType(dataType: DataType): void {

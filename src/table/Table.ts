@@ -37,15 +37,23 @@ export default class Table {
   }
 
   getName(): string {
-    return this.getTableSchema().getName();
+    return this.#schema.getName();
+  }
+
+  getSchemaName(): string {
+    return this.#schema.getSchemaName();
+  }
+
+  getTableNameWithSchema(): string {
+    return this.#schema.getTableNameWithSchema();
   }
 
   getTableSchema(): TableSchema {
     return this.#schema;
   }
 
-  getSchemaName(): string {
-    return this.getTableSchema().getSchemaName();
+  getColumnNames(): string[] {
+    return this.#schema.getColumnNames();
   }
 
   createNewRecord(): Record {
@@ -55,7 +63,7 @@ export default class Table {
   select(...args: any[]): Table {
     this.#queryBuilder = this.#queryBuilder.getInstance();
     this.#queryBuilder.select.apply(this.#queryBuilder, args);
-    this.#queryBuilder.from(this.getTableSchema().getFullName());
+    this.#queryBuilder.from(this.#schema.getTableNameWithSchema());
     return this;
   }
 
@@ -83,7 +91,7 @@ export default class Table {
     if (!this.#queryBuilder.getType()) {
       this.#queryBuilder = this.#queryBuilder.getInstance();
       this.#queryBuilder.select();
-      this.#queryBuilder.from(this.getTableSchema().getFullName());
+      this.#queryBuilder.from(this.getTableNameWithSchema());
     }
     if (this.#queryBuilder.getType() !== "select") {
       throw new Error("Count can only be called on select query");
