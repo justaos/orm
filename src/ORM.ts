@@ -106,6 +106,15 @@ export default class ORM {
     }
   }
 
+  async isDatabaseExist(databaseName: string): Promise<boolean> {
+    const tempConn = new DatabaseConnection({
+      ...this.#config,
+      database: "postgres"
+    });
+    await tempConn.connect();
+    return await tempConn.isDatabaseExist(databaseName);
+  }
+
   isTableDefined(tableName: string): boolean {
     return this.#tableDefinitionRegistry.has(TableNameUtils.getFullFormTableName(tableName));
   }
