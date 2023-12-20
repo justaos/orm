@@ -42,7 +42,7 @@ export default class DatabaseConnection {
       );
     } catch (err) {
       if (this.#sql)
-        this.#sql.end();
+        await this.#sql.end();
       this.#logger.error(err.message);
       throw err;
     }
@@ -88,7 +88,7 @@ export default class DatabaseConnection {
     return output;
   }
 
-  closeConnection(): Promise<void> {
-    return this.getNativeConnection().end();
+  async closeConnection(): Promise<void> {
+    return await this.getNativeConnection().end();
   }
 }
