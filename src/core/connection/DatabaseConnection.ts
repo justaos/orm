@@ -64,8 +64,9 @@ export default class DatabaseConnection {
 
   async isDatabaseExist(databaseName: string): Promise<boolean> {
     if (!databaseName) throw new Error(`No database name provided to check.`);
-    const [output] = await this
-      .#sql`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`;
+    const reserve = await this.#sql.reserve();
+    const [output] = await reserve`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`.execute();
+    reserve.release();
     return output.exists;
   }
 
