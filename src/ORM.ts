@@ -106,13 +106,17 @@ export default class ORM {
     }
   }
 
-  async isDatabaseExist(databaseName: string): Promise<boolean> {
+  async isDatabaseExist(): Promise<boolean> {
     const tempConn = new DatabaseConnection({
       ...this.#config,
       database: "postgres"
     });
+    if (!this.#config.database)
+      throw new Error("database name not provided");
     await tempConn.connect();
-    return await tempConn.isDatabaseExist(databaseName);
+    const result = await tempConn.isDatabaseExist(this.#config.database);
+    await tempConn.closeConnection();
+    return result;
   }
 
   isTableDefined(tableName: string): boolean {
