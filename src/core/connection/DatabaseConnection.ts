@@ -41,6 +41,8 @@ export default class DatabaseConnection {
         `Connected to ${this.#config.database} database successfully`
       );
     } catch (err) {
+      if (this.#sql)
+        this.#sql.end();
       this.#logger.error(err.message);
       throw err;
     }
