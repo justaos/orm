@@ -95,7 +95,7 @@ export default class UpdateQuery {
     if (this.#where.length > 0) {
       query += ` WHERE ${this.#where
         .map((condition) => {
-          return `${condition.column} ${condition.operator} ${SqlString.escape(
+          return `${condition.column} ${condition.operator} ${QueryUtils.escapeValue(
             condition.value
           )}`;
         })

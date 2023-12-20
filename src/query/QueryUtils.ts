@@ -5,13 +5,14 @@ export default class QueryUtils {
   static escapeValue(
     value: JSONPrimitive | JSONArray | JSONObject | object
   ): string {
+    if (typeof value === "number" || typeof value === "boolean") {
+      return String(value);
+    }
     if (
       typeof value === "string" ||
-      typeof value === "number" ||
-      typeof value === "boolean" ||
       value === null
     ) {
-      return SqlString.escape(value);
+      return SqlString.literal(value);
     }
     if (typeof value === "object") {
       return `'${JSON.stringify(value)}'`;
