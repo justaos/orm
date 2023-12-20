@@ -1,7 +1,4 @@
-import {
-  OrderByDirectionType,
-  OrderByType
-} from "../table/query/OrderByType.ts";
+import { OrderByDirectionType, OrderByType } from "../table/query/OrderByType.ts";
 
 export default class SelectQuery {
   #columns: string[] = ["*"];
@@ -16,7 +13,8 @@ export default class SelectQuery {
 
   #from?: string;
 
-  constructor() {}
+  constructor() {
+  }
 
   from(nameWithSchema: string): SelectQuery {
     this.#from = nameWithSchema;
@@ -51,6 +49,9 @@ export default class SelectQuery {
       return this.where(1, "=", column ? 1 : 0);
     }
     if (typeof value === "undefined") {
+      if (Array.isArray(operator)) {
+        return this.where(column, "in", operator);
+      }
       return this.where(column, "=", operator);
     }
 
@@ -105,6 +106,16 @@ export default class SelectQuery {
     return this;
   }
 
+  buildQuery(): string {
+    let query = `SELECT ${this.#columns} FROM ${this.#from}`;
+    query = query + this.#prepareWhereClause();
+    query = query + this.#prepareOrderByClause();
+    query = query + this.#prepareLimitClause();
+    query = query + this.#prepareOffsetClause();
+
+    return query;
+  }
+
   #prepareWhereClause(): string {
     if (this.#where.length === 0) {
       return "";
@@ -113,6 +124,13 @@ export default class SelectQuery {
       " WHERE " +
       this.#where
         .map((where) => {
+          if (Array.isArray(where.value)) {
+            return `"${where.column}" ${where.operator} (${where.value
+              .map((value: string) => {
+                return `'${value}'`;
+              })
+              .join(", ")})`;
+          }
           return `"${where.column}" ${where.operator} '${where.value}'`;
         })
         .join(" AND ")
@@ -145,15 +163,5 @@ export default class SelectQuery {
         })
         .join(", ")
     );
-  }
-
-  buildQuery(): string {
-    let query = `SELECT ${this.#columns} FROM ${this.#from}`;
-    query = query + this.#prepareWhereClause();
-    query = query + this.#prepareOrderByClause();
-    query = query + this.#prepareLimitClause();
-    query = query + this.#prepareOffsetClause();
-
-    return query;
   }
 }

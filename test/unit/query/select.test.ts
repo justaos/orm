@@ -83,6 +83,13 @@ describe(
       assertStrictEquals(count, 20, "Should be 20 records");
     });
 
+    it("#simple in select query", async () => {
+      const taskTable = conn.table("task");
+      taskTable.select().where("priority", [1, 2]);
+      let count = await taskTable.count();
+      assertStrictEquals(count, 40, "Should be 40 records");
+    });
+
     it("#select - filter and sort", async () => {
       const taskTable = conn.table("task");
       taskTable.select();
