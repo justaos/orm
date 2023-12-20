@@ -80,6 +80,24 @@ describe({
       await conn.closeConnection();
     });
 
+    it("#multi database connections", async () => {
+      const config = {
+        ...defaultConfig,
+        database: "odm-created-database"
+      }
+      const conn1 = await DatabaseConnection.connect(config);
+      const conn2 = await DatabaseConnection.connect(config);
+      const conn3 = await DatabaseConnection.connect(config);
+      const conn4 = await DatabaseConnection.connect(config);
+      const conn5 = await DatabaseConnection.connect(config);
+
+      await conn1.closeConnection();
+      await conn2.closeConnection();
+      await conn3.closeConnection();
+      await conn4.closeConnection();
+      await conn5.closeConnection();
+    });
+
     it("#dropDatabase", async () => {
       try {
         const dbConnection = await DatabaseConnection.connect({

@@ -174,7 +174,8 @@ export default class ORMConnection {
    * @param name Table name
    * @param context Context object
    */
-  table(nameWithSchema: string, context?: DatabaseOperationContext): Table {
+  table(name: string, context?: DatabaseOperationContext): Table {
+    const nameWithSchema = TableNameUtils.getFullFormTableName(name);
     const tableSchema: TableSchema | undefined = this.#orm.getTableSchema(nameWithSchema);
     if (typeof tableSchema === "undefined") {
       throw new ORMError(
