@@ -177,13 +177,13 @@ export default class Table {
 
   async disableAllTriggers() {
     const reserve = await this.#sql.reserve();
-    await reserve`ALTER TABLE ${this.getTableNameWithSchema()} DISABLE TRIGGER ALL)`.execute();
+    await reserve.unsafe(`ALTER TABLE ${this.getTableNameWithSchema()} DISABLE TRIGGER ALL`);
     reserve.release();
   }
 
   async enableAllTriggers() {
     const reserve = await this.#sql.reserve();
-    await reserve`ALTER TABLE ${this.getTableNameWithSchema()} ENABLE TRIGGER ALL)`.execute();
+    await reserve.unsafe(`ALTER TABLE ${this.getTableNameWithSchema()} ENABLE TRIGGER ALL`);
     reserve.release();
   }
 
