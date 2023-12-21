@@ -147,12 +147,31 @@ export default class Table {
     return new Record(this.#queryBuilder, this, this.#logger, rawRecord);
   }
 
-  async getRecord(idOrColumnName: UUID | string, value?: any): Promise<Record | undefined> {
+  /*
+    * Get record by id
+    * @param idOrColumnNameOrFilter Id or column name or filter
+    * @param value Value
+    * @returns Record
+    *
+    * @example
+    * const record = await table.getRecord('id', '123');
+    * const record = await table.getRecord('123');
+    * const record = await table.getRecord({id: '123'});
+    * const record = await table.getRecord({id: '123', name: 'test'});
+   */
+  async getRecord(idOrColumnNameOrFilter: UUID | string | {
+    [key: string]: any
+  }, value?: any): Promise<Record | undefined> {
     this.select();
-    if (typeof value === "undefined") {
-      this.#queryBuilder.where("id", idOrColumnName);
+    if (typeof idOrColumnNameOrFilter == "string" && typeof value === "undefined") {
+      this.#queryBuilder.where("id", idOrColumnNameOrFilter);
+    }
+    if (typeof idOrColumnNameOrFilter == "object") {
+      Object.keys(idOrColumnNameOrFilter).forEach((key) => {
+        this.#queryBuilder.where(key, idOrColumnNameOrFilter[key]);
+      });
     } else {
-      this.#queryBuilder.where(idOrColumnName, value);
+      this.#queryBuilder.where(idOrColumnNameOrFilter, value);
     }
     this.#queryBuilder.limit(1);
     const [record] = await this.toArray();
