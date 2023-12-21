@@ -19,8 +19,8 @@ export default class UUIDDataType extends DataType {
     return value;
   }
 
-  async validateValue(value: any) {
-    if (!UUIDUtils.isValidId(value))
+  async validateValue(value: string | null) {
+    if (typeof value === 'string' && !UUIDUtils.isValidId(value))
       throw new Error(`Invalid UUID value: ${value}`);
   }
 }
