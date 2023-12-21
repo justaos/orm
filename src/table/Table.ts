@@ -175,6 +175,18 @@ export default class Table {
     this.#disableIntercepts.push(interceptName);
   }
 
+  async disableAllTriggers() {
+    const reserve = await this.#sql.reserve();
+    await reserve`ALTER TABLE ${this.getTableNameWithSchema()} DISABLE TRIGGER ALL)`.execute();
+    reserve.release();
+  }
+
+  async enableAllTriggers() {
+    const reserve = await this.#sql.reserve();
+    await reserve`ALTER TABLE ${this.getTableNameWithSchema()} ENABLE TRIGGER ALL)`.execute();
+    reserve.release();
+  }
+
   /*async bulkInsert(records: Record[]): Promise<Record[]> {
     records = await this.intercept(
       "CREATE",
