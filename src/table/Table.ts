@@ -165,8 +165,7 @@ export default class Table {
     this.select();
     if (typeof idOrColumnNameOrFilter == "string" && typeof value === "undefined") {
       this.#queryBuilder.where("id", idOrColumnNameOrFilter);
-    }
-    if (typeof idOrColumnNameOrFilter == "object") {
+    } else if (typeof idOrColumnNameOrFilter == "object") {
       Object.keys(idOrColumnNameOrFilter).forEach((key) => {
         this.#queryBuilder.where(key, idOrColumnNameOrFilter[key]);
       });
