@@ -26,7 +26,6 @@ export {
 
 export type { DatabaseConfiguration } from "./src/core/connection/index.ts";
 export type {
-  UUID,
   DatabaseOperationType,
   DatabaseOperationWhen,
   TableDefinitionRaw,

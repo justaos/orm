@@ -1,12 +1,6 @@
-import { UUID } from "./types.ts";
-import { uuid } from "../deps.ts";
+import { format } from "npm:sql-formatter";
+import { Logger } from "../deps.ts";
 
-export class UUIDUtils {
-  static generateId(): UUID {
-    return crypto.randomUUID();
-  }
-
-  static isValidId(id: UUID): boolean {
-    return uuid.validate(id);
-  }
+export function logSQLQuery(logger: Logger, query: string) {
+  return logger.debug("\n" + format(query));
 }

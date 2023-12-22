@@ -1,4 +1,4 @@
-import { Logger } from "../deps.ts";
+import { LoggerUtils } from "../deps.ts";
 import { ORM } from "../mod.ts";
 import ORMConnection from "../src/ORMConnection.ts";
 
@@ -25,7 +25,7 @@ class Session {
         username: "postgres",
         password: "admin",
         database: "odm-test-db"
-      });
+      }, logger);
     }
 
     if (forceNewConnection || !this.#odmConnection) {
@@ -40,9 +40,6 @@ class Session {
 }
 
 const MAX_TIMEOUT = 10000;
-const logger = Logger.createLogger({
-  label: "test"
-  //filePath: "./test/test.log", cannot be used in github actions
-});
+const logger = LoggerUtils.defineLogger("ORMTest", "INFO");
 
 export { logger, MAX_TIMEOUT, Session };

@@ -8,7 +8,6 @@ import {
 } from "../../test.deps.ts";
 
 import { Session } from "../../test.utils.ts";
-import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
 import { ORMConnection, ORMError, ORM } from "../../../mod.ts";
 
 describe(
@@ -20,7 +19,7 @@ describe(
   () => {
     let conn: ORMConnection;
     let odm: ORM;
-    const logger = Logger.createLogger();
+    const logger = Session.getLogger();
     const cleanTableList: string[] = [];
 
     beforeAll(async () => {

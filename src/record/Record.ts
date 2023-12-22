@@ -1,12 +1,12 @@
-import { Logger } from "../../deps.ts";
+import { CommonUtils, Logger } from "../../deps.ts";
 import { JSONObject, RawRecord } from "../types.ts";
-import { UUIDUtils } from "../utils.ts";
 import Table from "../table/Table.ts";
 import ColumnSchema from "../table/ColumnSchema.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
+import { logSQLQuery } from "../utils.ts";
 
 export default class Record {
   #isNew = false;
@@ -42,7 +42,7 @@ export default class Record {
       .map((field: ColumnSchema) => {
         this.set(field.getName(), field.getDefaultValue() || null);
       });
-    this.#record["id"] = UUIDUtils.generateId();
+    this.#record["id"] = CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
     this.#isNew = true;
     return this;
@@ -96,7 +96,7 @@ export default class Record {
     this.#queryBuilder.values([recordJson]);
     this.#queryBuilder.returning("*");
 
-    this.#logger.info(`[Query] ${this.#queryBuilder.getSQLQuery()}`);
+    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
     let savedRawRecord: RawRecord;
     try {
@@ -133,7 +133,7 @@ export default class Record {
     this.#queryBuilder.value(recordJson);
     this.#queryBuilder.returning("*");
 
-    this.#logger.info(`[Query] ${this.#queryBuilder.getSQLQuery()}`);
+    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
     let savedRawRecord: RawRecord;
     try {
@@ -169,7 +169,7 @@ export default class Record {
     this.#queryBuilder.from(this.#table.getTableNameWithSchema());
     this.#queryBuilder.where("id", record.getID());
 
-    this.#logger.info(`[Query] ${this.#queryBuilder.getSQLQuery()}`);
+    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
     try {
       await this.#queryBuilder.execute();

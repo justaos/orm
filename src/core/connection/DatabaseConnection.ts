@@ -1,4 +1,4 @@
-import { Logger, postgres } from "../../../deps.ts";
+import { Logger, LoggerUtils, postgres } from "../../../deps.ts";
 import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
 import { NativeSQL } from "../NativeSQL.ts";
 import { DatabaseErrorCode, ORMError } from "../../errors/ORMError.ts";
@@ -18,13 +18,12 @@ import { DatabaseErrorCode, ORMError } from "../../errors/ORMError.ts";
 export default class DatabaseConnection {
   readonly #config: DatabaseConfiguration;
   #sql: any;
-  readonly #logger = Logger.createLogger({ label: DatabaseConnection.name });
+  readonly #logger;
 
   constructor(configuration: DatabaseConfiguration, logger?: Logger) {
-    this.#config = configuration;
-    if (logger) {
-      this.#logger = logger;
-    }
+    this.#config = { max_connections: 20, ...configuration };
+    if (logger) this.#logger = logger;
+    else this.#logger = LoggerUtils.getLogger(DatabaseConnection.name);
   }
 
   static async connect(configuration: DatabaseConfiguration) {
@@ -35,7 +34,7 @@ export default class DatabaseConnection {
 
   async connect(): Promise<void> {
     try {
-      this.#sql = postgres({ ...this.#config, max: 20 });
+      this.#sql = postgres({ ...this.#config, max: this.#config.max_connections });
       await this.#sql`select 1`;
       this.#logger.info(
         `Connected to ${this.#config.database} database successfully`

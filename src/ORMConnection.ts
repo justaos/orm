@@ -1,4 +1,4 @@
-import { Logger } from "../deps.ts";
+import { LoggerUtils, Logger } from "../deps.ts";
 import { DatabaseOperationContext, TableDefinition, TableDefinitionRaw } from "./types.ts";
 import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
@@ -12,6 +12,7 @@ import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
 import Query from "./query/Query.ts";
 import ORM from "./ORM.ts";
 import TableNameUtils from "./table/TableNameUtils.ts";
+import { logSQLQuery } from "./utils.ts";
 
 export default class ORMConnection {
   readonly #orm: ORM;
@@ -128,7 +129,7 @@ export default class ORMConnection {
         const inherits = tableSchema.getInherits();
         if (inherits)
           createQuery.inherits(TableNameUtils.getFullFormTableName(inherits));
-        this.#logger.info(`Create Query -> \n ${createQuery.getSQLQuery()}`);
+        logSQLQuery(this.#logger, createQuery.getSQLQuery());
         await createQuery.execute();
       } else {
         const columns =
@@ -150,7 +151,8 @@ export default class ORMConnection {
                 foreign_key: columnDefinition.foreign_key
               });
           }
-          this.#logger.info(`Alter Query -> \n ${alterQuery.getSQLQuery()}`);
+
+          logSQLQuery(this.#logger, alterQuery.getSQLQuery());
           await alterQuery.execute();
         }
       }

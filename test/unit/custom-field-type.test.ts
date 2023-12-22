@@ -2,9 +2,9 @@ import { afterAll, assert, beforeAll, describe, it } from "../test.deps.ts";
 
 import { ColumnDefinition, DataType, ORM, ORMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
-import { Logger } from "../../deps.ts";
+import { LoggerUtils } from "../../deps.ts";
 
-const logger = Logger.createLogger({ label: "FieldType" });
+
 
 describe(
   "custom-field-type",
@@ -16,6 +16,7 @@ describe(
     let odm: ORM;
     let conn: ORMConnection;
     const cleanTableList: string[] = [];
+    const logger = Session.getLogger();
 
     const MODEL_NAME = "field_definition_test";
     const EMAIL_TYPE = "email";
@@ -35,7 +36,7 @@ describe(
       await conn.closeConnection();
     });
 
-    it("#addDataType - Registering Custom data type", async function () {
+    it("#addDataType - Registering Custom data type", async function() {
       class EmailType extends DataType {
         constructor() {
           super("email", "VARCHAR");
@@ -121,7 +122,7 @@ describe(
       assert(error, "Able to create, invalid value");
     });
 
-    it("#registerFieldType - trying create invalid field", async function () {
+    it("#registerFieldType - trying create invalid field", async function() {
       let error = false;
       try {
         await conn.defineTable({

@@ -4,7 +4,7 @@ import DataType from "./data-types/DataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
 import ORMConnection from "./ORMConnection.ts";
-import { TableDefinition, UUID } from "./types.ts";
+import { TableDefinition } from "./types.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 import IntegerDataType from "./data-types/types/IntegerDataType.ts";
 import NumberDataType from "./data-types/types/NumberDataType.ts";
@@ -12,14 +12,13 @@ import JSONDataType from "./data-types/types/JSONDataType.ts";
 import BooleanDataType from "./data-types/types/BooleanDataType.ts";
 import DateDataType from "./data-types/types/DateDataType.ts";
 import DateTimeDataType from "./data-types/types/DateTimeDataType.ts";
-import { Logger } from "https://deno.land/x/justaos_utils@v1.6.0/packages/logger-utils/mod.ts";
 import UUIDDataType from "./data-types/types/UUIDDataType.ts";
 import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
 import TableSchema from "./table/TableSchema.ts";
-import { UUIDUtils } from "./utils.ts";
 import TableNameUtils from "./table/TableNameUtils.ts";
+import { CommonUtils, Logger, LoggerUtils, UUID } from "../deps.ts";
 
 /**
  * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -44,7 +43,7 @@ import TableNameUtils from "./table/TableNameUtils.ts";
  * @param config Database configuration
  */
 export default class ORM {
-  readonly #logger = Logger.createLogger({ label: ORM.name });
+  readonly #logger: Logger;
   readonly #config: DatabaseConfiguration;
   readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
     function(dataType) {
@@ -59,17 +58,19 @@ export default class ORM {
   readonly #operationInterceptorService =
     new DatabaseOperationInterceptorService();
 
-  constructor(config: DatabaseConfiguration) {
+  constructor(config: DatabaseConfiguration, logger?: Logger) {
     this.#loadBuildInFieldTypes();
     this.#config = config;
+    if (logger) this.#logger = logger;
+    else this.#logger = LoggerUtils.getLogger(ORM.name);
   }
 
   static generateRecordId(): UUID {
-    return UUIDUtils.generateId();
+    return CommonUtils.generateUUID();
   }
 
   static isValidRecordId(id: UUID): boolean {
-    return UUIDUtils.isValidId(id);
+    return CommonUtils.validateUUID(id);
   }
 
   async connect(createDatabaseIfNotExists?: boolean): Promise<ORMConnection> {

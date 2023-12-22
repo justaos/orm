@@ -1,14 +1,15 @@
-import { Logger } from "../../deps.ts";
-import { DatabaseOperationContext, DatabaseOperationType, DatabaseOperationWhen, RawRecord, UUID } from "../types.ts";
+import { Logger, UUID } from "../../deps.ts";
+import { DatabaseOperationContext, DatabaseOperationType, DatabaseOperationWhen, RawRecord } from "../types.ts";
 import Record from "../record/Record.ts";
 import TableSchema from "./TableSchema.ts";
 import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
 import Query from "../query/Query.ts";
+import { logSQLQuery } from "../utils.ts";
 
 export default class Table {
   readonly #schema: TableSchema;
   readonly #context?: DatabaseOperationContext;
-  readonly #logger = Logger.createLogger({ label: Table.name });
+  readonly #logger: Logger;
   readonly #operationInterceptorService: DatabaseOperationInterceptorService;
   #queryBuilder: Query;
 
@@ -97,8 +98,8 @@ export default class Table {
       throw new Error("Count can only be called on select query");
     }
     this.#queryBuilder.count();
-    const query = this.#queryBuilder.getSQLQuery();
-    this.#logger.info(`[Query] ${query}`);
+
+    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
     const [row] = await this.#queryBuilder.execute();
     return parseInt(row.count, 10);
   }
@@ -107,8 +108,7 @@ export default class Table {
     // deno-lint-ignore no-this-alias
     const table = this;
 
-    const query = this.#queryBuilder.getSQLQuery();
-    this.#logger.info(`[Query] ${query}`);
+    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
     await this.intercept("SELECT", "BEFORE", []);
 
@@ -125,8 +125,7 @@ export default class Table {
   }
 
   async toArray(): Promise<Record[]> {
-    const query = this.#queryBuilder.getSQLQuery();
-    this.#logger.info(`[Query] ${query}`);
+    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
     await this.intercept("SELECT", "BEFORE", []);
 

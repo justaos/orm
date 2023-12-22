@@ -57,8 +57,6 @@ export type NativeDataType =
   | "TIME"
   | "TIMESTAMP";
 
-export type UUID = string;
-
 export type RawRecord = {
   id?: string;
   _table?: string;
