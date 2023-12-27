@@ -33,7 +33,7 @@ export default class TableSchema {
     };
 
     if (tableDefinition.inherits) {
-      tableDefinition.inherits = TableNameUtils.getFullFormTableName(tableDefinition.inherits);
+      tableDefinition.inherits = TableNameUtils.getShortFormTableName(tableDefinition.inherits);
     }
 
     if (tableDefinition.columns) {
@@ -57,15 +57,11 @@ export default class TableSchema {
   }
 
   getName(): string {
-    return this.#definition.name;
+    return TableNameUtils.getShortFormTableName(`${this.#definition.schema}.${this.#definition.name}`);
   }
 
   getSchemaName(): string {
     return this.#definition.schema;
-  }
-
-  getTableNameWithSchema(): string {
-    return `${this.getSchemaName()}.${this.getName()}`;
   }
 
   getInherits(): string | undefined {
@@ -170,11 +166,11 @@ export default class TableSchema {
     /*
      * Validate table name
      */
-    if (!this.getName() || typeof this.getName() !== "string") {
+    if (!this.#definition.name || typeof this.#definition.name !== "string") {
       errorMessages.push(`Invalid table name provided`);
-    } else if (!/^[a-z0-9_]+$/i.test(this.getName())) {
+    } else if (!/^[a-z0-9_]+$/i.test(this.#definition.name)) {
       errorMessages.push(`Table name should be alphanumeric`);
-    } else if (this.#tableDefinitionRegistry.has(this.getTableNameWithSchema())) {
+    } else if (this.#tableDefinitionRegistry.has(this.getName())) {
       errorMessages.push(`Table name already exists`);
     }
 
@@ -220,7 +216,7 @@ export default class TableSchema {
   }
 
   #getTableSchema(tableName: string): TableSchema {
-    const schema = this.#tableDefinitionRegistry.get(TableNameUtils.getFullFormTableName(tableName));
+    const schema = this.#tableDefinitionRegistry.get(tableName);
     if (!schema)
       throw Error(`[Schema::_getSchema] Schema not found :: ${tableName}`);
     return new TableSchema(

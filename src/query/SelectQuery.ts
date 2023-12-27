@@ -1,5 +1,19 @@
 import { OrderByDirectionType, OrderByType } from "../table/query/OrderByType.ts";
 
+
+type SimpleCondition = {
+  column: string;
+  operator: string;
+  value: any;
+}
+
+type ExpressionCondition =
+    {
+  type: "or" | "and";
+  expression: (ExpressionCondition | SimpleCondition)[]
+}
+
+
 export default class SelectQuery {
   #columns: string[] = ["*"];
 

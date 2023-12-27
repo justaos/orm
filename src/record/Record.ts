@@ -7,6 +7,7 @@ import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
+import TableNameUtils from "../table/TableNameUtils.ts";
 
 export default class Record {
   #isNew = false;
@@ -91,7 +92,7 @@ export default class Record {
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.insert();
-    this.#queryBuilder.into(this.#table.getTableNameWithSchema());
+    this.#queryBuilder.into(TableNameUtils.getFullFormTableName(this.#table.getName()));
     this.#queryBuilder.columns(this.#table.getColumnNames());
     this.#queryBuilder.values([recordJson]);
     this.#queryBuilder.returning("*");
@@ -125,7 +126,7 @@ export default class Record {
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.update();
-    this.#queryBuilder.into(this.#table.getTableNameWithSchema());
+    this.#queryBuilder.into(TableNameUtils.getFullFormTableName(this.#table.getName()));
     this.#queryBuilder.columns(this.#table.getColumnNames().filter((col) => {
       return col !== "id";
     }));
@@ -166,7 +167,7 @@ export default class Record {
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
     this.#queryBuilder.delete();
-    this.#queryBuilder.from(this.#table.getTableNameWithSchema());
+    this.#queryBuilder.from(TableNameUtils.getFullFormTableName(this.#table.getName()));
     this.#queryBuilder.where("id", record.getID());
 
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());

@@ -46,13 +46,13 @@ export default class ORM {
   readonly #logger: Logger;
   readonly #config: DatabaseConfiguration;
   readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
-    function(dataType) {
+    function(dataType): string {
       return dataType.getName();
     }
   );
   readonly #tableDefinitionRegistry: Registry<TableDefinition> =
     new Registry<TableDefinition>(function(tableDefinition) {
-      return `${tableDefinition.schema}.${tableDefinition.name}`;
+      return TableNameUtils.getShortFormTableName(`${tableDefinition.schema}.${tableDefinition.name}`);
     });
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
   readonly #operationInterceptorService =
@@ -121,11 +121,10 @@ export default class ORM {
   }
 
   isTableDefined(tableName: string): boolean {
-    return this.#tableDefinitionRegistry.has(TableNameUtils.getFullFormTableName(tableName));
+    return this.#tableDefinitionRegistry.has(tableName);
   }
 
   getTableSchema(tableName: string): TableSchema | undefined {
-    tableName = TableNameUtils.getFullFormTableName(tableName);
     const tableDefinition: TableDefinition | undefined =
       this.#tableDefinitionRegistry.get(tableName);
     if (tableDefinition) {

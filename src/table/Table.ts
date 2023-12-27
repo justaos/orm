@@ -5,6 +5,7 @@ import TableSchema from "./TableSchema.ts";
 import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
 import Query from "../query/Query.ts";
 import { logSQLQuery } from "../utils.ts";
+import TableNameUtils from "./TableNameUtils.ts";
 
 export default class Table {
   readonly #schema: TableSchema;
@@ -45,10 +46,6 @@ export default class Table {
     return this.#schema.getSchemaName();
   }
 
-  getTableNameWithSchema(): string {
-    return this.#schema.getTableNameWithSchema();
-  }
-
   getTableSchema(): TableSchema {
     return this.#schema;
   }
@@ -64,7 +61,7 @@ export default class Table {
   select(...args: any[]): Table {
     this.#queryBuilder = this.#queryBuilder.getInstance();
     this.#queryBuilder.select.apply(this.#queryBuilder, args);
-    this.#queryBuilder.from(this.#schema.getTableNameWithSchema());
+    this.#queryBuilder.from(TableNameUtils.getFullFormTableName(this.getName()));
     return this;
   }
 
@@ -92,7 +89,7 @@ export default class Table {
     if (!this.#queryBuilder.getType()) {
       this.#queryBuilder = this.#queryBuilder.getInstance();
       this.#queryBuilder.select();
-      this.#queryBuilder.from(this.getTableNameWithSchema());
+      this.#queryBuilder.from(TableNameUtils.getFullFormTableName(this.getName()));
     }
     if (this.#queryBuilder.getType() !== "select") {
       throw new Error("Count can only be called on select query");
@@ -194,13 +191,13 @@ export default class Table {
 
   async disableAllTriggers() {
     const reserve = await this.#sql.reserve();
-    await reserve.unsafe(`ALTER TABLE ${this.getTableNameWithSchema()} DISABLE TRIGGER ALL`);
+    await reserve.unsafe(`ALTER TABLE ${TableNameUtils.getFullFormTableName(this.getName())} DISABLE TRIGGER ALL`);
     reserve.release();
   }
 
   async enableAllTriggers() {
     const reserve = await this.#sql.reserve();
-    await reserve.unsafe(`ALTER TABLE ${this.getTableNameWithSchema()} ENABLE TRIGGER ALL`);
+    await reserve.unsafe(`ALTER TABLE ${TableNameUtils.getFullFormTableName(this.getName())} ENABLE TRIGGER ALL`);
     reserve.release();
   }
 

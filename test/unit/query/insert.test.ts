@@ -72,7 +72,7 @@ describe({
             name: "department",
             type: "uuid",
             foreign_key: {
-              table: "public.department",
+              table: "department",
               column: "id",
               on_delete: "CASCADE"
             }

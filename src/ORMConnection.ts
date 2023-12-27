@@ -71,7 +71,7 @@ export default class ORMConnection {
   }
 
   deregisterTable(tableName: string) {
-    this.#tableDefinitionRegistry.delete(TableNameUtils.getFullFormTableName(tableName));
+    this.#tableDefinitionRegistry.delete(tableName);
   }
 
   async defineTable(tableDefinitionRaw: TableDefinitionRaw | Function) {
@@ -115,7 +115,7 @@ export default class ORMConnection {
 
       if (!tableExists) {
         const createQuery = new Query(this.#conn.getNativeConnection());
-        createQuery.create(tableSchema.getTableNameWithSchema());
+        createQuery.create(TableNameUtils.getFullFormTableName(tableSchema.getName()));
         for (const column of tableSchema.getOwnColumnSchemas()) {
           const columnDefinition = column.getDefinition();
           createQuery.addColumn({
@@ -139,7 +139,7 @@ export default class ORMConnection {
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
           const alterQuery = new Query(this.#conn.getNativeConnection());
-          alterQuery.alter(tableSchema.getTableNameWithSchema());
+          alterQuery.alter(TableNameUtils.getFullFormTableName(tableSchema.getName()));
           for (const column of tableSchema.getOwnColumnSchemas()) {
             const columnDefinition = column.getDefinition();
             if (!existingColumnNames.includes(column.getName()))
@@ -177,12 +177,11 @@ export default class ORMConnection {
    * @param context Context object
    */
   table(name: string, context?: DatabaseOperationContext): Table {
-    const nameWithSchema = TableNameUtils.getFullFormTableName(name);
-    const tableSchema: TableSchema | undefined = this.#orm.getTableSchema(nameWithSchema);
+    const tableSchema: TableSchema | undefined = this.#orm.getTableSchema(name);
     if (typeof tableSchema === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
-        `Table with name '${nameWithSchema}' is not defined`
+        `Table with name '${name}' is not defined`
       );
     }
     const queryBuilder = new Query(this.#conn.getNativeConnection());
