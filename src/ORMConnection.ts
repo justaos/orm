@@ -110,12 +110,12 @@ export default class ORMConnection {
 
       const [{ exists: tableExists }] = await reserved`SELECT EXISTS(SELECT
                     FROM information_schema.tables
-                    WHERE table_name = ${tableSchema.getName()} AND table_schema = ${tableSchema.getSchemaName()}
+                    WHERE table_name = ${tableSchema.getTableName()} AND table_schema = ${tableSchema.getSchemaName()}
                     LIMIT 1);`;
 
       if (!tableExists) {
         const createQuery = new Query(this.#conn.getNativeConnection());
-        createQuery.create(TableNameUtils.getFullFormTableName(tableSchema.getName()));
+        createQuery.create(tableSchema.getName());
         for (const column of tableSchema.getOwnColumnSchemas()) {
           const columnDefinition = column.getDefinition();
           createQuery.addColumn({
@@ -128,7 +128,7 @@ export default class ORMConnection {
         }
         const inherits = tableSchema.getInherits();
         if (inherits)
-          createQuery.inherits(TableNameUtils.getFullFormTableName(inherits));
+          createQuery.inherits(inherits);
         logSQLQuery(this.#logger, createQuery.getSQLQuery());
         await createQuery.execute();
       } else {
@@ -139,7 +139,7 @@ export default class ORMConnection {
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
           const alterQuery = new Query(this.#conn.getNativeConnection());
-          alterQuery.alter(TableNameUtils.getFullFormTableName(tableSchema.getName()));
+          alterQuery.alter(tableSchema.getName());
           for (const column of tableSchema.getOwnColumnSchemas()) {
             const columnDefinition = column.getDefinition();
             if (!existingColumnNames.includes(column.getName()))

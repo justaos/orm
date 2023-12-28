@@ -22,8 +22,8 @@ export class AlterQuery {
 
   #inherits?: string;
 
-  constructor(nameWithSchema: string) {
-    this.#tableName = nameWithSchema;
+  constructor(tableName: string) {
+    this.#tableName = TableNameUtils.getFullFormTableName(tableName);
   }
 
   addColumn(column: ColumnDefinitionNative): AlterQuery {
@@ -36,6 +36,7 @@ export class AlterQuery {
   buildQuery(): string {
     let query = `ALTER TABLE ${this.#tableName} \n\t`;
     query += this.#prepareColumns();
+    query += this.#prepareInherits();
     return query;
   }
 

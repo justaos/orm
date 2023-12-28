@@ -1,4 +1,5 @@
 import { OrderByDirectionType, OrderByType } from "../table/query/OrderByType.ts";
+import TableNameUtils from "../table/TableNameUtils.ts";
 
 
 type SimpleCondition = {
@@ -30,8 +31,8 @@ export default class SelectQuery {
   constructor() {
   }
 
-  from(nameWithSchema: string): SelectQuery {
-    this.#from = nameWithSchema;
+  from(tableName: string): SelectQuery {
+    this.#from = TableNameUtils.getFullFormTableName(tableName);
     return this;
   }
 

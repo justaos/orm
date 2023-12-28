@@ -1,3 +1,5 @@
+import TableNameUtils from "../table/TableNameUtils.ts";
+
 type ColumnDefinitionNative = {
   name: string;
   data_type: string;
@@ -20,8 +22,8 @@ export class CreateQuery {
 
   #inherits?: string;
 
-  constructor(nameWithSchema: string) {
-    this.#tableName = nameWithSchema;
+  constructor(tableName: string) {
+    this.#tableName = TableNameUtils.getFullFormTableName(tableName);
   }
 
   addColumn(column: ColumnDefinitionNative): CreateQuery {
@@ -30,8 +32,8 @@ export class CreateQuery {
     return this;
   }
 
-  inherits(nameWithSchema: string): CreateQuery {
-    this.#inherits = nameWithSchema;
+  inherits(tableName: string): CreateQuery {
+    this.#inherits = TableNameUtils.getFullFormTableName(tableName);
     return this;
   }
 
@@ -51,7 +53,7 @@ export class CreateQuery {
       const onDelete = column.foreign_key.on_delete
         ? ` ON DELETE ${column.foreign_key.on_delete}`
         : "";
-      query += ` REFERENCES ${column.foreign_key.table} ("${column.foreign_key.column}") ${onDelete}`;
+      query += ` REFERENCES ${TableNameUtils.getFullFormTableName(column.foreign_key.table)} ("${column.foreign_key.column}") ${onDelete}`;
     } else {
       if (column.not_null) query += ` NOT NULL`;
       if (column.unique) query += ` UNIQUE`;

@@ -60,6 +60,10 @@ export default class TableSchema {
     return TableNameUtils.getShortFormTableName(`${this.#definition.schema}.${this.#definition.name}`);
   }
 
+  getTableName(): string {
+    return this.#definition.name;
+  }
+
   getSchemaName(): string {
     return this.#definition.schema;
   }

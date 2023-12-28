@@ -92,7 +92,7 @@ export default class Record {
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.insert();
-    this.#queryBuilder.into(TableNameUtils.getFullFormTableName(this.#table.getName()));
+    this.#queryBuilder.into(this.#table.getName());
     this.#queryBuilder.columns(this.#table.getColumnNames());
     this.#queryBuilder.values([recordJson]);
     this.#queryBuilder.returning("*");
@@ -126,7 +126,7 @@ export default class Record {
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.update();
-    this.#queryBuilder.into(TableNameUtils.getFullFormTableName(this.#table.getName()));
+    this.#queryBuilder.into(this.#table.getName());
     this.#queryBuilder.columns(this.#table.getColumnNames().filter((col) => {
       return col !== "id";
     }));
@@ -167,7 +167,7 @@ export default class Record {
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
     this.#queryBuilder.delete();
-    this.#queryBuilder.from(TableNameUtils.getFullFormTableName(this.#table.getName()));
+    this.#queryBuilder.from(this.#table.getName());
     this.#queryBuilder.where("id", record.getID());
 
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());

@@ -1,3 +1,5 @@
+import TableNameUtils from "../table/TableNameUtils.ts";
+
 export default class DeleteQuery {
   #where: any[] = [];
 
@@ -6,8 +8,8 @@ export default class DeleteQuery {
   constructor() {
   }
 
-  from(nameWithSchema: string): DeleteQuery {
-    this.#from = nameWithSchema;
+  from(tableName: string): DeleteQuery {
+    this.#from = TableNameUtils.getFullFormTableName(tableName);
     return this;
   }
 

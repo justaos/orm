@@ -1,6 +1,7 @@
 import { SqlString } from "../../deps.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import QueryUtils from "./QueryUtils.ts";
+import TableNameUtils from "../table/TableNameUtils.ts";
 
 export default class UpdateQuery {
   #tableName?: string;
@@ -11,8 +12,8 @@ export default class UpdateQuery {
 
   constructor() {}
 
-  into(nameWithSchema: string): UpdateQuery {
-    this.#tableName = nameWithSchema;
+  into(tableName: string): UpdateQuery {
+    this.#tableName = TableNameUtils.getFullFormTableName(tableName);
     return this;
   }
 

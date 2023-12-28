@@ -17,4 +17,12 @@ export default class TableNameUtils {
     }
     return name;
   }
+
+  static getTableNameWithoutSchema(name: string): string {
+    const parts = name.split(".");
+    if (parts.length == 2) {
+      return parts[1];
+    }
+    return name;
+  }
 }

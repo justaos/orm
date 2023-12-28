@@ -61,7 +61,7 @@ export default class Table {
   select(...args: any[]): Table {
     this.#queryBuilder = this.#queryBuilder.getInstance();
     this.#queryBuilder.select.apply(this.#queryBuilder, args);
-    this.#queryBuilder.from(TableNameUtils.getFullFormTableName(this.getName()));
+    this.#queryBuilder.from(this.getName());
     return this;
   }
 
@@ -89,7 +89,7 @@ export default class Table {
     if (!this.#queryBuilder.getType()) {
       this.#queryBuilder = this.#queryBuilder.getInstance();
       this.#queryBuilder.select();
-      this.#queryBuilder.from(TableNameUtils.getFullFormTableName(this.getName()));
+      this.#queryBuilder.from(this.getName());
     }
     if (this.#queryBuilder.getType() !== "select") {
       throw new Error("Count can only be called on select query");
