@@ -7,7 +7,6 @@ import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
-import TableNameUtils from "../table/TableNameUtils.ts";
 
 export default class Record {
   #isNew = false;
@@ -41,7 +40,10 @@ export default class Record {
       .getTableSchema()
       .getColumnSchemas()
       .map((field: ColumnSchema) => {
-        this.set(field.getName(), field.getDefaultValue() || null);
+        if (typeof field.getDefaultValue() === "undefined")
+          this.set(field.getName(), null);
+        else
+          this.set(field.getName(), field.getDefaultValue());
       });
     this.#record["id"] = CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
