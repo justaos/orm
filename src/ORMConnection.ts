@@ -133,7 +133,7 @@ export default class ORMConnection {
         await createQuery.execute();
       } else {
         const columns =
-          await reserved`SELECT column_name FROM information_schema.columns WHERE table_schema = ${tableSchema.getSchemaName()} AND table_name = ${tableSchema.getName()};`;
+          await reserved`SELECT column_name FROM information_schema.columns WHERE table_schema = ${tableSchema.getSchemaName()} AND table_name = ${tableSchema.getTableName()};`;
         const existingColumnNames = columns.map((column: { column_name: string }) => column.column_name);
         const columnSchemas = tableSchema.getOwnColumnSchemas();
         // Create new columns

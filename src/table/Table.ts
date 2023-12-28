@@ -42,6 +42,10 @@ export default class Table {
     return this.#schema.getName();
   }
 
+  getTableName(): string {
+    return this.#schema.getTableName();
+  }
+
   getSchemaName(): string {
     return this.#schema.getSchemaName();
   }
