@@ -5,6 +5,7 @@ import Table from "./src/table/Table.ts";
 import { ORMError } from "./src/errors/ORMError.ts";
 import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOperationInterceptor.ts";
 import SelectQuery from "./src/query/SelectQuery.ts";
+import Query from "./src/query/Query.ts";
 import TableSchema from "./src/table/TableSchema.ts";
 import ColumnSchema from "./src/table/ColumnSchema.ts";
 import DataType from "./src/data-types/DataType.ts";
@@ -22,6 +23,7 @@ export {
   TableSchema,
   ColumnSchema,
   DataType,
+  Query,
   RecordSaveError,
   TableNameUtils
 };
