@@ -9,10 +9,10 @@ type SimpleCondition = {
 }
 
 type ExpressionCondition =
-    {
-  type: "or" | "and";
-  expression: (ExpressionCondition | SimpleCondition)[]
-}
+  {
+    type: "or" | "and";
+    expression: (ExpressionCondition | SimpleCondition)[]
+  }
 
 
 export default class SelectQuery {
@@ -27,6 +27,8 @@ export default class SelectQuery {
   #sortList: OrderByType[] = [];
 
   #from?: string;
+
+  #groupBy?: string[];
 
   constructor() {
   }
@@ -121,9 +123,27 @@ export default class SelectQuery {
     return this;
   }
 
+  groupBy(...args: string[]): SelectQuery {
+    if (args.length === 1 && Array.isArray(args[0])) {
+      this.#groupBy = args[0];
+    } else if (args.length === 1 && typeof args[0] === "object") {
+      this.#groupBy = Object.keys(args[0]);
+    } else {
+      this.#groupBy = args.map((arg) => {
+        if (typeof arg === "object") {
+          throw new Error("Invalid argument");
+        }
+        return arg;
+      });
+    }
+    return this;
+  }
+
   buildQuery(): string {
-    let query = `SELECT ${this.#columns} FROM ${this.#from}`;
+    let query = `SELECT ${this.#columns}
+                 FROM ${this.#from}`;
     query = query + this.#prepareWhereClause();
+    query = query + this.#prepareGroupByClause();
     query = query + this.#prepareOrderByClause();
     query = query + this.#prepareLimitClause();
     query = query + this.#prepareOffsetClause();
@@ -175,6 +195,21 @@ export default class SelectQuery {
       this.#sortList
         .map((sort) => {
           return `"${sort.column}" ${sort.order}`;
+        })
+        .join(", ")
+    );
+  }
+
+
+  #prepareGroupByClause(): string {
+    if (typeof this.#groupBy === "undefined") {
+      return "";
+    }
+    return (
+      " GROUP BY " +
+      this.#groupBy
+        .map((group) => {
+          return `"${group}"`;
         })
         .join(", ")
     );

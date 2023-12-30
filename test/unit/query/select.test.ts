@@ -51,14 +51,14 @@ describe(
         ]
       });
       const taskTable = conn.table("task");
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 10; i++) {
         const taskRecord = taskTable.createNewRecord();
         taskRecord.set("description", `Task [priority 1] ${i}`);
         taskRecord.set("priority", 1);
         taskRecord.set("order", Math.floor(Math.random() * 100));
         await taskRecord.insert();
       }
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 30; i++) {
         const taskRecord = taskTable.createNewRecord();
         taskRecord.set("description", `Task [priority 2] ${i}`);
         taskRecord.set("priority", 2);
@@ -80,13 +80,13 @@ describe(
 
       taskTable.select().where("priority", 1);
       count = await taskTable.count();
-      assertStrictEquals(count, 20, "Should be 20 records");
+      assertStrictEquals(count, 10, "Should be 20 records");
     });
 
     it("#simple in select query", async () => {
       const taskTable = conn.table("task");
       taskTable.select().where("priority", [1, 2]);
-      let count = await taskTable.count();
+      const count = await taskTable.count();
       assertStrictEquals(count, 40, "Should be 40 records");
     });
 
@@ -119,6 +119,21 @@ describe(
         }
         prevOrder = order;
       }
+    });
+
+    it("#select - group by", async () => {
+      const taskQuery = conn.query();
+      taskQuery.select("priority","count(*)::int as count");
+      taskQuery.from("task");
+      taskQuery.groupBy("priority");
+      taskQuery.orderBy("count", "ASC");
+      console.log(taskQuery.getSQLQuery());
+      const taskGroupedRecords = await taskQuery.execute();
+      assertStrictEquals(taskGroupedRecords.length, 2, "Should be 2 records");
+      assertStrictEquals(taskGroupedRecords[0].priority, 1, "Should be 1");
+      assertStrictEquals(taskGroupedRecords[0].count, 10, "Should be 10");
+      assertStrictEquals(taskGroupedRecords[1].priority, 2, "Should be 2");
+      assertStrictEquals(taskGroupedRecords[1].count, 30, "Should be 30");
     });
 
     /* it("#Collection::findOne", async () => {

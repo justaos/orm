@@ -121,6 +121,12 @@ export default class Query {
     return this;
   }
 
+  groupBy(columnName: string): Query {
+    const query = <SelectQuery>this.#getQuery();
+    query.groupBy(columnName);
+    return this;
+  }
+
   where(column: string | number | boolean, operator: any, value?: any): Query {
     const query = <SelectQuery>this.#getQuery();
     query.where(column, operator, value);
