@@ -22,7 +22,8 @@
   "scripts": {
     "test:debug": "deno task test:debug",
     "test": "deno task test",
-    "coverage": "deno task coverage"
+    "coverage": "deno task coverage",
+    "version": "version minor"
   },
   "publishConfig": {
     "access": "public"
