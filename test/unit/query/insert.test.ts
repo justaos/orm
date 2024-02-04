@@ -7,7 +7,6 @@ import {
   describe,
   it
 } from "../../test.deps.ts";
-import { Temporal } from "npm:@js-temporal/polyfill";
 
 import { ORM, ORMConnection, Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
