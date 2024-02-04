@@ -1,5 +1,4 @@
 import DataType from "../DataType.ts";
-import { Temporal } from "../../../deps.ts";
 import { ColumnDefinition } from "../../types.ts";
 
 export default class DateTimeDataType extends DataType {
