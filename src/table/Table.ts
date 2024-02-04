@@ -196,13 +196,13 @@ export default class Table {
   async disableAllTriggers() {
     const reserve = await this.#sql.reserve();
     await reserve.unsafe(`ALTER TABLE ${TableNameUtils.getFullFormTableName(this.getName())} DISABLE TRIGGER ALL`);
-    reserve.release();
+    await reserve.release();
   }
 
   async enableAllTriggers() {
     const reserve = await this.#sql.reserve();
     await reserve.unsafe(`ALTER TABLE ${TableNameUtils.getFullFormTableName(this.getName())} ENABLE TRIGGER ALL`);
-    reserve.release();
+    await reserve.release();
   }
 
   /*async bulkInsert(records: Record[]): Promise<Record[]> {

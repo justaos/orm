@@ -168,10 +168,10 @@ export default class Query {
     try {
       result = await reserve.unsafe(sqlQuery);
     } catch (_err) {
-      reserve.release();
+      await reserve.release();
       throw _err;
     }
-    reserve.release();
+    await reserve.release();
     return result;
   }
 
@@ -184,7 +184,7 @@ export default class Query {
     const sqlQuery = this.getSQLQuery();
     const reserve = await this.#sql.reserve();
     const cursor = await reserve.unsafe(sqlQuery).cursor();
-    reserve.release();
+    await reserve.release();
     return cursor;
   }
 

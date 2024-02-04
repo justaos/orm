@@ -25,14 +25,12 @@ export default class DateDataType extends DataType {
       return Temporal.PlainDate.from(value);
     }
     if (value instanceof Date) {
-      return Temporal.PlainDate.from({
-        year: value.getUTCFullYear(),
-        month: value.getUTCMonth(),
-        day: value.getUTCDate()
-      });
+      return Temporal.PlainDate.from(value.toISOString().replace("T", " ")
+        .replace("Z", ""));
     }
     return value;
   }
 
-  async validateValue() {}
+  async validateValue() {
+  }
 }

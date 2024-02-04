@@ -65,7 +65,7 @@ export default class DatabaseConnection {
     if (!databaseName) throw new Error(`No database name provided to check.`);
     const reserve = await this.#sql.reserve();
     const [output] = await reserve`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`.execute();
-    reserve.release();
+    await reserve.release();
     return output.exists;
   }
 

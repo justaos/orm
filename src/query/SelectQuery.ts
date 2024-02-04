@@ -3,14 +3,14 @@ import TableNameUtils from "../table/TableNameUtils.ts";
 
 
 type SimpleCondition = {
-  column: string;
+  column: string | number;
   operator: string;
   value: any;
 }
 
 type ExpressionCondition =
   {
-    type: "or" | "and";
+    type: "OR" | "AND";
     expression: (ExpressionCondition | SimpleCondition)[]
   }
 
@@ -18,7 +18,7 @@ type ExpressionCondition =
 export default class SelectQuery {
   #columns: string[] = ["*"];
 
-  #where: any[] = [];
+  #where: ExpressionCondition = { type: "AND", expression: [] };
 
   #offset: number | undefined;
 
@@ -72,7 +72,7 @@ export default class SelectQuery {
       return this.where(column, "=", operator);
     }
 
-    this.#where.push({
+    this.#where.expression.push({
       column,
       operator,
       value
@@ -151,13 +151,38 @@ export default class SelectQuery {
     return query;
   }
 
+  #prepareSimpleCondition(condition: SimpleCondition): string  {
+    if (Array.isArray(condition.value)) {
+      return `"${condition.column}" ${condition.operator} (${condition.value
+        .map((value: string) => {
+          return `'${value}'`;
+        })
+        .join(", ")})`;
+    }
+    return `"${condition.column}" ${condition.operator} '${condition.value}'`;
+  }
+
+  #prepareExpressionCondition(condition: ExpressionCondition): string  {
+    if(condition.expression.length) {
+      return condition.expression.map((condition) => {
+        const expressCondition: ExpressionCondition = <ExpressionCondition> condition;
+        if (expressCondition.type) {
+          return this.#prepareExpressionCondition(expressCondition);
+        } else {
+          return this.#prepareSimpleCondition(<SimpleCondition> condition);
+        }
+      }).join(` ${condition.type} ` );
+    }
+    return '';
+  }
+
   #prepareWhereClause(): string {
-    if (this.#where.length === 0) {
+    if (this.#where.expression.length === 0) {
       return "";
     }
     return (
-      " WHERE " +
-      this.#where
+      " WHERE " + this.#prepareExpressionCondition(this.#where)
+      /*this.#where
         .map((where) => {
           if (Array.isArray(where.value)) {
             return `"${where.column}" ${where.operator} (${where.value
@@ -168,7 +193,7 @@ export default class SelectQuery {
           }
           return `"${where.column}" ${where.operator} '${where.value}'`;
         })
-        .join(" AND ")
+        .join(" AND ")*/
     );
   }
 

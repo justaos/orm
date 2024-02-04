@@ -165,7 +165,6 @@ export default class Record {
         "Cannot remove unsaved record"
       );
     }
-    const tableSchema = this.#table.getTableSchema();
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
     this.#queryBuilder.delete();

@@ -160,7 +160,7 @@ export default class ORMConnection {
         }
       }
     } finally {
-      reserved.release();
+      await reserved.release();
     }
   }
 
@@ -170,7 +170,7 @@ export default class ORMConnection {
     try {
       await reserved.unsafe(`DROP TABLE IF EXISTS ${tableName} CASCADE;`);
     } finally {
-      reserved.release();
+      await reserved.release();
     }
   }
 

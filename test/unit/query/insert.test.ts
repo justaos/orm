@@ -14,8 +14,9 @@ import { Session } from "../../test.utils.ts";
 
 describe({
   name: "INSERT Query",
-  sanitizeResources: false,
-  sanitizeOps: false,
+  sanitizeResources: true,
+  sanitizeOps: true,
+  sanitizeExit: true,
   fn: () => {
     let conn: ORMConnection;
     const cleanTableList: string[] = [];
@@ -165,7 +166,7 @@ describe({
       assert(false, "not null error");
     });
 
-    it("#::insert unique error", async () => {
+    it("#insert unique error", async () => {
       const employeeTable = conn.table("employee");
       const employee = employeeTable.createNewRecord();
       employee.set("name", "John");
@@ -177,6 +178,7 @@ describe({
       }
       assert(false, "duplicate key error");
     });
+
 
     /**
      * UPDATE
@@ -193,22 +195,33 @@ describe({
 
     it("#getRecordById", async () => {
       const employeeTable = conn.table("employee");
+      const newEmp = employeeTable.createNewRecord();
+      newEmp.set("name", "John 3");
+      newEmp.set("salary", 500);
+      await newEmp.insert();
+
+
       const employee: Record | undefined = await employeeTable.getRecord(
-        johnRecord.getID()
+        newEmp.getID()
       );
       assert(!!employee, "record not found");
       assertStrictEquals(
         employee.get("name"),
-        "John",
+        "John 3",
         "name is expected to be John"
       );
     });
 
     it("#Record::delete", async () => {
       const employeeTable = conn.table("employee");
-      await johnRecord.delete();
+      const newEmp = employeeTable.createNewRecord();
+      newEmp.set("name", "John 2");
+      newEmp.set("salary", 500);
+      await newEmp.insert();
+
+      await newEmp.delete();
       const employee: Record | undefined = await employeeTable.getRecord(
-        johnRecord.getID()
+        newEmp.getID()
       );
       assert(!employee);
     });
