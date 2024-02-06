@@ -6,6 +6,7 @@ import DatabaseOperationInterceptorService from "../operation-interceptor/Databa
 import Query from "../query/Query.ts";
 import { logSQLQuery } from "../utils.ts";
 import TableNameUtils from "./TableNameUtils.ts";
+import { OrderByDirectionType, OrderByType } from "./query/OrderByType.ts";
 
 export default class Table {
   readonly #schema: TableSchema;
@@ -84,8 +85,9 @@ export default class Table {
     return this;
   }
 
-  orderBy(column: string, direction: "ASC" | "DESC"): Table {
-    this.#queryBuilder.orderBy(column, direction);
+  orderBy(columnNameOrOrderList?: string | OrderByType[],
+          direction?: OrderByDirectionType): Table {
+    this.#queryBuilder.orderBy(columnNameOrOrderList, direction);
     return this;
   }
 

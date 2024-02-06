@@ -5,6 +5,7 @@ import { ColumnDefinitionNative, CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
 import UpdateQuery from "./UpdateQuery.ts";
 import { AlterQuery } from "./AlterQuery.ts";
+import { OrderByDirectionType, OrderByType } from "../table/query/OrderByType.ts";
 
 export default class Query {
   readonly #sql: any;
@@ -150,9 +151,10 @@ export default class Query {
     return this;
   }
 
-  orderBy(column: string, direction: "ASC" | "DESC"): Query {
+  orderBy(columnNameOrOrderList?: string | OrderByType[],
+          direction?: OrderByDirectionType): Query {
     const query = <SelectQuery>this.#getQuery();
-    query.orderBy(column, direction);
+    query.orderBy(columnNameOrOrderList, direction);
     return this;
   }
 
