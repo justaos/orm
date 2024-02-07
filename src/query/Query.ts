@@ -20,6 +20,16 @@ export default class Query {
     return new Query(this.#sql);
   }
 
+  getClone(): Query {
+    const query = new Query(this.#sql);
+    query.setQuery(this.#query);
+    return query
+  }
+
+  setQuery(query: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery | AlterQuery | undefined){
+    this.#query = query;
+  }
+
   getType(): string | undefined {
     if (this.#query instanceof SelectQuery) return "select";
     if (this.#query instanceof DeleteQuery) return "delete";

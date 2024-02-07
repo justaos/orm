@@ -100,10 +100,11 @@ export default class Table {
     if (this.#queryBuilder.getType() !== "select") {
       throw new Error("Count can only be called on select query");
     }
-    this.#queryBuilder.count();
+    const queryBuilder: Query = this.#queryBuilder.getClone();
+    queryBuilder.count();
 
-    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
-    const [row] = await this.#queryBuilder.execute();
+    logSQLQuery(this.#logger, queryBuilder.getSQLQuery());
+    const [row] = await queryBuilder.execute();
     return parseInt(row.count, 10);
   }
 
