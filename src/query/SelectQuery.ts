@@ -149,11 +149,12 @@ export default class SelectQuery {
   }
 
   buildCountQuery(): string {
-    let query = `SELECT COUNT(*) as count FROM ${this.#from}`;
+    let query = `SELECT COUNT(*) as count FROM (SELECT * FROM ${this.#from}`;
     query = query + this.#prepareWhereClause();
     query = query + this.#prepareGroupByClause();
     query = query + this.#prepareLimitClause();
     query = query + this.#prepareOffsetClause();
+    query = query + ')'
     return query;
   }
 
