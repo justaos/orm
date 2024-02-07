@@ -20,10 +20,8 @@ export default class Query {
     return new Query(this.#sql);
   }
 
-  getClone(): Query {
-    const query = new Query(this.#sql);
-    query.setQuery(this.#query);
-    return query
+  getSelectQuery(): SelectQuery {
+    return <SelectQuery> this.#query;
   }
 
   setQuery(query: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery | AlterQuery | undefined){
@@ -144,11 +142,6 @@ export default class Query {
     return this;
   }
 
-  count() {
-    const query = <SelectQuery>this.#getQuery();
-    query.columns("COUNT(*) as count");
-  }
-
   limit(limit: number): Query {
     const query = <SelectQuery>this.#getQuery();
     query.limit(limit);
@@ -173,8 +166,13 @@ export default class Query {
     return query.buildQuery();
   }
 
-  async execute(): Promise<any> {
-    const sqlQuery = this.getSQLQuery();
+  getCountSQLQuery(): string {
+    const query = <SelectQuery> this.#getQuery();
+    return query.buildCountQuery();
+  }
+
+  async execute(sqlString?: string): Promise<any> {
+    const sqlQuery = sqlString || this.getSQLQuery();
     const reserve = await this.#sql.reserve();
     let result;
     try {

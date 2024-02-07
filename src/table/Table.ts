@@ -7,6 +7,7 @@ import Query from "../query/Query.ts";
 import { logSQLQuery } from "../utils.ts";
 import TableNameUtils from "./TableNameUtils.ts";
 import { OrderByDirectionType, OrderByType } from "./query/OrderByType.ts";
+import SelectQuery from "../query/SelectQuery.ts";
 
 export default class Table {
   readonly #schema: TableSchema;
@@ -100,11 +101,9 @@ export default class Table {
     if (this.#queryBuilder.getType() !== "select") {
       throw new Error("Count can only be called on select query");
     }
-    const queryBuilder: Query = this.#queryBuilder.getClone();
-    queryBuilder.count();
 
-    logSQLQuery(this.#logger, queryBuilder.getSQLQuery());
-    const [row] = await queryBuilder.execute();
+    logSQLQuery(this.#logger, this.#queryBuilder.getCountSQLQuery());
+    const [row] = await this.#queryBuilder.execute(this.#queryBuilder.getCountSQLQuery());
     return parseInt(row.count, 10);
   }
 

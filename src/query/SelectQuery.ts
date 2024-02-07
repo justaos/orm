@@ -20,11 +20,13 @@ export default class SelectQuery {
 
   #where: ExpressionCondition = { type: "AND", expression: [] };
 
-  #offset: number | undefined;
-
-  #limit: number | undefined;
 
   #sortList: OrderByType[] = [];
+
+  #offset?: number;
+
+  #limit?: number;
+
 
   #from?: string;
 
@@ -83,11 +85,6 @@ export default class SelectQuery {
 
   limit(limit: number): SelectQuery {
     this.#limit = limit;
-    return this;
-  }
-
-  count(): SelectQuery {
-    this.#columns = ["COUNT(*) as count"];
     return this;
   }
 
@@ -151,7 +148,15 @@ export default class SelectQuery {
     return query;
   }
 
-  #prepareSimpleCondition(condition: SimpleCondition): string  {
+  buildCountQuery(): string {
+    let query = `SELECT COUNT(*) as count FROM ${this.#from}`;
+    query = query + this.#prepareWhereClause();
+    query = query + this.#prepareGroupByClause();
+    query = query + this.#prepareLimitClause();
+    return query;
+  }
+
+  #prepareSimpleCondition(condition: SimpleCondition): string {
     if (Array.isArray(condition.value)) {
       return `"${condition.column}" ${condition.operator} (${condition.value
         .map((value: string) => {
@@ -162,18 +167,18 @@ export default class SelectQuery {
     return `"${condition.column}" ${condition.operator} '${condition.value}'`;
   }
 
-  #prepareExpressionCondition(condition: ExpressionCondition): string  {
-    if(condition.expression.length) {
+  #prepareExpressionCondition(condition: ExpressionCondition): string {
+    if (condition.expression.length) {
       return condition.expression.map((condition) => {
-        const expressCondition: ExpressionCondition = <ExpressionCondition> condition;
+        const expressCondition: ExpressionCondition = <ExpressionCondition>condition;
         if (expressCondition.type) {
           return this.#prepareExpressionCondition(expressCondition);
         } else {
-          return this.#prepareSimpleCondition(<SimpleCondition> condition);
+          return this.#prepareSimpleCondition(<SimpleCondition>condition);
         }
-      }).join(` ${condition.type} ` );
+      }).join(` ${condition.type} `);
     }
-    return '';
+    return "";
   }
 
   #prepareWhereClause(): string {
