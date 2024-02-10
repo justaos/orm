@@ -40,6 +40,6 @@ class Session {
 }
 
 const MAX_TIMEOUT = 10000;
-const logger = LoggerUtils.defineLogger("ORMTest", "INFO");
+const logger = LoggerUtils.defineLogger("ORMTest", "DEBUG");
 
 export { logger, MAX_TIMEOUT, Session };

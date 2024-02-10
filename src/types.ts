@@ -73,3 +73,9 @@ export type JSONObject = {
   [key: string]: JSONPrimitive | JSONArray | JSONObject | object;
 };
 export type JSONValue = JSONObject | JSONArray | JSONPrimitive;
+
+export type SimpleCondition = {
+  column: string | number;
+  operator: string;
+  value: any;
+};

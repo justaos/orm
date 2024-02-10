@@ -1,24 +1,12 @@
 import { OrderByDirectionType, OrderByType } from "../table/query/OrderByType.ts";
 import TableNameUtils from "../table/TableNameUtils.ts";
-
-
-type SimpleCondition = {
-  column: string | number;
-  operator: string;
-  value: any;
-}
-
-type ExpressionCondition =
-  {
-    type: "OR" | "AND";
-    expression: (ExpressionCondition | SimpleCondition)[]
-  }
+import { QueryExpression } from "./QueryExpression.ts";
 
 
 export default class SelectQuery {
   #columns: string[] = ["*"];
 
-  #where: ExpressionCondition = { type: "AND", expression: [] };
+  #where?: QueryExpression;
 
 
   #sortList: OrderByType[] = [];
@@ -62,25 +50,12 @@ export default class SelectQuery {
     column: string | number | boolean,
     operator: any,
     value?: any
-  ): SelectQuery {
-    // Support "where true || where false"
-    if (column === false || column === true) {
-      return this.where(1, "=", column ? 1 : 0);
-    }
-    if (typeof value === "undefined") {
-      if (Array.isArray(operator)) {
-        return this.where(column, "in", operator);
-      }
-      return this.where(column, "=", operator);
-    }
+  ): QueryExpression {
 
-    this.#where.expression.push({
-      column,
-      operator,
-      value
-    });
-
-    return this;
+    if (!this.#where) {
+      this.#where = new QueryExpression("COMPOUND");
+    }
+    return this.#where.andWhere(column, operator, value);
   }
 
   limit(limit: number): SelectQuery {
@@ -149,34 +124,37 @@ export default class SelectQuery {
   }
 
   buildCountQuery(): string {
-    let query = `SELECT COUNT(*) as count FROM (SELECT * FROM ${this.#from}`;
+    let query = `SELECT COUNT(*) as count
+                 FROM (SELECT * FROM ${this.#from}`;
     query = query + this.#prepareWhereClause();
     query = query + this.#prepareGroupByClause();
     query = query + this.#prepareLimitClause();
     query = query + this.#prepareOffsetClause();
-    query = query + ')'
+    query = query + ")";
     return query;
   }
 
-  #prepareSimpleCondition(condition: SimpleCondition): string {
-    if (Array.isArray(condition.value)) {
-      return `"${condition.column}" ${condition.operator} (${condition.value
+  #prepareSimpleCondition(condition: QueryExpression): string {
+    if (!condition.condition)
+      throw new Error("Condition not defined for simple expression");
+    if (Array.isArray(condition.condition.value)) {
+      return `"${condition.condition.column}" ${condition.condition.operator} (${condition.condition.value
         .map((value: string) => {
           return `'${value}'`;
         })
         .join(", ")})`;
     }
-    return `"${condition.column}" ${condition.operator} '${condition.value}'`;
+    return `"${condition.condition.column}" ${condition.condition.operator} '${condition.condition.value}'`;
   }
 
-  #prepareExpressionCondition(condition: ExpressionCondition): string {
-    if (condition.expression.length) {
-      return condition.expression.map((condition) => {
-        const expressCondition: ExpressionCondition = <ExpressionCondition>condition;
-        if (expressCondition.type) {
+  #prepareExpressionCondition(condition: QueryExpression): string {
+    if (condition.expressions.length) {
+      return condition.expressions.map((condition: any) => {
+        const expressCondition: QueryExpression = <QueryExpression>condition;
+        if (expressCondition.type == "COMPOUND") {
           return this.#prepareExpressionCondition(expressCondition);
         } else {
-          return this.#prepareSimpleCondition(<SimpleCondition>condition);
+          return this.#prepareSimpleCondition(<QueryExpression>condition);
         }
       }).join(` ${condition.type} `);
     }
@@ -184,7 +162,7 @@ export default class SelectQuery {
   }
 
   #prepareWhereClause(): string {
-    if (this.#where.expression.length === 0) {
+    if (!this.#where || !this.#where.expressions.length) {
       return "";
     }
     return (

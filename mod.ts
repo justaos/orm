@@ -38,7 +38,8 @@ export type {
   ColumnDefinition,
   NativeDataType,
   DatabaseOperationContext,
-  RawRecord
+  RawRecord,
+  SimpleCondition
 } from "./src/types.ts";
 export type {
   OrderByType,
