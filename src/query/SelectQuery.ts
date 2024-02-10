@@ -156,7 +156,7 @@ export default class SelectQuery {
         } else {
           return this.#prepareSimpleCondition(<QueryExpression>condition);
         }
-      }).join(` ${condition.type} `);
+      }).join(` ${condition.compoundOperator} `);
     }
     return "";
   }
