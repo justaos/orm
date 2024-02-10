@@ -29,6 +29,7 @@ export {
 };
 
 export type { DatabaseConfiguration } from "./src/core/connection/index.ts";
+
 export type {
   DatabaseOperationType,
   DatabaseOperationWhen,
@@ -41,6 +42,7 @@ export type {
   RawRecord,
   SimpleCondition
 } from "./src/types.ts";
+
 export type {
   OrderByType,
   OrderByDirectionType
