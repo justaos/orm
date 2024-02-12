@@ -38,7 +38,7 @@ jobs:
           deno-version: ${{ matrix.deno-version }}
       - name: build and test
         run: |
-          deno --version --unstable
+          deno --version --unstable-temporal
           deno task test
           deno task coverage
         env:
