@@ -130,7 +130,7 @@ export default class SelectQuery {
     query = query + this.#prepareGroupByClause();
     query = query + this.#prepareLimitClause();
     query = query + this.#prepareOffsetClause();
-    query = query + ")";
+    query = query + ") as t";
     return query;
   }
 
