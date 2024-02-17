@@ -4,7 +4,7 @@ export default function () {
   const config: DatabaseConfiguration = {
     database: "odm-example-db",
     username: "postgres",
-    password: "admin",
+    password: "postgres",
     hostname: "localhost",
     port: 5432
   };

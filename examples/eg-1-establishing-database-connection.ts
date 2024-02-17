@@ -4,7 +4,7 @@ import ORMConnection from "../src/ORMConnection.ts";
 const odm = new ORM({
   database: "collection-service",
   username: "postgres",
-  password: "admin",
+  password: "postgres",
   hostname: "localhost",
   port: 5432
 });

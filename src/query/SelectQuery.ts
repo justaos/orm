@@ -23,6 +23,10 @@ export default class SelectQuery {
   constructor() {
   }
 
+  getColumns(): string[] {
+    return this.#columns;
+  }
+
   from(tableName: string): SelectQuery {
     this.#from = TableNameUtils.getFullFormTableName(tableName);
     return this;

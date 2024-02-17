@@ -4,7 +4,7 @@ const odm = new ORM({
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",
-  password: "admin",
+  password: "postgres",
   database: "odm-test-db"
 });
 
@@ -55,7 +55,7 @@ self.onmessage = async (e) => {
   }
   const selectQuery = table.select();
   selectQuery.where("name", "=", "1992");
-  const count = await selectQuery.getCount();
+  const count = await selectQuery.count();
 
   console.log(`WORKER ${e.data.post} COUNTs : ${count} ========================================`);
 

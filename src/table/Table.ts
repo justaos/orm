@@ -71,6 +71,10 @@ export default class Table {
     return this;
   }
 
+  getSelectedColumns() {
+    return this.#queryBuilder.getSelectedColumns();
+  }
+
   where(column: string | number | boolean, operator: any, value?: any): Table {
     this.#queryBuilder.where(column, operator, value);
     return this;

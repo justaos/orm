@@ -21,10 +21,10 @@ export default class Query {
   }
 
   getSelectQuery(): SelectQuery {
-    return <SelectQuery> this.#query;
+    return <SelectQuery>this.#query;
   }
 
-  setQuery(query: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery | AlterQuery | undefined){
+  setQuery(query: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery | AlterQuery | undefined) {
     this.#query = query;
   }
 
@@ -108,6 +108,10 @@ export default class Query {
     return this;
   }
 
+  getSelectedColumns() {
+    return (<SelectQuery>this.#query).getColumns();
+  }
+
   delete(): Query {
     this.#query = new DeleteQuery();
     return this;
@@ -167,7 +171,7 @@ export default class Query {
   }
 
   getCountSQLQuery(): string {
-    const query = <SelectQuery> this.#getQuery();
+    const query = <SelectQuery>this.#getQuery();
     return query.buildCountQuery();
   }
 
