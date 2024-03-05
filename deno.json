@@ -1,4 +1,7 @@
 {
+  "name": "@justaos/orm",
+  "version": "6.4.0",
+  "exports": "./mod.ts",
   "tasks": {
     "build:docs": "deno run build.ts",
     "test:debug": "deno test --inspect-brk --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts",
@@ -7,8 +10,13 @@
     "coverage:report": "deno coverage coverage/ --lcov > coverage/report.html"
   },
   "test": {
-    "include": ["test/init.test.ts", "test/unit/", "test/end.test.ts"],
-    "exclude": ["src/"]
-  },
-  "importMap": "deno.json"
+    "include": [
+      "test/init.test.ts",
+      "test/unit/",
+      "test/end.test.ts"
+    ],
+    "exclude": [
+      "src/"
+    ]
+  }
 }
