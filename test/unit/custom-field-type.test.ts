@@ -1,4 +1,4 @@
-import { afterAll, assert, beforeAll, describe, it } from "../test.deps.ts";
+import { afterAll, assert, beforeAll, describe, it } from "../../test_deps.ts";
 
 import { ColumnDefinition, DataType, ORM, ORMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";

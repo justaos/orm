@@ -15,24 +15,28 @@ Postgres database.
 - Supports table with multi-level inheritance.
 - Also supports interception on operations (create, read, update and delete).
 
+```shell
+deno add @justaos/orm
+```
+
 ```ts
-import { ORM } from 'https://deno.land/x/justaos_orm@$VERSION/mod.ts';
+import { ORM } from '@justaos/orm';
 ```
 
 ## Database connection
 
 ```ts
-const orm = new ORM({
+const odm = new ORM({
   database: "collection-service",
   username: "postgres",
-  password: "admin",
+  password: "postgres",
   hostname: "localhost",
   port: 5432
 });
 
 let conn: ORMConnection | undefined;
 try {
-  conn = await orm.connect(true /* create database if not exists */);
+  conn = await odm.connect(true /* create database if not exists */);
   console.log("connection success");
 } catch (_error) {
   console.log("connection failed");
@@ -77,6 +81,20 @@ await orm.defineTable({
 ## Querying
 
 ```ts
+await conn.defineTable({
+  name: "teacher",
+  columns: [
+    {
+      name: "name",
+      type: "string",
+    },
+    {
+      name: "roll_no",
+      type: "integer",
+    },
+  ],
+});
+
 const teacherTable = conn.table("teacher");
 for (let i = 0; i < 10; i++) {
   const teacher = teacherTable.createNewRecord();
@@ -90,23 +108,20 @@ const records = await teacherTable
   .orderBy("roll_no", "DESC")
   .toArray();
 
-records.forEach(async function(rec) {
-  console.log(
-    `${await rec.getDisplayValue("name")} :: ${await rec.getDisplayValue(
-      "roll_no"
-    )}`
-  );
+records.forEach(async function (rec) {
+  console.log(`${await rec.get("name")} :: ${await rec.get("roll_no")}`);
   console.log(JSON.stringify(await rec.toJSON(), null, 4));
 });
 
-const count = await teacherTable.select().getCount();
-console.log(count);
+const count = await teacherTable.count();
+console.log("COUNT :: " + count);
+await conn.closeConnection();
 ```
 
 ## Intercepting database operations
 
 ```ts
-orm.addInterceptor(
+odm.addInterceptor(
   new (class extends DatabaseOperationInterceptor {
     getName() {
       return "my-intercept";
@@ -120,7 +135,7 @@ orm.addInterceptor(
       _context: DatabaseOperationContext
     ) {
       if (collectionName === "student") {
-        if (operation === "CREATE") {
+        if (operation === "INSERT") {
           console.log(
             `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );
@@ -133,7 +148,7 @@ orm.addInterceptor(
             }
           }
         }
-        if (operation === "READ") {
+        if (operation === "SELECT") {
           console.log(
             `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );
@@ -154,13 +169,13 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
+      type: "string",
     },
     {
       name: "computed",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 
 const studentTable = conn.table("student");
@@ -168,7 +183,6 @@ const studentRecord = studentTable.createNewRecord();
 studentRecord.set("name", "John " + new Date().toISOString());
 await studentRecord.insert();
 await studentTable.select().toArray();
-
 /* This will print the following:
 [collectionName=student, operation=CREATE, when=BEFORE]
 computed field updated for :: John 2023-12-05T13:57:21.418Z
@@ -190,56 +204,34 @@ computed field updated for :: John 2023-12-05T13:57:21.418Z
 After connection established, you can define custom field type.
 
 ```ts
-orm.addDataType(
-  class extends DataType {
+odm.addDataType(
+  new (class extends DataType {
     constructor() {
-      super(NATIVE_DATA_TYPES.VARCHAR);
+      super("email", "VARCHAR");
     }
 
-    getName() {
-      return "email";
+    toJSONValue(value: string | null): string | null {
+      return value;
     }
 
-    async validateValue(
-      _schema: TableSchema,
-      fieldName: string,
-      record: RawRecord
-    ) {
-      const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
-      if (!new RegExp(pattern).test(record[fieldName]))
-        throw new Error("Not a valid email");
+    validateDefinition(_columnDefinition: ColumnDefinition) {
+      return true;
     }
 
-    validateDefinition(fieldDefinition: ColumnDefinition) {
-      return !!fieldDefinition.name;
-    }
-
-    getValueIntercept(
-      _schema: TableSchema,
-      fieldName: string,
-      record: RawRecord
-    ): any {
-      return record[fieldName];
-    }
-
-    setValueIntercept(
-      _schema: TableSchema,
-      _fieldName: string,
-      newValue: any,
-      _record: RawRecord
-    ): any {
+    setValueIntercept(newValue: any): any {
       return newValue;
     }
 
-    async getDisplayValue(
-      _schema: TableSchema,
-      fieldName: string,
-      record: RawRecord,
-      _context: DatabaseOperationContext
-    ) {
-      return record[fieldName];
+    async validateValue(value: unknown): Promise<void> {
+      const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
+      if (
+        value &&
+        typeof value === "string" &&
+        !new RegExp(pattern).test(value)
+      )
+        throw new Error("Not a valid email");
     }
-  }
+  })()
 );
 
 await conn.defineTable({
@@ -276,12 +268,11 @@ const studentTable = conn.table("student");
 const student = studentTable.createNewRecord();
 student.set("personal_contact", "test");
 student.set("birth_date", new Date());
-
 try {
   await student.insert();
   console.log("Student created");
-} catch (_error) {
-  console.log(_error.toJSON());
+} catch (error) {
+  console.log(error.toJSON());
 }
 ```
 

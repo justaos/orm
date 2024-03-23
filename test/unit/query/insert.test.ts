@@ -6,7 +6,7 @@ import {
   beforeAll,
   describe,
   it,
-} from "../../test.deps.ts";
+} from "../../../test_deps.ts";
 
 import { ORM, ORMConnection, Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
@@ -202,11 +202,12 @@ describe({
         newEmp.getID()
       );
       assert(!!employee, "record not found");
-      assertStrictEquals(
-        employee.get("name"),
-        "John 3",
-        "name is expected to be John"
-      );
+      if (employee)
+        assertStrictEquals(
+          employee.get("name"),
+          "John 3",
+          "name is expected to be John"
+        );
     });
 
     it("#Record::delete", async () => {

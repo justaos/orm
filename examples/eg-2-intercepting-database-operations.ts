@@ -25,7 +25,7 @@ odm.addInterceptor(
       _context: DatabaseOperationContext
     ) {
       if (collectionName === "student") {
-        if (operation === "CREATE") {
+        if (operation === "INSERT") {
           console.log(
             `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );
@@ -38,7 +38,7 @@ odm.addInterceptor(
             }
           }
         }
-        if (operation === "READ") {
+        if (operation === "SELECT") {
           console.log(
             `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
           );

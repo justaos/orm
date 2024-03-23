@@ -1,4 +1,4 @@
-import { assert, describe, it } from "./test.deps.ts";
+import { assert, describe, it } from "../test_deps.ts";
 import { Session } from "./test.utils.ts";
 
 describe("End test cleanup", () => {

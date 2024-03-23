@@ -1,4 +1,4 @@
-import { assert, describe, it } from "../../test.deps.ts";
+import { assert, describe, it } from "../../../test_deps.ts";
 import DatabaseConnection from "../../../src/core/connection/DatabaseConnection.ts";
 import { DatabaseConfiguration } from "../../../src/core/connection/index.ts";
 

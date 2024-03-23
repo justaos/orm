@@ -4,7 +4,7 @@ import {
   beforeAll,
   describe,
   it,
-} from "../../test.deps.ts";
+} from "../../../test_deps.ts";
 
 import {
   DatabaseOperationType,

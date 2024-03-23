@@ -31,14 +31,10 @@ const records = await teacherTable
   .toArray();
 
 records.forEach(async function (rec) {
-  console.log(
-    `${await rec.getDisplayValue("name")} :: ${await rec.getDisplayValue(
-      "roll_no"
-    )}`
-  );
+  console.log(`${await rec.get("name")} :: ${await rec.get("roll_no")}`);
   console.log(JSON.stringify(await rec.toJSON(), null, 4));
 });
 
-const count = await teacherTable.select().getCount();
-console.log(count);
+const count = await teacherTable.count();
+console.log("COUNT :: " + count);
 await conn.closeConnection();
