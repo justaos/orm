@@ -1,6 +1,6 @@
 {
   "name": "@justaos/orm",
-  "version": "6.5.0",
+  "version": "6.6.0",
   "exports": "./mod.ts",
   "tasks": {
     "test:debug": "deno test --inspect-brk --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts",
