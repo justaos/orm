@@ -5,7 +5,7 @@ import {
   assertStrictEquals,
   beforeAll,
   describe,
-  it
+  it,
 } from "../../test.deps.ts";
 
 import { ORM, ORMConnection, Record } from "../../../mod.ts";
@@ -31,13 +31,13 @@ describe({
           {
             name: "name",
             type: "string",
-            unique: true
+            unique: true,
           },
           {
             name: "description",
-            type: "string"
-          }
-        ]
+            type: "string",
+          },
+        ],
       });
       const departmentTable = conn.table("department");
       itDepartment = departmentTable.createNewRecord();
@@ -66,7 +66,7 @@ describe({
           {
             name: "name",
             type: "string",
-            unique: true
+            unique: true,
           },
           {
             name: "department",
@@ -74,37 +74,37 @@ describe({
             foreign_key: {
               table: "department",
               column: "id",
-              on_delete: "CASCADE"
-            }
+              on_delete: "CASCADE",
+            },
           },
           {
             name: "salary",
             /*  maximum: 10000,*/
             type: "integer",
-            not_null: true
+            not_null: true,
           },
           {
             name: "birth_date",
-            type: "date"
+            type: "date",
           },
           {
             name: "created_on",
-            type: "datetime"
+            type: "datetime",
           },
           {
             name: "gender",
-            type: "boolean"
+            type: "boolean",
           },
           {
             name: "address",
-            type: "json"
+            type: "json",
           },
           {
             name: "rating",
             type: "number",
-            default: 4.5
-          }
-        ]
+            default: 4.5,
+          },
+        ],
       });
 
       cleanTableList.push("employee");
@@ -131,7 +131,7 @@ describe({
       employee.set("salary", 5000);
       employee.set("address", {
         street: "test",
-        zipcode: 500000
+        zipcode: 500000,
       });
 
       assertStrictEquals(employee.isNew(), true, "record is not new");
@@ -178,7 +178,6 @@ describe({
       assert(false, "duplicate key error");
     });
 
-
     /**
      * UPDATE
      */
@@ -198,7 +197,6 @@ describe({
       newEmp.set("name", "John 3");
       newEmp.set("salary", 500);
       await newEmp.insert();
-
 
       const employee: Record | undefined = await employeeTable.getRecord(
         newEmp.getID()
@@ -224,5 +222,5 @@ describe({
       );
       assert(!employee);
     });
-  }
+  },
 });

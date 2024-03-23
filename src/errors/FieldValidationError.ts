@@ -28,7 +28,7 @@ export class FieldValidationError extends Error {
     return {
       code: this.#code,
       columnDefinition: this.#columnDefinition,
-      value: this.#value
+      value: this.#value,
     };
   }
 }

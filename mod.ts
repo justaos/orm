@@ -25,7 +25,7 @@ export {
   DataType,
   Query,
   RecordSaveError,
-  TableNameUtils
+  TableNameUtils,
 };
 
 export type { DatabaseConfiguration } from "./src/core/connection/index.ts";
@@ -40,10 +40,10 @@ export type {
   NativeDataType,
   DatabaseOperationContext,
   RawRecord,
-  SimpleCondition
+  SimpleCondition,
 } from "./src/types.ts";
 
 export type {
   OrderByType,
-  OrderByDirectionType
+  OrderByDirectionType,
 } from "./src/table/query/OrderByType.ts";

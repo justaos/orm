@@ -53,7 +53,9 @@ export class CreateQuery {
       const onDelete = column.foreign_key.on_delete
         ? ` ON DELETE ${column.foreign_key.on_delete}`
         : "";
-      query += ` REFERENCES ${TableNameUtils.getFullFormTableName(column.foreign_key.table)} ("${column.foreign_key.column}") ${onDelete}`;
+      query += ` REFERENCES ${TableNameUtils.getFullFormTableName(
+        column.foreign_key.table
+      )} ("${column.foreign_key.column}") ${onDelete}`;
     } else {
       if (column.not_null) query += ` NOT NULL`;
       if (column.unique) query += ` UNIQUE`;

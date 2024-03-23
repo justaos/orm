@@ -2,7 +2,7 @@ import DatabaseOperationInterceptor from "./DatabaseOperationInterceptor.ts";
 import {
   DatabaseOperationContext,
   DatabaseOperationType,
-  DatabaseOperationWhen
+  DatabaseOperationWhen,
 } from "../types.ts";
 import Record from "../record/Record.ts";
 
@@ -26,14 +26,6 @@ export default class DatabaseOperationInterceptorService {
 
   hasInterceptors(): boolean {
     return this.#interceptors.size !== 0;
-  }
-
-  #getSortedIntercepts(): DatabaseOperationInterceptor[] {
-    const intercepts = [];
-    for (const interceptor of this.#interceptors.values()) {
-      intercepts.push(interceptor);
-    }
-    return intercepts.sort((a, b) => a.getOrder() - b.getOrder());
   }
 
   async intercept(
@@ -65,5 +57,13 @@ export default class DatabaseOperationInterceptorService {
       }
     }
     return records;
+  }
+
+  #getSortedIntercepts(): DatabaseOperationInterceptor[] {
+    const intercepts = [];
+    for (const interceptor of this.#interceptors.values()) {
+      intercepts.push(interceptor);
+    }
+    return intercepts.sort((a, b) => a.getOrder() - b.getOrder());
   }
 }

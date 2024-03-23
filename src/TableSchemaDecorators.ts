@@ -2,7 +2,7 @@ export function Table() {
   return (target: any) => {
     if (!target.__tableDefinition) {
       target.__tableDefinition = {
-        columns: []
+        columns: [],
       };
     }
     if (!Array.isArray(target.__tableDefinition.columns)) {
@@ -11,7 +11,7 @@ export function Table() {
       ).map((key) => {
         return {
           name: key,
-          ...target.__tableDefinition.columns[key]
+          ...target.__tableDefinition.columns[key],
         };
       });
     }
@@ -25,7 +25,7 @@ export function Table() {
 function columnInitializer(target: any, key: string | symbol) {
   if (!target.constructor.__tableDefinition) {
     target.constructor.__tableDefinition = {
-      columns: {}
+      columns: {},
     };
   }
   if (!target.constructor.__tableDefinition.columns[key]) {

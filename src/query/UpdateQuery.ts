@@ -1,4 +1,3 @@
-import { SqlString } from "../../deps.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import QueryUtils from "./QueryUtils.ts";
 import TableNameUtils from "../table/TableNameUtils.ts";
@@ -49,7 +48,7 @@ export default class UpdateQuery {
     this.#where.push({
       column,
       operator,
-      value
+      value,
     });
 
     return this;
@@ -96,9 +95,9 @@ export default class UpdateQuery {
     if (this.#where.length > 0) {
       query += ` WHERE ${this.#where
         .map((condition) => {
-          return `${condition.column} ${condition.operator} ${QueryUtils.escapeValue(
-            condition.value
-          )}`;
+          return `${condition.column} ${
+            condition.operator
+          } ${QueryUtils.escapeValue(condition.value)}`;
         })
         .join(" AND ")}`;
     }

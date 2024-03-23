@@ -1,13 +1,14 @@
-import { OrderByDirectionType, OrderByType } from "../table/query/OrderByType.ts";
+import {
+  OrderByDirectionType,
+  OrderByType,
+} from "../table/query/OrderByType.ts";
 import TableNameUtils from "../table/TableNameUtils.ts";
 import { QueryExpression } from "./QueryExpression.ts";
-
 
 export default class SelectQuery {
   #columns: string[] = ["*"];
 
   #where?: QueryExpression;
-
 
   #sortList: OrderByType[] = [];
 
@@ -15,13 +16,11 @@ export default class SelectQuery {
 
   #limit?: number;
 
-
   #from?: string;
 
   #groupBy?: string[];
 
-  constructor() {
-  }
+  constructor() {}
 
   getColumns(): string[] {
     return this.#columns;
@@ -55,7 +54,6 @@ export default class SelectQuery {
     operator: any,
     value?: any
   ): QueryExpression {
-
     if (!this.#where) {
       this.#where = new QueryExpression("COMPOUND");
     }
@@ -88,7 +86,7 @@ export default class SelectQuery {
     if (typeof columnNameOrOrderList === "string") {
       this.#sortList.push({
         column: columnNameOrOrderList,
-        order: direction || "ASC"
+        order: direction || "ASC",
       });
       return this;
     }
@@ -142,7 +140,9 @@ export default class SelectQuery {
     if (!condition.condition)
       throw new Error("Condition not defined for simple expression");
     if (Array.isArray(condition.condition.value)) {
-      return `"${condition.condition.column}" ${condition.condition.operator} (${condition.condition.value
+      return `"${condition.condition.column}" ${
+        condition.condition.operator
+      } (${condition.condition.value
         .map((value: string) => {
           return `'${value}'`;
         })
@@ -153,14 +153,16 @@ export default class SelectQuery {
 
   #prepareExpressionCondition(condition: QueryExpression): string {
     if (condition.expressions.length) {
-      return condition.expressions.map((condition: any) => {
-        const expressCondition: QueryExpression = <QueryExpression>condition;
-        if (expressCondition.type == "COMPOUND") {
-          return this.#prepareExpressionCondition(expressCondition);
-        } else {
-          return this.#prepareSimpleCondition(<QueryExpression>condition);
-        }
-      }).join(` ${condition.compoundOperator} `);
+      return condition.expressions
+        .map((condition: any) => {
+          const expressCondition: QueryExpression = <QueryExpression>condition;
+          if (expressCondition.type == "COMPOUND") {
+            return this.#prepareExpressionCondition(expressCondition);
+          } else {
+            return this.#prepareSimpleCondition(<QueryExpression>condition);
+          }
+        })
+        .join(` ${condition.compoundOperator} `);
     }
     return "";
   }
@@ -213,7 +215,6 @@ export default class SelectQuery {
         .join(", ")
     );
   }
-
 
   #prepareGroupByClause(): string {
     if (typeof this.#groupBy === "undefined") {

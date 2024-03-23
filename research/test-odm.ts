@@ -5,7 +5,7 @@ const conn = await new ORM({
   port: 5432,
   username: "postgres",
   password: "postgres",
-  database: "odm-test-db"
+  database: "odm-test-db",
 }).connect(true);
 
 /*@Table()
@@ -28,27 +28,24 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
+      type: "string",
     },
     {
       name: "age",
-      type: "integer"
-    }
-  ]
+      type: "integer",
+    },
+  ],
 });
 
 const table = conn.table("testing_table");
 
-
-
-for(let i = 0; i < 1000; i++) {
+for (let i = 0; i < 1000; i++) {
   const record = table.createNewRecord();
 
   record.set("name", "1992");
   record.set("age", "199201");
   await record.insert();
 }
-
 
 const selectQuery = table.select();
 selectQuery.where("name", "=", "1992");

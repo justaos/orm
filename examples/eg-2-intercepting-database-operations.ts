@@ -4,7 +4,7 @@ import {
   DatabaseOperationInterceptor,
   DatabaseOperationType,
   DatabaseOperationWhen,
-  Record
+  Record,
 } from "../mod.ts";
 
 const odm = getORM();
@@ -59,13 +59,13 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
+      type: "string",
     },
     {
       name: "computed",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 
 const studentTable = conn.table("student");

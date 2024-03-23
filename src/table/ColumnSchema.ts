@@ -19,7 +19,7 @@ export default class ColumnSchema {
     return {
       not_null: false,
       unique: false,
-      ...columnDefinition
+      ...columnDefinition,
     };
   }
 
@@ -41,7 +41,7 @@ export default class ColumnSchema {
 
   getDefinition(): ColumnDefinition {
     return {
-      ...this.#columnDefinition
+      ...this.#columnDefinition,
     };
   }
 
@@ -63,9 +63,13 @@ export default class ColumnSchema {
      * Validate column name
      */
     if (!this.getName() || typeof this.getName() !== "string") {
-      errorMessages.push(`[Column :: ${this.getName()}] Invalid column name provided`);
+      errorMessages.push(
+        `[Column :: ${this.getName()}] Invalid column name provided`
+      );
     } else if (!/^[a-z0-9_]+$/i.test(this.getName())) {
-      errorMessages.push(`[Column :: ${this.getName()}] Column name should be alphanumeric`);
+      errorMessages.push(
+        `[Column :: ${this.getName()}] Column name should be alphanumeric`
+      );
     }
 
     if (!this.#columnDefinition || !this.getType()) {
@@ -80,7 +84,9 @@ export default class ColumnSchema {
     } else if (
       !this.getColumnType().validateDefinition(this.#columnDefinition)
     ) {
-      errorMessages.push(`[Column :: ${this.getName()}] Invalid field definition`);
+      errorMessages.push(
+        `[Column :: ${this.getName()}] Invalid field definition`
+      );
     }
     return errorMessages;
   }

@@ -8,10 +8,7 @@ export default class QueryUtils {
     if (typeof value === "number" || typeof value === "boolean") {
       return String(value);
     }
-    if (
-      typeof value === "string" ||
-      value === null
-    ) {
+    if (typeof value === "string" || value === null) {
       return SqlString.literal(value);
     }
     if (typeof value === "object") {

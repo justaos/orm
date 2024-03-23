@@ -34,14 +34,16 @@ export default class DatabaseConnection {
 
   async connect(): Promise<void> {
     try {
-      this.#sql = postgres({ ...this.#config, max: this.#config.max_connections });
+      this.#sql = postgres({
+        ...this.#config,
+        max: this.#config.max_connections,
+      });
       await this.#sql`select 1`;
       this.#logger.info(
         `Connected to ${this.#config.database} database successfully`
       );
     } catch (err) {
-      if (this.#sql)
-        await this.#sql.end();
+      if (this.#sql) await this.#sql.end();
       this.#logger.error(err.message);
       throw err;
     }
@@ -64,7 +66,8 @@ export default class DatabaseConnection {
   async isDatabaseExist(databaseName: string): Promise<boolean> {
     if (!databaseName) throw new Error(`No database name provided to check.`);
     const reserve = await this.#sql.reserve();
-    const [output] = await reserve`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`.execute();
+    const [output] =
+      await reserve`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`.execute();
     await reserve.release();
     return output.exists;
   }

@@ -5,7 +5,7 @@ const odm = new ORM({
   port: 5432,
   username: "postgres",
   password: "postgres",
-  database: "odm-test-db"
+  database: "odm-test-db",
 });
 
 const conn = await odm.connect(true);
@@ -30,15 +30,14 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
+      type: "string",
     },
     {
       name: "age",
-      type: "integer"
-    }
-  ]
+      type: "integer",
+    },
+  ],
 });
-
 
 await conn.closeConnection();
 
@@ -47,7 +46,9 @@ self.onmessage = async (e) => {
   const conn = await odm.connect(true);
   const table = conn.table("testing_table");
   for (let i = 0; i < 1000; i++) {
-    console.log(`WORKER ${e.data.post} INDEX : ${i} ========================================`);
+    console.log(
+      `WORKER ${e.data.post} INDEX : ${i} ========================================`
+    );
     const record = table.createNewRecord();
     record.set("name", "1992");
     record.set("age", "199201");
@@ -57,7 +58,9 @@ self.onmessage = async (e) => {
   selectQuery.where("name", "=", "1992");
   const count = await selectQuery.count();
 
-  console.log(`WORKER ${e.data.post} COUNTs : ${count} ========================================`);
+  console.log(
+    `WORKER ${e.data.post} COUNTs : ${count} ========================================`
+  );
 
   debugger;
   await conn.closeConnection();

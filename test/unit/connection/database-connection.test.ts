@@ -6,7 +6,7 @@ const defaultConfig: DatabaseConfiguration = {
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",
-  password: "postgres"
+  password: "postgres",
 };
 
 describe({
@@ -17,7 +17,7 @@ describe({
     it("#connect", async () => {
       const conn = new DatabaseConnection({
         ...defaultConfig,
-        port: undefined
+        port: undefined,
       });
       await conn.connect();
       if (conn) {
@@ -30,12 +30,12 @@ describe({
     it("#connect wrong config", async () => {
       const config: DatabaseConfiguration = {
         ...defaultConfig,
-        port: 80
+        port: 80,
       };
       try {
         await DatabaseConnection.connect({
           ...config,
-          connect_timeout: 500
+          connect_timeout: 500,
         });
         assert(false, "Connection should fail");
       } catch (_error) {
@@ -83,8 +83,8 @@ describe({
     it("#multi database connections", async () => {
       const config = {
         ...defaultConfig,
-        database: "odm-created-database"
-      }
+        database: "odm-created-database",
+      };
       const conn1 = await DatabaseConnection.connect(config);
       const conn2 = await DatabaseConnection.connect(config);
       const conn3 = await DatabaseConnection.connect(config);
@@ -102,7 +102,7 @@ describe({
       try {
         const dbConnection = await DatabaseConnection.connect({
           ...defaultConfig,
-          database: ""
+          database: "",
         });
         await dbConnection.dropDatabase("odm-created-database");
       } catch (error) {
@@ -120,5 +120,5 @@ describe({
         assert(false, "close connection failed");
       }
     });
-  }
+  },
 });

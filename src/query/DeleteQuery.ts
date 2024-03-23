@@ -5,8 +5,7 @@ export default class DeleteQuery {
 
   #from?: string;
 
-  constructor() {
-  }
+  constructor() {}
 
   from(tableName: string): DeleteQuery {
     this.#from = TableNameUtils.getFullFormTableName(tableName);
@@ -29,10 +28,16 @@ export default class DeleteQuery {
     this.#where.push({
       column,
       operator,
-      value
+      value,
     });
 
     return this;
+  }
+
+  buildQuery(): string {
+    let query = `DELETE FROM ${this.#from}`;
+    query = query + this.#prepareWhereClause();
+    return query;
   }
 
   #prepareWhereClause(): string {
@@ -47,11 +52,5 @@ export default class DeleteQuery {
         })
         .join(" AND ")
     );
-  }
-
-  buildQuery(): string {
-    let query = `DELETE FROM ${this.#from}`;
-    query = query + this.#prepareWhereClause();
-    return query;
   }
 }

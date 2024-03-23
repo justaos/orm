@@ -8,13 +8,13 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
+      type: "string",
     },
     {
       name: "roll_no",
-      type: "integer"
-    }
-  ]
+      type: "integer",
+    },
+  ],
 });
 
 const teacherTable = conn.table("teacher");

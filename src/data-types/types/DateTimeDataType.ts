@@ -24,12 +24,12 @@ export default class DateTimeDataType extends DataType {
       return Temporal.PlainDateTime.from(value);
     }
     if (value instanceof Date) {
-      return Temporal.PlainDateTime.from(value.toISOString().replace("T", " ")
-        .replace("Z", ""));
+      return Temporal.PlainDateTime.from(
+        value.toISOString().replace("T", " ").replace("Z", "")
+      );
     }
     return value;
   }
 
-  async validateValue() {
-  }
+  async validateValue() {}
 }

@@ -27,12 +27,11 @@ export default class TimeDataType extends DataType {
       return Temporal.PlainTime.from({
         hour: value.getUTCHours(),
         minute: value.getUTCMinutes(),
-        second: value.getUTCSeconds()
+        second: value.getUTCSeconds(),
       });
     }
     return value;
   }
 
-  async validateValue() {
-  }
+  async validateValue() {}
 }

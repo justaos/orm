@@ -6,7 +6,7 @@ export default function () {
     username: "postgres",
     password: "postgres",
     hostname: "localhost",
-    port: 5432
+    port: 5432,
   };
   return new ORM(config);
 }

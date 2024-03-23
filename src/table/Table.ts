@@ -1,5 +1,10 @@
 import { Logger, UUID } from "../../deps.ts";
-import { DatabaseOperationContext, DatabaseOperationType, DatabaseOperationWhen, RawRecord } from "../types.ts";
+import {
+  DatabaseOperationContext,
+  DatabaseOperationType,
+  DatabaseOperationWhen,
+  RawRecord,
+} from "../types.ts";
 import Record from "../record/Record.ts";
 import TableSchema from "./TableSchema.ts";
 import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
@@ -7,7 +12,6 @@ import Query from "../query/Query.ts";
 import { logSQLQuery } from "../utils.ts";
 import TableNameUtils from "./TableNameUtils.ts";
 import { OrderByDirectionType, OrderByType } from "./query/OrderByType.ts";
-import SelectQuery from "../query/SelectQuery.ts";
 
 export default class Table {
   readonly #schema: TableSchema;
@@ -90,8 +94,10 @@ export default class Table {
     return this;
   }
 
-  orderBy(columnNameOrOrderList?: string | OrderByType[],
-          direction?: OrderByDirectionType): Table {
+  orderBy(
+    columnNameOrOrderList?: string | OrderByType[],
+    direction?: OrderByDirectionType
+  ): Table {
     this.#queryBuilder.orderBy(columnNameOrOrderList, direction);
     return this;
   }
@@ -107,7 +113,9 @@ export default class Table {
     }
 
     logSQLQuery(this.#logger, this.#queryBuilder.getCountSQLQuery());
-    const [row] = await this.#queryBuilder.execute(this.#queryBuilder.getCountSQLQuery());
+    const [row] = await this.#queryBuilder.execute(
+      this.#queryBuilder.getCountSQLQuery()
+    );
     return parseInt(row.count, 10);
   }
 
@@ -124,7 +132,7 @@ export default class Table {
     return async function* () {
       for await (const [row] of cursor) {
         const [record] = await table.intercept("SELECT", "AFTER", [
-          table.convertRawRecordToRecord(row)
+          table.convertRawRecordToRecord(row),
         ]);
         yield record;
       }
@@ -142,7 +150,7 @@ export default class Table {
 
     for (const row of rawRecords) {
       const [record] = await this.intercept("SELECT", "AFTER", [
-        this.convertRawRecordToRecord(row)
+        this.convertRawRecordToRecord(row),
       ]);
       records.push(record);
     }
@@ -154,22 +162,31 @@ export default class Table {
   }
 
   /*
-    * Get record by id
-    * @param idOrColumnNameOrFilter Id or column name or filter
-    * @param value Value
-    * @returns Record
-    *
-    * @example
-    * const record = await table.getRecord('id', '123');
-    * const record = await table.getRecord('123');
-    * const record = await table.getRecord({id: '123'});
-    * const record = await table.getRecord({id: '123', name: 'test'});
+   * Get record by id
+   * @param idOrColumnNameOrFilter Id or column name or filter
+   * @param value Value
+   * @returns Record
+   *
+   * @example
+   * const record = await table.getRecord('id', '123');
+   * const record = await table.getRecord('123');
+   * const record = await table.getRecord({id: '123'});
+   * const record = await table.getRecord({id: '123', name: 'test'});
    */
-  async getRecord(idOrColumnNameOrFilter: UUID | string | {
-    [key: string]: any
-  }, value?: any): Promise<Record | undefined> {
+  async getRecord(
+    idOrColumnNameOrFilter:
+      | UUID
+      | string
+      | {
+          [key: string]: any;
+        },
+    value?: any
+  ): Promise<Record | undefined> {
     this.select();
-    if (typeof idOrColumnNameOrFilter == "string" && typeof value === "undefined") {
+    if (
+      typeof idOrColumnNameOrFilter == "string" &&
+      typeof value === "undefined"
+    ) {
       this.#queryBuilder.where("id", idOrColumnNameOrFilter);
     } else if (typeof idOrColumnNameOrFilter == "object") {
       Object.keys(idOrColumnNameOrFilter).forEach((key) => {
@@ -201,13 +218,21 @@ export default class Table {
 
   async disableAllTriggers() {
     const reserve = await this.#sql.reserve();
-    await reserve.unsafe(`ALTER TABLE ${TableNameUtils.getFullFormTableName(this.getName())} DISABLE TRIGGER ALL`);
+    await reserve.unsafe(
+      `ALTER TABLE ${TableNameUtils.getFullFormTableName(
+        this.getName()
+      )} DISABLE TRIGGER ALL`
+    );
     await reserve.release();
   }
 
   async enableAllTriggers() {
     const reserve = await this.#sql.reserve();
-    await reserve.unsafe(`ALTER TABLE ${TableNameUtils.getFullFormTableName(this.getName())} ENABLE TRIGGER ALL`);
+    await reserve.unsafe(
+      `ALTER TABLE ${TableNameUtils.getFullFormTableName(
+        this.getName()
+      )} ENABLE TRIGGER ALL`
+    );
     await reserve.release();
   }
 

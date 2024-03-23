@@ -2,7 +2,7 @@ import {
   DatabaseOperationContext,
   DataType,
   NATIVE_DATA_TYPES,
-  RawRecord
+  RawRecord,
 } from "../mod.ts";
 import getORM from "./getORM.ts";
 import TableSchema from "../src/table/TableSchema.ts";
@@ -69,29 +69,29 @@ try {
     columns: [
       {
         name: "name",
-        type: "string"
+        type: "string",
       },
       {
         name: "personal_contact",
-        type: "email"
+        type: "email",
       },
       {
         name: "emp_no",
-        type: "uuid"
+        type: "uuid",
       },
       {
         name: "salary",
-        type: "integer"
+        type: "integer",
       },
       {
         name: "birth_date",
-        type: "date"
+        type: "date",
       },
       {
         name: "gender",
-        type: "boolean"
-      }
-    ]
+        type: "boolean",
+      },
+    ],
   });
 
   const studentTable = conn.table("student");

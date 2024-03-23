@@ -1,6 +1,5 @@
 import { SimpleCondition } from "../types.ts";
 
-
 export class QueryExpression {
   type: "SIMPLE" | "COMPOUND";
   condition?: SimpleCondition;
@@ -9,27 +8,31 @@ export class QueryExpression {
 
   expressions: QueryExpression[] = [];
 
-  constructor(type: "SIMPLE" | "COMPOUND", condition?: {
-    column: string | number | boolean,
-    operator: any,
-    value?: any
-  }) {
+  constructor(
+    type: "SIMPLE" | "COMPOUND",
+    condition?: {
+      column: string | number | boolean;
+      operator: any;
+      value?: any;
+    }
+  ) {
     this.type = type;
     if (type == "SIMPLE" && condition) {
-      this.condition = <SimpleCondition>this.#buildSimpleCondition(condition.column, condition.operator, condition.value);
+      this.condition = <SimpleCondition>(
+        this.#buildSimpleCondition(
+          condition.column,
+          condition.operator,
+          condition.value
+        )
+      );
     }
   }
 
-  orWhere(column: string | number | boolean,
-          operator: any,
-          value?: any) {
-
-    if (!this.compoundOperator)
-      this.compoundOperator = "OR";
+  orWhere(column: string | number | boolean, operator: any, value?: any) {
+    if (!this.compoundOperator) this.compoundOperator = "OR";
 
     if (this.compoundOperator === "AND")
       throw new Error("Cannot use 'OR' on top of 'AND'");
-
 
     if (this.type == "SIMPLE") {
       this.type = "COMPOUND";
@@ -40,17 +43,17 @@ export class QueryExpression {
       this.condition = undefined;
     }
 
-    const expression = new QueryExpression("SIMPLE", { column, operator, value });
+    const expression = new QueryExpression("SIMPLE", {
+      column,
+      operator,
+      value,
+    });
     this.expressions.push(expression);
     return expression;
   }
 
-  andWhere(column: string | number | boolean,
-           operator: any,
-           value?: any) {
-
-    if (!this.compoundOperator)
-      this.compoundOperator = "AND";
+  andWhere(column: string | number | boolean, operator: any, value?: any) {
+    if (!this.compoundOperator) this.compoundOperator = "AND";
 
     if (this.compoundOperator === "OR")
       throw new Error("Cannot use 'AND' on top of 'OR'");
@@ -64,17 +67,23 @@ export class QueryExpression {
       this.condition = undefined;
     }
 
-    const expression = new QueryExpression("SIMPLE", { column, operator, value });
+    const expression = new QueryExpression("SIMPLE", {
+      column,
+      operator,
+      value,
+    });
     this.expressions.push(expression);
     return expression;
   }
 
-  #buildSimpleCondition(column: string | number | boolean,
-                        operator: any,
-                        value?: any): {
-    column: string | number,
-    operator: string,
-    value: any
+  #buildSimpleCondition(
+    column: string | number | boolean,
+    operator: any,
+    value?: any
+  ): {
+    column: string | number;
+    operator: string;
+    value: any;
   } {
     // Support "where true || where false"
     if (column === false || column === true) {
@@ -88,9 +97,9 @@ export class QueryExpression {
     }
 
     return {
-      column, operator, value
+      column,
+      operator,
+      value,
     };
   }
-
-
 }

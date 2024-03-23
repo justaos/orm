@@ -42,8 +42,7 @@ export default class Record {
       .map((field: ColumnSchema) => {
         if (typeof field.getDefaultValue() === "undefined")
           this.set(field.getName(), null);
-        else
-          this.set(field.getName(), field.getDefaultValue());
+        else this.set(field.getName(), field.getDefaultValue());
       });
     this.#record["id"] = CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
@@ -115,7 +114,7 @@ export default class Record {
     }
 
     [record] = await this.#table.intercept("INSERT", "AFTER", [
-      new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord)
+      new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord),
     ]);
     this.#record = record.toJSON();
     this.#isNew = false;
@@ -129,9 +128,11 @@ export default class Record {
     await this.#validateRecord(recordJson);
     this.#queryBuilder.update();
     this.#queryBuilder.into(this.#table.getName());
-    this.#queryBuilder.columns(this.#table.getColumnNames().filter((col) => {
-      return col !== "id";
-    }));
+    this.#queryBuilder.columns(
+      this.#table.getColumnNames().filter((col) => {
+        return col !== "id";
+      })
+    );
     this.#queryBuilder.where("id", record.getID());
     this.#queryBuilder.value(recordJson);
     this.#queryBuilder.returning("*");
@@ -152,7 +153,7 @@ export default class Record {
     }
 
     [record] = await this.#table.intercept("UPDATE", "AFTER", [
-      new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord)
+      new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord),
     ]);
     this.#record = record.toJSON();
     return this;

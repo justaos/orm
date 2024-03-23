@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Deno: eg-4-inheritance.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/examples/eg-4-inheritance.ts" programParameters="run -A" workingDirectory="$PROJECT_DIR$/examples">
-    <method v="2" />
+    <method v="2"/>
   </configuration>
 </component>

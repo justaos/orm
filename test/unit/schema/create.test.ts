@@ -4,17 +4,17 @@ import {
   assertEquals,
   beforeAll,
   describe,
-  it
+  it,
 } from "../../test.deps.ts";
 
 import { Session } from "../../test.utils.ts";
-import { ORMConnection, ORMError, ORM } from "../../../mod.ts";
+import { ORM, ORMConnection, ORMError } from "../../../mod.ts";
 
 describe(
   "TableCreate",
   {
     sanitizeResources: false,
-    sanitizeOps: false
+    sanitizeOps: false,
   },
   () => {
     let conn: ORMConnection;
@@ -54,17 +54,17 @@ describe(
           columns: [
             {
               name: "name",
-              type: "string"
+              type: "string",
             },
             {
               name: "dob",
-              type: "date"
+              type: "date",
             },
             {
               name: "gender",
-              type: "boolean"
-            }
-          ]
+              type: "boolean",
+            },
+          ],
         });
         cleanTableList.push("person");
       } catch (_error) {
@@ -81,21 +81,21 @@ describe(
           columns: [
             {
               name: "name",
-              type: "string"
+              type: "string",
             },
             {
               name: "dob",
-              type: "date"
+              type: "date",
             },
             {
               name: "gender",
-              type: "boolean"
+              type: "boolean",
             },
             {
               name: "color",
-              type: "string"
-            }
-          ]
+              type: "string",
+            },
+          ],
         });
       } catch (_error) {
         assert(false, "Table has not been created");
@@ -110,9 +110,9 @@ describe(
           columns: [
             {
               name: "unknown",
-              type: "unknown"
-            }
-          ]
+              type: "unknown",
+            },
+          ],
         });
       } catch (_e) {
         assert(true, "Table not create as expected");
@@ -130,13 +130,13 @@ describe(
           columns: [
             {
               name: "name",
-              type: "integer"
+              type: "integer",
             },
             {
               name: "employee_id",
-              type: "integer"
-            }
-          ]
+              type: "integer",
+            },
+          ],
         });
       } catch (_error) {
         assertValue = true;
@@ -156,9 +156,9 @@ describe(
         columns: [
           {
             name: "employee_id",
-            type: "integer"
-          }
-        ]
+            type: "integer",
+          },
+        ],
       });
       assert(true, "Table should get extended");
     });
@@ -172,9 +172,9 @@ describe(
           columns: [
             {
               name: "address",
-              type: "string"
-            }
-          ]
+              type: "string",
+            },
+          ],
         });
       } catch (_error) {
         assertValue = true;

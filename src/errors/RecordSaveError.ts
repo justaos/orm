@@ -1,6 +1,6 @@
 import {
   FieldValidationError,
-  FieldValidationErrorObject
+  FieldValidationErrorObject,
 } from "./FieldValidationError.ts";
 import { TableDefinition } from "../types.ts";
 
@@ -26,7 +26,9 @@ export class RecordSaveError extends Error {
     message?: string
   ) {
     super(
-      `Record validation error in table ${tableDefinition.name} with id ${recordId}. ${message || JSON.stringify(fieldErrors)}`
+      `Record validation error in table ${
+        tableDefinition.name
+      } with id ${recordId}. ${message || JSON.stringify(fieldErrors)}`
     );
     this.name = "RecordValidationError";
     this.#tableDefinition = tableDefinition;
@@ -41,7 +43,7 @@ export class RecordSaveError extends Error {
       recordId: this.#recordId,
       fieldErrors: this.#fieldErrors.map((fieldError: FieldValidationError) => {
         return fieldError.toJSON();
-      })
+      }),
     };
   }
 }

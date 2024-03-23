@@ -19,13 +19,16 @@ class Session {
     forceNewConnection: boolean = false
   ): Promise<ORMConnection> {
     if (!this.#odm) {
-      this.#odm = new ORM({
-        hostname: Deno.env.get("POSTGRES_HOST") || "127.0.0.1",
-        port: 5432,
-        username: "postgres",
-        password: "postgres",
-        database: "odm-test-db"
-      }, logger);
+      this.#odm = new ORM(
+        {
+          hostname: Deno.env.get("POSTGRES_HOST") || "127.0.0.1",
+          port: 5432,
+          username: "postgres",
+          password: "postgres",
+          database: "odm-test-db",
+        },
+        logger
+      );
     }
 
     if (forceNewConnection || !this.#odmConnection) {

@@ -3,7 +3,7 @@ import {
   assertStrictEquals,
   beforeAll,
   describe,
-  it
+  it,
 } from "../../test.deps.ts";
 
 import { Session } from "../../test.utils.ts";
@@ -13,7 +13,7 @@ describe(
   "SELECT Query",
   {
     sanitizeResources: false,
-    sanitizeOps: false
+    sanitizeOps: false,
   },
   () => {
     let conn: ORMConnection;
@@ -26,29 +26,29 @@ describe(
         columns: [
           {
             name: "description",
-            type: "string"
+            type: "string",
           },
           {
             name: "state",
             type: "string",
-            default: "new"
+            default: "new",
           },
           {
             name: "priority",
             type: "integer",
-            default: 0
+            default: 0,
           },
           {
             name: "order",
             type: "integer",
-            default: 100
+            default: 100,
           },
           {
             name: "active",
             type: "boolean",
-            default: true
-          }
-        ]
+            default: true,
+          },
+        ],
       });
       const taskTable = conn.table("task");
       for (let i = 0; i < 10; i++) {
@@ -123,7 +123,7 @@ describe(
 
     it("#select - group by", async () => {
       const taskQuery = conn.query();
-      taskQuery.select("priority","count(*)::int as count");
+      taskQuery.select("priority", "count(*)::int as count");
       taskQuery.from("task");
       taskQuery.groupBy("priority");
       taskQuery.orderBy("count", "ASC");

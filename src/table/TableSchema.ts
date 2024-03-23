@@ -1,5 +1,9 @@
 import { CommonUtils } from "../../deps.ts";
-import { ColumnDefinition, TableDefinition, TableDefinitionRaw } from "../types.ts";
+import {
+  ColumnDefinition,
+  TableDefinition,
+  TableDefinitionRaw,
+} from "../types.ts";
 import Registry from "../core/Registry.ts";
 import ColumnSchema from "./ColumnSchema.ts";
 import DataType from "../data-types/DataType.ts";
@@ -29,11 +33,13 @@ export default class TableSchema {
       final: false,
       columns: [],
       schema: "public",
-      ...tableDefinition
+      ...tableDefinition,
     };
 
     if (tableDefinition.inherits) {
-      tableDefinition.inherits = TableNameUtils.getShortFormTableName(tableDefinition.inherits);
+      tableDefinition.inherits = TableNameUtils.getShortFormTableName(
+        tableDefinition.inherits
+      );
     }
 
     if (tableDefinition.columns) {
@@ -57,7 +63,9 @@ export default class TableSchema {
   }
 
   getName(): string {
-    return TableNameUtils.getShortFormTableName(`${this.#definition.schema}.${this.#definition.name}`);
+    return TableNameUtils.getShortFormTableName(
+      `${this.#definition.schema}.${this.#definition.name}`
+    );
   }
 
   getTableName(): string {
@@ -82,9 +90,9 @@ export default class TableSchema {
       ...this.#definition,
       columns: this.#definition.columns?.map((column: ColumnDefinition) => {
         return {
-          ...column
+          ...column,
         };
-      })
+      }),
     };
   }
 
@@ -122,13 +130,13 @@ export default class TableSchema {
           name: "id",
           type: "uuid",
           not_null: true,
-          unique: true
+          unique: true,
         }),
         new ColumnSchema(this, {
           name: "_table",
           type: "string",
           not_null: true,
-          unique: false
+          unique: false,
         })
       );
     }
@@ -145,7 +153,9 @@ export default class TableSchema {
 
     const extendsTableName = this.getInherits();
     if (
-      extendsTableName && this.#tableDefinitionRegistry.has(extendsTableName)) {
+      extendsTableName &&
+      this.#tableDefinitionRegistry.has(extendsTableName)
+    ) {
       const extendedSchema = this.#getTableSchema(extendsTableName);
       allFields.push(...extendedSchema.getColumnSchemas());
     }
@@ -183,7 +193,6 @@ export default class TableSchema {
      */
     const extendsTableName = this.getInherits();
     if (typeof extendsTableName === "string") {
-
       if (!this.#tableDefinitionRegistry.has(extendsTableName)) {
         errorMessages.push(
           `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' does not exists.`

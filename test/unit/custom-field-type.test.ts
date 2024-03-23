@@ -2,15 +2,12 @@ import { afterAll, assert, beforeAll, describe, it } from "../test.deps.ts";
 
 import { ColumnDefinition, DataType, ORM, ORMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
-import { LoggerUtils } from "../../deps.ts";
-
-
 
 describe(
   "custom-field-type",
   {
     sanitizeResources: false,
-    sanitizeOps: false
+    sanitizeOps: false,
   },
   () => {
     let odm: ORM;
@@ -36,7 +33,7 @@ describe(
       await conn.closeConnection();
     });
 
-    it("#addDataType - Registering Custom data type", async function() {
+    it("#addDataType - Registering Custom data type", async function () {
       class EmailType extends DataType {
         constructor() {
           super("email", "VARCHAR");
@@ -73,13 +70,13 @@ describe(
           columns: [
             {
               name: "name",
-              type: "string"
+              type: "string",
             },
             {
               name: EMAIL_FIELD,
-              type: EMAIL_TYPE
-            }
-          ]
+              type: EMAIL_TYPE,
+            },
+          ],
         });
         cleanTableList.push(MODEL_NAME);
         assert(true, "Custom field defined as expected");
@@ -122,7 +119,7 @@ describe(
       assert(error, "Able to create, invalid value");
     });
 
-    it("#registerFieldType - trying create invalid field", async function() {
+    it("#registerFieldType - trying create invalid field", async function () {
       let error = false;
       try {
         await conn.defineTable({
@@ -130,13 +127,13 @@ describe(
           columns: [
             {
               name: "name",
-              type: "string"
+              type: "string",
             },
             {
               name: "custom_field",
-              type: "invalid_field_type"
-            }
-          ]
+              type: "invalid_field_type",
+            },
+          ],
         });
       } catch (_err) {
         // No need to do anything

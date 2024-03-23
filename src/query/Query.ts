@@ -5,12 +5,21 @@ import { ColumnDefinitionNative, CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
 import UpdateQuery from "./UpdateQuery.ts";
 import { AlterQuery } from "./AlterQuery.ts";
-import { OrderByDirectionType, OrderByType } from "../table/query/OrderByType.ts";
+import {
+  OrderByDirectionType,
+  OrderByType,
+} from "../table/query/OrderByType.ts";
 
 export default class Query {
   readonly #sql: any;
 
-  #query?: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery | AlterQuery;
+  #query?:
+    | SelectQuery
+    | DeleteQuery
+    | CreateQuery
+    | InsertQuery
+    | UpdateQuery
+    | AlterQuery;
 
   constructor(sql: any) {
     this.#sql = sql;
@@ -24,7 +33,16 @@ export default class Query {
     return <SelectQuery>this.#query;
   }
 
-  setQuery(query: SelectQuery | DeleteQuery | CreateQuery | InsertQuery | UpdateQuery | AlterQuery | undefined) {
+  setQuery(
+    query:
+      | SelectQuery
+      | DeleteQuery
+      | CreateQuery
+      | InsertQuery
+      | UpdateQuery
+      | AlterQuery
+      | undefined
+  ) {
     this.#query = query;
   }
 
@@ -158,8 +176,10 @@ export default class Query {
     return this;
   }
 
-  orderBy(columnNameOrOrderList?: string | OrderByType[],
-          direction?: OrderByDirectionType): Query {
+  orderBy(
+    columnNameOrOrderList?: string | OrderByType[],
+    direction?: OrderByDirectionType
+  ): Query {
     const query = <SelectQuery>this.#getQuery();
     query.orderBy(columnNameOrOrderList, direction);
     return this;

@@ -3,7 +3,7 @@ import {
   assertStrictEquals,
   beforeAll,
   describe,
-  it
+  it,
 } from "../../test.deps.ts";
 
 import {
@@ -11,7 +11,7 @@ import {
   DatabaseOperationWhen,
   ORM,
   ORMConnection,
-  Record
+  Record,
 } from "../../../mod.ts";
 import { logger, Session } from "../../test.utils.ts";
 import DatabaseOperationInterceptor from "../../../src/operation-interceptor/DatabaseOperationInterceptor.ts";
@@ -75,13 +75,13 @@ describe({
         columns: [
           {
             name: "name",
-            type: "string"
+            type: "string",
           },
           {
             name: "computed",
-            type: "string"
-          }
-        ]
+            type: "string",
+          },
+        ],
       });
       cleanTableList.push(INTERCEPT_TEST_MODEL);
 
@@ -99,5 +99,5 @@ describe({
         logger.info(err.message + "");
       }
     });
-  }
+  },
 });

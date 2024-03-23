@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Deno: database-connection.test.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/test/unit/connection/database-connection.test.ts" programParameters="test -A" workingDirectory="$PROJECT_DIR$/test/unit/connection">
-    <method v="2" />
+    <method v="2"/>
   </configuration>
 </component>

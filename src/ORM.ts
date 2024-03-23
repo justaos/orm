@@ -1,4 +1,7 @@
-import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
+import {
+  DatabaseConfiguration,
+  DatabaseConnection,
+} from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
 import DataType from "./data-types/DataType.ts";
 
@@ -46,13 +49,15 @@ export default class ORM {
   readonly #logger: Logger;
   readonly #config: DatabaseConfiguration;
   readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
-    function(dataType): string {
+    function (dataType): string {
       return dataType.getName();
     }
   );
   readonly #tableDefinitionRegistry: Registry<TableDefinition> =
-    new Registry<TableDefinition>(function(tableDefinition) {
-      return TableNameUtils.getShortFormTableName(`${tableDefinition.schema}.${tableDefinition.name}`);
+    new Registry<TableDefinition>(function (tableDefinition) {
+      return TableNameUtils.getShortFormTableName(
+        `${tableDefinition.schema}.${tableDefinition.name}`
+      );
     });
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
   readonly #operationInterceptorService =
@@ -95,7 +100,7 @@ export default class ORM {
       ) {
         const tempConn = new DatabaseConnection({
           ...this.#config,
-          database: "postgres"
+          database: "postgres",
         });
         await tempConn.connect();
         await tempConn.createDatabase(this.#config.database);
@@ -110,10 +115,9 @@ export default class ORM {
   async isDatabaseExist(): Promise<boolean> {
     const tempConn = new DatabaseConnection({
       ...this.#config,
-      database: "postgres"
+      database: "postgres",
     });
-    if (!this.#config.database)
-      throw new Error("database name not provided");
+    if (!this.#config.database) throw new Error("database name not provided");
     await tempConn.connect();
     const result = await tempConn.isDatabaseExist(this.#config.database);
     await tempConn.closeConnection();
