@@ -14,31 +14,37 @@ export class QueryExpression {
       column: string | number | boolean;
       operator: any;
       value?: any;
-    }
+    },
   ) {
     this.type = type;
     if (type == "SIMPLE" && condition) {
-      this.condition = <SimpleCondition>(
+      this.condition = <SimpleCondition> (
         this.#buildSimpleCondition(
           condition.column,
           condition.operator,
-          condition.value
+          condition.value,
         )
       );
     }
   }
 
-  orWhere(column: string | number | boolean, operator: any, value?: any) {
+  orWhere(
+    column: string | number | boolean,
+    operator: any,
+    value?: any,
+  ): QueryExpression {
     if (!this.compoundOperator) this.compoundOperator = "OR";
 
-    if (this.compoundOperator === "AND")
+    if (this.compoundOperator === "AND") {
       throw new Error("Cannot use 'OR' on top of 'AND'");
+    }
 
     if (this.type == "SIMPLE") {
       this.type = "COMPOUND";
-      if (!this.condition)
+      if (!this.condition) {
         throw new Error("condition should be present on simple");
-      const expression = new QueryExpression("SIMPLE", <any>this.condition);
+      }
+      const expression = new QueryExpression("SIMPLE", <any> this.condition);
       this.expressions.push(expression);
       this.condition = undefined;
     }
@@ -52,16 +58,22 @@ export class QueryExpression {
     return expression;
   }
 
-  andWhere(column: string | number | boolean, operator: any, value?: any) {
+  andWhere(
+    column: string | number | boolean,
+    operator: any,
+    value?: any,
+  ): QueryExpression {
     if (!this.compoundOperator) this.compoundOperator = "AND";
 
-    if (this.compoundOperator === "OR")
+    if (this.compoundOperator === "OR") {
       throw new Error("Cannot use 'AND' on top of 'OR'");
+    }
 
     if (this.type == "SIMPLE") {
       this.type = "COMPOUND";
-      if (!this.condition)
+      if (!this.condition) {
         throw new Error("condition should be present on simple");
+      }
       const expression = new QueryExpression("SIMPLE", this.condition);
       this.expressions.push(expression);
       this.condition = undefined;
@@ -79,7 +91,7 @@ export class QueryExpression {
   #buildSimpleCondition(
     column: string | number | boolean,
     operator: any,
-    value?: any
+    value?: any,
   ): {
     column: string | number;
     operator: string;

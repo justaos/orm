@@ -23,6 +23,6 @@ export default abstract class DatabaseOperationInterceptor {
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],
-    context?: DatabaseOperationContext
+    context?: DatabaseOperationContext,
   ): Promise<Record[]>;
 }

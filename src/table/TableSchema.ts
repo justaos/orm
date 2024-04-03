@@ -21,7 +21,7 @@ export default class TableSchema {
   constructor(
     tableDefinition: TableDefinitionRaw,
     fieldTypeRegistry: Registry<DataType>,
-    tableDefinitionRegistry: Registry<TableDefinition>
+    tableDefinitionRegistry: Registry<TableDefinition>,
   ) {
     this.#fieldTypeRegistry = fieldTypeRegistry;
     this.#tableDefinitionRegistry = tableDefinitionRegistry;
@@ -38,19 +38,19 @@ export default class TableSchema {
 
     if (tableDefinition.inherits) {
       tableDefinition.inherits = TableNameUtils.getShortFormTableName(
-        tableDefinition.inherits
+        tableDefinition.inherits,
       );
     }
 
     if (tableDefinition.columns) {
       for (let i = 0; i < tableDefinition.columns.length; i++) {
         tableDefinition.columns[i] = ColumnSchema.setDefaults(
-          tableDefinition.columns[i]
+          tableDefinition.columns[i],
         );
       }
     }
 
-    return <TableDefinition>tableDefinition;
+    return <TableDefinition> tableDefinition;
   }
 
   static getTableName(fullName: string): string {
@@ -64,7 +64,7 @@ export default class TableSchema {
 
   getName(): string {
     return TableNameUtils.getShortFormTableName(
-      `${this.#definition.schema}.${this.#definition.name}`
+      `${this.#definition.schema}.${this.#definition.name}`,
     );
   }
 
@@ -101,7 +101,7 @@ export default class TableSchema {
     const extendsTableName = this.getInherits();
     if (extendsTableName) {
       extendedTables = extendedTables.concat(
-        this.#getTableSchema(extendsTableName).getExtendedTables()
+        this.#getTableSchema(extendsTableName).getExtendedTables(),
       );
     }
     return extendedTables;
@@ -137,13 +137,13 @@ export default class TableSchema {
           type: "string",
           not_null: true,
           unique: false,
-        })
+        }),
       );
     }
     columns.push(
       ...this.#definition.columns.map((column: ColumnDefinition) => {
         return new ColumnSchema(this, column);
-      })
+      }),
     );
     return columns;
   }
@@ -195,13 +195,13 @@ export default class TableSchema {
     if (typeof extendsTableName === "string") {
       if (!this.#tableDefinitionRegistry.has(extendsTableName)) {
         errorMessages.push(
-          `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' does not exists.`
+          `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' does not exists.`,
         );
       } else {
         const extendsCol: TableSchema = this.#getTableSchema(extendsTableName);
         if (extendsCol.isFinal()) {
           errorMessages.push(
-            `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' is final table schema.`
+            `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' is final table schema.`,
           );
         }
       }
@@ -230,12 +230,13 @@ export default class TableSchema {
 
   #getTableSchema(tableName: string): TableSchema {
     const schema = this.#tableDefinitionRegistry.get(tableName);
-    if (!schema)
+    if (!schema) {
       throw Error(`[Schema::_getSchema] Schema not found :: ${tableName}`);
+    }
     return new TableSchema(
       schema,
       this.#fieldTypeRegistry,
-      this.#tableDefinitionRegistry
+      this.#tableDefinitionRegistry,
     );
   }
 }

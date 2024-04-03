@@ -40,7 +40,7 @@ export default class DatabaseConnection {
       });
       await this.#sql`select 1`;
       this.#logger.info(
-        `Connected to ${this.#config.database} database successfully`
+        `Connected to ${this.#config.database} database successfully`,
       );
     } catch (err) {
       if (this.#sql) await this.#sql.end();
@@ -53,7 +53,7 @@ export default class DatabaseConnection {
     if (!this.#sql) {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
-        `Database connection not established`
+        `Database connection not established`,
       );
     }
     return this.#sql;
@@ -67,25 +67,30 @@ export default class DatabaseConnection {
     if (!databaseName) throw new Error(`No database name provided to check.`);
     const reserve = await this.#sql.reserve();
     const [output] =
-      await reserve`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`.execute();
+      await reserve`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`
+        .execute();
     await reserve.release();
     return output.exists;
   }
 
   async createDatabase(databaseName: string): Promise<any> {
     if (!databaseName) throw new Error(`No database name provided to create.`);
-    const output = await this.getNativeConnection()`CREATE DATABASE ${this.#sql(
-      databaseName
-    )}`;
+    const output = await this.getNativeConnection()`CREATE DATABASE ${
+      this.#sql(
+        databaseName,
+      )
+    }`;
     this.#logger.info(`Database ${databaseName} created successfully`);
     return output;
   }
 
   async dropDatabase(databaseName: string): Promise<any> {
     if (!databaseName) throw new Error(`No database name provided to drop.`);
-    const output = await this.getNativeConnection()`DROP DATABASE ${this.#sql(
-      databaseName
-    )}`;
+    const output = await this.getNativeConnection()`DROP DATABASE ${
+      this.#sql(
+        databaseName,
+      )
+    }`;
     this.#logger.info(`Database ${databaseName} dropped successfully`);
     return output;
   }

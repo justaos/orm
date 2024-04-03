@@ -7,7 +7,7 @@ export function Table() {
     }
     if (!Array.isArray(target.__tableDefinition.columns)) {
       target.__tableDefinition.columns = Object.keys(
-        target.__tableDefinition.columns
+        target.__tableDefinition.columns,
       ).map((key) => {
         return {
           name: key,

@@ -23,7 +23,7 @@ export default class Record {
     queryBuilder: Query,
     table: Table,
     logger: Logger,
-    record?: RawRecord
+    record?: RawRecord,
   ) {
     this.#queryBuilder = queryBuilder;
     this.#logger = logger;
@@ -40,9 +40,9 @@ export default class Record {
       .getTableSchema()
       .getColumnSchemas()
       .map((field: ColumnSchema) => {
-        if (typeof field.getDefaultValue() === "undefined")
+        if (typeof field.getDefaultValue() === "undefined") {
           this.set(field.getName(), null);
-        else this.set(field.getName(), field.getDefaultValue());
+        } else this.set(field.getName(), field.getDefaultValue());
       });
     this.#record["id"] = CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
@@ -82,8 +82,9 @@ export default class Record {
     const record = this.#getRawRecord();
     const schema = this.#table.getTableSchema();
     const dataType = schema.getColumnSchema(key)?.getColumnType();
-    if (dataType && typeof record[key] !== "undefined")
+    if (dataType && typeof record[key] !== "undefined") {
       return dataType.toJSONValue(record[key]);
+    }
     return null;
   }
 
@@ -109,7 +110,7 @@ export default class Record {
         this.#table.getTableSchema().getDefinition(),
         record.getID(),
         [],
-        err.message
+        err.message,
       );
     }
 
@@ -131,7 +132,7 @@ export default class Record {
     this.#queryBuilder.columns(
       this.#table.getColumnNames().filter((col) => {
         return col !== "id";
-      })
+      }),
     );
     this.#queryBuilder.where("id", record.getID());
     this.#queryBuilder.value(recordJson);
@@ -148,7 +149,7 @@ export default class Record {
         this.#table.getTableSchema().getDefinition(),
         record.getID(),
         [],
-        err.message
+        err.message,
       );
     }
 
@@ -163,7 +164,7 @@ export default class Record {
     if (this.#isNew) {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
-        "Cannot remove unsaved record"
+        "Cannot remove unsaved record",
       );
     }
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
@@ -182,7 +183,7 @@ export default class Record {
         this.#table.getTableSchema().getDefinition(),
         record.getID(),
         [],
-        err.message
+        err.message,
       );
     }
 
@@ -207,8 +208,9 @@ export default class Record {
   }
 
   #getRawRecord(): RawRecord {
-    if (typeof this.#record === "undefined")
+    if (typeof this.#record === "undefined") {
       throw new Error("Record not initialized");
+    }
     return this.#record;
   }
 
@@ -225,8 +227,8 @@ export default class Record {
           new FieldValidationError(
             columnSchema.getDefinition(),
             value,
-            err.message
-          )
+            err.message,
+          ),
         );
       }
     }
@@ -234,7 +236,7 @@ export default class Record {
       throw new RecordSaveError(
         tableSchema.getDefinition(),
         rawRecord.id,
-        fieldErrors
+        fieldErrors,
       );
     }
   }

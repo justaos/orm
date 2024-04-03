@@ -16,7 +16,7 @@ class Session {
   }
 
   static async getConnection(
-    forceNewConnection: boolean = false
+    forceNewConnection: boolean = false,
   ): Promise<ORMConnection> {
     if (!this.#odm) {
       this.#odm = new ORM(
@@ -27,7 +27,7 @@ class Session {
           password: "postgres",
           database: "odm-test-db",
         },
-        logger
+        logger,
       );
     }
 

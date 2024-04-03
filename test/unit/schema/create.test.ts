@@ -42,7 +42,7 @@ describe(
       } catch (error) {
         assert(
           error instanceof ORMError && error.code === "SCHEMA_VALIDATION_ERROR",
-          "Table should not exists"
+          "Table should not exists",
         );
       }
     });
@@ -143,7 +143,7 @@ describe(
       }
       assert(
         assertValue,
-        "Table should not get extended, with duplicate field names"
+        "Table should not get extended, with duplicate field names",
       );
     });
 
@@ -207,5 +207,5 @@ describe(
       }
       assert(assertValue);
     });
-  }
+  },
 );

@@ -1,6 +1,13 @@
 import { Logger } from "../deps.ts";
-import { DatabaseOperationContext, TableDefinition, TableDefinitionRaw } from "./types.ts";
-import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
+import {
+  DatabaseOperationContext,
+  TableDefinition,
+  TableDefinitionRaw,
+} from "./types.ts";
+import {
+  DatabaseConfiguration,
+  DatabaseConnection,
+} from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
 import TableSchema from "./table/TableSchema.ts";
 import DataType from "./data-types/DataType.ts";
@@ -30,7 +37,7 @@ export default class ORMConnection {
     dataTypeRegistry: Registry<DataType>,
     tableDefinitionRegistry: Registry<TableDefinition>,
     schemaRegistry: Map<string, null>,
-    operationInterceptorService: DatabaseOperationInterceptorService
+    operationInterceptorService: DatabaseOperationInterceptorService,
   ) {
     this.#orm = orm;
     this.#logger = logger;
@@ -59,9 +66,9 @@ export default class ORMConnection {
     const tempConn = new DatabaseConnection(
       {
         ...this.#config,
-        database: "postgres"
+        database: "postgres",
       },
-      this.#logger
+      this.#logger,
     );
     await tempConn.connect();
     const result = await tempConn.dropDatabase(databaseName);
@@ -81,7 +88,7 @@ export default class ORMConnection {
     const tableSchema = new TableSchema(
       tableDefinitionRaw,
       this.#dataTypeRegistry,
-      this.#tableDefinitionRegistry
+      this.#tableDefinitionRegistry,
     );
     try {
       tableSchema.validate();
@@ -100,9 +107,11 @@ export default class ORMConnection {
           LIMIT 1);`;
 
       if (!schemaExists) {
-        await reserved`CREATE SCHEMA IF NOT EXISTS ${sql(
-          tableSchema.getSchemaName()
-        )};`;
+        await reserved`CREATE SCHEMA IF NOT EXISTS ${
+          sql(
+            tableSchema.getSchemaName(),
+          )
+        };`;
         this.#logger.info(`Schema ${tableSchema.getSchemaName()} created`);
         this.#schemaRegistry.set(tableSchema.getSchemaName(), null);
       }
@@ -123,21 +132,23 @@ export default class ORMConnection {
             data_type: column.getColumnType().getNativeType(),
             not_null: column.isNotNull(),
             unique: column.isUnique(),
-            foreign_key: columnDefinition.foreign_key
+            foreign_key: columnDefinition.foreign_key,
           });
         }
         const inherits = tableSchema.getInherits();
-        if (inherits)
+        if (inherits) {
           createQuery.inherits(inherits);
+        }
         logSQLQuery(this.#logger, createQuery.getSQLQuery());
         await createQuery.execute();
       } else {
-        const columns =
-          await reserved`SELECT column_name
+        const columns = await reserved`SELECT column_name
                          FROM information_schema.columns
                          WHERE table_schema = ${tableSchema.getSchemaName()}
                            AND table_name = ${tableSchema.getTableName()};`;
-        const existingColumnNames = columns.map((column: { column_name: string }) => column.column_name);
+        const existingColumnNames = columns.map((
+          column: { column_name: string },
+        ) => column.column_name);
         const columnSchemas = tableSchema.getOwnColumnSchemas();
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
@@ -145,14 +156,15 @@ export default class ORMConnection {
           alterQuery.alter(tableSchema.getName());
           for (const column of tableSchema.getOwnColumnSchemas()) {
             const columnDefinition = column.getDefinition();
-            if (!existingColumnNames.includes(column.getName()))
+            if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
                 name: column.getName(),
                 data_type: column.getColumnType().getNativeType(),
                 not_null: column.isNotNull(),
                 unique: column.isUnique(),
-                foreign_key: columnDefinition.foreign_key
+                foreign_key: columnDefinition.foreign_key,
               });
+            }
           }
 
           logSQLQuery(this.#logger, alterQuery.getSQLQuery());
@@ -184,7 +196,7 @@ export default class ORMConnection {
     if (typeof tableSchema === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
-        `Table with name '${name}' is not defined`
+        `Table with name '${name}' is not defined`,
       );
     }
     const queryBuilder = new Query(this.#conn.getNativeConnection());
@@ -194,7 +206,7 @@ export default class ORMConnection {
       this.#operationInterceptorService,
       this.#logger,
       this.#conn.getNativeConnection(),
-      context
+      context,
     );
   }
 
@@ -206,7 +218,7 @@ export default class ORMConnection {
     if (!this.#conn) {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
-        "There is no active connection"
+        "There is no active connection",
       );
     }
     return this.#conn;

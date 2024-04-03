@@ -1,15 +1,12 @@
-name: Build
+name: Test
 
 on:
   push:
-    # Sequence of patterns matched against refs/heads
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
 
 jobs:
   build:
-    if: ${{startsWith(github.event.head_commit.message, 'WIP') != true}}
-
     services:
       postgres:
         image: postgres
@@ -28,36 +25,29 @@ jobs:
 
     strategy:
       matrix:
-        deno-version: [ 1.41.1 ]
+        os: [ macOS-latest, windows-latest, ubuntu-latest ]
+        deno: [ 1.41.1 ]
 
     steps:
-      - uses: actions/checkout@v1
-      - name: Use Deno ${{ matrix.deno-version }}
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
         uses: denolib/setup-deno@v2
         with:
-          deno-version: ${{ matrix.deno-version }}
-      - name: build and test
-        run: |
-          deno --version --unstable-temporal
-          deno task test
-          deno task coverage
+          deno-version: ${{ matrix.deno }}
+
+      - name: Test
+        run: deno task coverage
         env:
           CI: true
           # The hostname used to communicate with the PostgreSQL service container
           POSTGRES_HOST: localhost
           # The default PostgreSQL port
           POSTGRES_PORT: 5432
-      - name: Codecov
+
+      - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage/lcov.info
-
-  publish:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # The OIDC ID token is used for authentication with JSR.
-    steps:
-      - uses: actions/checkout@v4
-      - run: npx jsr publish
+          name: ${{ matrix.os }}-${{ matrix.deno }}
+          files: ./dist/coverage/lcov.info

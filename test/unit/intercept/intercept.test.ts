@@ -50,12 +50,12 @@ describe({
             tableName: string,
             operation: DatabaseOperationType,
             when: DatabaseOperationWhen,
-            records: Record[]
+            records: Record[],
           ) {
             if (tableName === INTERCEPT_TEST_MODEL) {
               if (operation === "INSERT") {
                 logger.info(
-                  `[tableName=${tableName}] [operation=${operation}] [when=${when}]`
+                  `[tableName=${tableName}] [operation=${operation}] [when=${when}]`,
                 );
                 if (when === "BEFORE") {
                   logger.info("before");
@@ -67,7 +67,7 @@ describe({
             }
             return records;
           }
-        })()
+        })(),
       );
 
       await conn.defineTable({
@@ -93,7 +93,7 @@ describe({
         assertStrictEquals(
           interceptRecord.get("computed"),
           "this is computed",
-          "read interceptor not computed the value"
+          "read interceptor not computed the value",
         );
       } catch (err) {
         logger.info(err.message + "");

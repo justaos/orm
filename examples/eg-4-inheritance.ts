@@ -8,9 +8,9 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 
 const animalTable = conn.table("animal");
@@ -25,9 +25,9 @@ await conn.defineTable({
   columns: [
     {
       name: "breed",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 
 const dogTable = conn.table("dog");

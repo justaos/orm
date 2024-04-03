@@ -52,7 +52,7 @@ export default class SelectQuery {
   where(
     column: string | number | boolean,
     operator: any,
-    value?: any
+    value?: any,
   ): QueryExpression {
     if (!this.#where) {
       this.#where = new QueryExpression("COMPOUND");
@@ -78,7 +78,7 @@ export default class SelectQuery {
    */
   orderBy(
     columnNameOrOrderList?: string | OrderByType[],
-    direction?: OrderByDirectionType
+    direction?: OrderByDirectionType,
   ): SelectQuery {
     if (typeof columnNameOrOrderList === "undefined") {
       return this;
@@ -137,16 +137,17 @@ export default class SelectQuery {
   }
 
   #prepareSimpleCondition(condition: QueryExpression): string {
-    if (!condition.condition)
+    if (!condition.condition) {
       throw new Error("Condition not defined for simple expression");
+    }
     if (Array.isArray(condition.condition.value)) {
-      return `"${condition.condition.column}" ${
-        condition.condition.operator
-      } (${condition.condition.value
-        .map((value: string) => {
-          return `'${value}'`;
-        })
-        .join(", ")})`;
+      return `"${condition.condition.column}" ${condition.condition.operator} (${
+        condition.condition.value
+          .map((value: string) => {
+            return `'${value}'`;
+          })
+          .join(", ")
+      })`;
     }
     return `"${condition.condition.column}" ${condition.condition.operator} '${condition.condition.value}'`;
   }
@@ -155,11 +156,11 @@ export default class SelectQuery {
     if (condition.expressions.length) {
       return condition.expressions
         .map((condition: any) => {
-          const expressCondition: QueryExpression = <QueryExpression>condition;
+          const expressCondition: QueryExpression = <QueryExpression> condition;
           if (expressCondition.type == "COMPOUND") {
             return this.#prepareExpressionCondition(expressCondition);
           } else {
-            return this.#prepareSimpleCondition(<QueryExpression>condition);
+            return this.#prepareSimpleCondition(<QueryExpression> condition);
           }
         })
         .join(` ${condition.compoundOperator} `);

@@ -3,19 +3,25 @@
   "version": "6.6.0",
   "exports": "./mod.ts",
   "tasks": {
-    "test:debug": "deno test --inspect-brk --allow-all --unstable test/init.test.ts test/unit/ test/end.test.ts",
-    "test": "deno test --coverage --allow-read --allow-env --allow-net --unstable-temporal",
-    "coverage": "deno coverage coverage/ --lcov > coverage/lcov.info",
-    "coverage:report": "deno coverage coverage/ --lcov > coverage/report.html"
+    "test:debug": "deno test --inspect-brk --allow-all --unstable",
+    "coverage": "deno task test --coverage=./dist/coverage && deno coverage --include=src --lcov ./dist/coverage > ./dist/coverage/lcov.info",
+    "test": "deno test --allow-read --allow-env --allow-net --unstable-temporal"
+  },
+  "exclude": [
+    ".run",
+    "dist"
+  ],
+  "publish": {
+    "exclude": [
+      ".github/",
+      "test/"
+    ]
   },
   "test": {
     "include": [
       "test/init.test.ts",
       "test/unit/",
       "test/end.test.ts"
-    ],
-    "exclude": [
-      "src/"
     ]
   },
   "imports": {

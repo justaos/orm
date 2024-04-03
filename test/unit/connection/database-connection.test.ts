@@ -75,7 +75,7 @@ describe({
       const conn = await DatabaseConnection.connect(defaultConfig);
       assert(
         await conn.isDatabaseExist("odm-created-database"),
-        "Database should exists"
+        "Database should exists",
       );
       await conn.closeConnection();
     });

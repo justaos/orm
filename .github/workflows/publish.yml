@@ -1,0 +1,37 @@
+name: Publish
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v1
+
+      - name: Publish (dry run)
+        if: github.event_name == 'push'
+        run: deno publish --dry-run
+
+      - name: Publish
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        run: deno publish
+
+      - name: Release to github
+        if: startsWith(github.event.ref, 'refs/tags/v') && contains(github.event.ref, '-pre') != true
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false

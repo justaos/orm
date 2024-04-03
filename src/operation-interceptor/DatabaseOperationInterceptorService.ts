@@ -13,16 +13,16 @@ export default class DatabaseOperationInterceptorService {
     this.#interceptors = new Map<string, DatabaseOperationInterceptor>();
   }
 
-  addInterceptor = (
-    operationInterceptor: DatabaseOperationInterceptor
-  ): void => {
+  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
     this.#interceptors.set(
       operationInterceptor.getName(),
       operationInterceptor
     );
-  };
+  }
 
-  deleteInterceptor = (name: string) => this.#interceptors.delete(name);
+  deleteInterceptor(name: string): void {
+    this.#interceptors.delete(name);
+  }
 
   hasInterceptors(): boolean {
     return this.#interceptors.size !== 0;

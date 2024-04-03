@@ -5,4 +5,4 @@ type OrderByType = {
   order: OrderByDirectionType;
 };
 
-export type { OrderByType, OrderByDirectionType };
+export type { OrderByDirectionType, OrderByType };

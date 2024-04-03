@@ -3,7 +3,7 @@ import { SqlString } from "../../deps.ts";
 
 export default class QueryUtils {
   static escapeValue(
-    value: JSONPrimitive | JSONArray | JSONObject | object
+    value: JSONPrimitive | JSONArray | JSONObject | object,
   ): string {
     if (typeof value === "number" || typeof value === "boolean") {
       return String(value);

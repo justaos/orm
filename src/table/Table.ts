@@ -30,7 +30,7 @@ export default class Table {
     operationInterceptorService: DatabaseOperationInterceptorService,
     logger: Logger,
     sql: any,
-    context?: DatabaseOperationContext
+    context?: DatabaseOperationContext,
   ) {
     this.#queryBuilder = queryBuilder;
     this.#operationInterceptorService = operationInterceptorService;
@@ -75,7 +75,7 @@ export default class Table {
     return this;
   }
 
-  getSelectedColumns() {
+  getSelectedColumns(): string[] {
     return this.#queryBuilder.getSelectedColumns();
   }
 
@@ -96,7 +96,7 @@ export default class Table {
 
   orderBy(
     columnNameOrOrderList?: string | OrderByType[],
-    direction?: OrderByDirectionType
+    direction?: OrderByDirectionType,
   ): Table {
     this.#queryBuilder.orderBy(columnNameOrOrderList, direction);
     return this;
@@ -114,7 +114,7 @@ export default class Table {
 
     logSQLQuery(this.#logger, this.#queryBuilder.getCountSQLQuery());
     const [row] = await this.#queryBuilder.execute(
-      this.#queryBuilder.getCountSQLQuery()
+      this.#queryBuilder.getCountSQLQuery(),
     );
     return parseInt(row.count, 10);
   }
@@ -178,9 +178,9 @@ export default class Table {
       | UUID
       | string
       | {
-          [key: string]: any;
-        },
-    value?: any
+        [key: string]: any;
+      },
+    value?: any,
   ): Promise<Record | undefined> {
     this.select();
     if (
@@ -219,9 +219,11 @@ export default class Table {
   async disableAllTriggers() {
     const reserve = await this.#sql.reserve();
     await reserve.unsafe(
-      `ALTER TABLE ${TableNameUtils.getFullFormTableName(
-        this.getName()
-      )} DISABLE TRIGGER ALL`
+      `ALTER TABLE ${
+        TableNameUtils.getFullFormTableName(
+          this.getName(),
+        )
+      } DISABLE TRIGGER ALL`,
     );
     await reserve.release();
   }
@@ -229,9 +231,11 @@ export default class Table {
   async enableAllTriggers() {
     const reserve = await this.#sql.reserve();
     await reserve.unsafe(
-      `ALTER TABLE ${TableNameUtils.getFullFormTableName(
-        this.getName()
-      )} ENABLE TRIGGER ALL`
+      `ALTER TABLE ${
+        TableNameUtils.getFullFormTableName(
+          this.getName(),
+        )
+      } ENABLE TRIGGER ALL`,
     );
     await reserve.release();
   }
@@ -324,7 +328,7 @@ export default class Table {
   async intercept(
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
-    records: Record[]
+    records: Record[],
   ): Promise<Record[]> {
     records = await this.#operationInterceptorService.intercept(
       this.getName(),
@@ -332,7 +336,7 @@ export default class Table {
       when,
       records,
       this.#context,
-      this.#disableIntercepts
+      this.#disableIntercepts,
     );
     return records;
   }

@@ -114,7 +114,7 @@ describe(
           assertStrictEquals(
             prevOrder >= order,
             true,
-            "Previous order is greater than current order"
+            "Previous order is greater than current order",
           );
         }
         prevOrder = order;
@@ -172,5 +172,5 @@ describe(
       console.log(recs);
       assert(recs[0].count == 1, "Not expected value");
     });*/
-  }
+  },
 );

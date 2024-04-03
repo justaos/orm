@@ -18,14 +18,14 @@ export default class DateTimeDataType extends DataType {
   }
 
   setValueIntercept(
-    value: Temporal.PlainDateTime | string | null
+    value: Temporal.PlainDateTime | string | null,
   ): Temporal.PlainDateTime | null {
     if (typeof value === "string") {
       return Temporal.PlainDateTime.from(value);
     }
     if (value instanceof Date) {
       return Temporal.PlainDateTime.from(
-        value.toISOString().replace("T", " ").replace("Z", "")
+        value.toISOString().replace("T", " ").replace("Z", ""),
       );
     }
     return value;

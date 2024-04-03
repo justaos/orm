@@ -6,6 +6,6 @@ import { Logger, LoggerUtils } from "@justaos/utils/logger-utils";
 
 import { default as SqlString } from "npm:pg-escape";
 
-export { postgres, LoggerUtils, Logger, CommonUtils, SqlString };
+export { CommonUtils, Logger, LoggerUtils, postgres, SqlString };
 
 export type { UUID };

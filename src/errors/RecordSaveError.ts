@@ -23,12 +23,12 @@ export class RecordSaveError extends Error {
     tableDefinition: TableDefinition,
     recordId: string | undefined,
     fieldErrors: FieldValidationError[],
-    message?: string
+    message?: string,
   ) {
     super(
-      `Record validation error in table ${
-        tableDefinition.name
-      } with id ${recordId}. ${message || JSON.stringify(fieldErrors)}`
+      `Record validation error in table ${tableDefinition.name} with id ${recordId}. ${
+        message || JSON.stringify(fieldErrors)
+      }`,
     );
     this.name = "RecordValidationError";
     this.#tableDefinition = tableDefinition;

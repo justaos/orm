@@ -15,7 +15,7 @@ describe({
           username: "postgres",
           password: "postgres",
           database: "odm-test-db",
-        })
+        }),
       );
 
       try {

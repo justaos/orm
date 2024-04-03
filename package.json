@@ -1,31 +1,6 @@
 {
   "name": "@justaos/odm",
-  "private": false,
-  "description": "JUST A OS's ORM (Object Document Mapper) is built for NodeJS and provides transparent persistence for JavaScript objects to Postgres database",
-  "keywords": [
-    "justaos",
-    "justaos odm",
-    "postgres wrapper",
-    "object document mapper"
-  ],
-  "homepage": "https://justaos.com",
-  "bugs": {
-    "url": "https://github.com/justaos/odm/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/justaos/odm.git"
-  },
-  "author": "Shivaji Varma Pusapati Venkata <contact@shivajivarma.com> (https://shivajivarma.com)",
-  "license": "Apache-2.0",
-  "contributors": [],
-  "scripts": {
-    "test:debug": "deno task test:debug",
-    "test": "deno task test",
-    "coverage": "deno task coverage",
-    "version": "version minor"
-  },
-  "publishConfig": {
-    "access": "public"
+  "dependencies": {
+    "pg-escape": "^0.2.0"
   }
 }

@@ -47,7 +47,7 @@ self.onmessage = async (e) => {
   const table = conn.table("testing_table");
   for (let i = 0; i < 1000; i++) {
     console.log(
-      `WORKER ${e.data.post} INDEX : ${i} ========================================`
+      `WORKER ${e.data.post} INDEX : ${i} ========================================`,
     );
     const record = table.createNewRecord();
     record.set("name", "1992");
@@ -59,7 +59,7 @@ self.onmessage = async (e) => {
   const count = await selectQuery.count();
 
   console.log(
-    `WORKER ${e.data.post} COUNTs : ${count} ========================================`
+    `WORKER ${e.data.post} COUNTs : ${count} ========================================`,
   );
 
   debugger;

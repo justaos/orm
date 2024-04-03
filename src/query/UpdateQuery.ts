@@ -35,7 +35,7 @@ export default class UpdateQuery {
   where(
     column: string | number | boolean,
     operator: any,
-    value?: any
+    value?: any,
   ): UpdateQuery {
     // Support "where true || where false"
     if (column === false || column === true) {
@@ -81,25 +81,29 @@ export default class UpdateQuery {
     if (typeof this.#columns === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
-        "Columns not defined"
+        "Columns not defined",
       );
     }
 
     let query = `UPDATE ${this.#tableName}`;
     if (typeof this.#row !== "undefined") {
       const row: any = this.#row;
-      query += ` SET ${this.#columns.map((column) => {
-        return `"${column}" = ${QueryUtils.escapeValue(row[column])}`;
-      })}`;
+      query += ` SET ${
+        this.#columns.map((column) => {
+          return `"${column}" = ${QueryUtils.escapeValue(row[column])}`;
+        })
+      }`;
     }
     if (this.#where.length > 0) {
-      query += ` WHERE ${this.#where
-        .map((condition) => {
-          return `${condition.column} ${
-            condition.operator
-          } ${QueryUtils.escapeValue(condition.value)}`;
-        })
-        .join(" AND ")}`;
+      query += ` WHERE ${
+        this.#where
+          .map((condition) => {
+            return `${condition.column} ${condition.operator} ${
+              QueryUtils.escapeValue(condition.value)
+            }`;
+          })
+          .join(" AND ")
+      }`;
     }
     if (this.#returning) {
       query += ` RETURNING ${this.#returning.join(", ")}`;

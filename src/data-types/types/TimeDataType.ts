@@ -18,7 +18,7 @@ export default class TimeDataType extends DataType {
   }
 
   setValueIntercept(
-    value: Temporal.PlainTime | null
+    value: Temporal.PlainTime | null,
   ): Temporal.PlainTime | null {
     if (typeof value === "string") {
       return Temporal.PlainTime.from(value);

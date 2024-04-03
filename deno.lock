@@ -366,6 +366,11 @@
       "jsr:@justaos/utils@^1.11.0",
       "jsr:@std/assert@^0.220.1",
       "jsr:@std/testing@^0.220.1"
-    ]
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:pg-escape@^0.2.0"
+      ]
+    }
   }
 }
