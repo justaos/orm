@@ -16,7 +16,7 @@ export default class DatabaseOperationInterceptorService {
   addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
     this.#interceptors.set(
       operationInterceptor.getName(),
-      operationInterceptor
+      operationInterceptor,
     );
   }
 
@@ -34,7 +34,7 @@ export default class DatabaseOperationInterceptorService {
     when: DatabaseOperationWhen,
     records: Record[],
     context?: DatabaseOperationContext,
-    disabledIntercepts?: boolean | string[]
+    disabledIntercepts?: boolean | string[],
   ): Promise<Record[]> {
     if (disabledIntercepts === true) {
       return records;
@@ -50,7 +50,7 @@ export default class DatabaseOperationInterceptorService {
             operation,
             when,
             records,
-            context
+            context,
           );
           if (!records) break;
         }
