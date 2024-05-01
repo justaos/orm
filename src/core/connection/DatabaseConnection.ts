@@ -1,7 +1,8 @@
-import { Logger, LoggerUtils, postgres } from "../../../deps.ts";
+import { Logger, LoggerUtils, pg, SqlString } from "../../../deps.ts";
 import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
-import { NativeSQL } from "../NativeSQL.ts";
 import { DatabaseErrorCode, ORMError } from "../../errors/ORMError.ts";
+
+const { Pool } = pg;
 
 /**
  * A class to handle the connection to the database.
@@ -17,11 +18,11 @@ import { DatabaseErrorCode, ORMError } from "../../errors/ORMError.ts";
  */
 export default class DatabaseConnection {
   readonly #config: DatabaseConfiguration;
-  #sql: any;
+  #pool?: typeof Pool;
   readonly #logger;
 
   constructor(configuration: DatabaseConfiguration, logger?: Logger) {
-    this.#config = { max_connections: 20, ...configuration };
+    this.#config = configuration;
     if (logger) this.#logger = logger;
     else this.#logger = LoggerUtils.getLogger(DatabaseConnection.name);
   }
@@ -34,29 +35,37 @@ export default class DatabaseConnection {
 
   async connect(): Promise<void> {
     try {
-      this.#sql = postgres({
-        ...this.#config,
-        max: this.#config.max_connections,
+      this.#pool = new Pool({
+        user: this.#config.username,
+        database: this.#config.database || "postgres",
+        password: this.#config.password,
+        port: this.#config.port || 5432,
+        host: this.#config.hostname,
+        max: 20,
+        connectionTimeoutMillis: this.#config.connect_timeout,
       });
-      await this.#sql`select 1`;
+
+      const client = await this.#pool.connect();
+      await client.query(`select 1`);
       this.#logger.info(
         `Connected to ${this.#config.database} database successfully`,
       );
+      client.release();
     } catch (err) {
-      if (this.#sql) await this.#sql.end();
+      if (this.#pool) await this.#pool.end();
       this.#logger.error(err.message);
       throw err;
     }
   }
 
-  getNativeConnection(): NativeSQL {
-    if (!this.#sql) {
+  getConnectionPool(): typeof Pool {
+    if (!this.#pool) {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
         `Database connection not established`,
       );
     }
-    return this.#sql;
+    return this.#pool;
   }
 
   getDatabaseName(): string | undefined {
@@ -65,37 +74,40 @@ export default class DatabaseConnection {
 
   async isDatabaseExist(databaseName: string): Promise<boolean> {
     if (!databaseName) throw new Error(`No database name provided to check.`);
-    const reserve = await this.#sql.reserve();
-    const [output] =
-      await reserve`SELECT EXISTS(SELECT 1 from pg_database WHERE datname=${databaseName})`
-        .execute();
-    await reserve.release();
-    return output.exists;
+    const client = await this.getConnectionPool().connect();
+    const result = await client.query({
+      text: `SELECT EXISTS(SELECT 1 from pg_database WHERE datname = '${SqlString(
+        databaseName,
+      )}')`,
+    });
+    client.release();
+    return result.rows[0].exists;
   }
 
   async createDatabase(databaseName: string): Promise<any> {
     if (!databaseName) throw new Error(`No database name provided to create.`);
-    const output = await this.getNativeConnection()`CREATE DATABASE ${
-      this.#sql(
-        databaseName,
-      )
-    }`;
+    const client = await this.getConnectionPool().connect();
+    const output = await client.query({
+      text: `CREATE DATABASE "${SqlString(databaseName)}"`,
+    });
     this.#logger.info(`Database ${databaseName} created successfully`);
+    client.release();
     return output;
   }
 
   async dropDatabase(databaseName: string): Promise<any> {
     if (!databaseName) throw new Error(`No database name provided to drop.`);
-    const output = await this.getNativeConnection()`DROP DATABASE ${
-      this.#sql(
-        databaseName,
-      )
-    }`;
+    const client = await this.getConnectionPool().connect();
+    const output = await client.query({
+      text: `DROP DATABASE "${SqlString(databaseName)}"`,
+    });
     this.#logger.info(`Database ${databaseName} dropped successfully`);
+    client.release();
     return output;
   }
 
   async closeConnection(): Promise<void> {
-    return await this.getNativeConnection().end();
+    const pool = this.getConnectionPool();
+    return await pool.end();
   }
 }

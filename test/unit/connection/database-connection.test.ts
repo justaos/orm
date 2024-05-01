@@ -35,7 +35,6 @@ describe({
       try {
         await DatabaseConnection.connect({
           ...config,
-          connect_timeout: 500,
         });
         assert(false, "Connection should fail");
       } catch (_error) {
@@ -56,8 +55,8 @@ describe({
     it("#isDatabaseExist - without database", async () => {
       const conn = await DatabaseConnection.connect(defaultConfig);
       const output = await conn.isDatabaseExist("some-random-database");
-      assert(!output, "Database should not exists");
       await conn.closeConnection();
+      assert(!output, "Database should not exists");
     });
 
     it("#createDatabase", async () => {

@@ -9,9 +9,11 @@ import {
   OrderByDirectionType,
   OrderByType,
 } from "../table/query/OrderByType.ts";
+import { pg } from "../../deps.ts";
+import { runSQLQuery } from "../utils.ts";
 
 export default class Query {
-  readonly #sql: any;
+  readonly #pool: pg.Pool;
 
   #query?:
     | SelectQuery
@@ -21,12 +23,12 @@ export default class Query {
     | UpdateQuery
     | AlterQuery;
 
-  constructor(sql: any) {
-    this.#sql = sql;
+  constructor(sql: pg.Pool) {
+    this.#pool = sql;
   }
 
   getInstance(): Query {
-    return new Query(this.#sql);
+    return new Query(this.#pool);
   }
 
   getSelectQuery(): SelectQuery {
@@ -199,15 +201,15 @@ export default class Query {
 
   async execute(sqlString?: string): Promise<any> {
     const sqlQuery = sqlString || this.getSQLQuery();
-    const reserve = await this.#sql.reserve();
+    const reserve = await this.#pool.connect();
     let result;
     try {
-      result = await reserve.unsafe(sqlQuery);
+      result = await runSQLQuery(reserve, sqlQuery);
     } catch (_err) {
-      await reserve.release();
+      reserve.release();
       throw _err;
     }
-    await reserve.release();
+    reserve.release();
     return result;
   }
 
@@ -219,7 +221,7 @@ export default class Query {
       );
     }
     const sqlQuery = this.getSQLQuery();
-    const reserve = await this.#sql.reserve();
+    const reserve = await this.#pool.connect();
     const cursor = await reserve.unsafe(sqlQuery).cursor();
     await reserve.release();
     return cursor;
