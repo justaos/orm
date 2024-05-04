@@ -4,8 +4,9 @@ import {
   DatabaseOperationType,
   DatabaseOperationWhen,
 } from "../types.ts";
+import DataType from "../data-types/DataType.ts";
 
-export default abstract class DatabaseOperationInterceptor {
+abstract class DatabaseOperationInterceptor {
   #order = 100;
 
   abstract getName(): string;
@@ -26,3 +27,4 @@ export default abstract class DatabaseOperationInterceptor {
     context?: DatabaseOperationContext,
   ): Promise<Record[]>;
 }
+export default DatabaseOperationInterceptor;

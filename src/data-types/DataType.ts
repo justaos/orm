@@ -1,6 +1,6 @@
 import { ColumnDefinition, JSONValue, NativeDataType } from "../types.ts";
 
-export default abstract class DataType {
+abstract class DataType {
   readonly #nativeDataType: NativeDataType;
   readonly #name: string;
 
@@ -25,3 +25,5 @@ export default abstract class DataType {
 
   abstract validateValue(value: unknown): Promise<void>;
 }
+
+export default DataType;
