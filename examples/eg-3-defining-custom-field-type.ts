@@ -28,10 +28,11 @@ odm.addDataType(
         value &&
         typeof value === "string" &&
         !new RegExp(pattern).test(value)
-      )
+      ) {
         throw new Error("Not a valid email");
+      }
     }
-  })()
+  })(),
 );
 
 await conn.defineTable({

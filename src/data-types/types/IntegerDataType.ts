@@ -22,7 +22,8 @@ export default class IntegerDataType extends DataType {
   }
 
   async validateValue(value: any) {
-    if (value !== null && typeof value !== "number")
+    if (value !== null && typeof value !== "number") {
       throw new Error(`Invalid integer value: ${value}`);
+    }
   }
 }

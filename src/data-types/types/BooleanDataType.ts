@@ -15,7 +15,7 @@ export default class BooleanDataType extends DataType {
   }
 
   setValueIntercept(
-    value: boolean | number | string | null
+    value: boolean | number | string | null,
   ): boolean | string | number | null {
     if (typeof value === "string") {
       if (value === "true") return true;

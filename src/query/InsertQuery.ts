@@ -59,7 +59,7 @@ export default class InsertQuery {
     if (typeof this.#columns === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
-        "Columns not defined"
+        "Columns not defined",
       );
     }
 

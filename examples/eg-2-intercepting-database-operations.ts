@@ -22,17 +22,17 @@ odm.addInterceptor(
       operation: DatabaseOperationType,
       when: DatabaseOperationWhen,
       records: Record[],
-      _context: DatabaseOperationContext
+      _context: DatabaseOperationContext,
     ) {
       if (collectionName === "student") {
         if (operation === "INSERT") {
           console.log(
-            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
           );
           if (when === "BEFORE") {
             for (let record of records) {
               console.log(
-                "computed field updated for :: " + record.get("name")
+                "computed field updated for :: " + record.get("name"),
               );
               record.set("computed", record.get("name") + " +++ computed");
             }
@@ -40,7 +40,7 @@ odm.addInterceptor(
         }
         if (operation === "SELECT") {
           console.log(
-            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
           );
           if (when === "AFTER") {
             for (const record of records) {
@@ -51,7 +51,7 @@ odm.addInterceptor(
       }
       return records;
     }
-  })()
+  })(),
 );
 
 await conn.defineTable({

@@ -6,7 +6,7 @@ const odm = new ORM({
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  port: 5432
+  port: 5432,
 });
 
 let conn: ORMConnection | undefined;

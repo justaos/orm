@@ -3,13 +3,9 @@ import { afterAll, assert, beforeAll, describe, it } from "../../test_deps.ts";
 import { ColumnDefinition, DataType, ORM, ORMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
 
-describe(
-  "custom-field-type",
-  {
-    sanitizeResources: false,
-    sanitizeOps: false,
-  },
-  () => {
+describe({
+  name: "Custom FieldType",
+  fn: () => {
     let odm: ORM;
     let conn: ORMConnection;
     const cleanTableList: string[] = [];
@@ -57,8 +53,9 @@ describe(
             value &&
             typeof value === "string" &&
             !new RegExp(pattern).test(value)
-          )
+          ) {
             throw new Error("Not a valid email");
+          }
         }
       }
 
@@ -100,7 +97,7 @@ describe(
 
       assert(
         records.length && records[0].get(EMAIL_FIELD) === EMAIL_VALUE,
-        "Record created as expected"
+        "Record created as expected",
       );
     });
 
@@ -141,5 +138,5 @@ describe(
       }
       assert(error, "Able to create, not defined field type element");
     });
-  }
-);
+  },
+});

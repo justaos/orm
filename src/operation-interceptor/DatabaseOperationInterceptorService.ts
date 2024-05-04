@@ -13,16 +13,16 @@ export default class DatabaseOperationInterceptorService {
     this.#interceptors = new Map<string, DatabaseOperationInterceptor>();
   }
 
-  addInterceptor = (
-    operationInterceptor: DatabaseOperationInterceptor
-  ): void => {
+  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
     this.#interceptors.set(
       operationInterceptor.getName(),
-      operationInterceptor
+      operationInterceptor,
     );
-  };
+  }
 
-  deleteInterceptor = (name: string) => this.#interceptors.delete(name);
+  deleteInterceptor(name: string): void {
+    this.#interceptors.delete(name);
+  }
 
   hasInterceptors(): boolean {
     return this.#interceptors.size !== 0;
@@ -34,7 +34,7 @@ export default class DatabaseOperationInterceptorService {
     when: DatabaseOperationWhen,
     records: Record[],
     context?: DatabaseOperationContext,
-    disabledIntercepts?: boolean | string[]
+    disabledIntercepts?: boolean | string[],
   ): Promise<Record[]> {
     if (disabledIntercepts === true) {
       return records;
@@ -50,7 +50,7 @@ export default class DatabaseOperationInterceptorService {
             operation,
             when,
             records,
-            context
+            context,
           );
           if (!records) break;
         }

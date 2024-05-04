@@ -4,8 +4,8 @@ type DatabaseConfiguration = {
   database?: string;
   username?: string;
   password?: string;
-  connect_timeout?: number;
   max_connections?: number;
+  connect_timeout?: number;
 };
 
 export type { DatabaseConfiguration };

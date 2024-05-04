@@ -15,7 +15,7 @@ export default class DeleteQuery {
   where(
     column: string | number | boolean,
     operator: any,
-    value?: any
+    value?: any,
   ): DeleteQuery {
     // Support "where true || where false"
     if (column === false || column === true) {

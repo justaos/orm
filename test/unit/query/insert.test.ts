@@ -13,9 +13,6 @@ import { Session } from "../../test.utils.ts";
 
 describe({
   name: "INSERT Query",
-  sanitizeResources: true,
-  sanitizeOps: true,
-  sanitizeExit: true,
   fn: () => {
     let conn: ORMConnection;
     const cleanTableList: string[] = [];
@@ -138,7 +135,7 @@ describe({
       assertStrictEquals(
         employee.getTable().getName(),
         "employee",
-        "record is not new"
+        "record is not new",
       );
 
       johnRecord = await employee.insert();
@@ -147,7 +144,7 @@ describe({
       assertEquals(
         johnObject.id + "",
         empId,
-        "id is expected to be same as initialized value"
+        "id is expected to be same as initialized value",
       );
       assertEquals(johnObject.name, "John", "name is expected to be John");
       assertEquals(johnObject.rating, 4.5, "default is expected to be 4.5");
@@ -199,15 +196,16 @@ describe({
       await newEmp.insert();
 
       const employee: Record | undefined = await employeeTable.getRecord(
-        newEmp.getID()
+        newEmp.getID(),
       );
       assert(!!employee, "record not found");
-      if (employee)
+      if (employee) {
         assertStrictEquals(
           employee.get("name"),
           "John 3",
-          "name is expected to be John"
+          "name is expected to be John",
         );
+      }
     });
 
     it("#Record::delete", async () => {
@@ -219,7 +217,7 @@ describe({
 
       await newEmp.delete();
       const employee: Record | undefined = await employeeTable.getRecord(
-        newEmp.getID()
+        newEmp.getID(),
       );
       assert(!employee);
     });

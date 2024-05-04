@@ -51,14 +51,15 @@ export default class ORM {
   readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
     function (dataType): string {
       return dataType.getName();
-    }
+    },
   );
-  readonly #tableDefinitionRegistry: Registry<TableDefinition> =
-    new Registry<TableDefinition>(function (tableDefinition) {
-      return TableNameUtils.getShortFormTableName(
-        `${tableDefinition.schema}.${tableDefinition.name}`
-      );
-    });
+  readonly #tableDefinitionRegistry: Registry<TableDefinition> = new Registry<
+    TableDefinition
+  >(function (tableDefinition) {
+    return TableNameUtils.getShortFormTableName(
+      `${tableDefinition.schema}.${tableDefinition.name}`,
+    );
+  });
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
   readonly #operationInterceptorService =
     new DatabaseOperationInterceptorService();
@@ -87,13 +88,12 @@ export default class ORM {
         this.#dataTypeRegistry,
         this.#tableDefinitionRegistry,
         this.#schemaRegistry,
-        this.#operationInterceptorService
+        this.#operationInterceptorService,
       );
       await conn.connect();
       return conn;
     } catch (error) {
       if (
-        error.name === "PostgresError" &&
         error.code === "3D000" &&
         this.#config.database &&
         createDatabaseIfNotExists
@@ -129,13 +129,13 @@ export default class ORM {
   }
 
   getTableSchema(tableName: string): TableSchema | undefined {
-    const tableDefinition: TableDefinition | undefined =
-      this.#tableDefinitionRegistry.get(tableName);
+    const tableDefinition: TableDefinition | undefined = this
+      .#tableDefinitionRegistry.get(tableName);
     if (tableDefinition) {
       return new TableSchema(
         tableDefinition,
         this.#dataTypeRegistry,
-        this.#tableDefinitionRegistry
+        this.#tableDefinitionRegistry,
       );
     }
   }
@@ -150,7 +150,7 @@ export default class ORM {
 
   deleteInterceptor(operationInterceptorName: string): void {
     this.#operationInterceptorService.deleteInterceptor(
-      operationInterceptorName
+      operationInterceptorName,
     );
   }
 

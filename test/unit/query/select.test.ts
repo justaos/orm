@@ -98,7 +98,9 @@ describe(
       taskTable.orderBy("order", "ASC");
       const taskCursor = await taskTable.execute();
       for await (const taskRecord of taskCursor()) {
-        assertStrictEquals(taskRecord.get("priority"), 1, "Should be 1");
+        console.log(taskRecord);
+        const priority = taskRecord.get("priority");
+        assertStrictEquals(priority, 1, "Should be 1");
       }
     });
 
@@ -114,7 +116,7 @@ describe(
           assertStrictEquals(
             prevOrder >= order,
             true,
-            "Previous order is greater than current order"
+            "Previous order is greater than current order",
           );
         }
         prevOrder = order;
@@ -172,5 +174,5 @@ describe(
       console.log(recs);
       assert(recs[0].count == 1, "Not expected value");
     });*/
-  }
+  },
 );

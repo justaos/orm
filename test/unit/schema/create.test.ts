@@ -10,13 +10,9 @@ import {
 import { Session } from "../../test.utils.ts";
 import { ORM, ORMConnection, ORMError } from "../../../mod.ts";
 
-describe(
-  "TableCreate",
-  {
-    sanitizeResources: false,
-    sanitizeOps: false,
-  },
-  () => {
+describe({
+  name: "CREATE Query",
+  fn: () => {
     let conn: ORMConnection;
     let odm: ORM;
     const logger = Session.getLogger();
@@ -42,7 +38,7 @@ describe(
       } catch (error) {
         assert(
           error instanceof ORMError && error.code === "SCHEMA_VALIDATION_ERROR",
-          "Table should not exists"
+          "Table should not exists",
         );
       }
     });
@@ -143,7 +139,7 @@ describe(
       }
       assert(
         assertValue,
-        "Table should not get extended, with duplicate field names"
+        "Table should not get extended, with duplicate field names",
       );
     });
 
@@ -207,5 +203,5 @@ describe(
       }
       assert(assertValue);
     });
-  }
-);
+  },
+});

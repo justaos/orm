@@ -1,6 +1,13 @@
 import { Logger } from "../deps.ts";
-import { DatabaseOperationContext, TableDefinition, TableDefinitionRaw } from "./types.ts";
-import { DatabaseConfiguration, DatabaseConnection } from "./core/connection/index.ts";
+import {
+  DatabaseOperationContext,
+  TableDefinition,
+  TableDefinitionRaw,
+} from "./types.ts";
+import {
+  DatabaseConfiguration,
+  DatabaseConnection,
+} from "./core/connection/index.ts";
 import Registry from "./core/Registry.ts";
 import TableSchema from "./table/TableSchema.ts";
 import DataType from "./data-types/DataType.ts";
@@ -11,7 +18,7 @@ import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
 
 import Query from "./query/Query.ts";
 import ORM from "./ORM.ts";
-import { logSQLQuery } from "./utils.ts";
+import { logSQLQuery, runSQLQuery } from "./utils.ts";
 
 export default class ORMConnection {
   readonly #orm: ORM;
@@ -30,7 +37,7 @@ export default class ORMConnection {
     dataTypeRegistry: Registry<DataType>,
     tableDefinitionRegistry: Registry<TableDefinition>,
     schemaRegistry: Map<string, null>,
-    operationInterceptorService: DatabaseOperationInterceptorService
+    operationInterceptorService: DatabaseOperationInterceptorService,
   ) {
     this.#orm = orm;
     this.#logger = logger;
@@ -59,9 +66,9 @@ export default class ORMConnection {
     const tempConn = new DatabaseConnection(
       {
         ...this.#config,
-        database: "postgres"
+        database: "postgres",
       },
-      this.#logger
+      this.#logger,
     );
     await tempConn.connect();
     const result = await tempConn.dropDatabase(databaseName);
@@ -81,7 +88,7 @@ export default class ORMConnection {
     const tableSchema = new TableSchema(
       tableDefinitionRaw,
       this.#dataTypeRegistry,
-      this.#tableDefinitionRegistry
+      this.#tableDefinitionRegistry,
     );
     try {
       tableSchema.validate();
@@ -91,30 +98,37 @@ export default class ORMConnection {
     }
     this.#tableDefinitionRegistry.add(tableSchema.getDefinition());
 
-    const sql = this.#conn.getNativeConnection();
-    const reserved = await sql.reserve();
+    const pool = this.#conn.getConnectionPool();
+    const reserved = await pool.connect();
     try {
-      const [{ exists: schemaExists }] = await reserved`SELECT EXISTS(SELECT
-                                                                      FROM information_schema.schemata
-                                                                      WHERE schema_name = ${tableSchema.getSchemaName()}
-          LIMIT 1);`;
+      const [{ exists: schemaExists }] = await runSQLQuery(
+        reserved,
+        `SELECT EXISTS(SELECT
+                       FROM information_schema.schemata
+                       WHERE schema_name = '${tableSchema.getSchemaName()}'
+          LIMIT 1);`,
+      );
 
       if (!schemaExists) {
-        await reserved`CREATE SCHEMA IF NOT EXISTS ${sql(
-          tableSchema.getSchemaName()
-        )};`;
+        await runSQLQuery(
+          reserved,
+          `CREATE SCHEMA IF NOT EXISTS "${tableSchema.getSchemaName()}";`,
+        );
         this.#logger.info(`Schema ${tableSchema.getSchemaName()} created`);
         this.#schemaRegistry.set(tableSchema.getSchemaName(), null);
       }
 
-      const [{ exists: tableExists }] = await reserved`SELECT EXISTS(SELECT
-                                                                     FROM information_schema.tables
-                                                                     WHERE table_name = ${tableSchema.getTableName()}
-                                                                       AND table_schema = ${tableSchema.getSchemaName()}
-          LIMIT 1);`;
+      const [{ exists: tableExists }] = await runSQLQuery(
+        reserved,
+        `SELECT EXISTS(SELECT
+                       FROM information_schema.tables
+                       WHERE table_name = '${tableSchema.getTableName()}'
+                         AND table_schema = '${tableSchema.getSchemaName()}'
+          LIMIT 1);`,
+      );
 
       if (!tableExists) {
-        const createQuery = new Query(this.#conn.getNativeConnection());
+        const createQuery = new Query(this.#conn.getConnectionPool());
         createQuery.create(tableSchema.getName());
         for (const column of tableSchema.getOwnColumnSchemas()) {
           const columnDefinition = column.getDefinition();
@@ -123,36 +137,42 @@ export default class ORMConnection {
             data_type: column.getColumnType().getNativeType(),
             not_null: column.isNotNull(),
             unique: column.isUnique(),
-            foreign_key: columnDefinition.foreign_key
+            foreign_key: columnDefinition.foreign_key,
           });
         }
         const inherits = tableSchema.getInherits();
-        if (inherits)
+        if (inherits) {
           createQuery.inherits(inherits);
+        }
         logSQLQuery(this.#logger, createQuery.getSQLQuery());
         await createQuery.execute();
       } else {
-        const columns =
-          await reserved`SELECT column_name
-                         FROM information_schema.columns
-                         WHERE table_schema = ${tableSchema.getSchemaName()}
-                           AND table_name = ${tableSchema.getTableName()};`;
-        const existingColumnNames = columns.map((column: { column_name: string }) => column.column_name);
+        const columns = await runSQLQuery(
+          reserved,
+          `SELECT column_name
+           FROM information_schema.columns
+           WHERE table_schema = '${tableSchema.getSchemaName()}'
+             AND table_name = '${tableSchema.getTableName()}';`,
+        );
+        const existingColumnNames = columns.map(
+          (column: { column_name: string }) => column.column_name,
+        );
         const columnSchemas = tableSchema.getOwnColumnSchemas();
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
-          const alterQuery = new Query(this.#conn.getNativeConnection());
+          const alterQuery = new Query(this.#conn.getConnectionPool());
           alterQuery.alter(tableSchema.getName());
           for (const column of tableSchema.getOwnColumnSchemas()) {
             const columnDefinition = column.getDefinition();
-            if (!existingColumnNames.includes(column.getName()))
+            if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
                 name: column.getName(),
                 data_type: column.getColumnType().getNativeType(),
                 not_null: column.isNotNull(),
                 unique: column.isUnique(),
-                foreign_key: columnDefinition.foreign_key
+                foreign_key: columnDefinition.foreign_key,
               });
+            }
           }
 
           logSQLQuery(this.#logger, alterQuery.getSQLQuery());
@@ -160,17 +180,20 @@ export default class ORMConnection {
         }
       }
     } finally {
-      await reserved.release();
+      reserved.release();
     }
   }
 
   async dropTable(tableName: string): Promise<void> {
-    const sql = this.#conn.getNativeConnection();
-    const reserved = await sql.reserve();
+    const pool = this.#conn.getConnectionPool();
+    const reserved = await pool.connect();
     try {
-      await reserved.unsafe(`DROP TABLE IF EXISTS ${tableName} CASCADE;`);
+      await runSQLQuery(
+        reserved,
+        `DROP TABLE IF EXISTS "${tableName}" CASCADE;`,
+      );
     } finally {
-      await reserved.release();
+      reserved.release();
     }
   }
 
@@ -184,29 +207,29 @@ export default class ORMConnection {
     if (typeof tableSchema === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
-        `Table with name '${name}' is not defined`
+        `Table with name '${name}' is not defined`,
       );
     }
-    const queryBuilder = new Query(this.#conn.getNativeConnection());
+    const queryBuilder = new Query(this.#conn.getConnectionPool());
     return new Table(
       queryBuilder,
       tableSchema,
       this.#operationInterceptorService,
       this.#logger,
-      this.#conn.getNativeConnection(),
-      context
+      this.#conn.getConnectionPool(),
+      context,
     );
   }
 
   query(): Query {
-    return new Query(this.#conn.getNativeConnection());
+    return new Query(this.#conn.getConnectionPool());
   }
 
   #getConnection(): DatabaseConnection {
     if (!this.#conn) {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
-        "There is no active connection"
+        "There is no active connection",
       );
     }
     return this.#conn;

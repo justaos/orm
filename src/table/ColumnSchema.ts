@@ -14,7 +14,7 @@ export default class ColumnSchema {
   }
 
   static setDefaults(
-    columnDefinition: ColumnDefinitionRaw
+    columnDefinition: ColumnDefinitionRaw,
   ): ColumnDefinitionRaw {
     return {
       not_null: false,
@@ -64,28 +64,28 @@ export default class ColumnSchema {
      */
     if (!this.getName() || typeof this.getName() !== "string") {
       errorMessages.push(
-        `[Column :: ${this.getName()}] Invalid column name provided`
+        `[Column :: ${this.getName()}] Invalid column name provided`,
       );
     } else if (!/^[a-z0-9_]+$/i.test(this.getName())) {
       errorMessages.push(
-        `[Column :: ${this.getName()}] Column name should be alphanumeric`
+        `[Column :: ${this.getName()}] Column name should be alphanumeric`,
       );
     }
 
     if (!this.#columnDefinition || !this.getType()) {
       errorMessages.push(
-        `[Column :: ${this.getName()}] Column type not provided`
+        `[Column :: ${this.getName()}] Column type not provided`,
       );
     }
     if (!this.#fieldType) {
       errorMessages.push(
-        `[Column :: ${this.getName()}] No such column type "${this.getType()}"`
+        `[Column :: ${this.getName()}] No such column type "${this.getType()}"`,
       );
     } else if (
       !this.getColumnType().validateDefinition(this.#columnDefinition)
     ) {
       errorMessages.push(
-        `[Column :: ${this.getName()}] Invalid field definition`
+        `[Column :: ${this.getName()}] Invalid field definition`,
       );
     }
     return errorMessages;

@@ -11,19 +11,18 @@ const defaultConfig: DatabaseConfiguration = {
 
 describe({
   name: "DatabaseConnection",
-  sanitizeResources: false,
-  sanitizeOps: false,
   fn: () => {
     it("#connect", async () => {
       const conn = new DatabaseConnection({
         ...defaultConfig,
         port: undefined,
       });
-      await conn.connect();
-      if (conn) {
-        await conn.closeConnection();
-      } else {
+      try {
+        await conn.connect();
+      } catch (_error) {
         assert(false, "connection failed");
+      } finally {
+        await conn.closeConnection();
       }
     });
 
@@ -35,7 +34,6 @@ describe({
       try {
         await DatabaseConnection.connect({
           ...config,
-          connect_timeout: 500,
         });
         assert(false, "Connection should fail");
       } catch (_error) {
@@ -56,8 +54,8 @@ describe({
     it("#isDatabaseExist - without database", async () => {
       const conn = await DatabaseConnection.connect(defaultConfig);
       const output = await conn.isDatabaseExist("some-random-database");
-      assert(!output, "Database should not exists");
       await conn.closeConnection();
+      assert(!output, "Database should not exists");
     });
 
     it("#createDatabase", async () => {
@@ -75,7 +73,7 @@ describe({
       const conn = await DatabaseConnection.connect(defaultConfig);
       assert(
         await conn.isDatabaseExist("odm-created-database"),
-        "Database should exists"
+        "Database should exists",
       );
       await conn.closeConnection();
     });
@@ -105,6 +103,7 @@ describe({
           database: "",
         });
         await dbConnection.dropDatabase("odm-created-database");
+        await dbConnection.closeConnection();
       } catch (error) {
         console.log(error);
         assert(false, "Database dropping failed");

@@ -13,37 +13,37 @@ import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 import TableNameUtils from "./src/table/TableNameUtils.ts";
 
 export {
+  ColumnSchema,
+  DatabaseOperationInterceptor,
+  DataType,
   ORM,
   ORMConnection,
-  Record,
-  Table,
   ORMError,
-  DatabaseOperationInterceptor,
-  SelectQuery,
-  TableSchema,
-  ColumnSchema,
-  DataType,
   Query,
+  Record,
   RecordSaveError,
+  SelectQuery,
+  Table,
   TableNameUtils,
+  TableSchema,
 };
 
 export type { DatabaseConfiguration } from "./src/core/connection/index.ts";
 
 export type {
+  ColumnDefinition,
+  ColumnDefinitionRaw,
+  DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,
-  TableDefinitionRaw,
-  TableDefinition,
-  ColumnDefinitionRaw,
-  ColumnDefinition,
   NativeDataType,
-  DatabaseOperationContext,
   RawRecord,
   SimpleCondition,
+  TableDefinition,
+  TableDefinitionRaw,
 } from "./src/types.ts";
 
 export type {
-  OrderByType,
   OrderByDirectionType,
+  OrderByType,
 } from "./src/table/query/OrderByType.ts";

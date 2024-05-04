@@ -6,11 +6,11 @@
 [![License](https://img.shields.io/github/license/justaos/orm.svg)](/LICENSE)
 [![Contributors](https://img.shields.io/github/contributors/justaos/orm.svg)]()
 
-JUSTAOS's ORM (Object Relational Mapping) tool is built for Deno and provides transparent persistence for JavaScript
-objects to
-Postgres database.
+JUSTAOS's ORM (Object Relational Mapping) tool is built for Deno and provides
+transparent persistence for JavaScript objects to Postgres database.
 
-- Supports all primitive data types (string, integer, float, boolean, date, object, array, etc).
+- Supports all primitive data types (string, integer, float, boolean, date,
+  object, array, etc).
 - Supports custom data types.
 - Supports table with multi-level inheritance.
 - Also supports interception on operations (create, read, update and delete).
@@ -20,7 +20,7 @@ deno add @justaos/orm
 ```
 
 ```ts
-import { ORM } from '@justaos/orm';
+import { ORM } from "@justaos/orm";
 ```
 
 ## Database connection
@@ -31,7 +31,7 @@ const odm = new ORM({
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  port: 5432
+  port: 5432,
 });
 
 let conn: ORMConnection | undefined;
@@ -53,13 +53,13 @@ await orm.defineTable({
   columns: [
     {
       name: "title",
-      type: "string"
+      type: "string",
     },
     {
       name: "content",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 
 await orm.defineTable({
@@ -67,14 +67,13 @@ await orm.defineTable({
   columns: [
     {
       name: "blog_post",
-      type: "reference"
-
+      type: "reference",
     },
     {
       name: "message",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 ```
 
@@ -132,17 +131,17 @@ odm.addInterceptor(
       operation: DatabaseOperationType,
       when: DatabaseOperationWhen,
       records: Record[],
-      _context: DatabaseOperationContext
+      _context: DatabaseOperationContext,
     ) {
       if (collectionName === "student") {
         if (operation === "INSERT") {
           console.log(
-            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
           );
           if (when === "BEFORE") {
             for (let record of records) {
               console.log(
-                "computed field updated for :: " + record.get("name")
+                "computed field updated for :: " + record.get("name"),
               );
               record.set("computed", record.get("name") + " +++ computed");
             }
@@ -150,7 +149,7 @@ odm.addInterceptor(
         }
         if (operation === "SELECT") {
           console.log(
-            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`
+            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
           );
           if (when === "AFTER") {
             for (const record of records) {
@@ -161,7 +160,7 @@ odm.addInterceptor(
       }
       return records;
     }
-  })()
+  })(),
 );
 
 await conn.defineTable({
@@ -228,10 +227,11 @@ odm.addDataType(
         value &&
         typeof value === "string" &&
         !new RegExp(pattern).test(value)
-      )
+      ) {
         throw new Error("Not a valid email");
+      }
     }
-  })()
+  })(),
 );
 
 await conn.defineTable({
@@ -239,29 +239,29 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
+      type: "string",
     },
     {
       name: "personal_contact",
-      type: "email"
+      type: "email",
     },
     {
       name: "emp_no",
-      type: "uuid"
+      type: "uuid",
     },
     {
       name: "salary",
-      type: "integer"
+      type: "integer",
     },
     {
       name: "birth_date",
-      type: "date"
+      type: "date",
     },
     {
       name: "gender",
-      type: "boolean"
-    }
-  ]
+      type: "boolean",
+    },
+  ],
 });
 
 const studentTable = conn.table("student");
@@ -284,9 +284,9 @@ await conn.defineTable({
   columns: [
     {
       name: "name",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 
 const animalTable = conn.table("animal");
@@ -301,9 +301,9 @@ await conn.defineTable({
   columns: [
     {
       name: "breed",
-      type: "string"
-    }
-  ]
+      type: "string",
+    },
+  ],
 });
 
 const dogTable = conn.table("dog");
@@ -317,10 +317,10 @@ const animals = await animalTable.select().toArray();
 animals.forEach((animal) => {
   console.log(animal.toJSON());
 });
- ```
+```
 
 | Data type | get                  | getJSONValue |
-|-----------|----------------------|--------------|
+| --------- | -------------------- | ------------ |
 | string    | _string_             | _string_     |
 | integer   | _number_             | _number_     |
 | date      | _Temporal.PlainDate_ | _string_     |
