@@ -4,8 +4,6 @@ import { Session } from "./test.utils.ts";
 
 describe({
   name: "Initial test setup",
-  sanitizeResources: false,
-  sanitizeOps: false,
   fn: () => {
     it("#connect()", async () => {
       Session.setORM(

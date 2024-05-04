@@ -5,6 +5,6 @@ export function logSQLQuery(logger: Logger, query: string) {
 }
 
 export async function runSQLQuery(conn: any, query: string) {
-  const { rows }: any = await conn.queryObject({ text: query });
+  const { rows }: any = await conn.query({ text: query });
   return rows;
 }

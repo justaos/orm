@@ -98,7 +98,9 @@ describe(
       taskTable.orderBy("order", "ASC");
       const taskCursor = await taskTable.execute();
       for await (const taskRecord of taskCursor()) {
-        assertStrictEquals(taskRecord.get("priority"), 1, "Should be 1");
+        console.log(taskRecord);
+        const priority = taskRecord.get("priority");
+        assertStrictEquals(priority, 1, "Should be 1");
       }
     });
 

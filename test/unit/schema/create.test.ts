@@ -10,13 +10,9 @@ import {
 import { Session } from "../../test.utils.ts";
 import { ORM, ORMConnection, ORMError } from "../../../mod.ts";
 
-describe(
-  "TableCreate",
-  {
-    sanitizeResources: false,
-    sanitizeOps: false,
-  },
-  () => {
+describe({
+  name: "CREATE Query",
+  fn: () => {
     let conn: ORMConnection;
     let odm: ORM;
     const logger = Session.getLogger();
@@ -208,4 +204,4 @@ describe(
       assert(assertValue);
     });
   },
-);
+});

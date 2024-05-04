@@ -18,8 +18,6 @@ import DatabaseOperationInterceptor from "../../../src/operation-interceptor/Dat
 
 describe({
   name: "Operations Intercept",
-  sanitizeResources: false,
-  sanitizeOps: false,
   fn: () => {
     let odm: ORM;
     let conn: ORMConnection;

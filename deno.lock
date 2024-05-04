@@ -25,6 +25,7 @@
       "jsr:@std/testing@^0.220.1": "jsr:@std/testing@0.220.1",
       "jsr:@std/uuid@^0.218.2": "jsr:@std/uuid@0.218.2",
       "npm:bcryptjs@2.4.3": "npm:bcryptjs@2.4.3",
+      "npm:pg-cursor@^2.10.5": "npm:pg-cursor@2.10.5_pg@8.11.5",
       "npm:pg-escape": "npm:pg-escape@0.2.0",
       "npm:pg-escape@^0.2.0": "npm:pg-escape@0.2.0",
       "npm:pg@^8.11.5": "npm:pg@8.11.5"
@@ -141,6 +142,12 @@
       "pg-connection-string@2.6.4": {
         "integrity": "sha512-v+Z7W/0EO707aNMaAEfiGnGL9sxxumwLl2fJvCQtMn9Fxsg+lPpPkdcyBSv/KFgpGdYkMfn+EI1Or2EHjpgLCA==",
         "dependencies": {}
+      },
+      "pg-cursor@2.10.5_pg@8.11.5": {
+        "integrity": "sha512-wzgmyk+k9mwuYe30ylLA6qRWw2TBFSee4Bw23oTz66YL9RdRJjDi2TaROMMF+V3QB6QWB3FFCju22loDftjKkw==",
+        "dependencies": {
+          "pg": "pg@8.11.5"
+        }
       },
       "pg-escape@0.2.0": {
         "integrity": "sha512-QfXcpxyN9vT+kvexQpTeNyiwCxs4LPXLAV/C0EeLTJPCF61swhGdDlnHcuDgxJudgKGfQYiCkegg0GsSKSvvEg==",
@@ -501,11 +508,13 @@
       "jsr:@justaos/utils@^1.11.0",
       "jsr:@std/assert@^0.220.1",
       "jsr:@std/testing@^0.220.1",
+      "npm:pg-cursor@^2.10.5",
       "npm:pg-escape@^0.2.0",
       "npm:pg@^8.11.5"
     ],
     "packageJson": {
       "dependencies": [
+        "npm:pg-cursor@^2.10.5",
         "npm:pg-escape@^0.2.0"
       ]
     }

@@ -105,7 +105,7 @@ export default class ORMConnection {
         reserved,
         `SELECT EXISTS(SELECT
                        FROM information_schema.schemata
-                       WHERE schema_name = "${tableSchema.getSchemaName()}"
+                       WHERE schema_name = '${tableSchema.getSchemaName()}'
           LIMIT 1);`,
       );
 
@@ -122,8 +122,8 @@ export default class ORMConnection {
         reserved,
         `SELECT EXISTS(SELECT
                        FROM information_schema.tables
-                       WHERE table_name = "${tableSchema.getTableName()}"
-                         AND table_schema = "${tableSchema.getSchemaName()}"
+                       WHERE table_name = '${tableSchema.getTableName()}'
+                         AND table_schema = '${tableSchema.getSchemaName()}'
           LIMIT 1);`,
       );
 
@@ -151,8 +151,8 @@ export default class ORMConnection {
           reserved,
           `SELECT column_name
            FROM information_schema.columns
-           WHERE table_schema = "${tableSchema.getSchemaName()}"
-             AND table_name = "${tableSchema.getTableName()}";`,
+           WHERE table_schema = '${tableSchema.getSchemaName()}'
+             AND table_name = '${tableSchema.getTableName()}';`,
         );
         const existingColumnNames = columns.map(
           (column: { column_name: string }) => column.column_name,

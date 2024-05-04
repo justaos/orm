@@ -13,9 +13,6 @@ import { Session } from "../../test.utils.ts";
 
 describe({
   name: "INSERT Query",
-  sanitizeResources: true,
-  sanitizeOps: true,
-  sanitizeExit: true,
   fn: () => {
     let conn: ORMConnection;
     const cleanTableList: string[] = [];

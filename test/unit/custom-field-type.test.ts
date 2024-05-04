@@ -3,13 +3,9 @@ import { afterAll, assert, beforeAll, describe, it } from "../../test_deps.ts";
 import { ColumnDefinition, DataType, ORM, ORMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
 
-describe(
-  "custom-field-type",
-  {
-    sanitizeResources: false,
-    sanitizeOps: false,
-  },
-  () => {
+describe({
+  name: "Custom FieldType",
+  fn: () => {
     let odm: ORM;
     let conn: ORMConnection;
     const cleanTableList: string[] = [];
@@ -143,4 +139,4 @@ describe(
       assert(error, "Able to create, not defined field type element");
     });
   },
-);
+});

@@ -1,4 +1,4 @@
-import { Logger, UUID } from "../../deps.ts";
+import { Logger, pg, UUID } from "../../deps.ts";
 import {
   DatabaseOperationContext,
   DatabaseOperationType,
@@ -22,21 +22,21 @@ export default class Table {
 
   #disableIntercepts: boolean | string[] = false;
 
-  readonly #sql: any;
+  readonly #pool: pg.Pool;
 
   constructor(
     queryBuilder: Query,
     schema: TableSchema,
     operationInterceptorService: DatabaseOperationInterceptorService,
     logger: Logger,
-    sql: any,
+    pool: pg.Pool,
     context?: DatabaseOperationContext,
   ) {
     this.#queryBuilder = queryBuilder;
     this.#operationInterceptorService = operationInterceptorService;
     this.#schema = schema;
     this.#logger = logger;
-    this.#sql = sql;
+    this.#pool = pool;
     this.#context = context;
   }
 
@@ -127,14 +127,22 @@ export default class Table {
 
     await this.intercept("SELECT", "BEFORE", []);
 
-    const cursor = await this.#queryBuilder.cursor();
+    const { cursor, reserve } = await this.#queryBuilder.cursor();
+
+    reserve.on("error", () => console.log("Error in event."));
 
     return async function* () {
-      for await (const [row] of cursor) {
-        const [record] = await table.intercept("SELECT", "AFTER", [
-          table.convertRawRecordToRecord(row),
-        ]);
-        yield record;
+      try {
+        let rows = await cursor.read(1);
+        while (rows.length > 0) {
+          const [record] = await table.intercept("SELECT", "AFTER", [
+            table.convertRawRecordToRecord(rows[0]),
+          ]);
+          yield record;
+          rows = await cursor.read(1);
+        }
+      } finally {
+        reserve.release();
       }
     };
   }
@@ -217,7 +225,7 @@ export default class Table {
   }
 
   async disableAllTriggers() {
-    const reserve = await this.#sql.reserve();
+    const reserve = await this.#pool.reserve();
     await reserve.unsafe(
       `ALTER TABLE ${
         TableNameUtils.getFullFormTableName(
@@ -225,11 +233,11 @@ export default class Table {
         )
       } DISABLE TRIGGER ALL`,
     );
-    await reserve.release();
+    await reserve.release(true);
   }
 
   async enableAllTriggers() {
-    const reserve = await this.#sql.reserve();
+    const reserve = await this.#pool.reserve();
     await reserve.unsafe(
       `ALTER TABLE ${
         TableNameUtils.getFullFormTableName(
@@ -237,7 +245,7 @@ export default class Table {
         )
       } ENABLE TRIGGER ALL`,
     );
-    await reserve.release();
+    reserve.release();
   }
 
   /*async bulkInsert(records: Record[]): Promise<Record[]> {
@@ -257,7 +265,7 @@ export default class Table {
       await this.validateRecord(record.toJSON(), this.getContext());
     }
     let savedRawRecords: RawRecord;
-    const reserve = await this.#sql.reserve();
+    const reserve = await this.#pool.reserve();
     try {
       const command = reserve`INSERT INTO ${reserve(
         this.getTableSchema().getFullName()
@@ -299,7 +307,7 @@ export default class Table {
 
     const ids = records.map((record) => record.getID());
 
-    const reserve = await this.#sql.reserve();
+    const reserve = await this.#pool.reserve();
     try {
       const command = reserve`DELETE FROM ${reserve(
         this.getTableSchema().getFullName()

@@ -11,19 +11,18 @@ const defaultConfig: DatabaseConfiguration = {
 
 describe({
   name: "DatabaseConnection",
-  sanitizeResources: false,
-  sanitizeOps: false,
   fn: () => {
     it("#connect", async () => {
       const conn = new DatabaseConnection({
         ...defaultConfig,
         port: undefined,
       });
-      await conn.connect();
-      if (conn) {
-        await conn.closeConnection();
-      } else {
+      try {
+        await conn.connect();
+      } catch (_error) {
         assert(false, "connection failed");
+      } finally {
+        await conn.closeConnection();
       }
     });
 
@@ -104,6 +103,7 @@ describe({
           database: "",
         });
         await dbConnection.dropDatabase("odm-created-database");
+        await dbConnection.closeConnection();
       } catch (error) {
         console.log(error);
         assert(false, "Database dropping failed");

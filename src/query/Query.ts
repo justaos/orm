@@ -9,7 +9,7 @@ import {
   OrderByDirectionType,
   OrderByType,
 } from "../table/query/OrderByType.ts";
-import { pg } from "../../deps.ts";
+import { pg, PgCursor } from "../../deps.ts";
 import { runSQLQuery } from "../utils.ts";
 
 export default class Query {
@@ -23,8 +23,8 @@ export default class Query {
     | UpdateQuery
     | AlterQuery;
 
-  constructor(sql: pg.Pool) {
-    this.#pool = sql;
+  constructor(pool: pg.Pool) {
+    this.#pool = pool;
   }
 
   getInstance(): Query {
@@ -213,7 +213,7 @@ export default class Query {
     return result;
   }
 
-  async cursor(): Promise<any[]> {
+  async cursor(): Promise<any> {
     if (this.getType() !== "select") {
       throw new ORMError(
         DatabaseErrorCode.GENERIC_ERROR,
@@ -222,9 +222,11 @@ export default class Query {
     }
     const sqlQuery = this.getSQLQuery();
     const reserve = await this.#pool.connect();
-    const cursor = await reserve.unsafe(sqlQuery).cursor();
-    await reserve.release();
-    return cursor;
+    this.#pool.on("error", (r: any) => {
+      console.log(r);
+    });
+    const cursor = await reserve.query(new PgCursor(sqlQuery));
+    return { cursor, reserve };
   }
 
   #getQuery():

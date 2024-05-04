@@ -53,12 +53,13 @@ export default class ORM {
       return dataType.getName();
     },
   );
-  readonly #tableDefinitionRegistry: Registry<TableDefinition> =
-    new Registry<TableDefinition>(function (tableDefinition) {
-      return TableNameUtils.getShortFormTableName(
-        `${tableDefinition.schema}.${tableDefinition.name}`,
-      );
-    });
+  readonly #tableDefinitionRegistry: Registry<TableDefinition> = new Registry<
+    TableDefinition
+  >(function (tableDefinition) {
+    return TableNameUtils.getShortFormTableName(
+      `${tableDefinition.schema}.${tableDefinition.name}`,
+    );
+  });
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
   readonly #operationInterceptorService =
     new DatabaseOperationInterceptorService();
@@ -128,8 +129,8 @@ export default class ORM {
   }
 
   getTableSchema(tableName: string): TableSchema | undefined {
-    const tableDefinition: TableDefinition | undefined =
-      this.#tableDefinitionRegistry.get(tableName);
+    const tableDefinition: TableDefinition | undefined = this
+      .#tableDefinitionRegistry.get(tableName);
     if (tableDefinition) {
       return new TableSchema(
         tableDefinition,

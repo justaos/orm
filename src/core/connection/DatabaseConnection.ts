@@ -34,6 +34,7 @@ export default class DatabaseConnection {
   }
 
   async connect(): Promise<void> {
+    let client;
     try {
       this.#pool = new Pool({
         user: this.#config.username,
@@ -45,16 +46,18 @@ export default class DatabaseConnection {
         connectionTimeoutMillis: this.#config.connect_timeout,
       });
 
-      const client = await this.#pool.connect();
+      client = await this.#pool.connect();
       await client.query(`select 1`);
       this.#logger.info(
         `Connected to ${this.#config.database} database successfully`,
       );
-      client.release();
     } catch (err) {
       if (this.#pool) await this.#pool.end();
       this.#logger.error(err.message);
       throw err;
+    }
+    if (client) {
+      client.release();
     }
   }
 
@@ -76,9 +79,11 @@ export default class DatabaseConnection {
     if (!databaseName) throw new Error(`No database name provided to check.`);
     const client = await this.getConnectionPool().connect();
     const result = await client.query({
-      text: `SELECT EXISTS(SELECT 1 from pg_database WHERE datname = '${SqlString(
-        databaseName,
-      )}')`,
+      text: `SELECT EXISTS(SELECT 1 from pg_database WHERE datname = '${
+        SqlString(
+          databaseName,
+        )
+      }')`,
     });
     client.release();
     return result.rows[0].exists;
