@@ -1,0 +1,7 @@
+{
+  "version": "7.0.0",
+  "deno": true,
+  "node": true,
+  "jsr": true,
+  "signGitTag": true
+}
