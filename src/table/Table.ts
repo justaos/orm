@@ -1,4 +1,4 @@
-import { Logger, pg, UUID } from "../../deps.ts";
+import { Logger, pg, SqlString, UUID } from "../../deps.ts";
 import {
   DatabaseOperationContext,
   DatabaseOperationType,
@@ -186,8 +186,8 @@ export default class Table {
       | UUID
       | string
       | {
-        [key: string]: any;
-      },
+          [key: string]: any;
+        },
     value?: any,
   ): Promise<Record | undefined> {
     this.select();
@@ -225,27 +225,23 @@ export default class Table {
   }
 
   async disableAllTriggers() {
-    const reserve = await this.#pool.reserve();
-    await reserve.unsafe(
-      `ALTER TABLE ${
-        TableNameUtils.getFullFormTableName(
-          this.getName(),
-        )
-      } DISABLE TRIGGER ALL`,
-    );
-    await reserve.release(true);
+    const client = await this.#pool.connect();
+    await client.query({
+      text: `ALTER TABLE ${TableNameUtils.getFullFormTableName(
+        this.getName(),
+      )} DISABLE TRIGGER ALL`,
+    });
+    client.release();
   }
 
   async enableAllTriggers() {
-    const reserve = await this.#pool.reserve();
-    await reserve.unsafe(
-      `ALTER TABLE ${
-        TableNameUtils.getFullFormTableName(
-          this.getName(),
-        )
-      } ENABLE TRIGGER ALL`,
+    const client = await this.#pool.connect();
+    await client.query(
+      `ALTER TABLE ${TableNameUtils.getFullFormTableName(
+        this.getName(),
+      )} ENABLE TRIGGER ALL`,
     );
-    reserve.release();
+    client.release();
   }
 
   /*async bulkInsert(records: Record[]): Promise<Record[]> {
@@ -348,16 +344,4 @@ export default class Table {
     );
     return records;
   }
-
-  /*
-  #formatFilter(filter: any, schema: TableSchema): void {
-    Object.keys(filter).forEach((key) => {
-      const field = schema.getColumnSchema(key);
-      if (field && typeof filter[key] !== "object") {
-        filter[key] = field
-          .getColumnType()
-          .setValueIntercept(this.getSchema(), key, filter[key], filter);
-      }
-    });
-  }*/
 }
