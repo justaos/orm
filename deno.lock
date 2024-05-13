@@ -3,7 +3,7 @@
   "packages": {
     "specifiers": {
       "jsr:@bartlomieju/postgres": "jsr:@bartlomieju/postgres@0.17.2",
-      "jsr:@justaos/utils@^1.11.0": "jsr:@justaos/utils@1.11.0",
+      "jsr:@justaos/utils@^2.0.0": "jsr:@justaos/utils@2.0.0",
       "jsr:@std/assert@^0.213.1": "jsr:@std/assert@0.213.1",
       "jsr:@std/assert@^0.218.2": "jsr:@std/assert@0.218.2",
       "jsr:@std/assert@^0.220.1": "jsr:@std/assert@0.220.1",
@@ -44,8 +44,8 @@
           "jsr:@std/path@0.213.1"
         ]
       },
-      "@justaos/utils@1.11.0": {
-        "integrity": "cc4718d2b192d24703cb1fb1fc81bd4caf59dba1cf8a65dcb698899351f45f77",
+      "@justaos/utils@2.0.0": {
+        "integrity": "bd2f230d7e8a6c025351ef2030ede9415bafa07cd9ede1cf9585424d9371a232",
         "dependencies": [
           "jsr:@std/log@^0.218.2",
           "jsr:@std/uuid@^0.218.2",
@@ -505,7 +505,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@justaos/utils@^1.11.0",
+      "jsr:@justaos/utils@^2.0.0",
       "jsr:@std/assert@^0.220.1",
       "jsr:@std/testing@^0.220.1",
       "npm:pg-cursor@^2.10.5",
