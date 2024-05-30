@@ -1,4 +1,4 @@
-import { JSONObject, JSONPrimitive } from "../deps.ts";
+import { JSONPrimitive } from "../deps.ts";
 
 export type DatabaseOperationType = "INSERT" | "SELECT" | "UPDATE" | "DELETE";
 export type DatabaseOperationWhen = "BEFORE" | "AFTER";
@@ -62,9 +62,12 @@ export type NativeDataType =
 export type RawRecord = {
   id?: string;
   _table?: string;
-} & JSONObject;
+  [key: string]: unknown;
+};
 
-export type DatabaseOperationContext = JSONObject;
+export type DatabaseOperationContext = {
+  [key: string]: unknown;
+};
 
 export type SimpleCondition = {
   column: string | number;

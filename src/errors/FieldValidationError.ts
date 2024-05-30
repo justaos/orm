@@ -16,11 +16,7 @@ export class FieldValidationError extends Error {
 
   readonly #value: JSONValue;
 
-  constructor(
-    fieldDefinition: ColumnDefinition,
-    value: JSONValue,
-    code: string,
-  ) {
+  constructor(fieldDefinition: ColumnDefinition, value: any, code: string) {
     super(`FieldValidationError: ${fieldDefinition} ${value} ${code}`);
     this.name = "FieldValidationError";
     this.#columnDefinition = fieldDefinition;

@@ -7,7 +7,6 @@ import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
-import { JSONValue } from "https://deno.land/x/postgresjs@v3.4.3/types/index.d.ts";
 
 export default class Record {
   #isNew = false;
@@ -219,7 +218,7 @@ export default class Record {
     const tableSchema = this.#table.getTableSchema();
     const fieldErrors: FieldValidationError[] = [];
     for (const columnSchema of tableSchema.getColumnSchemas()) {
-      const value = <JSONValue> rawRecord[columnSchema.getName()];
+      const value = rawRecord[columnSchema.getName()];
       try {
         await columnSchema.getColumnType().validateValue(value);
       } catch (err) {
