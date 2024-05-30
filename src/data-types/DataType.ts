@@ -1,4 +1,5 @@
-import { ColumnDefinition, JSONValue, NativeDataType } from "../types.ts";
+import { ColumnDefinition, NativeDataType } from "../types.ts";
+import { JSONValue } from "../../deps.ts";
 
 abstract class DataType {
   readonly #nativeDataType: NativeDataType;
@@ -21,7 +22,7 @@ abstract class DataType {
 
   abstract toJSONValue(value: unknown): JSONValue;
 
-  abstract setValueIntercept(value: unknown): unknown;
+  abstract setValueIntercept(value: unknown): any;
 
   abstract validateValue(value: unknown): Promise<void>;
 }

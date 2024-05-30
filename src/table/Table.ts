@@ -1,4 +1,4 @@
-import { Logger, pg, SqlString, UUID } from "../../deps.ts";
+import { Logger, pg, UUID4 } from "../../deps.ts";
 import {
   DatabaseOperationContext,
   DatabaseOperationType,
@@ -183,11 +183,11 @@ export default class Table {
    */
   async getRecord(
     idOrColumnNameOrFilter:
-      | UUID
+      | UUID4
       | string
       | {
-          [key: string]: any;
-        },
+        [key: string]: any;
+      },
     value?: any,
   ): Promise<Record | undefined> {
     this.select();
@@ -227,9 +227,11 @@ export default class Table {
   async disableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query({
-      text: `ALTER TABLE ${TableNameUtils.getFullFormTableName(
-        this.getName(),
-      )} DISABLE TRIGGER ALL`,
+      text: `ALTER TABLE ${
+        TableNameUtils.getFullFormTableName(
+          this.getName(),
+        )
+      } DISABLE TRIGGER ALL`,
     });
     client.release();
   }
@@ -237,9 +239,11 @@ export default class Table {
   async enableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query(
-      `ALTER TABLE ${TableNameUtils.getFullFormTableName(
-        this.getName(),
-      )} ENABLE TRIGGER ALL`,
+      `ALTER TABLE ${
+        TableNameUtils.getFullFormTableName(
+          this.getName(),
+        )
+      } ENABLE TRIGGER ALL`,
     );
     client.release();
   }

@@ -1,9 +1,10 @@
 import { ColumnDefinition } from "../types.ts";
+import { JSONValue } from "../../deps.ts";
 
 type FieldValidationErrorObject = {
   code: string;
   columnDefinition: ColumnDefinition;
-  value: string;
+  value: JSONValue;
 };
 
 export type { FieldValidationErrorObject };
@@ -13,9 +14,13 @@ export class FieldValidationError extends Error {
 
   readonly #columnDefinition: ColumnDefinition;
 
-  readonly #value: string;
+  readonly #value: JSONValue;
 
-  constructor(fieldDefinition: ColumnDefinition, value: string, code: string) {
+  constructor(
+    fieldDefinition: ColumnDefinition,
+    value: JSONValue,
+    code: string,
+  ) {
     super(`FieldValidationError: ${fieldDefinition} ${value} ${code}`);
     this.name = "FieldValidationError";
     this.#columnDefinition = fieldDefinition;

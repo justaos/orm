@@ -11,6 +11,13 @@ import ColumnSchema from "./src/table/ColumnSchema.ts";
 import DataType from "./src/data-types/DataType.ts";
 import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 import TableNameUtils from "./src/table/TableNameUtils.ts";
+export {
+  type JSONArray,
+  type JSONObject,
+  type JSONPrimitive,
+  type JSONValue,
+  type UUID4,
+} from "./deps.ts";
 
 export {
   ColumnSchema,

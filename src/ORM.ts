@@ -21,7 +21,7 @@ import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
 import TableSchema from "./table/TableSchema.ts";
 import TableNameUtils from "./table/TableNameUtils.ts";
-import { CommonUtils, Logger, LoggerUtils, UUID } from "../deps.ts";
+import { CommonUtils, Logger, LoggerUtils, UUID4 } from "../deps.ts";
 
 /**
  * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -33,7 +33,7 @@ import { CommonUtils, Logger, LoggerUtils, UUID } from "../deps.ts";
  * @example
  * Get connection to database
  * ```ts
- * import {ORM} from "https://deno.land/x/justaos_odm@$VERSION/mod.ts";
+ * import {ORM} from "jsr:@justaos/odm@$VERSION";
  * const odm = new ORM({
  *  hostname: "localhost",
  *  port: 5432,
@@ -71,11 +71,11 @@ export default class ORM {
     else this.#logger = LoggerUtils.getLogger(ORM.name);
   }
 
-  static generateRecordId(): UUID {
-    return CommonUtils.generateUUID();
+  static generateRecordId(): UUID4 {
+    return <UUID4> CommonUtils.generateUUID();
   }
 
-  static isValidRecordId(id: UUID): boolean {
+  static isValidRecordId(id: UUID4): boolean {
     return CommonUtils.validateUUID(id);
   }
 

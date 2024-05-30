@@ -24,6 +24,7 @@
       "jsr:@std/path@0.213.1": "jsr:@std/path@0.213.1",
       "jsr:@std/testing@^0.220.1": "jsr:@std/testing@0.220.1",
       "jsr:@std/uuid@^0.218.2": "jsr:@std/uuid@0.218.2",
+      "jsr:@utility/types@^0.4.0": "jsr:@utility/types@0.4.0",
       "npm:bcryptjs@2.4.3": "npm:bcryptjs@2.4.3",
       "npm:pg-cursor@^2.10.5": "npm:pg-cursor@2.10.5_pg@8.11.5",
       "npm:pg-escape": "npm:pg-escape@0.2.0",
@@ -128,6 +129,9 @@
           "jsr:@std/bytes@^0.218.2",
           "jsr:@std/crypto@^0.218.2"
         ]
+      },
+      "@utility/types@0.4.0": {
+        "integrity": "6853c8e37b630a62753022ad723bb961d39d76d96a4d2a0a5ba82a14f341b718"
       }
     },
     "npm": {
@@ -508,6 +512,7 @@
       "jsr:@justaos/utils@^2.0.0",
       "jsr:@std/assert@^0.220.1",
       "jsr:@std/testing@^0.220.1",
+      "jsr:@utility/types@^0.4.0",
       "npm:pg-cursor@^2.10.5",
       "npm:pg-escape@^0.2.0",
       "npm:pg@^8.11.5"

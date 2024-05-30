@@ -1,6 +1,6 @@
 import DataType from "../DataType.ts";
 import { ColumnDefinition } from "../../types.ts";
-import { CommonUtils, UUID } from "../../../deps.ts";
+import { CommonUtils, UUID4 } from "../../../deps.ts";
 
 export default class UUIDDataType extends DataType {
   constructor() {
@@ -11,11 +11,11 @@ export default class UUIDDataType extends DataType {
     return true;
   }
 
-  toJSONValue(value: UUID | null): string | null {
+  toJSONValue(value: UUID4 | null): string | null {
     return value;
   }
 
-  setValueIntercept(value: string | UUID | null): UUID | null {
+  setValueIntercept(value: UUID4 | null): UUID4 | null {
     return value;
   }
 

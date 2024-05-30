@@ -28,6 +28,7 @@
     "@justaos/utils": "jsr:@justaos/utils@^2.0.0",
     "@std/assert": "jsr:@std/assert@^0.220.1",
     "@std/testing": "jsr:@std/testing@^0.220.1",
+    "@utility/types": "jsr:@utility/types@^0.4.0",
     "pg": "npm:pg@^8.11.5",
     "pg-cursor": "npm:pg-cursor@^2.10.5",
     "pg-escape": "npm:pg-escape@^0.2.0"

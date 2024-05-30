@@ -1,5 +1,5 @@
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
-import { JSONObject } from "../types.ts";
+import { JSONObject } from "../../deps.ts";
 import QueryUtils from "./QueryUtils.ts";
 import TableNameUtils from "../table/TableNameUtils.ts";
 

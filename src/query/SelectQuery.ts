@@ -5,6 +5,7 @@ import {
 import TableNameUtils from "../table/TableNameUtils.ts";
 import { QueryExpression } from "./QueryExpression.ts";
 import QueryUtils from "./QueryUtils.ts";
+import { JSONPrimitive } from "../../deps.ts";
 
 export default class SelectQuery {
   #columns: string[] = ["*"];
@@ -142,28 +143,28 @@ export default class SelectQuery {
       throw new Error("Condition not defined for simple expression");
     }
     if (Array.isArray(condition.condition.value)) {
-      return `"${condition.condition.column}" ${
-        condition.condition.operator
-      } (${condition.condition.value
-        .map((value: string | null) => {
-          return QueryUtils.escapeValue(value);
-        })
-        .join(", ")})`;
+      return `"${condition.condition.column}" ${condition.condition.operator} (${
+        condition.condition.value
+          .map((value: JSONPrimitive) => {
+            return QueryUtils.escapeValue(value);
+          })
+          .join(", ")
+      })`;
     }
-    return `"${condition.condition.column}" ${
-      condition.condition.operator
-    } ${QueryUtils.escapeValue(condition.condition.value)}`;
+    return `"${condition.condition.column}" ${condition.condition.operator} ${
+      QueryUtils.escapeValue(condition.condition.value)
+    }`;
   }
 
   #prepareExpressionCondition(condition: QueryExpression): string {
     if (condition.expressions.length) {
       return condition.expressions
         .map((condition: any) => {
-          const expressCondition: QueryExpression = <QueryExpression>condition;
+          const expressCondition: QueryExpression = <QueryExpression> condition;
           if (expressCondition.type == "COMPOUND") {
             return this.#prepareExpressionCondition(expressCondition);
           } else {
-            return this.#prepareSimpleCondition(<QueryExpression>condition);
+            return this.#prepareSimpleCondition(<QueryExpression> condition);
           }
         })
         .join(` ${condition.compoundOperator} `);

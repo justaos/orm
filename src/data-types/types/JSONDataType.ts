@@ -1,5 +1,6 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition, JSONValue } from "../../types.ts";
+import { ColumnDefinition } from "../../types.ts";
+import { JSONValue } from "../../../deps.ts";
 
 export default class JSONDataType extends DataType {
   constructor() {

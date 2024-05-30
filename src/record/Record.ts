@@ -1,5 +1,5 @@
 import { CommonUtils, Logger } from "../../deps.ts";
-import { JSONObject, RawRecord } from "../types.ts";
+import { RawRecord } from "../types.ts";
 import Table from "../table/Table.ts";
 import ColumnSchema from "../table/ColumnSchema.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
@@ -7,13 +7,14 @@ import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
+import { JSONValue } from "https://deno.land/x/postgresjs@v3.4.3/types/index.d.ts";
 
 export default class Record {
   #isNew = false;
 
   readonly #logger: Logger;
 
-  #record: RawRecord | undefined;
+  #record?: RawRecord;
 
   readonly #queryBuilder: Query;
 
@@ -191,8 +192,8 @@ export default class Record {
     return this;
   }
 
-  toJSON(columns?: string[]): JSONObject {
-    const jsonObject: JSONObject = {};
+  toJSON(columns?: string[]): RawRecord {
+    const rawRecord: RawRecord = {};
     this.#table
       .getTableSchema()
       .getColumnSchemas()
@@ -200,11 +201,11 @@ export default class Record {
         return !columns || columns.includes(field.getName());
       })
       .map((columnSchema: ColumnSchema) => {
-        jsonObject[columnSchema.getName()] = columnSchema
+        rawRecord[columnSchema.getName()] = columnSchema
           .getColumnType()
           .toJSONValue(this.get(columnSchema.getName()));
       });
-    return jsonObject;
+    return rawRecord;
   }
 
   #getRawRecord(): RawRecord {
@@ -216,10 +217,9 @@ export default class Record {
 
   async #validateRecord(rawRecord: RawRecord) {
     const tableSchema = this.#table.getTableSchema();
-    const context = this.#table.getContext();
-    const fieldErrors: any[] = [];
+    const fieldErrors: FieldValidationError[] = [];
     for (const columnSchema of tableSchema.getColumnSchemas()) {
-      const value = rawRecord[columnSchema.getName()];
+      const value = <JSONValue> rawRecord[columnSchema.getName()];
       try {
         await columnSchema.getColumnType().validateValue(value);
       } catch (err) {

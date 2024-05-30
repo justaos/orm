@@ -1,5 +1,4 @@
-import { JSONArray, JSONObject, JSONPrimitive } from "../types.ts";
-import { SqlString } from "../../deps.ts";
+import { JSONArray, JSONObject, JSONPrimitive, SqlString } from "../../deps.ts";
 
 export default class QueryUtils {
   static escapeValue(

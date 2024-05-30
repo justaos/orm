@@ -1,3 +1,5 @@
+import { JSONObject, JSONPrimitive } from "../deps.ts";
+
 export type DatabaseOperationType = "INSERT" | "SELECT" | "UPDATE" | "DELETE";
 export type DatabaseOperationWhen = "BEFORE" | "AFTER";
 
@@ -60,22 +62,12 @@ export type NativeDataType =
 export type RawRecord = {
   id?: string;
   _table?: string;
-  [key: string]: any;
-};
+} & JSONObject;
 
-export type DatabaseOperationContext = {
-  [key: string]: any;
-};
-
-export type JSONPrimitive = string | boolean | number | null | undefined;
-export type JSONArray = (JSONPrimitive | JSONObject | JSONArray)[];
-export type JSONObject = {
-  [key: string]: JSONPrimitive | JSONArray | JSONObject | object;
-};
-export type JSONValue = JSONObject | JSONArray | JSONPrimitive;
+export type DatabaseOperationContext = JSONObject;
 
 export type SimpleCondition = {
   column: string | number;
   operator: string;
-  value: any;
+  value: JSONPrimitive | JSONPrimitive[];
 };
