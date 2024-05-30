@@ -150,7 +150,9 @@ export default class SelectQuery {
         })
         .join(", ")})`;
     }
-    return `"${condition.condition.column}" ${condition.condition.operator} '${condition.condition.value}'`;
+    return `"${condition.condition.column}" ${
+      condition.condition.operator
+    } ${QueryUtils.escapeValue(condition.condition.value)}`;
   }
 
   #prepareExpressionCondition(condition: QueryExpression): string {
