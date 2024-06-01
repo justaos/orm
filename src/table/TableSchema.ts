@@ -4,7 +4,7 @@ import {
   TableDefinition,
   TableDefinitionRaw,
 } from "../types.ts";
-import Registry from "../core/Registry.ts";
+import Registry from "../Registry.ts";
 import ColumnSchema from "./ColumnSchema.ts";
 import DataType from "../data-types/DataType.ts";
 
@@ -50,7 +50,7 @@ export default class TableSchema {
       }
     }
 
-    return <TableDefinition> tableDefinition;
+    return <TableDefinition>tableDefinition;
   }
 
   static getTableName(fullName: string): string {
@@ -216,7 +216,7 @@ export default class TableSchema {
     }
 
     const allColumnNames: string[] = this.getColumnSchemas().map((f) =>
-      f.getName()
+      f.getName(),
     );
     const duplicates = CommonUtils.findDuplicates(allColumnNames);
     if (duplicates.length) {

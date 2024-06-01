@@ -4,7 +4,8 @@
   "exports": "./mod.ts",
   "tasks": {
     "coverage": "deno task test --coverage=./dist/coverage && deno coverage --include=src --lcov ./dist/coverage > ./dist/coverage/lcov.info",
-    "test": "deno test --allow-read --allow-env --allow-net --unstable-temporal"
+    "test": "deno test --allow-read --allow-env --allow-net --unstable-temporal",
+    "bench": "deno test --allow-read --allow-env ./test/bench.ts"
   },
   "exclude": [
     "dist",

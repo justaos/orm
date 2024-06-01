@@ -4,11 +4,9 @@ import {
   TableDefinition,
   TableDefinitionRaw,
 } from "./types.ts";
-import {
-  DatabaseConfiguration,
-  DatabaseConnection,
-} from "./core/connection/index.ts";
-import Registry from "./core/Registry.ts";
+import DatabaseConnection from "./connection/DatabaseConnection.ts";
+import { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
+import Registry from "./Registry.ts";
 import TableSchema from "./table/TableSchema.ts";
 import DataType from "./data-types/DataType.ts";
 

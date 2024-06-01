@@ -11,6 +11,7 @@ import ColumnSchema from "./src/table/ColumnSchema.ts";
 import DataType from "./src/data-types/DataType.ts";
 import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 import TableNameUtils from "./src/table/TableNameUtils.ts";
+
 export {
   type JSONArray,
   type JSONObject,
@@ -35,7 +36,7 @@ export {
   TableSchema,
 };
 
-export type { DatabaseConfiguration } from "./src/core/connection/index.ts";
+export type { DatabaseConfiguration } from "./src/connection/DatabaseConfiguration.ts";
 
 export type {
   ColumnDefinition,

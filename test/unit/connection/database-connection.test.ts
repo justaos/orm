@@ -1,6 +1,6 @@
 import { assert, describe, it } from "../../../test_deps.ts";
-import DatabaseConnection from "../../../src/core/connection/DatabaseConnection.ts";
-import { DatabaseConfiguration } from "../../../src/core/connection/index.ts";
+import DatabaseConnection from "../../../src/connection/DatabaseConnection.ts";
+import { DatabaseConfiguration } from "../../../mod.ts";
 
 const defaultConfig: DatabaseConfiguration = {
   hostname: "127.0.0.1",
@@ -40,16 +40,6 @@ describe({
         // Connection failed as expected
       }
     });
-
-    /* it("#getDBO - create record", async () => {
-       const conn = await DatabaseConnection.connect(defaultConfig);
-       const res = await conn
-         .getDBO()
-         .collection("test")
-         .insertOne({ name: "hello" });
-       assert(!!res, "insertedCount should be 1");
-       conn.closeConnection();
-     });*/
 
     it("#isDatabaseExist - without database", async () => {
       const conn = await DatabaseConnection.connect(defaultConfig);

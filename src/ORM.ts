@@ -1,8 +1,6 @@
-import {
-  DatabaseConfiguration,
-  DatabaseConnection,
-} from "./core/connection/index.ts";
-import Registry from "./core/Registry.ts";
+import DatabaseConnection from "./connection/DatabaseConnection.ts";
+import { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
+import Registry from "./Registry.ts";
 import DataType from "./data-types/DataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
@@ -31,9 +29,8 @@ import { CommonUtils, Logger, LoggerUtils, UUID4 } from "../deps.ts";
  * - Also supports interception on operations (create, read, update and delete).
  *
  * @example
- * Get connection to database
  * ```ts
- * import {ORM} from "jsr:@justaos/odm@$VERSION";
+ * import { ORM } from "@justaos/orm";
  * const odm = new ORM({
  *  hostname: "localhost",
  *  port: 5432,
@@ -43,8 +40,21 @@ import { CommonUtils, Logger, LoggerUtils, UUID4 } from "../deps.ts";
  * odm.connect();
  * ```
  *
- * @param config Database configuration
- */
+ *
+ * @module ORM
+ * @see {@link DatabaseConfiguration} for the configuration options
+ * @see {@link DataType} for the data types supported
+ * @see {@link TableDefinition} for the table definitions
+ * @see {@link DatabaseOperationInterceptor} for the operation interceptors
+ *
+ * @method connect Establishes a connection to the database
+ * @method isDatabaseExist Checks if the database exists
+ * @method isTableDefined Checks if a table is defined in the registry
+ * @method getTableSchema Retrieves the schema of a table
+ * @method addDataType Adds a new data type to the registry
+ * @method addInterceptor Adds a new operation interceptor to the service
+ * @method deleteInterceptor Deletes an operation interceptor from the service
+ * */
 export default class ORM {
   readonly #logger: Logger;
   readonly #config: DatabaseConfiguration;
@@ -53,13 +63,12 @@ export default class ORM {
       return dataType.getName();
     },
   );
-  readonly #tableDefinitionRegistry: Registry<TableDefinition> = new Registry<
-    TableDefinition
-  >(function (tableDefinition) {
-    return TableNameUtils.getShortFormTableName(
-      `${tableDefinition.schema}.${tableDefinition.name}`,
-    );
-  });
+  readonly #tableDefinitionRegistry: Registry<TableDefinition> =
+    new Registry<TableDefinition>(function (tableDefinition) {
+      return TableNameUtils.getShortFormTableName(
+        `${tableDefinition.schema}.${tableDefinition.name}`,
+      );
+    });
   readonly #schemaRegistry: Map<string, null> = new Map<string, null>();
   readonly #operationInterceptorService =
     new DatabaseOperationInterceptorService();
@@ -72,7 +81,7 @@ export default class ORM {
   }
 
   static generateRecordId(): UUID4 {
-    return <UUID4> CommonUtils.generateUUID();
+    return <UUID4>CommonUtils.generateUUID();
   }
 
   static isValidRecordId(id: UUID4): boolean {
@@ -129,8 +138,8 @@ export default class ORM {
   }
 
   getTableSchema(tableName: string): TableSchema | undefined {
-    const tableDefinition: TableDefinition | undefined = this
-      .#tableDefinitionRegistry.get(tableName);
+    const tableDefinition: TableDefinition | undefined =
+      this.#tableDefinitionRegistry.get(tableName);
     if (tableDefinition) {
       return new TableSchema(
         tableDefinition,
