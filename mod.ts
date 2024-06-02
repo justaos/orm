@@ -2,6 +2,7 @@ import ORM from "./src/ORM.ts";
 import ORMConnection from "./src/ORMConnection.ts";
 import Record from "./src/record/Record.ts";
 import Table from "./src/table/Table.ts";
+import Column from "./src/table/Column.ts";
 import { ORMError } from "./src/errors/ORMError.ts";
 import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOperationInterceptor.ts";
 import SelectQuery from "./src/query/SelectQuery.ts";
@@ -20,6 +21,7 @@ export {
   RecordSaveError,
   SelectQuery,
   Table,
+  Column,
 };
 
 export type {
