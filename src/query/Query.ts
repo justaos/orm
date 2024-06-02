@@ -1,11 +1,15 @@
 import SelectQuery from "./SelectQuery.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import DeleteQuery from "./DeleteQuery.ts";
-import { ColumnDefinitionNative, CreateQuery } from "./CreateQuery.ts";
+import { CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
 import UpdateQuery from "./UpdateQuery.ts";
 import { AlterQuery } from "./AlterQuery.ts";
-import { OrderByDirectionType, OrderByType } from "../types.ts";
+import {
+  ColumnDefinitionInternal,
+  OrderByDirectionType,
+  OrderByType,
+} from "../types.ts";
 import { pg, PgCursor } from "../../deps.ts";
 import { runSQLQuery } from "../utils.ts";
 
@@ -58,7 +62,7 @@ export default class Query {
     return this;
   }
 
-  addColumn(column: ColumnDefinitionNative): Query {
+  addColumn(column: ColumnDefinitionInternal): Query {
     const query = <CreateQuery>this.#getQuery();
     query.addColumn(column);
     return this;

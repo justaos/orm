@@ -1,21 +1,17 @@
 import { Logger } from "../deps.ts";
 import {
   DatabaseOperationContext,
-  TableDefinitionInternal,
   TableDefinition,
+  TableDefinitionInternal,
 } from "./types.ts";
 import DatabaseConnection from "./connection/DatabaseConnection.ts";
 import { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
-import Registry from "./Registry.ts";
 import TableDefinitionHandler from "./table/TableDefinitionHandler.ts";
-import DataType from "./data-types/DataType.ts";
 
 import Table from "./table/Table.ts";
-import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
 import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
 
 import Query from "./query/Query.ts";
-import ORM from "./ORM.ts";
 import { logSQLQuery, runSQLQuery } from "./utils.ts";
 import RegistriesHandler from "./RegistriesHandler.ts";
 
@@ -45,7 +41,7 @@ import RegistriesHandler from "./RegistriesHandler.ts";
  * import { ORMConnection } from "@justaos/orm";
  * const connection: ORMConnection = odm.connect();
  * const table = connection.table("users");
- *```
+ * ```
  */
 export default class ORMConnection {
   readonly #config: DatabaseConfiguration;
@@ -149,6 +145,7 @@ export default class ORMConnection {
           const columnDefinition = column.getDefinitionClone();
           createQuery.addColumn({
             name: column.getName(),
+            type: columnDefinition.type,
             data_type: column.getColumnType().getNativeType(),
             not_null: column.isNotNull(),
             unique: column.isUnique(),
@@ -182,6 +179,7 @@ export default class ORMConnection {
             if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
                 name: column.getName(),
+                type: columnDefinition.type,
                 data_type: column.getColumnType().getNativeType(),
                 not_null: column.isNotNull(),
                 unique: column.isUnique(),

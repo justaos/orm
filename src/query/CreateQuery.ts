@@ -1,24 +1,10 @@
 import { getFullFormTableName } from "../utils.ts";
-
-type ColumnDefinitionNative = {
-  name: string;
-  data_type: string;
-  not_null?: boolean;
-  default?: unknown;
-  unique?: boolean;
-  foreign_key?: {
-    table: string;
-    column: string;
-    on_delete?: "NO ACTION" | "CASCADE" | "SET NULL" | "SET DEFAULT";
-  };
-};
-
-export type { ColumnDefinitionNative };
+import { ColumnDefinitionInternal } from "../types.ts";
 
 export class CreateQuery {
   readonly #tableName: string;
 
-  #columns: ColumnDefinitionNative[] = [];
+  #columns: ColumnDefinitionInternal[] = [];
 
   #inherits?: string;
 
@@ -26,8 +12,8 @@ export class CreateQuery {
     this.#tableName = getFullFormTableName(tableName);
   }
 
-  addColumn(column: ColumnDefinitionNative): CreateQuery {
-    column = { not_null: false, unique: false, ...column };
+  addColumn(column: ColumnDefinitionInternal): CreateQuery {
+    column = { ...column };
     this.#columns.push(column);
     return this;
   }
@@ -47,7 +33,7 @@ export class CreateQuery {
     return query;
   }
 
-  #prepareColumn(column: ColumnDefinitionNative): string {
+  #prepareColumn(column: ColumnDefinitionInternal): string {
     let query = `"${column.name}" ${column.data_type}`;
     if (column.foreign_key) {
       const onDelete = column.foreign_key.on_delete

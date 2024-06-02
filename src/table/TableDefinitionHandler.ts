@@ -163,8 +163,8 @@ export default class TableDefinitionHandler {
     return columns;
   }
 
-  getColumnSchemas(): ColumnDefinitionHandler[] {
-    const allFields: ColumnDefinitionHandler[] = this.getOwnColumns();
+  getColumns(): Column[] {
+    const columns: Column[] = this.getOwnColumns();
 
     const extendsTableName = this.getInherits();
     if (
@@ -172,13 +172,13 @@ export default class TableDefinitionHandler {
       this.#registriesHandler.tableDefinitionRegistry.has(extendsTableName)
     ) {
       const extendedSchema = this.#getTableSchema(extendsTableName);
-      allFields.push(...extendedSchema.getColumnSchemas());
+      columns.push(...extendedSchema.getColumns());
     }
-    return allFields;
+    return columns;
   }
 
   getColumnNames(): string[] {
-    return this.getColumnSchemas().map((f) => f.getName());
+    return this.getColumns().map((f) => f.getName());
   }
 
   getOwnColumnNames(): string[] {
@@ -186,7 +186,7 @@ export default class TableDefinitionHandler {
   }
 
   getColumnSchema(name: string): ColumnDefinitionHandler | undefined {
-    return this.getColumnSchemas().find((field) => field.getName() === name);
+    return this.getColumns().find((field) => field.getName() === name);
   }
 
   validate() {
@@ -238,9 +238,7 @@ export default class TableDefinitionHandler {
       errorMessages = errorMessages.concat(columnSchema.validate());
     }
 
-    const allColumnNames: string[] = this.getColumnSchemas().map((f) =>
-      f.getName(),
-    );
+    const allColumnNames: string[] = this.getColumns().map((f) => f.getName());
     const duplicates = CommonUtils.findDuplicates(allColumnNames);
     if (duplicates.length) {
       errorMessages.push(`Duplicate fields -> ${duplicates.join(",")}`);
