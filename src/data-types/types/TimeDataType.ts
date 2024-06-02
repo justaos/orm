@@ -1,12 +1,12 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 
 export default class TimeDataType extends DataType {
   constructor() {
     super("time", "TIME");
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
+  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
     return true;
   }
 
@@ -18,7 +18,7 @@ export default class TimeDataType extends DataType {
   }
 
   setValueIntercept(
-    value: Temporal.PlainTime | null,
+    value: Temporal.PlainTime | Date | null,
   ): Temporal.PlainTime | null {
     if (typeof value === "string") {
       return Temporal.PlainTime.from(value);

@@ -1,4 +1,4 @@
-import TableNameUtils from "../table/TableNameUtils.ts";
+import { getFullFormTableName } from "../utils.ts";
 
 type ColumnDefinitionNative = {
   name: string;
@@ -23,7 +23,7 @@ export class AlterQuery {
   #inherits?: string;
 
   constructor(tableName: string) {
-    this.#tableName = TableNameUtils.getFullFormTableName(tableName);
+    this.#tableName = getFullFormTableName(tableName);
   }
 
   addColumn(column: ColumnDefinitionNative): AlterQuery {
@@ -45,11 +45,9 @@ export class AlterQuery {
       const onDelete = column.foreign_key.on_delete
         ? ` ON DELETE ${column.foreign_key.on_delete}`
         : "";
-      query += ` REFERENCES ${
-        TableNameUtils.getFullFormTableName(
-          column.foreign_key.table,
-        )
-      } ("${column.foreign_key.column}") ${onDelete}`;
+      query += ` REFERENCES ${getFullFormTableName(
+        column.foreign_key.table,
+      )} ("${column.foreign_key.column}") ${onDelete}`;
     } else {
       if (column.not_null) query += ` NOT NULL`;
       if (column.unique) query += ` UNIQUE`;

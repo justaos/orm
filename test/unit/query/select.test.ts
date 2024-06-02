@@ -17,7 +17,6 @@ describe(
   },
   () => {
     let conn: ORMConnection;
-    const logger = Session.getLogger();
 
     beforeAll(async () => {
       conn = await Session.getConnection();
@@ -138,41 +137,21 @@ describe(
       assertStrictEquals(taskGroupedRecords[1].count, 30, "Should be 30");
     });
 
-    /* it("#Collection::findOne", async () => {
-      const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-      const employee: Record | undefined = await employeeCollection.findOne({
-        name: "John"
-      });
-      assert(!!employee && employee.getID() === johnRecord.getID());
-    });
+    it("#select - getRecord", async () => {
+      const taskTable = conn.table("task");
+      const taskRecord = taskTable.createNewRecord();
+      const createdTaskId = taskRecord.getID();
+      taskRecord.set("description", "getRecord test");
+      await taskRecord.insert();
 
-    it("#Collection::Aggregation", async () => {
-      const employeeCollection = odm.collection(EMPLOYEE_MODEL_NAME);
-      const empRecord = employeeCollection.createNewRecord();
-      empRecord.set("name", "John");
-      empRecord.set("emp_no", odm.generateObjectId());
-      empRecord.set("birth_date", new Date().toISOString());
-      empRecord.set("created_on", new Date().toISOString());
-      empRecord.set("gender", true);
-      empRecord.set("salary", 5000);
-      empRecord.set("rating", 4.5);
-      empRecord.set("address", {
-        street: "test",
-        zipcode: 500000
+      const foundRecord = await taskTable.getRecord({
+        description: "getRecord test",
       });
-      await empRecord.insert();
-      const recs: any = await employeeCollection
-        .aggregate([
-          {
-            $group: {
-              _id: "$name",
-              count: { $count: {} }
-            }
-          }
-        ])
-        .toArray();
-      console.log(recs);
-      assert(recs[0].count == 1, "Not expected value");
-    });*/
+      assertStrictEquals(
+        createdTaskId,
+        foundRecord?.getID(),
+        "Record not found",
+      );
+    });
   },
 );

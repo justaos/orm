@@ -1,7 +1,7 @@
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { JSONObject } from "../../deps.ts";
 import QueryUtils from "./QueryUtils.ts";
-import TableNameUtils from "../table/TableNameUtils.ts";
+import { getFullFormTableName } from "../utils.ts";
 
 export default class InsertQuery {
   #tableName?: string;
@@ -12,7 +12,7 @@ export default class InsertQuery {
   constructor() {}
 
   into(tableName: string): InsertQuery {
-    this.#tableName = TableNameUtils.getFullFormTableName(tableName);
+    this.#tableName = getFullFormTableName(tableName);
     return this;
   }
 

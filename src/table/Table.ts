@@ -3,21 +3,29 @@ import {
   DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,
+  OrderByDirectionType,
+  OrderByType,
   RawRecord,
+  TableDefinitionInternal,
+  TableDefinition,
 } from "../types.ts";
 import Record from "../record/Record.ts";
-import TableSchema from "./TableSchema.ts";
 import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
 import Query from "../query/Query.ts";
-import { logSQLQuery } from "../utils.ts";
-import TableNameUtils from "./TableNameUtils.ts";
-import { OrderByDirectionType, OrderByType } from "./query/OrderByType.ts";
+import {
+  getFullFormTableName,
+  getShortFormTableName,
+  logSQLQuery,
+} from "../utils.ts";
+import Registry from "../Registry.ts";
+import DataType from "../data-types/DataType.ts";
+import TableDefinitionHandler from "./TableDefinitionHandler.ts";
+import RegistriesHandler from "../RegistriesHandler.ts";
 
-export default class Table {
-  readonly #schema: TableSchema;
+export default class Table extends TableDefinitionHandler {
   readonly #context?: DatabaseOperationContext;
   readonly #logger: Logger;
-  readonly #operationInterceptorService: DatabaseOperationInterceptorService;
+  readonly #registriesHandler: RegistriesHandler;
   #queryBuilder: Query;
 
   #disableIntercepts: boolean | string[] = false;
@@ -26,51 +34,39 @@ export default class Table {
 
   constructor(
     queryBuilder: Query,
-    schema: TableSchema,
-    operationInterceptorService: DatabaseOperationInterceptorService,
+    tableDefinition: TableDefinition,
+    registriesHandler: RegistriesHandler,
     logger: Logger,
     pool: pg.Pool,
     context?: DatabaseOperationContext,
   ) {
+    super(tableDefinition, registriesHandler);
+    this.#registriesHandler = registriesHandler;
     this.#queryBuilder = queryBuilder;
-    this.#operationInterceptorService = operationInterceptorService;
-    this.#schema = schema;
     this.#logger = logger;
     this.#pool = pool;
     this.#context = context;
+  }
+
+  static getFullFormTableName(name: string): string {
+    return getFullFormTableName(name);
+  }
+
+  static getShortFormTableName(name: string): string {
+    return getShortFormTableName(name);
   }
 
   getContext(): DatabaseOperationContext | undefined {
     return this.#context;
   }
 
-  getName(): string {
-    return this.#schema.getName();
-  }
-
-  getTableName(): string {
-    return this.#schema.getTableName();
-  }
-
-  getSchemaName(): string {
-    return this.#schema.getSchemaName();
-  }
-
-  getTableSchema(): TableSchema {
-    return this.#schema;
-  }
-
-  getColumnNames(): string[] {
-    return this.#schema.getColumnNames();
-  }
-
   createNewRecord(): Record {
     return new Record(this.#queryBuilder, this, this.#logger).initialize();
   }
 
-  select(...args: any[]): Table {
+  select(): Table {
     this.#queryBuilder = this.#queryBuilder.getInstance();
-    this.#queryBuilder.select.apply(this.#queryBuilder, args);
+    this.#queryBuilder.select.apply(this.#queryBuilder);
     this.#queryBuilder.from(this.getName());
     return this;
   }
@@ -169,25 +165,27 @@ export default class Table {
     return new Record(this.#queryBuilder, this, this.#logger, rawRecord);
   }
 
-  /*
-   * Get record by id
-   * @param idOrColumnNameOrFilter Id or column name or filter
-   * @param value Value
-   * @returns Record
+  /**
+   * Get a record by its ID or a column name and value
+   * @param idOrColumnNameOrFilter - The ID of the record or a column name and value
+   * @param value - The value of the column
+   * @returns The record or undefined if not found
    *
    * @example
+   * ```typescript
    * const record = await table.getRecord('id', '123');
    * const record = await table.getRecord('123');
    * const record = await table.getRecord({id: '123'});
    * const record = await table.getRecord({id: '123', name: 'test'});
+   * ```
    */
   async getRecord(
     idOrColumnNameOrFilter:
       | UUID4
       | string
       | {
-        [key: string]: any;
-      },
+          [key: string]: any;
+        },
     value?: any,
   ): Promise<Record | undefined> {
     this.select();
@@ -222,30 +220,6 @@ export default class Table {
       this.#disableIntercepts = [];
     }
     this.#disableIntercepts.push(interceptName);
-  }
-
-  async disableAllTriggers() {
-    const client = await this.#pool.connect();
-    await client.query({
-      text: `ALTER TABLE ${
-        TableNameUtils.getFullFormTableName(
-          this.getName(),
-        )
-      } DISABLE TRIGGER ALL`,
-    });
-    client.release();
-  }
-
-  async enableAllTriggers() {
-    const client = await this.#pool.connect();
-    await client.query(
-      `ALTER TABLE ${
-        TableNameUtils.getFullFormTableName(
-          this.getName(),
-        )
-      } ENABLE TRIGGER ALL`,
-    );
-    client.release();
   }
 
   /*async bulkInsert(records: Record[]): Promise<Record[]> {
@@ -333,19 +307,53 @@ export default class Table {
     );
   }*/
 
+  /**
+   * Disable all triggers on the table
+   */
+  async disableAllTriggers() {
+    const client = await this.#pool.connect();
+    await client.query({
+      text: `ALTER TABLE ${Table.getFullFormTableName(
+        this.getName(),
+      )} DISABLE TRIGGER ALL`,
+    });
+    client.release();
+  }
+
+  /**
+   * Enable all triggers on the table
+   */
+  async enableAllTriggers() {
+    const client = await this.#pool.connect();
+    await client.query(
+      `ALTER TABLE ${Table.getFullFormTableName(
+        this.getName(),
+      )} ENABLE TRIGGER ALL`,
+    );
+    client.release();
+  }
+
+  /**
+   * Intercepts table operation
+   * @param operation - The operation type
+   * @param when - The operation when
+   * @param records - The records
+   * @returns The records
+   */
   async intercept(
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],
   ): Promise<Record[]> {
-    records = await this.#operationInterceptorService.intercept(
-      this.getName(),
-      operation,
-      when,
-      records,
-      this.#context,
-      this.#disableIntercepts,
-    );
+    records =
+      await this.#registriesHandler.operationInterceptorService.intercept(
+        this.getName(),
+        operation,
+        when,
+        records,
+        this.#context,
+        this.#disableIntercepts,
+      );
     return records;
   }
 }

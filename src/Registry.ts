@@ -35,6 +35,10 @@ export default class Registry<T> {
     return this.registry.has(name);
   }
 
+  hasEntries(): boolean {
+    return this.registry.size > 0;
+  }
+
   /**
    * Retrieves the item with the given name from the registry.
    *

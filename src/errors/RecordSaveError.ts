@@ -2,10 +2,10 @@ import {
   FieldValidationError,
   FieldValidationErrorObject,
 } from "./FieldValidationError.ts";
-import { TableDefinition } from "../types.ts";
+import { TableDefinitionInternal } from "../types.ts";
 
 type RecordValidationErrorObject = {
-  tableDefinition: TableDefinition;
+  tableDefinition: TableDefinitionInternal;
   recordId: string | undefined;
   fieldErrors: FieldValidationErrorObject[];
 };
@@ -13,22 +13,22 @@ type RecordValidationErrorObject = {
 export type { RecordValidationErrorObject };
 
 export class RecordSaveError extends Error {
-  readonly #tableDefinition: TableDefinition;
+  readonly #tableDefinition: TableDefinitionInternal;
 
   readonly #recordId: string | undefined;
 
   readonly #fieldErrors: FieldValidationError[] = [];
 
   constructor(
-    tableDefinition: TableDefinition,
+    tableDefinition: TableDefinitionInternal,
     recordId: string | undefined,
     fieldErrors: FieldValidationError[],
     message?: string,
   ) {
     super(
-      `Record validation error in table ${tableDefinition.name} with id ${recordId}. ${
-        message || JSON.stringify(fieldErrors)
-      }`,
+      `Record validation error in table ${
+        tableDefinition.name
+      } with id ${recordId}. ${message || JSON.stringify(fieldErrors)}`,
     );
     this.name = "RecordValidationError";
     this.#tableDefinition = tableDefinition;

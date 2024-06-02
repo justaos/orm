@@ -1,12 +1,13 @@
 import { CommonUtils, Logger } from "../../deps.ts";
 import { RawRecord } from "../types.ts";
 import Table from "../table/Table.ts";
-import ColumnSchema from "../table/ColumnSchema.ts";
+import ColumnDefinitionHandler from "../table/ColumnDefinitionHandler.ts";
 import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
+import { JSONValue } from "https://deno.land/x/postgresjs@v3.4.3/types/index.d.ts";
 
 export default class Record {
   #isNew = false;
@@ -18,6 +19,8 @@ export default class Record {
   readonly #queryBuilder: Query;
 
   readonly #table: Table;
+
+  #columnsModified: { [key: string]: boolean } = {};
 
   constructor(
     queryBuilder: Query,
@@ -36,14 +39,12 @@ export default class Record {
 
   initialize(): Record {
     this.#record = {};
-    this.#table
-      .getTableSchema()
-      .getColumnSchemas()
-      .map((field: ColumnSchema) => {
-        if (typeof field.getDefaultValue() === "undefined") {
-          this.set(field.getName(), null);
-        } else this.set(field.getName(), field.getDefaultValue());
-      });
+    this.#columnsModified = {};
+    this.#table.getColumnSchemas().map((field: ColumnDefinitionHandler) => {
+      if (typeof field.getDefaultValue() === "undefined") {
+        this.set(field.getName(), null);
+      } else this.set(field.getName(), field.getDefaultValue());
+    });
     this.#record["id"] = CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
     this.#isNew = true;
@@ -64,26 +65,26 @@ export default class Record {
 
   set(key: string, value: any): void {
     const record = this.#getRawRecord();
-    const schema = this.#table.getTableSchema();
-    const field = schema.getColumnSchema(key);
+    const field = this.#table.getColumnSchema(key);
     if (field) {
       record[key] = field.getColumnType().setValueIntercept(value);
+      this.#columnsModified[key] = true;
     }
   }
 
   get(key: string): any {
     const record = this.#getRawRecord();
-    const schema = this.#table.getTableSchema();
-    if (schema.getColumnSchema(key)) return record[key];
+    if (this.#table.getColumnSchema(key)) return record[key];
     return null;
   }
 
-  getJSONValue(key: string): any {
+  getJSONValue(key: string): JSONValue {
     const record = this.#getRawRecord();
-    const schema = this.#table.getTableSchema();
-    const dataType = schema.getColumnSchema(key)?.getColumnType();
+    const dataType = this.#table.getColumnSchema(key)?.getColumnType();
     if (dataType && typeof record[key] !== "undefined") {
-      return dataType.toJSONValue(record[key]);
+      const jsonValue = <JSONValue>dataType.toJSONValue(record[key]);
+      if (typeof jsonValue === "undefined") return null;
+      return jsonValue;
     }
     return null;
   }
@@ -107,7 +108,7 @@ export default class Record {
     } catch (err) {
       this.#logger.error(err);
       throw new RecordSaveError(
-        this.#table.getTableSchema().getDefinition(),
+        this.#table.getDefinitionClone(),
         record.getID(),
         [],
         err.message,
@@ -119,6 +120,7 @@ export default class Record {
     ]);
     this.#record = record.toJSON();
     this.#isNew = false;
+    this.#columnsModified = {};
     return this;
   }
 
@@ -130,7 +132,7 @@ export default class Record {
     this.#queryBuilder.update();
     this.#queryBuilder.into(this.#table.getName());
     this.#queryBuilder.columns(
-      this.#table.getColumnNames().filter((col) => {
+      Object.keys(this.#columnsModified).filter((col) => {
         return col !== "id";
       }),
     );
@@ -146,7 +148,7 @@ export default class Record {
     } catch (err) {
       this.#logger.error(err);
       throw new RecordSaveError(
-        this.#table.getTableSchema().getDefinition(),
+        this.#table.getDefinitionClone(),
         record.getID(),
         [],
         err.message,
@@ -157,6 +159,7 @@ export default class Record {
       new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord),
     ]);
     this.#record = record.toJSON();
+    this.#columnsModified = {};
     return this;
   }
 
@@ -180,7 +183,7 @@ export default class Record {
     } catch (err) {
       this.#logger.error(err);
       throw new RecordSaveError(
-        this.#table.getTableSchema().getDefinition(),
+        this.#table.getDefinitionClone(),
         record.getID(),
         [],
         err.message,
@@ -194,12 +197,11 @@ export default class Record {
   toJSON(columns?: string[]): RawRecord {
     const rawRecord: RawRecord = {};
     this.#table
-      .getTableSchema()
       .getColumnSchemas()
-      .filter((field: ColumnSchema) => {
+      .filter((field: ColumnDefinitionHandler) => {
         return !columns || columns.includes(field.getName());
       })
-      .map((columnSchema: ColumnSchema) => {
+      .map((columnSchema: ColumnDefinitionHandler) => {
         rawRecord[columnSchema.getName()] = columnSchema
           .getColumnType()
           .toJSONValue(this.get(columnSchema.getName()));
@@ -215,16 +217,15 @@ export default class Record {
   }
 
   async #validateRecord(rawRecord: RawRecord) {
-    const tableSchema = this.#table.getTableSchema();
     const fieldErrors: FieldValidationError[] = [];
-    for (const columnSchema of tableSchema.getColumnSchemas()) {
+    for (const columnSchema of this.#table.getColumnSchemas()) {
       const value = rawRecord[columnSchema.getName()];
       try {
         await columnSchema.getColumnType().validateValue(value);
       } catch (err) {
         fieldErrors.push(
           new FieldValidationError(
-            columnSchema.getDefinition(),
+            columnSchema.getDefinitionClone(),
             value,
             err.message,
           ),
@@ -233,7 +234,7 @@ export default class Record {
     }
     if (fieldErrors.length) {
       throw new RecordSaveError(
-        tableSchema.getDefinition(),
+        this.#table.getDefinitionClone(),
         rawRecord.id,
         fieldErrors,
       );

@@ -1,5 +1,5 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 
 export default class StringDataType extends DataType {
   constructor() {
@@ -10,7 +10,7 @@ export default class StringDataType extends DataType {
     return value;
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
+  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
     return true;
   }
 

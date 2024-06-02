@@ -1,13 +1,13 @@
 import { Logger } from "../deps.ts";
 import {
   DatabaseOperationContext,
+  TableDefinitionInternal,
   TableDefinition,
-  TableDefinitionRaw,
 } from "./types.ts";
 import DatabaseConnection from "./connection/DatabaseConnection.ts";
 import { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
 import Registry from "./Registry.ts";
-import TableSchema from "./table/TableSchema.ts";
+import TableDefinitionHandler from "./table/TableDefinitionHandler.ts";
 import DataType from "./data-types/DataType.ts";
 
 import Table from "./table/Table.ts";
@@ -17,34 +17,51 @@ import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
 import Query from "./query/Query.ts";
 import ORM from "./ORM.ts";
 import { logSQLQuery, runSQLQuery } from "./utils.ts";
+import RegistriesHandler from "./RegistriesHandler.ts";
 
+/**
+ * The main class for interacting with the database.
+ * It provides methods for creating, dropping, and interacting with tables.
+ * It also provides methods for creating and executing queries.
+ * It is the main entry point for the ORM.
+ *
+ * @module ORMConnection
+ * @see {@link DatabaseConfiguration} for the configuration options
+ * @see {@link DataType} for the data types supported
+ * @see {@link TableDefinition} for the table definitions
+ * @see {@link DatabaseOperationInterceptorService} for the operation interceptors\
+ *
+ * @method connect Establishes a connection to the database
+ * @method closeConnection Closes the connection to the database
+ * @method dropDatabase Drops the database
+ * @method deregisterTable Deregisters a table from the registry
+ * @method defineTable Defines a new table
+ * @method dropTable Drops a table
+ * @method table Gets a table object
+ * @method query Creates a new query object
+ *
+ * @example
+ * ```typescript
+ * import { ORMConnection } from "@justaos/orm";
+ * const connection: ORMConnection = odm.connect();
+ * const table = connection.table("users");
+ *```
+ */
 export default class ORMConnection {
-  readonly #orm: ORM;
   readonly #config: DatabaseConfiguration;
   readonly #conn: DatabaseConnection;
-  readonly #dataTypeRegistry: Registry<DataType>;
-  readonly #schemaRegistry: Map<string, null>;
-  readonly #tableDefinitionRegistry: Registry<TableDefinition>;
+  readonly #registriesHandler: RegistriesHandler;
   readonly #logger: Logger;
-  readonly #operationInterceptorService: DatabaseOperationInterceptorService;
 
   constructor(
-    orm: ORM,
     logger: Logger,
     config: DatabaseConfiguration,
-    dataTypeRegistry: Registry<DataType>,
-    tableDefinitionRegistry: Registry<TableDefinition>,
-    schemaRegistry: Map<string, null>,
-    operationInterceptorService: DatabaseOperationInterceptorService,
+    registriesHandler: RegistriesHandler,
   ) {
-    this.#orm = orm;
     this.#logger = logger;
     this.#config = config;
     this.#conn = new DatabaseConnection(config, logger);
-    this.#dataTypeRegistry = dataTypeRegistry;
-    this.#tableDefinitionRegistry = tableDefinitionRegistry;
-    this.#schemaRegistry = schemaRegistry;
-    this.#operationInterceptorService = operationInterceptorService;
+    this.#registriesHandler = registriesHandler;
   }
 
   async connect(): Promise<void> {
@@ -75,18 +92,17 @@ export default class ORMConnection {
   }
 
   deregisterTable(tableName: string) {
-    this.#tableDefinitionRegistry.delete(tableName);
+    this.#registriesHandler.tableDefinitionRegistry.delete(tableName);
   }
 
-  async defineTable(tableDefinitionRaw: TableDefinitionRaw | Function) {
+  async defineTable(tableDefinitionRaw: TableDefinition | Function) {
     if (typeof tableDefinitionRaw === "function") {
       // @ts-ignore
       tableDefinitionRaw = tableDefinitionRaw.__tableDefinition;
     }
-    const tableSchema = new TableSchema(
+    const tableSchema = new TableDefinitionHandler(
       tableDefinitionRaw,
-      this.#dataTypeRegistry,
-      this.#tableDefinitionRegistry,
+      this.#registriesHandler,
     );
     try {
       tableSchema.validate();
@@ -94,7 +110,9 @@ export default class ORMConnection {
       this.#logger.error(error.message);
       throw error;
     }
-    this.#tableDefinitionRegistry.add(tableSchema.getDefinition());
+    this.#registriesHandler.tableDefinitionRegistry.add(
+      tableSchema.getDefinitionClone(),
+    );
 
     const pool = this.#conn.getConnectionPool();
     const reserved = await pool.connect();
@@ -113,7 +131,6 @@ export default class ORMConnection {
           `CREATE SCHEMA IF NOT EXISTS "${tableSchema.getSchemaName()}";`,
         );
         this.#logger.info(`Schema ${tableSchema.getSchemaName()} created`);
-        this.#schemaRegistry.set(tableSchema.getSchemaName(), null);
       }
 
       const [{ exists: tableExists }] = await runSQLQuery(
@@ -128,8 +145,8 @@ export default class ORMConnection {
       if (!tableExists) {
         const createQuery = new Query(this.#conn.getConnectionPool());
         createQuery.create(tableSchema.getName());
-        for (const column of tableSchema.getOwnColumnSchemas()) {
-          const columnDefinition = column.getDefinition();
+        for (const column of tableSchema.getOwnColumns()) {
+          const columnDefinition = column.getDefinitionClone();
           createQuery.addColumn({
             name: column.getName(),
             data_type: column.getColumnType().getNativeType(),
@@ -155,13 +172,13 @@ export default class ORMConnection {
         const existingColumnNames = columns.map(
           (column: { column_name: string }) => column.column_name,
         );
-        const columnSchemas = tableSchema.getOwnColumnSchemas();
+        const columnSchemas = tableSchema.getOwnColumns();
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
           const alterQuery = new Query(this.#conn.getConnectionPool());
           alterQuery.alter(tableSchema.getName());
-          for (const column of tableSchema.getOwnColumnSchemas()) {
-            const columnDefinition = column.getDefinition();
+          for (const column of tableSchema.getOwnColumns()) {
+            const columnDefinition = column.getDefinitionClone();
             if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
                 name: column.getName(),
@@ -201,8 +218,9 @@ export default class ORMConnection {
    * @param context Context object
    */
   table(name: string, context?: DatabaseOperationContext): Table {
-    const tableSchema: TableSchema | undefined = this.#orm.getTableSchema(name);
-    if (typeof tableSchema === "undefined") {
+    const tableDefinition: TableDefinitionInternal | undefined =
+      this.#registriesHandler.tableDefinitionRegistry.get(name);
+    if (typeof tableDefinition === "undefined") {
       throw new ORMError(
         DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
         `Table with name '${name}' is not defined`,
@@ -211,8 +229,8 @@ export default class ORMConnection {
     const queryBuilder = new Query(this.#conn.getConnectionPool());
     return new Table(
       queryBuilder,
-      tableSchema,
-      this.#operationInterceptorService,
+      tableDefinition,
+      this.#registriesHandler,
       this.#logger,
       this.#conn.getConnectionPool(),
       context,

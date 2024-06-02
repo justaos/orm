@@ -1,12 +1,12 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 
 export default class CharDataType extends DataType {
   constructor() {
     super("string", "CHAR");
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
+  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
     return true;
   }
 

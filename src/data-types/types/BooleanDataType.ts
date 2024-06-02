@@ -1,12 +1,12 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 
 export default class BooleanDataType extends DataType {
   constructor() {
     super("boolean", "BOOLEAN");
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
+  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
     return true;
   }
 

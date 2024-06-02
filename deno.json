@@ -3,8 +3,12 @@
   "version": "7.1.1",
   "exports": "./mod.ts",
   "tasks": {
-    "coverage": "deno task test --coverage=./dist/coverage && deno coverage --include=src --lcov ./dist/coverage > ./dist/coverage/lcov.info",
-    "test": "deno test --allow-read --allow-env --allow-net --unstable-temporal",
+    "coverage:unit": "deno task test:unit --coverage=./dist/coverage && deno coverage --include=src --lcov ./dist/coverage > ./dist/coverage/lcov.info",
+    "coverage": "deno task test:setUp && deno task coverage:unit && deno task test:tearDown",
+    "test:unit": "deno test --allow-read --allow-env --allow-net --unstable-temporal",
+    "test:setUp": "deno run --allow-read --allow-env --allow-net --unstable-temporal ./test/setUp.ts",
+    "test:tearDown": "deno run --allow-read --allow-env --allow-net --unstable-temporal ./test/tareDown.ts",
+    "test": "deno task test:setUp && deno task test:unit && deno task test:tearDown",
     "bench": "deno test --allow-read --allow-env ./test/bench.ts"
   },
   "exclude": [
@@ -20,9 +24,7 @@
   },
   "test": {
     "include": [
-      "test/init.test.ts",
-      "test/unit/",
-      "test/end.test.ts"
+      "test/"
     ]
   },
   "imports": {

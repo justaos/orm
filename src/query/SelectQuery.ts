@@ -1,16 +1,9 @@
-import {
-  OrderByDirectionType,
-  OrderByType,
-} from "../table/query/OrderByType.ts";
-import TableNameUtils from "../table/TableNameUtils.ts";
-import { QueryExpression } from "./QueryExpression.ts";
-import QueryUtils from "./QueryUtils.ts";
-import { JSONPrimitive } from "../../deps.ts";
+import { OrderByDirectionType, OrderByType } from "../types.ts";
+import WhereClause from "./WhereClause.ts";
+import { getFullFormTableName } from "../utils.ts";
 
-export default class SelectQuery {
+export default class SelectQuery extends WhereClause {
   #columns: string[] = ["*"];
-
-  #where?: QueryExpression;
 
   #sortList: OrderByType[] = [];
 
@@ -22,14 +15,16 @@ export default class SelectQuery {
 
   #groupBy?: string[];
 
-  constructor() {}
+  constructor() {
+    super();
+  }
 
   getColumns(): string[] {
     return this.#columns;
   }
 
   from(tableName: string): SelectQuery {
-    this.#from = TableNameUtils.getFullFormTableName(tableName);
+    this.#from = getFullFormTableName(tableName);
     return this;
   }
 
@@ -49,17 +44,6 @@ export default class SelectQuery {
       });
     }
     return this;
-  }
-
-  where(
-    column: string | number | boolean,
-    operator: any,
-    value?: any,
-  ): QueryExpression {
-    if (!this.#where) {
-      this.#where = new QueryExpression("COMPOUND");
-    }
-    return this.#where.andWhere(column, operator, value);
   }
 
   limit(limit: number): SelectQuery {
@@ -118,7 +102,7 @@ export default class SelectQuery {
   buildQuery(): string {
     let query = `SELECT ${this.#columns}
                  FROM ${this.#from}`;
-    query = query + this.#prepareWhereClause();
+    query = query + this.prepareWhereClause();
     query = query + this.#prepareGroupByClause();
     query = query + this.#prepareOrderByClause();
     query = query + this.#prepareLimitClause();
@@ -130,67 +114,12 @@ export default class SelectQuery {
   buildCountQuery(): string {
     let query = `SELECT COUNT(*) as count
                  FROM (SELECT * FROM ${this.#from}`;
-    query = query + this.#prepareWhereClause();
+    query = query + this.prepareWhereClause();
     query = query + this.#prepareGroupByClause();
     query = query + this.#prepareLimitClause();
     query = query + this.#prepareOffsetClause();
     query = query + ") as t";
     return query;
-  }
-
-  #prepareSimpleCondition(condition: QueryExpression): string {
-    if (!condition.condition) {
-      throw new Error("Condition not defined for simple expression");
-    }
-    if (Array.isArray(condition.condition.value)) {
-      return `"${condition.condition.column}" ${condition.condition.operator} (${
-        condition.condition.value
-          .map((value: JSONPrimitive) => {
-            return QueryUtils.escapeValue(value);
-          })
-          .join(", ")
-      })`;
-    }
-    return `"${condition.condition.column}" ${condition.condition.operator} ${
-      QueryUtils.escapeValue(condition.condition.value)
-    }`;
-  }
-
-  #prepareExpressionCondition(condition: QueryExpression): string {
-    if (condition.expressions.length) {
-      return condition.expressions
-        .map((condition: any) => {
-          const expressCondition: QueryExpression = <QueryExpression> condition;
-          if (expressCondition.type == "COMPOUND") {
-            return this.#prepareExpressionCondition(expressCondition);
-          } else {
-            return this.#prepareSimpleCondition(<QueryExpression> condition);
-          }
-        })
-        .join(` ${condition.compoundOperator} `);
-    }
-    return "";
-  }
-
-  #prepareWhereClause(): string {
-    if (!this.#where || !this.#where.expressions.length) {
-      return "";
-    }
-    return (
-      " WHERE " + this.#prepareExpressionCondition(this.#where)
-      /*this.#where
-        .map((where) => {
-          if (Array.isArray(where.value)) {
-            return `"${where.column}" ${where.operator} (${where.value
-              .map((value: string) => {
-                return `'${value}'`;
-              })
-              .join(", ")})`;
-          }
-          return `"${where.column}" ${where.operator} '${where.value}'`;
-        })
-        .join(" AND ")*/
-    );
   }
 
   #prepareLimitClause(): string {

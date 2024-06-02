@@ -1,5 +1,5 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 import { CommonUtils, UUID4 } from "../../../deps.ts";
 
 export default class UUIDDataType extends DataType {
@@ -7,7 +7,7 @@ export default class UUIDDataType extends DataType {
     super("uuid", "UUID");
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
+  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
     return true;
   }
 

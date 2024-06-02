@@ -1,5 +1,5 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 import { JSONValue } from "../../../deps.ts";
 
 export default class JSONDataType extends DataType {
@@ -7,15 +7,15 @@ export default class JSONDataType extends DataType {
     super("json", "JSON");
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
+  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
     return true;
   }
 
-  toJSONValue(value: JSONValue | null): JSONValue | null {
+  toJSONValue(value: JSONValue): JSONValue {
     return value;
   }
 
-  setValueIntercept(value: JSONValue | null): JSONValue | null {
+  setValueIntercept(value: JSONValue): JSONValue {
     return value;
   }
 

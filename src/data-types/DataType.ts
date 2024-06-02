@@ -1,4 +1,4 @@
-import { ColumnDefinition, NativeDataType } from "../types.ts";
+import { ColumnDefinitionInternal, NativeDataType } from "../types.ts";
 import { JSONValue } from "../../deps.ts";
 
 abstract class DataType {
@@ -18,7 +18,7 @@ abstract class DataType {
     return this.#nativeDataType;
   }
 
-  abstract validateDefinition(definition: ColumnDefinition): boolean;
+  abstract validateDefinition(definition: ColumnDefinitionInternal): boolean;
 
   abstract toJSONValue(value: unknown): JSONValue;
 

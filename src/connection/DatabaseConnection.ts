@@ -15,7 +15,7 @@ const { Pool } = pg;
  * @returns {DatabaseConnection} - Database connection instance.
  *
  * @example
- * ```ts
+ * ```typescript
  *  new DatabaseConnection({
  *   host: "127.0.0.1",
  *   port: 5432,

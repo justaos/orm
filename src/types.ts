@@ -1,11 +1,16 @@
 import { JSONPrimitive } from "../deps.ts";
 
+/**
+ * Database operation type
+ * @type {string}
+ * @enum {"INSERT" | "SELECT" | "UPDATE" | "DELETE"}
+ */
 export type DatabaseOperationType = "INSERT" | "SELECT" | "UPDATE" | "DELETE";
 export type DatabaseOperationWhen = "BEFORE" | "AFTER";
 
-export type ColumnDefinitionRaw = {
+export type ColumnDefinition = {
   name: string;
-  type?: string;
+  type: string;
   not_null?: boolean;
   default?: unknown;
   unique?: boolean;
@@ -16,10 +21,10 @@ export type ColumnDefinitionRaw = {
   };
 };
 
-export type ColumnDefinition = {
+export type ColumnDefinitionInternal = {
   name: string;
   type: string;
-  data_type?: string;
+  data_type: string;
   not_null: boolean;
   default?: unknown;
   unique: boolean;
@@ -30,20 +35,20 @@ export type ColumnDefinition = {
   };
 };
 
-export type TableDefinitionRaw = {
+export type TableDefinition = {
   schema?: string;
   name: string;
   inherits?: string;
   final?: boolean;
-  columns?: ColumnDefinitionRaw[];
+  columns?: ColumnDefinition[];
 };
 
-export type TableDefinition = {
+export type TableDefinitionInternal = {
   schema: string;
   name: string;
   inherits?: string;
   final: boolean;
-  columns: ColumnDefinition[];
+  columns: ColumnDefinitionInternal[];
 };
 
 export type NativeDataType =
@@ -73,4 +78,11 @@ export type SimpleCondition = {
   column: string | number;
   operator: string;
   value: JSONPrimitive | JSONPrimitive[];
+};
+
+export type OrderByDirectionType = "ASC" | "DESC";
+
+export type OrderByType = {
+  column: string;
+  order: OrderByDirectionType;
 };

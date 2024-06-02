@@ -6,22 +6,10 @@ import { ORMError } from "./src/errors/ORMError.ts";
 import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOperationInterceptor.ts";
 import SelectQuery from "./src/query/SelectQuery.ts";
 import Query from "./src/query/Query.ts";
-import TableSchema from "./src/table/TableSchema.ts";
-import ColumnSchema from "./src/table/ColumnSchema.ts";
 import DataType from "./src/data-types/DataType.ts";
 import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
-import TableNameUtils from "./src/table/TableNameUtils.ts";
 
 export {
-  type JSONArray,
-  type JSONObject,
-  type JSONPrimitive,
-  type JSONValue,
-  type UUID4,
-} from "./deps.ts";
-
-export {
-  ColumnSchema,
   DatabaseOperationInterceptor,
   DataType,
   ORM,
@@ -32,26 +20,27 @@ export {
   RecordSaveError,
   SelectQuery,
   Table,
-  TableNameUtils,
-  TableSchema,
 };
+
+export type {
+  JSONArray,
+  JSONObject,
+  JSONPrimitive,
+  JSONValue,
+  UUID4,
+} from "./deps.ts";
 
 export type { DatabaseConfiguration } from "./src/connection/DatabaseConfiguration.ts";
 
 export type {
-  ColumnDefinition,
-  ColumnDefinitionRaw,
+  ColumnDefinitionInternal,
   DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,
   NativeDataType,
-  RawRecord,
-  SimpleCondition,
-  TableDefinition,
-  TableDefinitionRaw,
-} from "./src/types.ts";
-
-export type {
   OrderByDirectionType,
   OrderByType,
-} from "./src/table/query/OrderByType.ts";
+  RawRecord,
+  SimpleCondition,
+  TableDefinitionInternal,
+} from "./src/types.ts";

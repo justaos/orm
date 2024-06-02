@@ -1,24 +1,27 @@
 import DataType from "../data-types/DataType.ts";
-import TableSchema from "./TableSchema.ts";
-import { ColumnDefinition, ColumnDefinitionRaw } from "../types.ts";
+import { ColumnDefinition, ColumnDefinitionInternal } from "../types.ts";
 
-export default class ColumnSchema {
-  readonly #columnDefinition: ColumnDefinition;
+export default class ColumnDefinitionHandler {
+  readonly #columnDefinition: ColumnDefinitionInternal;
 
-  readonly #fieldType?: DataType;
+  readonly #dataType: DataType;
 
-  constructor(schema: TableSchema, columnDefinition: ColumnDefinition) {
-    this.#columnDefinition = columnDefinition;
-    this.#fieldType = schema.getDataType(columnDefinition.type);
-    this.#columnDefinition.data_type = this.#fieldType?.getName();
+  constructor(columnDefinition: ColumnDefinition, dataType: DataType) {
+    this.#dataType = dataType;
+    this.#columnDefinition = ColumnDefinitionHandler.setDefaults(
+      columnDefinition,
+      dataType,
+    );
   }
 
   static setDefaults(
-    columnDefinition: ColumnDefinitionRaw,
-  ): ColumnDefinitionRaw {
+    columnDefinition: ColumnDefinition,
+    dataType: DataType,
+  ): ColumnDefinitionInternal {
     return {
       not_null: false,
       unique: false,
+      data_type: dataType.getName(),
       ...columnDefinition,
     };
   }
@@ -39,7 +42,7 @@ export default class ColumnSchema {
     return this.#columnDefinition.type;
   }
 
-  getDefinition(): ColumnDefinition {
+  getDefinitionClone(): ColumnDefinitionInternal {
     return {
       ...this.#columnDefinition,
     };
@@ -50,10 +53,10 @@ export default class ColumnSchema {
   }
 
   getColumnType(): DataType {
-    if (!this.#fieldType) {
+    if (!this.#dataType) {
       throw Error("No such field type");
     }
-    return this.#fieldType;
+    return this.#dataType;
   }
 
   validate(): string[] {
@@ -77,7 +80,7 @@ export default class ColumnSchema {
         `[Column :: ${this.getName()}] Column type not provided`,
       );
     }
-    if (!this.#fieldType) {
+    if (!this.#dataType) {
       errorMessages.push(
         `[Column :: ${this.getName()}] No such column type "${this.getType()}"`,
       );
