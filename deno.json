@@ -1,6 +1,6 @@
 {
   "name": "@justaos/orm",
-  "version": "7.1.1",
+  "version": "7.2.0-pre.0",
   "exports": "./mod.ts",
   "tasks": {
     "coverage:unit": "deno task test:unit --coverage=./dist/coverage && deno coverage --include=src --lcov ./dist/coverage > ./dist/coverage/lcov.info",
