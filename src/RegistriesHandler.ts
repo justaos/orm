@@ -16,6 +16,6 @@ export default class RegistriesHandler {
         `${tableSchema.schema}.${tableSchema.name}`,
       );
     });
-  readonly operationInterceptorService =
+  readonly operationInterceptorService: DatabaseOperationInterceptorService =
     new DatabaseOperationInterceptorService();
 }

@@ -1,4 +1,4 @@
-import { CommonUtils, Logger } from "../../deps.ts";
+import { CommonUtils, Logger, JSONValue } from "../../deps.ts";
 import { RawRecord } from "../types.ts";
 import Table from "../table/Table.ts";
 import ColumnDefinitionHandler from "../table/ColumnDefinitionHandler.ts";
@@ -7,7 +7,6 @@ import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
-import { JSONValue } from "https://deno.land/x/postgresjs@v3.4.3/types/index.d.ts";
 
 export default class Record {
   #isNew = false;
@@ -40,7 +39,7 @@ export default class Record {
   initialize(): Record {
     this.#record = {};
     this.#columnsModified = {};
-    this.#table.getColumnSchemas().map((field: ColumnDefinitionHandler) => {
+    this.#table.getColumns().map((field: ColumnDefinitionHandler) => {
       if (typeof field.getDefaultValue() === "undefined") {
         this.set(field.getName(), null);
       } else this.set(field.getName(), field.getDefaultValue());
@@ -197,7 +196,7 @@ export default class Record {
   toJSON(columns?: string[]): RawRecord {
     const rawRecord: RawRecord = {};
     this.#table
-      .getColumnSchemas()
+      .getColumns()
       .filter((field: ColumnDefinitionHandler) => {
         return !columns || columns.includes(field.getName());
       })
@@ -218,7 +217,7 @@ export default class Record {
 
   async #validateRecord(rawRecord: RawRecord) {
     const fieldErrors: FieldValidationError[] = [];
-    for (const columnSchema of this.#table.getColumnSchemas()) {
+    for (const columnSchema of this.#table.getColumns()) {
       const value = rawRecord[columnSchema.getName()];
       try {
         await columnSchema.getColumnType().validateValue(value);
