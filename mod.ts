@@ -33,7 +33,7 @@ export type {
 export type { DatabaseConfiguration } from "./src/connection/DatabaseConfiguration.ts";
 
 export type {
-  ColumnDefinitionInternal,
+  ColumnDefinition,
   DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,
@@ -42,5 +42,5 @@ export type {
   OrderByType,
   RawRecord,
   SimpleCondition,
-  TableDefinitionInternal,
+  TableDefinition,
 } from "./src/types.ts";
