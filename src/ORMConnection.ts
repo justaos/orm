@@ -100,12 +100,9 @@ export default class ORMConnection {
       tableDefinitionRaw,
       this.#registriesHandler,
     );
-    try {
-      tableSchema.validate();
-    } catch (error) {
-      this.#logger.error(error.message);
-      throw error;
-    }
+
+    tableSchema.validate();
+
     this.#registriesHandler.tableDefinitionRegistry.add(
       tableSchema.getDefinitionClone(),
     );
