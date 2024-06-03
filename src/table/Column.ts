@@ -10,9 +10,6 @@ export default class Column extends ColumnDefinitionHandler {
     const dataType = registriesHandler.dataTypeRegistry.get(
       columnDefinition.type,
     );
-    if (!dataType) {
-      throw new Error(`No such data type: ${columnDefinition.type}`);
-    }
     super(columnDefinition, dataType);
   }
 }

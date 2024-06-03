@@ -1,11 +1,6 @@
 import { afterAll, assert, beforeAll, describe, it } from "../../test_deps.ts";
 
-import {
-  ColumnDefinitionInternal,
-  DataType,
-  ORM,
-  ORMConnection,
-} from "../../mod.ts";
+import { ColumnDefinition, DataType, ORM, ORMConnection } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
 
 describe({
@@ -44,7 +39,7 @@ describe({
           return value;
         }
 
-        validateDefinition(fieldDefinition: ColumnDefinitionInternal) {
+        validateDefinition(fieldDefinition: ColumnDefinition) {
           return true;
         }
 

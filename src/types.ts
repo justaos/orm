@@ -24,7 +24,7 @@ export type ColumnDefinition = {
 export type ColumnDefinitionInternal = {
   name: string;
   type: string;
-  data_type: string;
+  data_type?: string;
   not_null: boolean;
   default?: unknown;
   unique: boolean;

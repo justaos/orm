@@ -4,9 +4,9 @@ import { ColumnDefinition, ColumnDefinitionInternal } from "../types.ts";
 export default class ColumnDefinitionHandler {
   readonly #columnDefinition: ColumnDefinitionInternal;
 
-  readonly #dataType: DataType;
+  readonly #dataType?: DataType;
 
-  constructor(columnDefinition: ColumnDefinition, dataType: DataType) {
+  constructor(columnDefinition: ColumnDefinition, dataType?: DataType) {
     this.#dataType = dataType;
     this.#columnDefinition = ColumnDefinitionHandler.setDefaults(
       columnDefinition,
@@ -16,12 +16,12 @@ export default class ColumnDefinitionHandler {
 
   static setDefaults(
     columnDefinition: ColumnDefinition,
-    dataType: DataType,
+    dataType?: DataType,
   ): ColumnDefinitionInternal {
     return {
       not_null: false,
       unique: false,
-      data_type: dataType.getName(),
+      data_type: dataType?.getName(),
       ...columnDefinition,
     };
   }
