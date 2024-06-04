@@ -1,4 +1,4 @@
-import { JSONArray, JSONObject, JSONPrimitive, SqlString } from "../../deps.ts";
+import { JSONArray, JSONObject, JSONPrimitive } from "../../deps.ts";
 
 export default class QueryUtils {
   static escapeValue(
@@ -8,7 +8,7 @@ export default class QueryUtils {
       return String(value);
     }
     if (typeof value === "string" || value === null) {
-      return SqlString.literal(value);
+      return literal(value);
     }
     if (typeof value === "object") {
       return `'${JSON.stringify(value)}'`;
@@ -16,3 +16,16 @@ export default class QueryUtils {
     return String(value);
   }
 }
+
+const literal: any = function (val: any): string {
+  if (null == val) return "NULL";
+  if (Array.isArray(val)) {
+    const vals = val.map(literal);
+    return "(" + vals.join(", ") + ")";
+  }
+  const backslash = ~val.indexOf("\\");
+  const prefix = backslash ? "E" : "";
+  val = val.replace(/'/g, "''");
+  val = val.replace(/\\/g, "\\\\");
+  return prefix + "'" + val + "'";
+};

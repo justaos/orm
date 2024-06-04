@@ -9,11 +9,12 @@ import { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
 import TableDefinitionHandler from "./table/TableDefinitionHandler.ts";
 
 import Table from "./table/Table.ts";
-import { DatabaseErrorCode, ORMError } from "./errors/ORMError.ts";
 
 import Query from "./query/Query.ts";
 import { logSQLQuery, runSQLQuery } from "./utils.ts";
 import RegistriesHandler from "./RegistriesHandler.ts";
+import { ORMGeneralError } from "./errors/ORMGeneralError.ts";
+import { ORMError } from "./errors/ORMError.ts";
 
 /**
  * The main class for interacting with the database.
@@ -88,7 +89,7 @@ export default class ORMConnection {
   }
 
   deregisterTable(tableName: string) {
-    this.#registriesHandler.tableDefinitionRegistry.delete(tableName);
+    this.#registriesHandler.deleteTableDefinition(tableName);
   }
 
   async defineTable(tableDefinitionRaw: TableDefinition | Function) {
@@ -96,15 +97,15 @@ export default class ORMConnection {
       // @ts-ignore
       tableDefinitionRaw = tableDefinitionRaw.__tableDefinition;
     }
-    const tableSchema = new TableDefinitionHandler(
+    const tableDefinitionHandler = new TableDefinitionHandler(
       tableDefinitionRaw,
       this.#registriesHandler,
     );
 
-    tableSchema.validate();
+    tableDefinitionHandler.validate();
 
-    this.#registriesHandler.tableDefinitionRegistry.add(
-      tableSchema.getDefinitionClone(),
+    this.#registriesHandler.addTableDefinition(
+      tableDefinitionHandler.getDefinitionClone(),
     );
 
     const pool = this.#conn.getConnectionPool();
@@ -114,31 +115,33 @@ export default class ORMConnection {
         reserved,
         `SELECT EXISTS(SELECT
                        FROM information_schema.schemata
-                       WHERE schema_name = '${tableSchema.getSchemaName()}'
+                       WHERE schema_name = '${tableDefinitionHandler.getSchemaName()}'
           LIMIT 1);`,
       );
 
       if (!schemaExists) {
         await runSQLQuery(
           reserved,
-          `CREATE SCHEMA IF NOT EXISTS "${tableSchema.getSchemaName()}";`,
+          `CREATE SCHEMA IF NOT EXISTS "${tableDefinitionHandler.getSchemaName()}";`,
         );
-        this.#logger.info(`Schema ${tableSchema.getSchemaName()} created`);
+        this.#logger.info(
+          `Schema ${tableDefinitionHandler.getSchemaName()} created`,
+        );
       }
 
       const [{ exists: tableExists }] = await runSQLQuery(
         reserved,
         `SELECT EXISTS(SELECT
                        FROM information_schema.tables
-                       WHERE table_name = '${tableSchema.getTableName()}'
-                         AND table_schema = '${tableSchema.getSchemaName()}'
+                       WHERE table_name = '${tableDefinitionHandler.getTableName()}'
+                         AND table_schema = '${tableDefinitionHandler.getSchemaName()}'
           LIMIT 1);`,
       );
 
       if (!tableExists) {
         const createQuery = new Query(this.#conn.getConnectionPool());
-        createQuery.create(tableSchema.getName());
-        for (const column of tableSchema.getOwnColumns()) {
+        createQuery.create(tableDefinitionHandler.getName());
+        for (const column of tableDefinitionHandler.getOwnColumns()) {
           const columnDefinition = column.getDefinitionClone();
           createQuery.addColumn({
             name: column.getName(),
@@ -149,7 +152,7 @@ export default class ORMConnection {
             foreign_key: columnDefinition.foreign_key,
           });
         }
-        const inherits = tableSchema.getInherits();
+        const inherits = tableDefinitionHandler.getInherits();
         if (inherits) {
           createQuery.inherits(inherits);
         }
@@ -160,18 +163,18 @@ export default class ORMConnection {
           reserved,
           `SELECT column_name
            FROM information_schema.columns
-           WHERE table_schema = '${tableSchema.getSchemaName()}'
-             AND table_name = '${tableSchema.getTableName()}';`,
+           WHERE table_schema = '${tableDefinitionHandler.getSchemaName()}'
+             AND table_name = '${tableDefinitionHandler.getTableName()}';`,
         );
         const existingColumnNames = columns.map(
           (column: { column_name: string }) => column.column_name,
         );
-        const columnSchemas = tableSchema.getOwnColumns();
+        const columnSchemas = tableDefinitionHandler.getOwnColumns();
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
           const alterQuery = new Query(this.#conn.getConnectionPool());
-          alterQuery.alter(tableSchema.getName());
-          for (const column of tableSchema.getOwnColumns()) {
+          alterQuery.alter(tableDefinitionHandler.getName());
+          for (const column of tableDefinitionHandler.getOwnColumns()) {
             const columnDefinition = column.getDefinitionClone();
             if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
@@ -214,10 +217,10 @@ export default class ORMConnection {
    */
   table(name: string, context?: DatabaseOperationContext): Table {
     const tableDefinition: TableDefinitionInternal | undefined =
-      this.#registriesHandler.tableDefinitionRegistry.get(name);
+      this.#registriesHandler.getTableDefinition(name);
     if (typeof tableDefinition === "undefined") {
       throw new ORMError(
-        DatabaseErrorCode.SCHEMA_VALIDATION_ERROR,
+        "TABLE_DEFINITION_VALIDATION",
         `Table with name '${name}' is not defined`,
       );
     }
@@ -238,10 +241,7 @@ export default class ORMConnection {
 
   #getConnection(): DatabaseConnection {
     if (!this.#conn) {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "There is no active connection",
-      );
+      throw new ORMGeneralError("There is no active connection");
     }
     return this.#conn;
   }

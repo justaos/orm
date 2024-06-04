@@ -18,7 +18,12 @@ abstract class DataType {
     return this.#nativeDataType;
   }
 
-  abstract validateDefinition(definition: ColumnDefinitionInternal): boolean;
+  /**
+   * Validate the column definition
+   * @param definition
+   * @throws {Error} if the definition is invalid
+   */
+  abstract validateDefinition(definition: ColumnDefinitionInternal): void;
 
   abstract toJSONValue(value: unknown): JSONValue;
 

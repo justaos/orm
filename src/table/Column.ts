@@ -7,9 +7,7 @@ export default class Column extends ColumnDefinitionHandler {
     columnDefinition: ColumnDefinition,
     registriesHandler: RegistriesHandler,
   ) {
-    const dataType = registriesHandler.dataTypeRegistry.get(
-      columnDefinition.type,
-    );
+    const dataType = registriesHandler.getDataType(columnDefinition.type);
     super(columnDefinition, dataType);
   }
 }

@@ -112,7 +112,7 @@ export default class TableDefinitionHandler {
     const extendsTableName = this.getInherits();
     if (extendsTableName) {
       extendedTables = extendedTables.concat(
-        this.#getTableSchema(extendsTableName).getExtendedTables(),
+        this.#getTableDefinitionHandler(extendsTableName).getExtendedTables(),
       );
     }
     return extendedTables;
@@ -122,8 +122,9 @@ export default class TableDefinitionHandler {
     let hostName = this.getName();
     const extendsTableName = this.getInherits();
     if (extendsTableName) {
-      const extendedSchema = this.#getTableSchema(extendsTableName);
-      hostName = extendedSchema.getBaseName();
+      const extendedTableDefinition =
+        this.#getTableDefinitionHandler(extendsTableName);
+      hostName = extendedTableDefinition.getBaseName();
     }
     return hostName;
   }
@@ -169,9 +170,9 @@ export default class TableDefinitionHandler {
     const extendsTableName = this.getInherits();
     if (
       extendsTableName &&
-      this.#registriesHandler.tableDefinitionRegistry.has(extendsTableName)
+      this.#registriesHandler.hasTableDefinition(extendsTableName)
     ) {
-      const extendedSchema = this.#getTableSchema(extendsTableName);
+      const extendedSchema = this.#getTableDefinitionHandler(extendsTableName);
       columns.push(...extendedSchema.getColumns());
     }
     return columns;
@@ -190,7 +191,9 @@ export default class TableDefinitionHandler {
   }
 
   validate() {
-    let errorMessages: string[] = [];
+    let tableDefinitionError: any = {
+      columns: [],
+    };
 
     /*
      * Validate table name
@@ -199,13 +202,11 @@ export default class TableDefinitionHandler {
       !this.#tableDefinition.name ||
       typeof this.#tableDefinition.name !== "string"
     ) {
-      errorMessages.push(`Invalid table name provided`);
+      tableDefinitionError.name = "Invalid table name provided";
     } else if (!/^[a-z0-9_]+$/i.test(this.#tableDefinition.name)) {
-      errorMessages.push(`Table name should be alphanumeric`);
-    } else if (
-      this.#registriesHandler.tableDefinitionRegistry.has(this.getName())
-    ) {
-      errorMessages.push(`Table name already exists`);
+      tableDefinitionError.name = "Table name should be alphanumeric";
+    } else if (this.#registriesHandler.hasTableDefinition(this.getName())) {
+      tableDefinitionError.name = "Table name already exists";
     }
 
     /*
@@ -213,19 +214,13 @@ export default class TableDefinitionHandler {
      */
     const extendsTableName = this.getInherits();
     if (typeof extendsTableName === "string") {
-      if (
-        !this.#registriesHandler.tableDefinitionRegistry.has(extendsTableName)
-      ) {
-        errorMessages.push(
-          `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' does not exists.`,
-        );
+      if (!this.#registriesHandler.hasTableDefinition(extendsTableName)) {
+        tableDefinitionError.inherits = `${this.getName()} cannot inherit '${extendsTableName}'. '${this.getInherits()}' does not exists.`;
       } else {
         const extendsCol: TableDefinitionHandler =
-          this.#getTableSchema(extendsTableName);
+          this.#getTableDefinitionHandler(extendsTableName);
         if (extendsCol.isFinal()) {
-          errorMessages.push(
-            `${this.getName()} cannot extend '${extendsTableName}'. '${this.getInherits()}' is final table schema.`,
-          );
+          tableDefinitionError.inherits = `${this.getName()} cannot inherit '${extendsTableName}'. '${this.getInherits()}' is final table schema.`;
         }
       }
     }
@@ -235,23 +230,34 @@ export default class TableDefinitionHandler {
      */
     const columnSchemas = this.getOwnColumns();
     for (const columnSchema of columnSchemas) {
-      errorMessages = errorMessages.concat(columnSchema.validate());
+      try {
+        columnSchema.validate();
+      } catch (error) {
+        tableDefinitionError.columns.push(error);
+      }
     }
 
     const allColumnNames: string[] = this.getColumns().map((f) => f.getName());
     const duplicates = CommonUtils.findDuplicates(allColumnNames);
     if (duplicates.length) {
-      errorMessages.push(`Duplicate fields -> ${duplicates.join(",")}`);
+      tableDefinitionError.duplicateFields = `Duplicate fields -> ${duplicates.join(
+        ",",
+      )}`;
     }
 
-    if (errorMessages.length) {
-      throw new TableDefinitionError(this.#tableDefinition, errorMessages);
+    if (
+      Object.keys(tableDefinitionError).length > 1 ||
+      tableDefinitionError.columns.length > 0
+    ) {
+      throw new TableDefinitionError(
+        `${this.#tableDefinition.schema}.${this.#tableDefinition.name}`,
+        tableDefinitionError,
+      );
     }
   }
 
-  #getTableSchema(tableName: string): TableDefinitionHandler {
-    const schema =
-      this.#registriesHandler.tableDefinitionRegistry.get(tableName);
+  #getTableDefinitionHandler(tableName: string): TableDefinitionHandler {
+    const schema = this.#registriesHandler.getTableDefinition(tableName);
     if (!schema) {
       throw Error(`[Schema::_getSchema] Schema not found :: ${tableName}`);
     }

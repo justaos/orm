@@ -2,6 +2,7 @@ import {
   afterAll,
   assert,
   assertEquals,
+  assertStrictEquals,
   beforeAll,
   describe,
   it,
@@ -36,8 +37,9 @@ describe({
         conn.table("unknown_table");
         assert(false, "Table should not exists");
       } catch (error) {
-        assert(
-          error instanceof ORMError && error.code === "SCHEMA_VALIDATION_ERROR",
+        assertStrictEquals(
+          error.code,
+          "TABLE_DEFINITION_VALIDATION",
           "Table should not exists",
         );
       }
@@ -110,8 +112,34 @@ describe({
             },
           ],
         });
-      } catch (_e) {
-        assert(true, "Table not create as expected");
+      } catch (error) {
+        console.log(error, JSON.stringify(error.cause, null, 4));
+        assertStrictEquals(
+          error.cause.columns[0].name,
+          "unknown",
+          "Table not create as expected",
+        );
+      }
+    });
+
+    it("#ORM::defineTable - invalid name", async () => {
+      try {
+        await conn.defineTable({
+          name: "unknown",
+          columns: [
+            {
+              name: "invalid name",
+              type: "string",
+            },
+          ],
+        });
+      } catch (error) {
+        console.log(error, JSON.stringify(error.cause, null, 4));
+        assertStrictEquals(
+          error.cause.columns[0].name,
+          "invalid name",
+          "Table not create as expected",
+        );
       }
     });
 

@@ -1,5 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Deno: eg-3-defining-custom-field-type.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/examples/eg-3-defining-custom-field-type.ts" programParameters="run --allow-all --unstable-temporal" workingDirectory="$PROJECT_DIR$/examples">
-    <method v="2" />
-  </configuration>
-</component>

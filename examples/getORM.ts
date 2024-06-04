@@ -1,12 +1,11 @@
-import { DatabaseConfiguration, ORM } from "../mod.ts";
+import { ORM } from "../mod.ts";
 
 export default function () {
-  const config: DatabaseConfiguration = {
-    database: "odm-example-db",
+  return new ORM({
+    database: "school-database",
     username: "postgres",
     password: "postgres",
     hostname: "localhost",
     port: 5432,
-  };
-  return new ORM(config);
+  });
 }

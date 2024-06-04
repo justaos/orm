@@ -1,20 +1,18 @@
-export enum DatabaseErrorCode {
-  GENERIC_ERROR = "GENERIC_ERROR",
-  CONNECTION_ERROR = "CONNECTION_ERROR",
-  SCHEMA_VALIDATION_ERROR = "SCHEMA_VALIDATION_ERROR",
-}
+export type ORMErrorCode =
+  | "GENERAL"
+  | "DATABASE_DOES_NOT_EXISTS"
+  | "QUERY"
+  | "TABLE_DEFINITION_VALIDATION";
 
 export class ORMError extends Error {
   public readonly name: string;
-  public readonly code: DatabaseErrorCode;
+  public readonly code: ORMErrorCode;
+  public readonly cause?: any;
 
-  constructor(code: DatabaseErrorCode, description: string) {
-    super(description);
-    Object.setPrototypeOf(this, new.target.prototype);
-
+  constructor(code: ORMErrorCode, message: string, cause?: any) {
+    super(message);
     this.name = "ORMError";
     this.code = code;
-
-    Error.captureStackTrace(this);
+    this.cause = cause;
   }
 }

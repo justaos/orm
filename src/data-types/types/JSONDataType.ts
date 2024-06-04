@@ -7,9 +7,7 @@ export default class JSONDataType extends DataType {
     super("json", "JSON");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: JSONValue): JSONValue {
     return value;

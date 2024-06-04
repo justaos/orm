@@ -6,8 +6,8 @@ import {
   OrderByDirectionType,
   OrderByType,
   RawRecord,
-  TableDefinitionInternal,
   TableDefinition,
+  TableDefinitionInternal,
 } from "../types.ts";
 import Record from "../record/Record.ts";
 import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
@@ -21,6 +21,7 @@ import Registry from "../Registry.ts";
 import DataType from "../data-types/DataType.ts";
 import TableDefinitionHandler from "./TableDefinitionHandler.ts";
 import RegistriesHandler from "../RegistriesHandler.ts";
+import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
 
 export default class Table extends TableDefinitionHandler {
   readonly #context?: DatabaseOperationContext;
@@ -105,7 +106,7 @@ export default class Table extends TableDefinitionHandler {
       this.#queryBuilder.from(this.getName());
     }
     if (this.#queryBuilder.getType() !== "select") {
-      throw new Error("Count can only be called on select query");
+      throw new ORMGeneralError("Count can only be called on select query");
     }
 
     logSQLQuery(this.#logger, this.#queryBuilder.getCountSQLQuery());
@@ -184,8 +185,8 @@ export default class Table extends TableDefinitionHandler {
       | UUID4
       | string
       | {
-          [key: string]: any;
-        },
+        [key: string]: any;
+      },
     value?: any,
   ): Promise<Record | undefined> {
     this.select();
@@ -313,9 +314,11 @@ export default class Table extends TableDefinitionHandler {
   async disableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query({
-      text: `ALTER TABLE ${Table.getFullFormTableName(
-        this.getName(),
-      )} DISABLE TRIGGER ALL`,
+      text: `ALTER TABLE ${
+        Table.getFullFormTableName(
+          this.getName(),
+        )
+      } DISABLE TRIGGER ALL`,
     });
     client.release();
   }
@@ -326,9 +329,11 @@ export default class Table extends TableDefinitionHandler {
   async enableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query(
-      `ALTER TABLE ${Table.getFullFormTableName(
-        this.getName(),
-      )} ENABLE TRIGGER ALL`,
+      `ALTER TABLE ${
+        Table.getFullFormTableName(
+          this.getName(),
+        )
+      } ENABLE TRIGGER ALL`,
     );
     client.release();
   }
@@ -345,15 +350,14 @@ export default class Table extends TableDefinitionHandler {
     when: DatabaseOperationWhen,
     records: Record[],
   ): Promise<Record[]> {
-    records =
-      await this.#registriesHandler.operationInterceptorService.intercept(
-        this.getName(),
-        operation,
-        when,
-        records,
-        this.#context,
-        this.#disableIntercepts,
-      );
+    records = await this.#registriesHandler.intercept(
+      this.getName(),
+      operation,
+      when,
+      records,
+      this.#context,
+      this.#disableIntercepts,
+    );
     return records;
   }
 }

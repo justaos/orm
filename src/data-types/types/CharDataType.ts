@@ -6,9 +6,7 @@ export default class CharDataType extends DataType {
     super("string", "CHAR");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: string | null): string | null {
     return value;

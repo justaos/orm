@@ -10,9 +10,7 @@ export default class StringDataType extends DataType {
     return value;
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   setValueIntercept(value: string | number | null): string | null {
     if (value === null) return null;

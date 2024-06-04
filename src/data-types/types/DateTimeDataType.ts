@@ -6,9 +6,7 @@ export default class DateTimeDataType extends DataType {
     super("datetime", "TIMESTAMP");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: Temporal.PlainDateTime | null): string | null {
     if (value instanceof Temporal.PlainDateTime) {

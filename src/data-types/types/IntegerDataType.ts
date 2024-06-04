@@ -1,5 +1,5 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 
 export default class IntegerDataType extends DataType {
   constructor() {
@@ -10,9 +10,7 @@ export default class IntegerDataType extends DataType {
     return value;
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   setValueIntercept(value: number | string | null): number | null {
     if (value === null) return null;

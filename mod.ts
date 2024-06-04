@@ -11,6 +11,7 @@ import DataType from "./src/data-types/DataType.ts";
 import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 
 export {
+  Column,
   DatabaseOperationInterceptor,
   DataType,
   ORM,
@@ -21,7 +22,6 @@ export {
   RecordSaveError,
   SelectQuery,
   Table,
-  Column,
 };
 
 export type {

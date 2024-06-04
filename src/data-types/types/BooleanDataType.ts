@@ -6,9 +6,7 @@ export default class BooleanDataType extends DataType {
     super("boolean", "BOOLEAN");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: boolean | null): boolean | null {
     return value;

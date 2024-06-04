@@ -59,38 +59,60 @@ export default class ColumnDefinitionHandler {
     return this.#dataType;
   }
 
-  validate(): string[] {
-    const errorMessages: string[] = [];
+  validate(): void {
+    const error: {
+      name: string;
+      errors: {
+        name?: string;
+        value?: any;
+        message: string;
+      }[];
+    } = {
+      name: this.getName(),
+      errors: [],
+    };
 
     /*
      * Validate column name
      */
     if (!this.getName() || typeof this.getName() !== "string") {
-      errorMessages.push(
-        `[Column :: ${this.getName()}] Invalid column name provided`,
-      );
+      error.errors.push({
+        name: "name",
+        value: this.getName(),
+        message: "Invalid column name provided",
+      });
     } else if (!/^[a-z0-9_]+$/i.test(this.getName())) {
-      errorMessages.push(
-        `[Column :: ${this.getName()}] Column name should be alphanumeric`,
-      );
+      error.errors.push({
+        name: "name",
+        value: this.getName(),
+        message: "Column name should be alphanumeric",
+      });
     }
 
-    if (!this.#columnDefinition || !this.getType()) {
-      errorMessages.push(
-        `[Column :: ${this.getName()}] Column type not provided`,
-      );
+    if (!this.getType()) {
+      error.errors.push({
+        name: "type",
+        value: this.getType(),
+        message: "Column type not provided",
+      });
+    } else if (!this.#dataType) {
+      error.errors.push({
+        name: "type",
+        value: this.getType(),
+        message: `No such column type "${this.getType()}"`,
+      });
+    } else {
+      try {
+        this.getColumnType().validateDefinition(this.#columnDefinition);
+      } catch (e) {
+        error.errors.push({
+          message: e.message,
+        });
+      }
     }
-    if (!this.#dataType) {
-      errorMessages.push(
-        `[Column :: ${this.getName()}] No such column type "${this.getType()}"`,
-      );
-    } else if (
-      !this.getColumnType().validateDefinition(this.#columnDefinition)
-    ) {
-      errorMessages.push(
-        `[Column :: ${this.getName()}] Invalid field definition`,
-      );
+
+    if (error.errors.length > 0) {
+      throw error;
     }
-    return errorMessages;
   }
 }

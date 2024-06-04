@@ -6,9 +6,7 @@ export default class TimeDataType extends DataType {
     super("time", "TIME");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: Temporal.PlainTime | null): string | null {
     if (value instanceof Temporal.PlainTime) {

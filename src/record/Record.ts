@@ -1,12 +1,12 @@
-import { CommonUtils, Logger, JSONValue } from "../../deps.ts";
+import { CommonUtils, JSONValue, Logger } from "../../deps.ts";
 import { RawRecord } from "../types.ts";
 import Table from "../table/Table.ts";
 import ColumnDefinitionHandler from "../table/ColumnDefinitionHandler.ts";
-import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
+import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
 
 export default class Record {
   #isNew = false;
@@ -81,7 +81,7 @@ export default class Record {
     const record = this.#getRawRecord();
     const dataType = this.#table.getColumnSchema(key)?.getColumnType();
     if (dataType && typeof record[key] !== "undefined") {
-      const jsonValue = <JSONValue>dataType.toJSONValue(record[key]);
+      const jsonValue = <JSONValue> dataType.toJSONValue(record[key]);
       if (typeof jsonValue === "undefined") return null;
       return jsonValue;
     }
@@ -164,10 +164,7 @@ export default class Record {
 
   async delete(): Promise<Record> {
     if (this.#isNew) {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "Cannot remove unsaved record",
-      );
+      throw new ORMGeneralError("Cannot remove unsaved record");
     }
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
@@ -210,7 +207,7 @@ export default class Record {
 
   #getRawRecord(): RawRecord {
     if (typeof this.#record === "undefined") {
-      throw new Error("Record not initialized");
+      throw new ORMGeneralError("Record not initialized");
     }
     return this.#record;
   }

@@ -27,7 +27,7 @@ import { ORM } from "@justaos/orm";
 
 ```ts
 const odm = new ORM({
-  database: "collection-service",
+  database: "employee-database",
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
@@ -37,15 +37,16 @@ const odm = new ORM({
 let conn: ORMConnection | undefined;
 try {
   conn = await odm.connect(true /* create database if not exists */);
-  console.log("connection success");
-} catch (_error) {
-  console.log("connection failed");
-} finally {
-  if (conn) await conn.closeConnection();
+  console.log("Connection established successfully");
+} catch (error) {
+  console.log("Error while establishing connection", error);
 }
+
+if (conn) await conn.closeConnection();
+
 ```
 
-## Defining models
+## Defining tables
 
 ```ts
 await orm.defineTable({
@@ -119,83 +120,94 @@ await conn.closeConnection();
 
 ## Intercepting database operations
 
+Intercept and compute student full name before insert and print all records after
 ```ts
-odm.addInterceptor(
-  new (class extends DatabaseOperationInterceptor {
-    getName() {
-      return "my-intercept";
-    }
-
-    async intercept(
-      collectionName: string,
-      operation: DatabaseOperationType,
-      when: DatabaseOperationWhen,
-      records: Record[],
-      _context: DatabaseOperationContext,
-    ) {
-      if (collectionName === "student") {
-        if (operation === "INSERT") {
-          console.log(
-            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
-          );
-          if (when === "BEFORE") {
-            for (let record of records) {
-              console.log(
-                "computed field updated for :: " + record.get("name"),
-              );
-              record.set("computed", record.get("name") + " +++ computed");
-            }
-          }
-        }
-        if (operation === "SELECT") {
-          console.log(
-            `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
-          );
-          if (when === "AFTER") {
-            for (const record of records) {
-              console.log(JSON.stringify(record.toJSON(), null, 4));
-            }
-          }
-        }
-      }
-      return records;
-    }
-  })(),
-);
+const conn = await odm.connect(true);
 
 await conn.defineTable({
   name: "student",
   columns: [
     {
-      name: "name",
+      name: "first_name",
       type: "string",
     },
     {
-      name: "computed",
+      name: "last_name",
+      type: "string",
+    },
+    {
+      name: "full_name" /* Value computed in intercept */,
       type: "string",
     },
   ],
 });
 
+class FullNameIntercept extends DatabaseOperationInterceptor {
+  getName() {
+    return "full-name-intercept";
+  }
+
+  async intercept(
+    collectionName: string,
+    operation: DatabaseOperationType,
+    when: DatabaseOperationWhen,
+    records: Record[],
+    _context: DatabaseOperationContext,
+  ) {
+    if (collectionName === "student") {
+      console.log(
+        `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
+      );
+      if (operation === "INSERT") {
+        if (when === "BEFORE") {
+          for (const record of records) {
+            console.log(
+              `Full name field updated for :: ${record.get("first_name")}`,
+            );
+            record.set(
+              "full_name",
+              `${record.get("first_name")} ${record.get("last_name")}`,
+            );
+          }
+        }
+      }
+      if (operation === "SELECT") {
+        if (when === "AFTER") {
+          for (const record of records) {
+            console.log(JSON.stringify(record.toJSON(), null, 4));
+          }
+        }
+      }
+    }
+    return records;
+  }
+}
+
+odm.addInterceptor(new FullNameIntercept());
+
 const studentTable = conn.table("student");
 const studentRecord = studentTable.createNewRecord();
-studentRecord.set("name", "John " + new Date().toISOString());
+studentRecord.set("first_name", "John");
+studentRecord.set("last_name", "Doe");
 await studentRecord.insert();
 await studentTable.select().toArray();
 /* This will print the following:
-[collectionName=student, operation=CREATE, when=BEFORE]
-computed field updated for :: John 2023-12-05T13:57:21.418Z
-[collectionName=student, operation=CREATE, when=AFTER]
-
-[collectionName=student, operation=READ, when=BEFORE]
-[collectionName=student, operation=READ, when=AFTER]
+[collectionName=student, operation=INSERT, when=BEFORE]
+Full name field updated for :: John
+[collectionName=student, operation=INSERT, when=AFTER]
+[collectionName=student, operation=SELECT, when=BEFORE]
+[collectionName=student, operation=SELECT, when=AFTER]
 {
-    "id": "e5d8a03e-7511-45c6-96ad-31a6fa833696",
+    "id": "653c21bb-7d92-435e-a742-1da749f914dd",
     "_table": "student",
-    "name": "John 2023-12-05T13:31:13.313Z",
-    "computed": "John 2023-12-05T13:31:13.313Z +++ computed"
+    "first_name": "John",
+    "last_name": "Doe",
+    "full_name": "John Doe"
 }
 */
+
+await conn.closeConnection();
+
 ```
 
 ## Define custom field type

@@ -122,6 +122,33 @@ describe(
       }
     });
 
+    it("#select - conn.query", async () => {
+      const taskQuery = conn.query();
+      taskQuery.select(["priority"]);
+      taskQuery.from("task");
+      taskQuery.where("priority", 2);
+      taskQuery.orderBy([
+        {
+          column: "order",
+          order: "ASC",
+        },
+      ]);
+      console.log(taskQuery.getSQLQuery());
+      const taskGroupedRecords = await taskQuery.execute();
+      for (const taskGroupedRecord of taskGroupedRecords) {
+        assertStrictEquals(
+          taskGroupedRecord.priority,
+          2,
+          "priority should be 2",
+        );
+        assertStrictEquals(
+          typeof taskGroupedRecord.description,
+          "undefined",
+          "except priority, all other fields should be undefined",
+        );
+      }
+    });
+
     it("#select - group by", async () => {
       const taskQuery = conn.query();
       taskQuery.select("priority", "count(*)::int as count");

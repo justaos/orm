@@ -2,7 +2,6 @@ import pg from "pg";
 import Cursor from "pg-cursor";
 
 export { CommonUtils } from "@justaos/utils/common-utils";
-export { default as SqlString } from "pg-escape";
 
 export { Logger, LoggerUtils } from "@justaos/utils/logger-utils";
 export {

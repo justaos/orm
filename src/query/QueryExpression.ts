@@ -1,4 +1,5 @@
 import { SimpleCondition } from "../types.ts";
+import { ORMError } from "../errors/ORMError.ts";
 
 export class QueryExpression {
   type: "SIMPLE" | "COMPOUND";
@@ -36,13 +37,13 @@ export class QueryExpression {
     if (!this.compoundOperator) this.compoundOperator = "OR";
 
     if (this.compoundOperator === "AND") {
-      throw new Error("Cannot use 'OR' on top of 'AND'");
+      throw new ORMError("QUERY", "Cannot use 'OR' on top of 'AND'");
     }
 
     if (this.type == "SIMPLE") {
       this.type = "COMPOUND";
       if (!this.condition) {
-        throw new Error("condition should be present on simple");
+        throw new ORMError("QUERY", "condition should be present on simple");
       }
       const expression = new QueryExpression("SIMPLE", <any> this.condition);
       this.expressions.push(expression);
@@ -66,13 +67,13 @@ export class QueryExpression {
     if (!this.compoundOperator) this.compoundOperator = "AND";
 
     if (this.compoundOperator === "OR") {
-      throw new Error("Cannot use 'AND' on top of 'OR'");
+      throw new ORMError("QUERY", "Cannot use 'AND' on top of 'OR'");
     }
 
     if (this.type == "SIMPLE") {
       this.type = "COMPOUND";
       if (!this.condition) {
-        throw new Error("condition should be present on simple");
+        throw new ORMError("QUERY", "condition should be present on simple");
       }
       const expression = new QueryExpression("SIMPLE", this.condition);
       this.expressions.push(expression);

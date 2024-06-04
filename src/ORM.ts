@@ -16,6 +16,7 @@ import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
 import { CommonUtils, Logger, LoggerUtils, UUID4 } from "../deps.ts";
 import RegistriesHandler from "./RegistriesHandler.ts";
+import { ORMGeneralError } from "./errors/ORMGeneralError.ts";
 
 /**
  * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -59,7 +60,7 @@ export default class ORM {
     this.#loadBuildInFieldTypes();
     this.#config = config;
     if (logger) this.#logger = logger;
-    else this.#logger = LoggerUtils.getLogger(ORM.name);
+    else this.#logger = LoggerUtils.getLogger(ORM.name, "INFO");
   }
 
   /**
@@ -92,7 +93,7 @@ export default class ORM {
       return conn;
     } catch (error) {
       if (
-        error.code === "3D000" &&
+        error.code === "DATABASE_DOES_NOT_EXISTS" &&
         this.#config.database &&
         createDatabaseIfNotExists
       ) {
@@ -118,7 +119,9 @@ export default class ORM {
       ...this.#config,
       database: "postgres",
     });
-    if (!this.#config.database) throw new Error("database name not provided");
+    if (!this.#config.database) {
+      throw new ORMGeneralError("Database name not provided");
+    }
     await tempConn.connect();
     const result = await tempConn.isDatabaseExist(this.#config.database);
     await tempConn.closeConnection();
@@ -130,7 +133,7 @@ export default class ORM {
    * @param tableName
    */
   isTableDefined(tableName: string): boolean {
-    return this.#registryHandler.tableDefinitionRegistry.has(tableName);
+    return this.#registryHandler.hasTableDefinition(tableName);
   }
 
   /**
@@ -138,7 +141,7 @@ export default class ORM {
    * @param dataType
    */
   addDataType(dataType: DataType): void {
-    this.#registryHandler.dataTypeRegistry.add(dataType);
+    this.#registryHandler.addDataType(dataType);
   }
 
   /**
@@ -146,9 +149,7 @@ export default class ORM {
    * @param operationInterceptor
    */
   addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
-    this.#registryHandler.operationInterceptorService.addInterceptor(
-      operationInterceptor,
-    );
+    this.#registryHandler.addInterceptor(operationInterceptor);
   }
 
   /**
@@ -156,9 +157,7 @@ export default class ORM {
    * @param operationInterceptorName
    */
   deleteInterceptor(operationInterceptorName: string): void {
-    this.#registryHandler.operationInterceptorService.deleteInterceptor(
-      operationInterceptorName,
-    );
+    this.#registryHandler.deleteInterceptor(operationInterceptorName);
   }
 
   /**

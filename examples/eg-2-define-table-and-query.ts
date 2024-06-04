@@ -30,11 +30,10 @@ const records = await teacherTable
   .orderBy("roll_no", "DESC")
   .toArray();
 
-records.forEach(async function (rec) {
-  console.log(`${await rec.get("name")} :: ${await rec.get("roll_no")}`);
-  console.log(JSON.stringify(await rec.toJSON(), null, 4));
-});
+for (const record of records) {
+  console.log(record.get("name") + " :: " + record.get("roll_no"));
+}
 
-const count = await teacherTable.count();
-console.log("COUNT :: " + count);
+console.log("Count :: " + (await teacherTable.count()));
+
 await conn.closeConnection();

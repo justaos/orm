@@ -1,7 +1,8 @@
-import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import { JSONObject } from "../../deps.ts";
 import QueryUtils from "./QueryUtils.ts";
 import { getFullFormTableName } from "../utils.ts";
+import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
+import { ORMError } from "../errors/ORMError.ts";
 
 export default class InsertQuery {
   #tableName?: string;
@@ -24,7 +25,7 @@ export default class InsertQuery {
     } else {
       this.#columns = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new Error("Invalid argument");
+          throw new ORMError("QUERY", "Invalid argument");
         }
         return arg;
       });
@@ -42,7 +43,7 @@ export default class InsertQuery {
     } else {
       this.#returning = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new Error("Invalid argument");
+          throw new ORMError("QUERY", "Invalid argument");
         }
         return arg;
       });
@@ -57,10 +58,7 @@ export default class InsertQuery {
 
   buildQuery(): string {
     if (typeof this.#columns === "undefined") {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "Columns not defined",
-      );
+      throw new ORMError("QUERY", "Columns not defined");
     }
 
     let query = `INSERT INTO ${this.#tableName}`;

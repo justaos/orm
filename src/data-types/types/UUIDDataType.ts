@@ -7,9 +7,7 @@ export default class UUIDDataType extends DataType {
     super("uuid", "UUID");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: UUID4 | null): string | null {
     return value;

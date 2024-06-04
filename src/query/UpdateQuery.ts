@@ -1,7 +1,8 @@
-import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import QueryUtils from "./QueryUtils.ts";
 import WhereClause from "./WhereClause.ts";
 import { getFullFormTableName } from "../utils.ts";
+import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
+import { ORMError } from "../errors/ORMError.ts";
 
 export default class UpdateQuery extends WhereClause {
   #tableName?: string;
@@ -26,7 +27,7 @@ export default class UpdateQuery extends WhereClause {
     } else {
       this.#columns = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new Error("Invalid argument");
+          throw new ORMError("QUERY", "Invalid argument");
         }
         return arg;
       });
@@ -44,7 +45,7 @@ export default class UpdateQuery extends WhereClause {
     } else {
       this.#returning = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new Error("Invalid argument");
+          throw new ORMError("QUERY", "Invalid argument");
         }
         return arg;
       });
@@ -59,18 +60,17 @@ export default class UpdateQuery extends WhereClause {
 
   buildQuery(): string {
     if (typeof this.#columns === "undefined") {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "Columns not defined",
-      );
+      throw new ORMError("QUERY", "Columns not defined");
     }
 
     let query = `UPDATE ${this.#tableName}`;
     if (typeof this.#row !== "undefined") {
       const row: any = this.#row;
-      query += ` SET ${this.#columns.map((column) => {
-        return `"${column}" = ${QueryUtils.escapeValue(row[column])}`;
-      })}`;
+      query += ` SET ${
+        this.#columns.map((column) => {
+          return `"${column}" = ${QueryUtils.escapeValue(row[column])}`;
+        })
+      }`;
     }
     query = query + this.prepareWhereClause();
     query += ` RETURNING ${this.#returning}`;

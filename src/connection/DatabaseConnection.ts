@@ -1,6 +1,7 @@
-import { Logger, LoggerUtils, pg, SqlString } from "../../deps.ts";
+import { Logger, LoggerUtils, pg } from "../../deps.ts";
 import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
-import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
+import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
+import { ORMError } from "../errors/ORMError.ts";
 
 const { Pool } = pg;
 
@@ -69,7 +70,12 @@ export default class DatabaseConnection {
     } catch (err) {
       if (this.#pool) await this.#pool.end();
       this.#logger.error(err.message);
-      throw err;
+      if (err.code === "3D000") {
+        throw new ORMError(
+          "DATABASE_DOES_NOT_EXISTS",
+          `Database ${this.#config.database} does not exist.`,
+        );
+      } else throw err;
     }
     if (client) {
       client.release();
@@ -84,10 +90,7 @@ export default class DatabaseConnection {
    */
   getConnectionPool(): typeof Pool {
     if (!this.#pool) {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        `Database connection not established`,
-      );
+      throw new ORMGeneralError("Connection pool is not present.");
     }
     return this.#pool;
   }
@@ -112,9 +115,8 @@ export default class DatabaseConnection {
     if (!databaseName) throw new Error(`No database name provided to check.`);
     const client = await this.getConnectionPool().connect();
     const result = await client.query({
-      text: `SELECT EXISTS(SELECT 1 from pg_database WHERE datname = '${SqlString(
-        databaseName,
-      )}')`,
+      text:
+        `SELECT EXISTS(SELECT 1 from pg_database WHERE datname = '${databaseName}')`,
     });
     client.release();
     return result.rows[0].exists;
@@ -128,10 +130,12 @@ export default class DatabaseConnection {
    * @throws {Error} Throws an error if no database name is provided.
    */
   async createDatabase(databaseName: string): Promise<any> {
-    if (!databaseName) throw new Error(`No database name provided to create.`);
+    if (!databaseName) {
+      throw new ORMGeneralError("No database name provided to create.");
+    }
     const client = await this.getConnectionPool().connect();
     const output = await client.query({
-      text: `CREATE DATABASE "${SqlString(databaseName)}"`,
+      text: `CREATE DATABASE "${databaseName}"`,
     });
     this.#logger.info(`Database ${databaseName} created successfully`);
     client.release();
@@ -146,10 +150,12 @@ export default class DatabaseConnection {
    * @throws {Error} Throws an error if no database name is provided.
    */
   async dropDatabase(databaseName: string): Promise<any> {
-    if (!databaseName) throw new Error(`No database name provided to drop.`);
+    if (!databaseName) {
+      throw new ORMGeneralError("No database name provided to drop.");
+    }
     const client = await this.getConnectionPool().connect();
     const output = await client.query({
-      text: `DROP DATABASE "${SqlString(databaseName)}"`,
+      text: `DROP DATABASE "${databaseName}"`,
     });
     this.#logger.info(`Database ${databaseName} dropped successfully`);
     client.release();

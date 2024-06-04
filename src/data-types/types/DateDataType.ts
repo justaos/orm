@@ -6,9 +6,7 @@ export default class DateDataType extends DataType {
     super("date", "DATE");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: Temporal.PlainDate | null): string | null {
     if (value instanceof Temporal.PlainDate) {

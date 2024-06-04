@@ -1,5 +1,4 @@
 import SelectQuery from "./SelectQuery.ts";
-import { DatabaseErrorCode, ORMError } from "../errors/ORMError.ts";
 import DeleteQuery from "./DeleteQuery.ts";
 import { CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
@@ -12,6 +11,8 @@ import {
 } from "../types.ts";
 import { pg, PgCursor } from "../../deps.ts";
 import { runSQLQuery } from "../utils.ts";
+import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
+import { ORMError } from "../errors/ORMError.ts";
 
 type QueryType =
   | SelectQuery
@@ -139,16 +140,10 @@ export default class Query {
 
   from(nameWithSchema: string): Query {
     if (!this.#query) {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "Query not initialized",
-      );
+      throw new ORMError("QUERY", "Query not initialized");
     }
     if (!nameWithSchema) {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "Table name not provided",
-      );
+      throw new ORMError("QUERY", "Table name not provided");
     }
 
     const query = <SelectQuery | DeleteQuery>this.#query;
@@ -215,10 +210,7 @@ export default class Query {
 
   async cursor(): Promise<any> {
     if (this.getType() !== "select") {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "Query type not supported",
-      );
+      throw new ORMError("QUERY", "Query type not supported");
     }
     const sqlQuery = this.getSQLQuery();
     const reserve = await this.#pool.connect();
@@ -237,10 +229,7 @@ export default class Query {
     | UpdateQuery
     | AlterQuery {
     if (!this.#query) {
-      throw new ORMError(
-        DatabaseErrorCode.GENERIC_ERROR,
-        "Query not initialized",
-      );
+      throw new ORMError("QUERY", "Query not initialized");
     }
     return this.#query;
   }

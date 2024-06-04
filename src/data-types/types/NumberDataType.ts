@@ -1,14 +1,12 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinition } from "../../types.ts";
+import { ColumnDefinitionInternal } from "../../types.ts";
 
 export default class NumberDataType extends DataType {
   constructor() {
     super("number", "DECIMAL");
   }
 
-  validateDefinition(_definition: ColumnDefinition): boolean {
-    return true;
-  }
+  validateDefinition(_definition: ColumnDefinitionInternal) {}
 
   toJSONValue(value: number | null): number | null {
     return value;

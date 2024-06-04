@@ -1,6 +1,7 @@
 import { OrderByDirectionType, OrderByType } from "../types.ts";
 import WhereClause from "./WhereClause.ts";
 import { getFullFormTableName } from "../utils.ts";
+import { ORMError } from "../errors/ORMError.ts";
 
 export default class SelectQuery extends WhereClause {
   #columns: string[] = ["*"];
@@ -38,7 +39,7 @@ export default class SelectQuery extends WhereClause {
     } else {
       this.#columns = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new Error("Invalid argument");
+          throw new ORMError("QUERY", "Invalid argument");
         }
         return arg;
       });
@@ -91,7 +92,7 @@ export default class SelectQuery extends WhereClause {
     } else {
       this.#groupBy = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new Error("Invalid argument");
+          throw new ORMError("QUERY", "Invalid argument");
         }
         return arg;
       });
@@ -112,8 +113,7 @@ export default class SelectQuery extends WhereClause {
   }
 
   buildCountQuery(): string {
-    let query = `SELECT COUNT(*) as count
-                 FROM (SELECT * FROM ${this.#from}`;
+    let query = `SELECT COUNT(*) as count FROM (SELECT * FROM ${this.#from}`;
     query = query + this.prepareWhereClause();
     query = query + this.#prepareGroupByClause();
     query = query + this.#prepareLimitClause();
