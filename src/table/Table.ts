@@ -112,7 +112,18 @@ export default class Table extends TableDefinitionHandler {
     return parseInt(row.count, 10);
   }
 
-  async execute() {
+  /**
+   * Execute the query and return cursor
+   *
+   * @example
+   * ```typescript
+   * const cursor = await table.select().execute();
+   * for await (const record of cursor()) {
+   *     console.log(record);
+   * }
+   * ```
+   */
+  async execute(): Promise<() => AsyncGenerator<Record, void, unknown>> {
     // deno-lint-ignore no-this-alias
     const table = this;
 
@@ -140,6 +151,17 @@ export default class Table extends TableDefinitionHandler {
     };
   }
 
+  /**
+   * Execute the query and return result as array
+   *
+   * @example
+   * ```typescript
+   * const records = await table.select().toArray();
+   * for (const record of records) {
+   *     console.log(record);
+   * }
+   * ```
+   */
   async toArray(): Promise<Record[]> {
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
