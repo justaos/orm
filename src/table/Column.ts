@@ -1,6 +1,6 @@
 import ColumnDefinitionHandler from "./ColumnDefinitionHandler.ts";
-import { ColumnDefinition } from "../types.ts";
-import RegistriesHandler from "../RegistriesHandler.ts";
+import type { ColumnDefinition } from "../types.ts";
+import type RegistriesHandler from "../RegistriesHandler.ts";
 
 export default class Column extends ColumnDefinitionHandler {
   constructor(

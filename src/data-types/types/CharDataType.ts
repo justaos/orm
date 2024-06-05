@@ -1,5 +1,5 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinitionInternal } from "../../types.ts";
+import type { ColumnDefinitionInternal } from "../../types.ts";
 
 export default class CharDataType extends DataType {
   constructor() {

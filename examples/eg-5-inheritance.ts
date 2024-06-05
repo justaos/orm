@@ -36,10 +36,10 @@ husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
 await husky.insert();
 
-const animals = await animalTable.select().toArray();
+const animalCursor = await animalTable.select().execute();
 
-animals.forEach((animal) => {
+for await (const animal of animalCursor()) {
   console.log(animal.toJSON());
-});
+}
 
 await conn.closeConnection();

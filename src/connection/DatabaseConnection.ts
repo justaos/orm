@@ -1,5 +1,5 @@
-import { Logger, LoggerUtils, pg } from "../../deps.ts";
-import { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
+import { type Logger, LoggerUtils, pg } from "../../deps.ts";
+import type { DatabaseConfiguration } from "./DatabaseConfiguration.ts";
 import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
 import { ORMError } from "../errors/ORMError.ts";
 
@@ -29,12 +29,11 @@ const { Pool } = pg;
 export default class DatabaseConnection {
   readonly #config: DatabaseConfiguration;
   #pool?: typeof Pool;
-  readonly #logger;
+  readonly #logger: Logger;
 
   constructor(configuration: DatabaseConfiguration, logger?: Logger) {
     this.#config = configuration;
-    if (logger) this.#logger = logger;
-    else this.#logger = LoggerUtils.getLogger(DatabaseConnection.name);
+    this.#logger = logger || LoggerUtils.getLogger(DatabaseConnection.name);
   }
 
   static async connect(configuration: DatabaseConfiguration) {

@@ -1,5 +1,5 @@
-import DataType from "../data-types/DataType.ts";
-import { ColumnDefinition, ColumnDefinitionInternal } from "../types.ts";
+import type DataType from "../data-types/DataType.ts";
+import type { ColumnDefinition, ColumnDefinitionInternal } from "../types.ts";
 
 export default class ColumnDefinitionHandler {
   readonly #columnDefinition: ColumnDefinitionInternal;

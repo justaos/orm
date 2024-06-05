@@ -9,7 +9,7 @@ import {
 } from "../../../test_deps.ts";
 
 import { Session } from "../../test.utils.ts";
-import { ORM, ORMConnection, ORMError } from "../../../mod.ts";
+import type { ORM, ORMConnection, ORMError } from "../../../mod.ts";
 
 describe({
   name: "CREATE Query",

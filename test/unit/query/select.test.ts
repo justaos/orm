@@ -7,7 +7,7 @@ import {
 } from "../../../test_deps.ts";
 
 import { Session } from "../../test.utils.ts";
-import { ORMConnection } from "../../../mod.ts";
+import type { ORMConnection } from "../../../mod.ts";
 
 describe(
   "SELECT Query",

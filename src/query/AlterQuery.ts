@@ -1,5 +1,5 @@
 import { getFullFormTableName } from "../utils.ts";
-import { ColumnDefinitionInternal } from "../types.ts";
+import type { ColumnDefinitionInternal } from "../types.ts";
 
 export class AlterQuery {
   readonly #tableName: string;

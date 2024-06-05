@@ -43,7 +43,6 @@ try {
 }
 
 if (conn) await conn.closeConnection();
-
 ```
 
 ## Defining tables
@@ -108,19 +107,33 @@ const records = await teacherTable
   .orderBy("roll_no", "DESC")
   .toArray();
 
-records.forEach(async function (rec) {
-  console.log(`${await rec.get("name")} :: ${await rec.get("roll_no")}`);
-  console.log(JSON.stringify(await rec.toJSON(), null, 4));
-});
+for (const record of records) {
+  console.log(record.get("name") + " :: " + record.get("roll_no"));
+}
 
-const count = await teacherTable.count();
-console.log("COUNT :: " + count);
+console.log("Count :: " + (await teacherTable.count()));
+
 await conn.closeConnection();
+```
+
+#### Using cursor
+
+```ts
+const recordCursor = await teacherTable
+  .select()
+  .orderBy("roll_no", "DESC")
+  .execute();
+
+for await (const record of recordCursor) {
+  console.log(record.get("name") + " :: " + record.get("roll_no"));
+}
 ```
 
 ## Intercepting database operations
 
-Intercept and compute student full name before insert and print all records after
+Intercept and compute student full name before insert and print all records
+after
+
 ```ts
 const conn = await odm.connect(true);
 
@@ -136,7 +149,7 @@ await conn.defineTable({
       type: "string",
     },
     {
-      name: "full_name" /* Value computed in intercept */,
+      name: "full_name", /* Value computed in intercept */
       type: "string",
     },
   ],
@@ -148,15 +161,15 @@ class FullNameIntercept extends DatabaseOperationInterceptor {
   }
 
   async intercept(
-    collectionName: string,
+    tableName: string,
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],
     _context: DatabaseOperationContext,
   ) {
-    if (collectionName === "student") {
+    if (tableName === "student") {
       console.log(
-        `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
+        `[collectionName=${tableName}, operation=${operation}, when=${when}]`,
       );
       if (operation === "INSERT") {
         if (when === "BEFORE") {
@@ -207,7 +220,6 @@ Full name field updated for :: John
 */
 
 await conn.closeConnection();
-
 ```
 
 ## Define custom field type
@@ -324,18 +336,23 @@ husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
 await husky.insert();
 
-const animals = await animalTable.select().toArray();
+const animalCursor = await animalTable.select().execute();
 
-animals.forEach((animal) => {
+for await (const animal of animalCursor()) {
   console.log(animal.toJSON());
-});
+}
+
+await conn.closeConnection();
 ```
 
-| Data type | get                  | getJSONValue |
-| --------- | -------------------- | ------------ |
-| string    | _string_             | _string_     |
-| integer   | _number_             | _number_     |
-| date      | _Temporal.PlainDate_ | _string_     |
+| Data type    | Record.get             | Record.getJSONValue |
+|--------------|------------------------|---------------------|
+| **date**     | Temporal.PlainDate     | string              |
+| **datetime** | Temporal.PlainDateTime | string              |
+| **integer**  | number                 | number              |
+| **json**     | {}                     | {}                  |
+| **number**   | number                 | number              |
+| **string**   | string                 | string              |
 
 Check the examples >> [here](./examples) <<
 

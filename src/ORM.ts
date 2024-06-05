@@ -1,6 +1,6 @@
 import DatabaseConnection from "./connection/DatabaseConnection.ts";
-import { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
-import DataType from "./data-types/DataType.ts";
+import type { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
+import type DataType from "./data-types/DataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
 import ORMConnection from "./ORMConnection.ts";
@@ -11,10 +11,10 @@ import BooleanDataType from "./data-types/types/BooleanDataType.ts";
 import DateDataType from "./data-types/types/DateDataType.ts";
 import DateTimeDataType from "./data-types/types/DateTimeDataType.ts";
 import UUIDDataType from "./data-types/types/UUIDDataType.ts";
-import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
+import type DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
 import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
-import { CommonUtils, Logger, LoggerUtils, UUID4 } from "../deps.ts";
+import { CommonUtils, type Logger, LoggerUtils, type UUID4 } from "../deps.ts";
 import RegistriesHandler from "./RegistriesHandler.ts";
 import { ORMGeneralError } from "./errors/ORMGeneralError.ts";
 
@@ -59,15 +59,14 @@ export default class ORM {
   constructor(config: DatabaseConfiguration, logger?: Logger) {
     this.#loadBuildInFieldTypes();
     this.#config = config;
-    if (logger) this.#logger = logger;
-    else this.#logger = LoggerUtils.getLogger(ORM.name, "INFO");
+    this.#logger = logger || LoggerUtils.getLogger(ORM.name);
   }
 
   /**
    * Generates a new record ID.
    */
   static generateRecordId(): UUID4 {
-    return <UUID4>CommonUtils.generateUUID();
+    return <UUID4> CommonUtils.generateUUID();
   }
 
   /**

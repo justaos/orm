@@ -1,6 +1,6 @@
 import { LoggerUtils } from "../deps.ts";
 import { ORM } from "../mod.ts";
-import ORMConnection from "../src/ORMConnection.ts";
+import type ORMConnection from "../src/ORMConnection.ts";
 
 class Session {
   static #odm: ORM;

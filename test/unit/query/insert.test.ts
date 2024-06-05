@@ -8,7 +8,7 @@ import {
   it,
 } from "../../../test_deps.ts";
 
-import { ORM, ORMConnection, Record } from "../../../mod.ts";
+import { ORM, type ORMConnection, type Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
 
 describe({
@@ -18,7 +18,7 @@ describe({
     const cleanTableList: string[] = [];
     let johnRecord: Record;
 
-    let itDepartment: any, hrDepartment: any;
+    let itDepartment: Record, hrDepartment: Record;
 
     beforeAll(async () => {
       conn = await Session.getConnection();

@@ -1,5 +1,5 @@
 import { assert, describe, it } from "../../../test_deps.ts";
-import { DatabaseConfiguration, ORM } from "../../../mod.ts";
+import { type DatabaseConfiguration, ORM } from "../../../mod.ts";
 
 const defaultConfig: DatabaseConfiguration = {
   hostname: "127.0.0.1",

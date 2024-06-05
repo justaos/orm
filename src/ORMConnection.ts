@@ -1,18 +1,18 @@
-import { Logger } from "../deps.ts";
-import {
+import type { Logger } from "../deps.ts";
+import type {
   DatabaseOperationContext,
   TableDefinition,
   TableDefinitionInternal,
 } from "./types.ts";
 import DatabaseConnection from "./connection/DatabaseConnection.ts";
-import { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
+import type { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
 import TableDefinitionHandler from "./table/TableDefinitionHandler.ts";
 
 import Table from "./table/Table.ts";
 
 import Query from "./query/Query.ts";
 import { logSQLQuery, runSQLQuery } from "./utils.ts";
-import RegistriesHandler from "./RegistriesHandler.ts";
+import type RegistriesHandler from "./RegistriesHandler.ts";
 import { ORMGeneralError } from "./errors/ORMGeneralError.ts";
 import { ORMError } from "./errors/ORMError.ts";
 
@@ -216,8 +216,8 @@ export default class ORMConnection {
    * @param context Context object
    */
   table(name: string, context?: DatabaseOperationContext): Table {
-    const tableDefinition: TableDefinitionInternal | undefined =
-      this.#registriesHandler.getTableDefinition(name);
+    const tableDefinition: TableDefinitionInternal | undefined = this
+      .#registriesHandler.getTableDefinition(name);
     if (typeof tableDefinition === "undefined") {
       throw new ORMError(
         "TABLE_DEFINITION_VALIDATION",

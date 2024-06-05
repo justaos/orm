@@ -1,10 +1,10 @@
-import DatabaseOperationInterceptor from "./DatabaseOperationInterceptor.ts";
-import {
+import type DatabaseOperationInterceptor from "./DatabaseOperationInterceptor.ts";
+import type {
   DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,
 } from "../types.ts";
-import Record from "../record/Record.ts";
+import type Record from "../record/Record.ts";
 
 export default class DatabaseOperationInterceptorService {
   #interceptors: Map<string, DatabaseOperationInterceptor>;

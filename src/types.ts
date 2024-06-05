@@ -1,4 +1,4 @@
-import { JSONPrimitive } from "../deps.ts";
+import type { JSONPrimitive } from "../deps.ts";
 
 /**
  * Database operation type

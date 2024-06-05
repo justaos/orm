@@ -1,8 +1,8 @@
-import {
+import type {
   FieldValidationError,
   FieldValidationErrorObject,
 } from "./FieldValidationError.ts";
-import { TableDefinitionInternal } from "../types.ts";
+import type { TableDefinitionInternal } from "../types.ts";
 
 type RecordValidationErrorObject = {
   tableDefinition: TableDefinitionInternal;

@@ -1,5 +1,5 @@
-import { ColumnDefinitionInternal, NativeDataType } from "../types.ts";
-import { JSONValue } from "../../deps.ts";
+import type { ColumnDefinitionInternal, NativeDataType } from "../types.ts";
+import type { JSONValue } from "../../deps.ts";
 
 abstract class DataType {
   readonly #nativeDataType: NativeDataType;

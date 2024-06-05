@@ -1,4 +1,4 @@
-import { ColumnDefinition, DataType } from "../mod.ts";
+import { type ColumnDefinition, DataType } from "../mod.ts";
 import getORM from "./getORM.ts";
 
 const odm = getORM();

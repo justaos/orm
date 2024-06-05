@@ -1,4 +1,4 @@
-import { JSONArray, JSONObject, JSONPrimitive } from "../../deps.ts";
+import type { JSONArray, JSONObject, JSONPrimitive } from "../../deps.ts";
 
 export default class QueryUtils {
   static escapeValue(

@@ -1,4 +1,4 @@
-import { PgCursor } from "../../deps.ts";
+import type { PgCursor } from "../../deps.ts";
 
 export default class Cursor {
   #cursor: PgCursor;

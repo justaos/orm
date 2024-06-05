@@ -1,4 +1,3 @@
-import { Session } from "./test.utils.ts";
 import { ORM } from "../mod.ts";
 
 const conn = await new ORM({

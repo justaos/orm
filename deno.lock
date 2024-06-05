@@ -171,12 +171,6 @@
       "jsr:@utility/types@^0.4.0",
       "npm:pg-cursor@^2.10.5",
       "npm:pg@^8.11.5"
-    ],
-    "packageJson": {
-      "dependencies": [
-        "npm:pg-cursor@^2.10.5",
-        "npm:pg-escape@^0.2.0"
-      ]
-    }
+    ]
   }
 }

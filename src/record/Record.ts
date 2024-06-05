@@ -1,9 +1,9 @@
-import { CommonUtils, JSONValue, Logger } from "../../deps.ts";
-import { RawRecord } from "../types.ts";
-import Table from "../table/Table.ts";
-import ColumnDefinitionHandler from "../table/ColumnDefinitionHandler.ts";
+import { CommonUtils, type JSONValue, type Logger } from "../../deps.ts";
+import type { RawRecord } from "../types.ts";
+import type Table from "../table/Table.ts";
+import type ColumnDefinitionHandler from "../table/ColumnDefinitionHandler.ts";
 import { RecordSaveError } from "../errors/RecordSaveError.ts";
-import Query from "../query/Query.ts";
+import type Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
 import { ORMGeneralError } from "../errors/ORMGeneralError.ts";

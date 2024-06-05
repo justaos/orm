@@ -1,6 +1,6 @@
 import Registry from "./Registry.ts";
-import DataType from "./data-types/DataType.ts";
-import {
+import type DataType from "./data-types/DataType.ts";
+import type {
   DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,
@@ -8,8 +8,8 @@ import {
 } from "./types.ts";
 import Table from "./table/Table.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
-import DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
-import Record from "./record/Record.ts";
+import type DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
+import type Record from "./record/Record.ts";
 
 export default class RegistriesHandler {
   readonly #tableDefinitionRegistry: Registry<TableDefinitionInternal> =

@@ -1,7 +1,0 @@
-{
-  "name": "@justaos/odm",
-  "dependencies": {
-    "pg-escape": "^0.2.0",
-    "pg-cursor": "^2.10.5"
-  }
-}

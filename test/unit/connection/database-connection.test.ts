@@ -1,6 +1,6 @@
 import { assert, describe, it } from "../../../test_deps.ts";
 import DatabaseConnection from "../../../src/connection/DatabaseConnection.ts";
-import { DatabaseConfiguration } from "../../../mod.ts";
+import type { DatabaseConfiguration } from "../../../mod.ts";
 
 const defaultConfig: DatabaseConfiguration = {
   hostname: "127.0.0.1",

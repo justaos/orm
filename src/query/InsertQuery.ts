@@ -1,7 +1,6 @@
-import { JSONObject } from "../../deps.ts";
+import type { JSONObject } from "../../deps.ts";
 import QueryUtils from "./QueryUtils.ts";
 import { getFullFormTableName } from "../utils.ts";
-import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
 import { ORMError } from "../errors/ORMError.ts";
 
 export default class InsertQuery {

@@ -1,4 +1,4 @@
-import { SimpleCondition } from "../types.ts";
+import type { SimpleCondition } from "../types.ts";
 import { ORMError } from "../errors/ORMError.ts";
 
 export class QueryExpression {

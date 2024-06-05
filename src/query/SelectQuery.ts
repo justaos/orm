@@ -1,4 +1,4 @@
-import { OrderByDirectionType, OrderByType } from "../types.ts";
+import type { OrderByDirectionType, OrderByType } from "../types.ts";
 import WhereClause from "./WhereClause.ts";
 import { getFullFormTableName } from "../utils.ts";
 import { ORMError } from "../errors/ORMError.ts";

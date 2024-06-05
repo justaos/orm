@@ -6,7 +6,7 @@ import {
   it,
 } from "../../../test_deps.ts";
 
-import {
+import type {
   DatabaseOperationType,
   DatabaseOperationWhen,
   ORM,

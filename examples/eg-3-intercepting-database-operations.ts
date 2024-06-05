@@ -1,10 +1,10 @@
 import getORM from "./getORM.ts";
 import {
-  DatabaseOperationContext,
+  type DatabaseOperationContext,
   DatabaseOperationInterceptor,
-  DatabaseOperationType,
-  DatabaseOperationWhen,
-  Record,
+  type DatabaseOperationType,
+  type DatabaseOperationWhen,
+  type Record,
 } from "../mod.ts";
 
 const odm = getORM();
@@ -35,15 +35,15 @@ class FullNameIntercept extends DatabaseOperationInterceptor {
   }
 
   async intercept(
-    collectionName: string,
+    tableName: string,
     operation: DatabaseOperationType,
     when: DatabaseOperationWhen,
     records: Record[],
     _context: DatabaseOperationContext,
   ) {
-    if (collectionName === "student") {
+    if (tableName === "student") {
       console.log(
-        `[collectionName=${collectionName}, operation=${operation}, when=${when}]`,
+        `[collectionName=${tableName}, operation=${operation}, when=${when}]`,
       );
       if (operation === "INSERT") {
         if (when === "BEFORE") {

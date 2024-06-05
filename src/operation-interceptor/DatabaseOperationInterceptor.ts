@@ -1,5 +1,5 @@
-import Record from "../record/Record.ts";
-import {
+import type Record from "../record/Record.ts";
+import type {
   DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,

@@ -1,6 +1,6 @@
 import DataType from "../DataType.ts";
-import { ColumnDefinitionInternal } from "../../types.ts";
-import { CommonUtils, UUID4 } from "../../../deps.ts";
+import type { ColumnDefinitionInternal } from "../../types.ts";
+import { CommonUtils, type UUID4 } from "../../../deps.ts";
 
 export default class UUIDDataType extends DataType {
   constructor() {

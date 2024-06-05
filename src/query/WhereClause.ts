@@ -1,5 +1,5 @@
 import { QueryExpression } from "./QueryExpression.ts";
-import { JSONPrimitive } from "../../deps.ts";
+import type { JSONPrimitive } from "../../deps.ts";
 import QueryUtils from "./QueryUtils.ts";
 import { ORMError } from "../errors/ORMError.ts";
 

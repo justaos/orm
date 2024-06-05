@@ -1,5 +1,5 @@
-import { ColumnDefinitionInternal } from "../types.ts";
-import { JSONValue } from "../../deps.ts";
+import type { ColumnDefinitionInternal } from "../types.ts";
+import type { JSONValue } from "../../deps.ts";
 
 type FieldValidationErrorObject = {
   code: string;

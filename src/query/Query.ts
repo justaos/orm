@@ -4,14 +4,13 @@ import { CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
 import UpdateQuery from "./UpdateQuery.ts";
 import { AlterQuery } from "./AlterQuery.ts";
-import {
+import type {
   ColumnDefinitionInternal,
   OrderByDirectionType,
   OrderByType,
 } from "../types.ts";
-import { pg, PgCursor } from "../../deps.ts";
+import { type pg, PgCursor } from "../../deps.ts";
 import { runSQLQuery } from "../utils.ts";
-import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
 import { ORMError } from "../errors/ORMError.ts";
 
 type QueryType =
@@ -36,7 +35,7 @@ export default class Query {
   }
 
   getSelectQuery(): SelectQuery {
-    return <SelectQuery>this.#query;
+    return <SelectQuery> this.#query;
   }
 
   setQuery(query: QueryType) {
@@ -64,14 +63,14 @@ export default class Query {
   }
 
   addColumn(column: ColumnDefinitionInternal): Query {
-    const query = <CreateQuery>this.#getQuery();
+    const query = <CreateQuery> this.#getQuery();
     query.addColumn(column);
     return this;
   }
 
   inherits(nameWithSchema: string | undefined): Query {
     if (typeof nameWithSchema === "undefined") return this;
-    const query = <CreateQuery>this.#getQuery();
+    const query = <CreateQuery> this.#getQuery();
     query.inherits(nameWithSchema);
     return this;
   }
@@ -83,25 +82,25 @@ export default class Query {
   }
 
   into(nameWithSchema: string): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.into(nameWithSchema);
     return this;
   }
 
   columns(...args: any[]): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.columns(...args);
     return this;
   }
 
   values(rows: any[]): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.values(rows);
     return this;
   }
 
   returning(...args: any[]): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.returning(...args);
     return this;
   }
@@ -113,7 +112,7 @@ export default class Query {
   }
 
   value(row: any): Query {
-    const query = <UpdateQuery>this.#getQuery();
+    const query = <UpdateQuery> this.#getQuery();
     query.value(row);
     return this;
   }
@@ -130,7 +129,7 @@ export default class Query {
   }
 
   getSelectedColumns(): string[] {
-    return (<SelectQuery>this.#query).getColumns();
+    return (<SelectQuery> this.#query).getColumns();
   }
 
   delete(): Query {
@@ -146,31 +145,31 @@ export default class Query {
       throw new ORMError("QUERY", "Table name not provided");
     }
 
-    const query = <SelectQuery | DeleteQuery>this.#query;
+    const query = <SelectQuery | DeleteQuery> this.#query;
     query.from(nameWithSchema);
     return this;
   }
 
   groupBy(columnName: string): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.groupBy(columnName);
     return this;
   }
 
   where(column: string | number | boolean, operator: any, value?: any): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.where(column, operator, value);
     return this;
   }
 
   limit(limit: number): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.limit(limit);
     return this;
   }
 
   offset(offset: number): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.offset(offset);
     return this;
   }
@@ -179,7 +178,7 @@ export default class Query {
     columnNameOrOrderList?: string | OrderByType[],
     direction?: OrderByDirectionType,
   ): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.orderBy(columnNameOrOrderList, direction);
     return this;
   }
@@ -190,7 +189,7 @@ export default class Query {
   }
 
   getCountSQLQuery(): string {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     return query.buildCountQuery();
   }
 
@@ -214,7 +213,7 @@ export default class Query {
     }
     const sqlQuery = this.getSQLQuery();
     const reserve = await this.#pool.connect();
-    this.#pool.on("error", (err: any) => {
+    this.#pool.on("error", (err: Error) => {
       console.log(err);
     });
     const cursor = await reserve.query(new PgCursor(sqlQuery));

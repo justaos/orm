@@ -1,5 +1,5 @@
 import { ORM } from "../mod.ts";
-import ORMConnection from "../src/ORMConnection.ts";
+import type ORMConnection from "../src/ORMConnection.ts";
 
 const odm = new ORM({
   database: "school-database",

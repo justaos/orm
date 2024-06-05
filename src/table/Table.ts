@@ -1,5 +1,5 @@
-import { Logger, pg, UUID4 } from "../../deps.ts";
-import {
+import type { Logger, pg, UUID4 } from "../../deps.ts";
+import type {
   DatabaseOperationContext,
   DatabaseOperationType,
   DatabaseOperationWhen,
@@ -7,20 +7,16 @@ import {
   OrderByType,
   RawRecord,
   TableDefinition,
-  TableDefinitionInternal,
 } from "../types.ts";
 import Record from "../record/Record.ts";
-import DatabaseOperationInterceptorService from "../operation-interceptor/DatabaseOperationInterceptorService.ts";
-import Query from "../query/Query.ts";
+import type Query from "../query/Query.ts";
 import {
   getFullFormTableName,
   getShortFormTableName,
   logSQLQuery,
 } from "../utils.ts";
-import Registry from "../Registry.ts";
-import DataType from "../data-types/DataType.ts";
 import TableDefinitionHandler from "./TableDefinitionHandler.ts";
-import RegistriesHandler from "../RegistriesHandler.ts";
+import type RegistriesHandler from "../RegistriesHandler.ts";
 import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
 
 export default class Table extends TableDefinitionHandler {
@@ -116,7 +112,7 @@ export default class Table extends TableDefinitionHandler {
     return parseInt(row.count, 10);
   }
 
-  async execute(): Promise<any> {
+  async execute() {
     // deno-lint-ignore no-this-alias
     const table = this;
 
@@ -185,8 +181,8 @@ export default class Table extends TableDefinitionHandler {
       | UUID4
       | string
       | {
-        [key: string]: any;
-      },
+          [key: string]: any;
+        },
     value?: any,
   ): Promise<Record | undefined> {
     this.select();
@@ -314,11 +310,9 @@ export default class Table extends TableDefinitionHandler {
   async disableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query({
-      text: `ALTER TABLE ${
-        Table.getFullFormTableName(
-          this.getName(),
-        )
-      } DISABLE TRIGGER ALL`,
+      text: `ALTER TABLE ${Table.getFullFormTableName(
+        this.getName(),
+      )} DISABLE TRIGGER ALL`,
     });
     client.release();
   }
@@ -329,11 +323,9 @@ export default class Table extends TableDefinitionHandler {
   async enableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query(
-      `ALTER TABLE ${
-        Table.getFullFormTableName(
-          this.getName(),
-        )
-      } ENABLE TRIGGER ALL`,
+      `ALTER TABLE ${Table.getFullFormTableName(
+        this.getName(),
+      )} ENABLE TRIGGER ALL`,
     );
     client.release();
   }

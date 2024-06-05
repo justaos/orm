@@ -5,11 +5,6 @@ const worker = new Worker(new URL("./worker.ts", import.meta.url).href, {
   },
 });
 
-/*worker.postMessage({ post: "BBBBBB" });
-console.log("posted message");
-worker.postMessage({ post: "CCCCCC" });
-console.log("posted message");*/
-
 setTimeout(() => {
   worker.postMessage({ post: "AAAAAA" });
   console.log("posted message");
