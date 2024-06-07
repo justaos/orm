@@ -15,10 +15,9 @@
       "jsr:@std/uuid@^0.218.2": "jsr:@std/uuid@0.218.2",
       "jsr:@utility/types@^0.4.0": "jsr:@utility/types@0.4.0",
       "npm:bcryptjs@2.4.3": "npm:bcryptjs@2.4.3",
-      "npm:pg-cursor@^2.10.5": "npm:pg-cursor@2.10.5_pg@8.11.5",
-      "npm:pg-minify": "npm:pg-minify@1.6.4",
-      "npm:pg@^8.11.5": "npm:pg@8.11.5",
-      "npm:sql-formatter": "npm:sql-formatter@15.0.2"
+      "npm:pg-cursor@^2.10.5": "npm:pg-cursor@2.11.0_pg@8.12.0",
+      "npm:pg-minify@1.6.4": "npm:pg-minify@1.6.4",
+      "npm:pg@^8.11.5": "npm:pg@8.12.0"
     },
     "jsr": {
       "@justaos/utils@2.0.0": {
@@ -77,38 +76,9 @@
       }
     },
     "npm": {
-      "argparse@2.0.1": {
-        "integrity": "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==",
-        "dependencies": {}
-      },
       "bcryptjs@2.4.3": {
         "integrity": "sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==",
         "dependencies": {}
-      },
-      "commander@2.20.3": {
-        "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==",
-        "dependencies": {}
-      },
-      "discontinuous-range@1.0.0": {
-        "integrity": "sha512-c68LpLbO+7kP/b1Hr1qs8/BJ09F5khZGTxqxZuhzxpmwJKOgRFHJWIb9/KmqnqHhLdO55aOxFH/EGBvUQbL/RQ==",
-        "dependencies": {}
-      },
-      "get-stdin@8.0.0": {
-        "integrity": "sha512-sY22aA6xchAzprjyqmSEQv4UbAAzRN0L2dQB0NlN5acTTK9Don6nhoc3eAbUnpZiCANAMfd/+40kVdKfFygohg==",
-        "dependencies": {}
-      },
-      "moo@0.5.2": {
-        "integrity": "sha512-iSAJLHYKnX41mKcJKjqvnAN9sf0LMDTXDEvFv+ffuRR9a1MIuXLjMNL6EsnDHSkKLTWNqQQ5uo61P4EbU4NU+Q==",
-        "dependencies": {}
-      },
-      "nearley@2.20.1": {
-        "integrity": "sha512-+Mc8UaAebFzgV+KpI5n7DasuuQCHA89dmwm7JXw3TV43ukfNQ9DnBH3Mdb2g/I4Fdxc26pwimBWvjIw0UAILSQ==",
-        "dependencies": {
-          "commander": "commander@2.20.3",
-          "moo": "moo@0.5.2",
-          "railroad-diagrams": "railroad-diagrams@1.0.0",
-          "randexp": "randexp@0.4.6"
-        }
       },
       "pg-cloudflare@1.1.1": {
         "integrity": "sha512-xWPagP/4B6BgFO+EKz3JONXv3YDgvkbVrGw2mTo3D6tVDQRh1e7cqVGvyR3BE+eQgAvx1XhW/iEASj4/jCWl3Q==",
@@ -118,10 +88,10 @@
         "integrity": "sha512-v+Z7W/0EO707aNMaAEfiGnGL9sxxumwLl2fJvCQtMn9Fxsg+lPpPkdcyBSv/KFgpGdYkMfn+EI1Or2EHjpgLCA==",
         "dependencies": {}
       },
-      "pg-cursor@2.10.5_pg@8.11.5": {
-        "integrity": "sha512-wzgmyk+k9mwuYe30ylLA6qRWw2TBFSee4Bw23oTz66YL9RdRJjDi2TaROMMF+V3QB6QWB3FFCju22loDftjKkw==",
+      "pg-cursor@2.11.0_pg@8.12.0": {
+        "integrity": "sha512-TLCOCtu+rqMarzjUi+/Ffc2DV5ZqO/27y5GqnK9Z3w51rWXMwC8FcO96Uf9/ORo5o+qRXEVJxM9Ts3K2K31MLg==",
         "dependencies": {
-          "pg": "pg@8.11.5"
+          "pg": "pg@8.12.0"
         }
       },
       "pg-int8@1.0.1": {
@@ -132,10 +102,10 @@
         "integrity": "sha512-cf6hBt1YqzqPX0OznXKSv4U7e4o7eUU4zp2zQsbJ+4OCNNr7EnnAVWkIz4k0dv6UN4ouS1ZL4WlXxCrZHHl69g==",
         "dependencies": {}
       },
-      "pg-pool@3.6.2_pg@8.11.5": {
+      "pg-pool@3.6.2_pg@8.12.0": {
         "integrity": "sha512-Htjbg8BlwXqSBQ9V8Vjtc+vzf/6fVUuak/3/XXKA9oxZprwW3IMDQTGHP+KDmVL7rtd+R1QjbnCFPuTHm3G4hg==",
         "dependencies": {
-          "pg": "pg@8.11.5"
+          "pg": "pg@8.12.0"
         }
       },
       "pg-protocol@1.6.1": {
@@ -152,12 +122,12 @@
           "postgres-interval": "postgres-interval@1.2.0"
         }
       },
-      "pg@8.11.5": {
-        "integrity": "sha512-jqgNHSKL5cbDjFlHyYsCXmQDrfIX/3RsNwYqpd4N0Kt8niLuNoRNH+aazv6cOd43gPh9Y4DjQCtb+X0MH0Hvnw==",
+      "pg@8.12.0": {
+        "integrity": "sha512-A+LHUSnwnxrnL/tZ+OLfqR1SxLN3c/pgDztZ47Rpbsd4jUytsTtwQo/TLPRzPJMp/1pbhYVhH9cuSZLAajNfjQ==",
         "dependencies": {
           "pg-cloudflare": "pg-cloudflare@1.1.1",
           "pg-connection-string": "pg-connection-string@2.6.4",
-          "pg-pool": "pg-pool@3.6.2_pg@8.11.5",
+          "pg-pool": "pg-pool@3.6.2_pg@8.12.0",
           "pg-protocol": "pg-protocol@1.6.1",
           "pg-types": "pg-types@2.2.0",
           "pgpass": "pgpass@1.0.5"
@@ -187,32 +157,9 @@
           "xtend": "xtend@4.0.2"
         }
       },
-      "railroad-diagrams@1.0.0": {
-        "integrity": "sha512-cz93DjNeLY0idrCNOH6PviZGRN9GJhsdm9hpn1YCS879fj4W+x5IFJhhkRZcwVgMmFF7R82UA/7Oh+R8lLZg6A==",
-        "dependencies": {}
-      },
-      "randexp@0.4.6": {
-        "integrity": "sha512-80WNmd9DA0tmZrw9qQa62GPPWfuXJknrmVmLcxvq4uZBdYqb1wYoKTmnlGUchvVWe0XiLupYkBoXVOxz3C8DYQ==",
-        "dependencies": {
-          "discontinuous-range": "discontinuous-range@1.0.0",
-          "ret": "ret@0.1.15"
-        }
-      },
-      "ret@0.1.15": {
-        "integrity": "sha512-TTlYpa+OL+vMMNG24xSlQGEJ3B/RzEfUlLct7b5G/ytav+wPrplCpVMFuwzXbkecJrb6IYo1iFb0S9v37754mg==",
-        "dependencies": {}
-      },
       "split2@4.2.0": {
         "integrity": "sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==",
         "dependencies": {}
-      },
-      "sql-formatter@15.0.2": {
-        "integrity": "sha512-B8FTRc1dhb36lfuwSdiLhwrhkvT3PU/3es7YDPPQBOhbGHdXKlweAXTRS+QfCWk06ufAh118yFja6NcukBS4gg==",
-        "dependencies": {
-          "argparse": "argparse@2.0.1",
-          "get-stdin": "get-stdin@8.0.0",
-          "nearley": "nearley@2.20.1"
-        }
       },
       "xtend@4.0.2": {
         "integrity": "sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==",
@@ -229,8 +176,7 @@
       "jsr:@utility/types@^0.4.0",
       "npm:pg-cursor@^2.10.5",
       "npm:pg-minify@^1.6.4",
-      "npm:pg@^8.11.5",
-      "npm:sql-formatter@^15.3.1"
+      "npm:pg@^8.11.5"
     ]
   }
 }
