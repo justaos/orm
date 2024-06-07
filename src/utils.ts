@@ -1,5 +1,5 @@
 import type { Logger } from "../deps.ts";
-import * as minify from "npm:pg-minify";
+import * as minify from "npm:pg-minify@1.6.4";
 
 export function logSQLQuery(logger: Logger, query: string): void {
   try {
