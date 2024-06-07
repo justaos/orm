@@ -31,11 +31,9 @@ export class AlterQuery {
       const onDelete = column.foreign_key.on_delete
         ? ` ON DELETE ${column.foreign_key.on_delete}`
         : "";
-      query += ` REFERENCES ${
-        getFullFormTableName(
-          column.foreign_key.table,
-        )
-      } ("${column.foreign_key.column}") ${onDelete}`;
+      query += ` REFERENCES ${getFullFormTableName(
+        column.foreign_key.table,
+      )} ("${column.foreign_key.column}") ${onDelete}`;
     } else {
       if (column.not_null) query += ` NOT NULL`;
       if (column.unique) query += ` UNIQUE`;
@@ -45,7 +43,9 @@ export class AlterQuery {
 
   #prepareColumns(): string {
     return this.#addColumns
-      .map((column) => {
+      .map((column, index) => {
+        if (index !== this.#addColumns.length - 1)
+          return this.#prepareColumn(column) + ",";
         return this.#prepareColumn(column);
       })
       .join("\n\t");

@@ -1,10 +1,16 @@
 import type { Logger } from "../deps.ts";
+import * as minify from "npm:pg-minify";
 
-export function logSQLQuery(logger: Logger, query: string) {
-  return logger.debug("\n" + query);
+export function logSQLQuery(logger: Logger, query: string): void {
+  try {
+    logger.debug(minify.default(query));
+  } catch (error) {
+    logger.error(error);
+    logger.debug(query);
+  }
 }
 
-export async function runSQLQuery(conn: any, query: string) {
+export async function runSQLQuery(conn: any, query: string): Promise<any> {
   const { rows }: any = await conn.query({ text: query });
   return rows;
 }

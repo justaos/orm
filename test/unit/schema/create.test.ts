@@ -93,10 +93,14 @@ describe({
               name: "color",
               type: "string",
             },
+            {
+              name: "phone_number",
+              type: "string",
+            },
           ],
         });
       } catch (_error) {
-        assert(false, "Table has not been created");
+        assert(false, "Table has not been altered");
       }
       assertEquals(odm.isTableDefined("person"), true, "Table should exists");
     });

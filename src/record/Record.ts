@@ -81,7 +81,7 @@ export default class Record {
     const record = this.#getRawRecord();
     const dataType = this.#table.getColumnSchema(key)?.getColumnType();
     if (dataType && typeof record[key] !== "undefined") {
-      const jsonValue = <JSONValue> dataType.toJSONValue(record[key]);
+      const jsonValue = <JSONValue>dataType.toJSONValue(record[key]);
       if (typeof jsonValue === "undefined") return null;
       return jsonValue;
     }
@@ -210,6 +210,10 @@ export default class Record {
       throw new ORMGeneralError("Record not initialized");
     }
     return this.#record;
+  }
+
+  toString(): string {
+    return JSON.stringify(this.toJSON());
   }
 
   async #validateRecord(rawRecord: RawRecord) {
