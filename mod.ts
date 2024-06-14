@@ -3,12 +3,11 @@ import ORMConnection from "./src/ORMConnection.ts";
 import Record from "./src/record/Record.ts";
 import Table from "./src/table/Table.ts";
 import Column from "./src/table/Column.ts";
-import { ORMError } from "./src/errors/ORMError.ts";
+
 import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOperationInterceptor.ts";
 import SelectQuery from "./src/query/SelectQuery.ts";
 import Query from "./src/query/Query.ts";
 import DataType from "./src/data-types/DataType.ts";
-import { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 
 export {
   Column,
@@ -16,13 +15,15 @@ export {
   DataType,
   ORM,
   ORMConnection,
-  ORMError,
   Query,
   Record,
-  RecordSaveError,
   SelectQuery,
   Table,
 };
+
+export { ORMError } from "./src/errors/ORMError.ts";
+export { RecordSaveError } from "./src/errors/RecordSaveError.ts";
+export { CompoundQuery } from "./src/query/CompoundQuery.ts";
 
 export type {
   JSONArray,
