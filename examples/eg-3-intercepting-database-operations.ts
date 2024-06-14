@@ -23,7 +23,7 @@ await conn.defineTable({
       type: "string",
     },
     {
-      name: "full_name" /* Value computed in intercept */,
+      name: "full_name", /* Value computed in intercept */
       type: "string",
     },
   ],

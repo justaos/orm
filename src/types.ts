@@ -8,6 +8,8 @@ import type { JSONPrimitive } from "../deps.ts";
 export type DatabaseOperationType = "INSERT" | "SELECT" | "UPDATE" | "DELETE";
 export type DatabaseOperationWhen = "BEFORE" | "AFTER";
 
+export type CompoundOperator = "OR" | "AND";
+
 export type ColumnDefinition = {
   name: string;
   type: string;

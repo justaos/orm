@@ -18,6 +18,8 @@ import {
 import TableDefinitionHandler from "./TableDefinitionHandler.ts";
 import type RegistriesHandler from "../RegistriesHandler.ts";
 import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
+import { QueryExpression } from "../query/QueryExpression.ts";
+import { CompoundQuery } from "../query/CompoundQuery.ts";
 
 export default class Table extends TableDefinitionHandler {
   readonly #context?: DatabaseOperationContext;
@@ -75,6 +77,14 @@ export default class Table extends TableDefinitionHandler {
   where(column: string | number | boolean, operator: any, value?: any): Table {
     this.#queryBuilder.where(column, operator, value);
     return this;
+  }
+
+  compoundOr(): CompoundQuery {
+    return this.#queryBuilder.compoundOr();
+  }
+
+  compoundAnd(): CompoundQuery {
+    return this.#queryBuilder.compoundAnd();
   }
 
   limit(limit: number): Table {

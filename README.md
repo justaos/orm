@@ -91,6 +91,10 @@ await conn.defineTable({
       name: "roll_no",
       type: "integer",
     },
+    {
+      name: "age",
+      type: "integer",
+    },
   ],
 });
 
@@ -99,8 +103,10 @@ for (let i = 0; i < 10; i++) {
   const teacher = teacherTable.createNewRecord();
   teacher.set("name", "a" + (i + 1));
   teacher.set("roll_no", i + 1);
+  teacher.set("age", 10 * ((i + 1) % 2));
   await teacher.insert();
 }
+
 
 const records = await teacherTable
   .select()
@@ -114,6 +120,24 @@ for (const record of records) {
 console.log("Count :: " + (await teacherTable.count()));
 
 await conn.closeConnection();
+```
+
+## Querying with compound 'OR' and 'AND' conditions
+
+```ts
+// Where 'age' is 10  and (name is 'a1' or 'roll_no' is 5)
+// SELECT * FROM public.teacher WHERE "age" = 10 AND ("name" = 'a1' OR "roll_no" = 5)
+
+const selectQuery = teacherTable.select();
+selectQuery.where("name", "a1");
+
+const compoundOrQuery = selectQuery.compoundOr();
+compoundOrQuery.where("roll_no", 4);
+compoundOrQuery.where("roll_no", 2);
+
+records = await selectQuery.toArray();
+
+console.log(records.map((t) => t.toJSON()));
 ```
 
 #### Using cursor
@@ -346,7 +370,7 @@ await conn.closeConnection();
 ```
 
 | Data type    | Record.get             | Record.getJSONValue |
-|--------------|------------------------|---------------------|
+| ------------ | ---------------------- | ------------------- |
 | **date**     | Temporal.PlainDate     | string              |
 | **datetime** | Temporal.PlainDateTime | string              |
 | **integer**  | number                 | number              |
