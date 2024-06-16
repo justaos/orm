@@ -66,7 +66,11 @@ export default class Record {
     const record = this.#getRawRecord();
     const field = this.#table.getColumnSchema(key);
     if (field) {
-      record[key] = field.getColumnType().setValueIntercept(value);
+      if (typeof value === "undefined") {
+        record[key] = null;
+      } else {
+        record[key] = field.getColumnType().setValueIntercept(value);
+      }
       this.#columnsModified[key] = true;
     }
   }
@@ -81,7 +85,7 @@ export default class Record {
     const record = this.#getRawRecord();
     const dataType = this.#table.getColumnSchema(key)?.getColumnType();
     if (dataType && typeof record[key] !== "undefined") {
-      const jsonValue = <JSONValue> dataType.toJSONValue(record[key]);
+      const jsonValue = <JSONValue>dataType.toJSONValue(record[key]);
       if (typeof jsonValue === "undefined") return null;
       return jsonValue;
     }
