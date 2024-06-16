@@ -217,10 +217,16 @@ export default class Table extends TableDefinitionHandler {
         },
     value?: any,
   ): Promise<Record | undefined> {
+    if (
+      typeof idOrColumnNameOrFilter === "undefined" ||
+      idOrColumnNameOrFilter === null
+    ) {
+      throw new ORMGeneralError("ID or column name must be provided");
+    }
     this.select();
     if (
       typeof idOrColumnNameOrFilter == "string" &&
-      (typeof value === "undefined" || value == null)
+      typeof value === "undefined"
     ) {
       this.#queryBuilder.where("id", idOrColumnNameOrFilter);
     } else if (typeof idOrColumnNameOrFilter == "object") {
