@@ -220,7 +220,7 @@ export default class Table extends TableDefinitionHandler {
     this.select();
     if (
       typeof idOrColumnNameOrFilter == "string" &&
-      typeof value === "undefined"
+      (typeof value === "undefined" || value == null)
     ) {
       this.#queryBuilder.where("id", idOrColumnNameOrFilter);
     } else if (typeof idOrColumnNameOrFilter == "object") {
