@@ -4,16 +4,12 @@ import { CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
 import UpdateQuery from "./UpdateQuery.ts";
 import { AlterQuery } from "./AlterQuery.ts";
-import type {
-  ColumnDefinitionInternal,
-  OrderByDirectionType,
-  OrderByType,
-} from "../types.ts";
-import { type pg, PgCursor } from "../../deps.ts";
+import type { OrderByDirectionType, OrderByType } from "../types.ts";
 import { runSQLQuery } from "../utils.ts";
-import { ORMError } from "../errors/ORMError.ts";
-import { QueryExpression } from "./QueryExpression.ts";
+import ORMError from "../errors/ORMError.ts";
 import { CompoundQuery } from "./CompoundQuery.ts";
+import { ColumnDefinitionNative } from "../types.ts";
+import DatabaseConnectionPool from "../core/DatabaseConnectionPool.ts";
 
 type QueryType =
   | SelectQuery
@@ -24,11 +20,11 @@ type QueryType =
   | AlterQuery;
 
 export default class Query {
-  readonly #pool: pg.Pool;
+  readonly #pool: DatabaseConnectionPool;
 
   #query?: QueryType;
 
-  constructor(pool: pg.Pool) {
+  constructor(pool: DatabaseConnectionPool) {
     this.#pool = pool;
   }
 
@@ -64,7 +60,7 @@ export default class Query {
     return this;
   }
 
-  addColumn(column: ColumnDefinitionInternal): Query {
+  addColumn(column: ColumnDefinitionNative): Query {
     const query = <CreateQuery>this.#getQuery();
     query.addColumn(column);
     return this;
@@ -225,10 +221,7 @@ export default class Query {
     }
     const sqlQuery = this.getSQLQuery();
     const reserve = await this.#pool.connect();
-    this.#pool.on("error", (err: Error) => {
-      console.log(err);
-    });
-    const cursor = await reserve.query(new PgCursor(sqlQuery));
+    const cursor = await reserve.createCursor(sqlQuery);
     return { cursor, reserve };
   }
 

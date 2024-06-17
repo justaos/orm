@@ -1,5 +1,3 @@
-import type { SimpleCondition } from "../types.ts";
-import { ORMError } from "../errors/ORMError.ts";
 import { CompoundOperator } from "../types.ts";
 import { QueryExpression } from "./QueryExpression.ts";
 
@@ -17,11 +15,11 @@ export class CompoundQuery {
   }
 
   compoundOr(): CompoundQuery {
-    return new CompoundQuery("OR", <QueryExpression>this.#currentExpression);
+    return new CompoundQuery("OR", <QueryExpression> this.#currentExpression);
   }
 
   compoundAnd(): CompoundQuery {
-    return new CompoundQuery("AND", <QueryExpression>this.#currentExpression);
+    return new CompoundQuery("AND", <QueryExpression> this.#currentExpression);
   }
 
   where(

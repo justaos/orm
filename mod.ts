@@ -8,6 +8,7 @@ import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOp
 import SelectQuery from "./src/query/SelectQuery.ts";
 import Query from "./src/query/Query.ts";
 import DataType from "./src/data-types/DataType.ts";
+import ORMError from "./src/errors/ORMError.ts";
 
 export {
   Column,
@@ -15,13 +16,13 @@ export {
   DataType,
   ORM,
   ORMConnection,
+  ORMError,
   Query,
   Record,
   SelectQuery,
   Table,
 };
 
-export { ORMError } from "./src/errors/ORMError.ts";
 export { RecordSaveError } from "./src/errors/RecordSaveError.ts";
 export { CompoundQuery } from "./src/query/CompoundQuery.ts";
 
@@ -33,7 +34,7 @@ export type {
   UUID4,
 } from "./deps.ts";
 
-export type { DatabaseConfiguration } from "./src/connection/DatabaseConfiguration.ts";
+export type { TDatabaseConfiguration } from "./src/core/types.ts";
 
 export type {
   ColumnDefinition,
@@ -43,7 +44,7 @@ export type {
   NativeDataType,
   OrderByDirectionType,
   OrderByType,
-  RawRecord,
   SimpleCondition,
   TableDefinition,
+  TRecord,
 } from "./src/types.ts";

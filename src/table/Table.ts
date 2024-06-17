@@ -5,8 +5,8 @@ import type {
   DatabaseOperationWhen,
   OrderByDirectionType,
   OrderByType,
-  RawRecord,
   TableDefinition,
+  TRecord,
 } from "../types.ts";
 import Record from "../record/Record.ts";
 import type Query from "../query/Query.ts";
@@ -17,9 +17,8 @@ import {
 } from "../utils.ts";
 import TableDefinitionHandler from "./TableDefinitionHandler.ts";
 import type RegistriesHandler from "../RegistriesHandler.ts";
-import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
-import { QueryExpression } from "../query/QueryExpression.ts";
 import { CompoundQuery } from "../query/CompoundQuery.ts";
+import { ORMError } from "../../mod.ts";
 
 export default class Table extends TableDefinitionHandler {
   readonly #context?: DatabaseOperationContext;
@@ -60,7 +59,7 @@ export default class Table extends TableDefinitionHandler {
   }
 
   createNewRecord(): Record {
-    return new Record(this.#queryBuilder, this, this.#logger).initialize();
+    return new Record(this.#queryBuilder, this, this.#logger);
   }
 
   select(): Table {
@@ -112,7 +111,7 @@ export default class Table extends TableDefinitionHandler {
       this.#queryBuilder.from(this.getName());
     }
     if (this.#queryBuilder.getType() !== "select") {
-      throw new ORMGeneralError("Count can only be called on select query");
+      throw ORMError.generalError("Count can only be called on select query");
     }
 
     logSQLQuery(this.#logger, this.#queryBuilder.getCountSQLQuery());
@@ -190,7 +189,7 @@ export default class Table extends TableDefinitionHandler {
     return records;
   }
 
-  convertRawRecordToRecord(rawRecord: RawRecord): Record {
+  convertRawRecordToRecord(rawRecord: TRecord): Record {
     return new Record(this.#queryBuilder, this, this.#logger, rawRecord);
   }
 
@@ -213,15 +212,15 @@ export default class Table extends TableDefinitionHandler {
       | UUID4
       | string
       | {
-          [key: string]: any;
-        },
+        [key: string]: any;
+      },
     value?: any,
   ): Promise<Record | undefined> {
     if (
       typeof idOrColumnNameOrFilter === "undefined" ||
       idOrColumnNameOrFilter === null
     ) {
-      throw new ORMGeneralError("ID or column name must be provided");
+      throw ORMError.generalError("ID or column name must be provided");
     }
     this.select();
     if (
@@ -348,9 +347,11 @@ export default class Table extends TableDefinitionHandler {
   async disableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query({
-      text: `ALTER TABLE ${Table.getFullFormTableName(
-        this.getName(),
-      )} DISABLE TRIGGER ALL`,
+      text: `ALTER TABLE ${
+        Table.getFullFormTableName(
+          this.getName(),
+        )
+      } DISABLE TRIGGER ALL`,
     });
     client.release();
   }
@@ -361,9 +362,11 @@ export default class Table extends TableDefinitionHandler {
   async enableAllTriggers() {
     const client = await this.#pool.connect();
     await client.query(
-      `ALTER TABLE ${Table.getFullFormTableName(
-        this.getName(),
-      )} ENABLE TRIGGER ALL`,
+      `ALTER TABLE ${
+        Table.getFullFormTableName(
+          this.getName(),
+        )
+      } ENABLE TRIGGER ALL`,
     );
     client.release();
   }

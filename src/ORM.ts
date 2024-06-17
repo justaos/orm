@@ -1,5 +1,5 @@
-import DatabaseConnection from "./connection/DatabaseConnection.ts";
-import type { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
+import DatabaseConnectionPool from "./core/DatabaseConnectionPool.ts";
+import type { TDatabaseConfiguration } from "./core/types.ts";
 import type DataType from "./data-types/DataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
@@ -16,7 +16,6 @@ import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
 import { CommonUtils, type Logger, LoggerUtils, type UUID4 } from "../deps.ts";
 import RegistriesHandler from "./RegistriesHandler.ts";
-import { ORMGeneralError } from "./errors/ORMGeneralError.ts";
 
 /**
  * JUSTAOS's ORM (Object Document Mapper) is built for Deno and provides transparent persistence for JavaScript objects to Postgres database.
@@ -52,11 +51,11 @@ import { ORMGeneralError } from "./errors/ORMGeneralError.ts";
  */
 export default class ORM {
   readonly #logger: Logger;
-  readonly #config: DatabaseConfiguration;
+  readonly #config: TDatabaseConfiguration;
 
   readonly #registryHandler = new RegistriesHandler();
 
-  constructor(config: DatabaseConfiguration, logger?: Logger) {
+  constructor(config: TDatabaseConfiguration, logger?: Logger) {
     this.#loadBuildInFieldTypes();
     this.#config = config;
     this.#logger = logger || LoggerUtils.getLogger(ORM.name);
@@ -88,7 +87,7 @@ export default class ORM {
         this.#config,
         this.#registryHandler,
       );
-      await conn.connect();
+      await conn.testConnection();
       return conn;
     } catch (error) {
       if (
@@ -96,35 +95,18 @@ export default class ORM {
         this.#config.database &&
         createDatabaseIfNotExists
       ) {
-        const tempConn = new DatabaseConnection({
+        const tempConn = new DatabaseConnectionPool({
           ...this.#config,
           database: "postgres",
         });
-        await tempConn.connect();
+        await tempConn.testConnection();
         await tempConn.createDatabase(this.#config.database);
-        await tempConn.closeConnection();
+        await tempConn.end();
         return await this.connect(false);
       } else {
         throw error;
       }
     }
-  }
-
-  /**
-   * Checks if the database exists.
-   */
-  async isDatabaseExist(): Promise<boolean> {
-    const tempConn = new DatabaseConnection({
-      ...this.#config,
-      database: "postgres",
-    });
-    if (!this.#config.database) {
-      throw new ORMGeneralError("Database name not provided");
-    }
-    await tempConn.connect();
-    const result = await tempConn.isDatabaseExist(this.#config.database);
-    await tempConn.closeConnection();
-    return result;
   }
 
   /**

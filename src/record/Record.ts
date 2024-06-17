@@ -1,19 +1,24 @@
-import { CommonUtils, type JSONValue, type Logger } from "../../deps.ts";
-import type { RawRecord } from "../types.ts";
+import {
+  CommonUtils,
+  type JSONValue,
+  type Logger,
+  type UUID4,
+} from "../../deps.ts";
+import type { TRecord } from "../types.ts";
 import type Table from "../table/Table.ts";
 import type ColumnDefinitionHandler from "../table/ColumnDefinitionHandler.ts";
 import { RecordSaveError } from "../errors/RecordSaveError.ts";
 import type Query from "../query/Query.ts";
 import { FieldValidationError } from "../errors/FieldValidationError.ts";
 import { logSQLQuery } from "../utils.ts";
-import { ORMGeneralError } from "../errors/ORMGeneralError.ts";
+import ORMError from "../errors/ORMError.ts";
 
 export default class Record {
   #isNew = false;
 
   readonly #logger: Logger;
 
-  #record?: RawRecord;
+  #record?: TRecord;
 
   readonly #queryBuilder: Query;
 
@@ -25,18 +30,20 @@ export default class Record {
     queryBuilder: Query,
     table: Table,
     logger: Logger,
-    record?: RawRecord,
+    record?: TRecord,
   ) {
     this.#queryBuilder = queryBuilder;
     this.#logger = logger;
     this.#table = table;
-    if (typeof record !== "undefined") {
+    if (typeof record === "undefined") {
+      this.#initialize();
+    } else {
       this.#record = {};
       for (const key of Object.keys(record)) this.set(key, record[key]);
     }
   }
 
-  initialize(): Record {
+  #initialize() {
     this.#record = {};
     this.#columnsModified = {};
     this.#table.getColumns().map((field: ColumnDefinitionHandler) => {
@@ -44,10 +51,9 @@ export default class Record {
         this.set(field.getName(), null);
       } else this.set(field.getName(), field.getDefaultValue());
     });
-    this.#record["id"] = CommonUtils.generateUUID();
+    this.#record["id"] = <UUID4> CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
     this.#isNew = true;
-    return this;
   }
 
   isNew(): boolean {
@@ -85,7 +91,7 @@ export default class Record {
     const record = this.#getRawRecord();
     const dataType = this.#table.getColumnSchema(key)?.getColumnType();
     if (dataType && typeof record[key] !== "undefined") {
-      const jsonValue = <JSONValue>dataType.toJSONValue(record[key]);
+      const jsonValue = <JSONValue> dataType.toJSONValue(record[key]);
       if (typeof jsonValue === "undefined") return null;
       return jsonValue;
     }
@@ -105,7 +111,7 @@ export default class Record {
 
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
-    let savedRawRecord: RawRecord;
+    let savedRawRecord: TRecord;
     try {
       [savedRawRecord] = await this.#queryBuilder.execute();
     } catch (err) {
@@ -145,7 +151,7 @@ export default class Record {
 
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
 
-    let savedRawRecord: RawRecord;
+    let savedRawRecord: TRecord;
     try {
       [savedRawRecord] = await this.#queryBuilder.execute();
     } catch (err) {
@@ -168,7 +174,7 @@ export default class Record {
 
   async delete(): Promise<Record> {
     if (this.#isNew) {
-      throw new ORMGeneralError("Cannot remove unsaved record");
+      throw ORMError.generalError("Cannot remove unsaved record");
     }
     const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
 
@@ -194,8 +200,8 @@ export default class Record {
     return this;
   }
 
-  toJSON(columns?: string[]): RawRecord {
-    const rawRecord: RawRecord = {};
+  toJSON(columns?: string[]): TRecord {
+    const rawRecord: TRecord = {};
     this.#table
       .getColumns()
       .filter((field: ColumnDefinitionHandler) => {
@@ -209,18 +215,18 @@ export default class Record {
     return rawRecord;
   }
 
-  #getRawRecord(): RawRecord {
-    if (typeof this.#record === "undefined") {
-      throw new ORMGeneralError("Record not initialized");
-    }
-    return this.#record;
-  }
-
   toString(): string {
     return JSON.stringify(this.toJSON());
   }
 
-  async #validateRecord(rawRecord: RawRecord) {
+  #getRawRecord(): TRecord {
+    if (typeof this.#record === "undefined") {
+      throw ORMError.generalError("Record not initialized");
+    }
+    return this.#record;
+  }
+
+  async #validateRecord(rawRecord: TRecord) {
     const fieldErrors: FieldValidationError[] = [];
     for (const columnSchema of this.#table.getColumns()) {
       const value = rawRecord[columnSchema.getName()];

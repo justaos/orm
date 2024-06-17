@@ -1,4 +1,4 @@
-import type { JSONPrimitive } from "../deps.ts";
+import type { JSONPrimitive, UUID4 } from "../deps.ts";
 
 /**
  * Database operation type
@@ -27,6 +27,19 @@ export type ColumnDefinitionInternal = {
   name: string;
   type: string;
   data_type?: string;
+  not_null: boolean;
+  default?: unknown;
+  unique: boolean;
+  foreign_key?: {
+    table: string;
+    column: string;
+    on_delete?: "NO ACTION" | "CASCADE" | "SET NULL" | "SET DEFAULT";
+  };
+};
+
+export type ColumnDefinitionNative = {
+  name: string;
+  native_type?: string;
   not_null: boolean;
   default?: unknown;
   unique: boolean;
@@ -66,8 +79,8 @@ export type NativeDataType =
   | "TIME"
   | "TIMESTAMP";
 
-export type RawRecord = {
-  id?: string;
+export type TRecord = {
+  id?: UUID4;
   _table?: string;
   [key: string]: unknown;
 };

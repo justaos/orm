@@ -1,5 +1,6 @@
 import type { Logger } from "../deps.ts";
 import * as minify from "npm:pg-minify@1.6.4";
+import { DatabaseConnection } from "./core/DatabaseConnection.ts";
 
 export function logSQLQuery(logger: Logger, query: string): void {
   try {
@@ -10,8 +11,11 @@ export function logSQLQuery(logger: Logger, query: string): void {
   }
 }
 
-export async function runSQLQuery(conn: any, query: string): Promise<any> {
-  const { rows }: any = await conn.query({ text: query });
+export async function runSQLQuery(
+  conn: DatabaseConnection,
+  query: string,
+): Promise<any> {
+  const { rows }: any = await conn.runQuery(query);
   return rows;
 }
 

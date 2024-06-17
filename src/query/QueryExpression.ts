@@ -1,5 +1,5 @@
 import type { SimpleCondition } from "../types.ts";
-import { ORMError } from "../errors/ORMError.ts";
+import ORMError from "../errors/ORMError.ts";
 import { CompoundOperator } from "../types.ts";
 
 export class QueryExpression {
@@ -20,7 +20,7 @@ export class QueryExpression {
   ) {
     this.type = type;
     if (type == "SIMPLE" && condition) {
-      this.condition = <SimpleCondition>(
+      this.condition = <SimpleCondition> (
         this.#buildSimpleCondition(
           condition.column,
           condition.operator,
@@ -38,15 +38,15 @@ export class QueryExpression {
     if (!this.compoundOperator) this.compoundOperator = "OR";
 
     if (this.compoundOperator === "AND") {
-      throw new ORMError("QUERY", "Cannot use 'OR' on top of 'AND'");
+      throw ORMError.queryError("Cannot use 'OR' on top of 'AND'");
     }
 
     if (this.type == "SIMPLE") {
       this.type = "COMPOUND";
       if (!this.condition) {
-        throw new ORMError("QUERY", "condition should be present on simple");
+        throw ORMError.queryError("condition should be present on simple");
       }
-      const expression = new QueryExpression("SIMPLE", <any>this.condition);
+      const expression = new QueryExpression("SIMPLE", <any> this.condition);
       this.expressions.push(expression);
       this.condition = undefined;
     }
@@ -68,13 +68,13 @@ export class QueryExpression {
     if (!this.compoundOperator) this.compoundOperator = "AND";
 
     if (this.compoundOperator === "OR") {
-      throw new ORMError("QUERY", "Cannot use 'AND' on top of 'OR'");
+      throw ORMError.queryError("Cannot use 'AND' on top of 'OR'");
     }
 
     if (this.type == "SIMPLE") {
       this.type = "COMPOUND";
       if (!this.condition) {
-        throw new ORMError("QUERY", "condition should be present on simple");
+        throw ORMError.queryError("condition should be present on simple");
       }
       const expression = new QueryExpression("SIMPLE", this.condition);
       this.expressions.push(expression);

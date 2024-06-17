@@ -1,7 +1,7 @@
 import type { JSONObject } from "../../deps.ts";
 import QueryUtils from "./QueryUtils.ts";
 import { getFullFormTableName } from "../utils.ts";
-import { ORMError } from "../errors/ORMError.ts";
+import ORMError from "../errors/ORMError.ts";
 
 export default class InsertQuery {
   #tableName?: string;
@@ -24,7 +24,7 @@ export default class InsertQuery {
     } else {
       this.#columns = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new ORMError("QUERY", "Invalid argument");
+          throw ORMError.queryError("Invalid argument");
         }
         return arg;
       });

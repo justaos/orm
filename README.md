@@ -107,7 +107,6 @@ for (let i = 0; i < 10; i++) {
   await teacher.insert();
 }
 
-
 const records = await teacherTable
   .select()
   .orderBy("roll_no", "DESC")

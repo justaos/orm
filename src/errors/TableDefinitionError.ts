@@ -1,4 +1,4 @@
-import { ORMError } from "./ORMError.ts";
+import ORMError from "./ORMError.ts";
 
 export default class TableDefinitionError extends ORMError {
   constructor(tableName: string, cause: any) {

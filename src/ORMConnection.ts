@@ -4,8 +4,8 @@ import type {
   TableDefinition,
   TableDefinitionInternal,
 } from "./types.ts";
-import DatabaseConnection from "./connection/DatabaseConnection.ts";
-import type { DatabaseConfiguration } from "./connection/DatabaseConfiguration.ts";
+import DatabaseConnectionPool from "./core/DatabaseConnectionPool.ts";
+import type { TDatabaseConfiguration } from "./core/types.ts";
 import TableDefinitionHandler from "./table/TableDefinitionHandler.ts";
 
 import Table from "./table/Table.ts";
@@ -13,8 +13,7 @@ import Table from "./table/Table.ts";
 import Query from "./query/Query.ts";
 import { logSQLQuery, runSQLQuery } from "./utils.ts";
 import type RegistriesHandler from "./RegistriesHandler.ts";
-import { ORMGeneralError } from "./errors/ORMGeneralError.ts";
-import { ORMError } from "./errors/ORMError.ts";
+import ORMError from "./errors/ORMError.ts";
 
 /**
  * The main class for interacting with the database.
@@ -45,46 +44,46 @@ import { ORMError } from "./errors/ORMError.ts";
  * ```
  */
 export default class ORMConnection {
-  readonly #config: DatabaseConfiguration;
-  readonly #conn: DatabaseConnection;
+  readonly #config: TDatabaseConfiguration;
+  readonly #pool: DatabaseConnectionPool;
   readonly #registriesHandler: RegistriesHandler;
   readonly #logger: Logger;
 
   constructor(
     logger: Logger,
-    config: DatabaseConfiguration,
+    config: TDatabaseConfiguration,
     registriesHandler: RegistriesHandler,
   ) {
     this.#logger = logger;
     this.#config = config;
-    this.#conn = new DatabaseConnection(config, logger);
+    this.#pool = new DatabaseConnectionPool(config, logger);
     this.#registriesHandler = registriesHandler;
   }
 
-  async connect(): Promise<void> {
-    return await this.#conn.connect();
+  async testConnection(): Promise<void> {
+    return await this.#pool.testConnection();
   }
 
   closeConnection(): Promise<void> {
-    return this.#getConnection().closeConnection();
+    return this.#getConnection().end();
   }
 
   async dropDatabase(): Promise<any> {
     const databaseName = this.#getConnection().getDatabaseName();
     if (!databaseName) {
-      throw new Error("Database name is not defined");
+      throw ORMError.generalError("Database name is not defined");
     }
     await this.closeConnection();
-    const tempConn = new DatabaseConnection(
+    const tempConn = new DatabaseConnectionPool(
       {
         ...this.#config,
         database: "postgres",
       },
       this.#logger,
     );
-    await tempConn.connect();
+    await tempConn.testConnection();
     const result = await tempConn.dropDatabase(databaseName);
-    await tempConn.closeConnection();
+    await tempConn.end();
     return result;
   }
 
@@ -108,8 +107,7 @@ export default class ORMConnection {
       tableDefinitionHandler.getDefinitionClone(),
     );
 
-    const pool = this.#conn.getConnectionPool();
-    const reserved = await pool.connect();
+    const reserved = await this.#pool.connect();
     try {
       const [{ exists: schemaExists }] = await runSQLQuery(
         reserved,
@@ -139,14 +137,13 @@ export default class ORMConnection {
       );
 
       if (!tableExists) {
-        const createQuery = new Query(this.#conn.getConnectionPool());
+        const createQuery = new Query(this.#pool);
         createQuery.create(tableDefinitionHandler.getName());
         for (const column of tableDefinitionHandler.getOwnColumns()) {
           const columnDefinition = column.getDefinitionClone();
           createQuery.addColumn({
             name: column.getName(),
-            type: columnDefinition.type,
-            data_type: column.getColumnType().getNativeType(),
+            native_type: column.getColumnType().getNativeType(),
             not_null: column.isNotNull(),
             unique: column.isUnique(),
             foreign_key: columnDefinition.foreign_key,
@@ -172,15 +169,14 @@ export default class ORMConnection {
         const columnSchemas = tableDefinitionHandler.getOwnColumns();
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
-          const alterQuery = new Query(this.#conn.getConnectionPool());
+          const alterQuery = new Query(this.#pool);
           alterQuery.alter(tableDefinitionHandler.getName());
           for (const column of tableDefinitionHandler.getOwnColumns()) {
             const columnDefinition = column.getDefinitionClone();
             if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
                 name: column.getName(),
-                type: columnDefinition.type,
-                data_type: column.getColumnType().getNativeType(),
+                native_type: column.getColumnType().getNativeType(),
                 not_null: column.isNotNull(),
                 unique: column.isUnique(),
                 foreign_key: columnDefinition.foreign_key,
@@ -198,8 +194,7 @@ export default class ORMConnection {
   }
 
   async dropTable(tableName: string): Promise<void> {
-    const pool = this.#conn.getConnectionPool();
-    const reserved = await pool.connect();
+    const reserved = await this.#pool.connect();
     try {
       await runSQLQuery(
         reserved,
@@ -224,25 +219,25 @@ export default class ORMConnection {
         `Table with name '${name}' is not defined`,
       );
     }
-    const queryBuilder = new Query(this.#conn.getConnectionPool());
+    const queryBuilder = new Query(this.#pool);
     return new Table(
       queryBuilder,
       tableDefinition,
       this.#registriesHandler,
       this.#logger,
-      this.#conn.getConnectionPool(),
+      this.#pool,
       context,
     );
   }
 
   query(): Query {
-    return new Query(this.#conn.getConnectionPool());
+    return new Query(this.#pool);
   }
 
-  #getConnection(): DatabaseConnection {
-    if (!this.#conn) {
-      throw new ORMGeneralError("There is no active connection");
+  #getConnection(): DatabaseConnectionPool {
+    if (!this.#pool) {
+      throw ORMError.generalError("There is no active connection");
     }
-    return this.#conn;
+    return this.#pool;
   }
 }

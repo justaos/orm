@@ -1,7 +1,7 @@
 import { assert, describe, it } from "../../../test_deps.ts";
-import { type DatabaseConfiguration, ORM } from "../../../mod.ts";
+import { ORM, type TDatabaseConfiguration } from "../../../mod.ts";
 
-const defaultConfig: DatabaseConfiguration = {
+const defaultConfig: TDatabaseConfiguration = {
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",
@@ -10,9 +10,9 @@ const defaultConfig: DatabaseConfiguration = {
 };
 
 describe({
-  name: "DatabaseConnection",
+  name: "ORMConnection",
   fn: () => {
-    it("#connect", async () => {
+    it("#connect(): success case", async () => {
       const orm = new ORM({
         ...defaultConfig,
         port: undefined,
@@ -25,22 +25,6 @@ describe({
       } finally {
         if (conn) await conn.closeConnection();
       }
-    });
-
-    it("#isDatabaseExist - without database", async () => {
-      const orm = new ORM({
-        ...defaultConfig,
-        database: "orm-test-2",
-      });
-      const output = await orm.isDatabaseExist();
-      assert(!output, "Database should not exists");
-    });
-
-    it("#isDatabaseExist - without database", async () => {
-      const orm = new ORM(defaultConfig);
-      const connect = await orm.connect();
-      const test = await connect.dropDatabase();
-      assert(test, "Database exists");
     });
   },
 });

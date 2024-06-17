@@ -1,7 +1,7 @@
 import type { OrderByDirectionType, OrderByType } from "../types.ts";
 import WhereClause from "./WhereClause.ts";
 import { getFullFormTableName } from "../utils.ts";
-import { ORMError } from "../errors/ORMError.ts";
+import ORMError from "../errors/ORMError.ts";
 
 export default class SelectQuery extends WhereClause {
   #columns: string[] = ["*"];
@@ -39,7 +39,7 @@ export default class SelectQuery extends WhereClause {
     } else {
       this.#columns = args.map((arg) => {
         if (typeof arg === "object") {
-          throw new ORMError("QUERY", "Invalid argument");
+          throw ORMError.queryError("Invalid columns selected", this.#columns);
         }
         return arg;
       });

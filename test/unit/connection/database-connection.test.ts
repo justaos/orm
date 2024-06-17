@@ -1,8 +1,8 @@
-import { assert, describe, it } from "../../../test_deps.ts";
-import DatabaseConnection from "../../../src/connection/DatabaseConnection.ts";
-import type { DatabaseConfiguration } from "../../../mod.ts";
+import { assert, assertRejects, describe, it } from "../../../test_deps.ts";
+import DatabaseConnectionPool from "../../../src/core/DatabaseConnectionPool.ts";
+import type { TDatabaseConfiguration } from "../../../mod.ts";
 
-const defaultConfig: DatabaseConfiguration = {
+const defaultConfig: TDatabaseConfiguration = {
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",
@@ -12,101 +12,85 @@ const defaultConfig: DatabaseConfiguration = {
 describe({
   name: "DatabaseConnection",
   fn: () => {
-    it("#connect", async () => {
-      const conn = new DatabaseConnection({
+    it("#connect(): Success case", async () => {
+      const connectionPool = new DatabaseConnectionPool({
         ...defaultConfig,
         port: undefined,
       });
       try {
-        await conn.connect();
+        await connectionPool.testConnection();
       } catch (_error) {
-        assert(false, "connection failed");
+        assert(false, "Connection failed");
       } finally {
-        await conn.closeConnection();
+        await connectionPool.end();
       }
     });
 
-    it("#connect wrong config", async () => {
-      const config: DatabaseConfiguration = {
+    it("#connect(): Invalid configuration", async () => {
+      const config: TDatabaseConfiguration = {
         ...defaultConfig,
         port: 80,
       };
-      try {
-        await DatabaseConnection.connect({
+      await assertRejects(async () => {
+        await DatabaseConnectionPool.createConnectionPoll({
           ...config,
         });
-        assert(false, "Connection should fail");
-      } catch (_error) {
-        // Connection failed as expected
-      }
-    });
-
-    it("#isDatabaseExist - without database", async () => {
-      const conn = await DatabaseConnection.connect(defaultConfig);
-      const output = await conn.isDatabaseExist("some-random-database");
-      await conn.closeConnection();
-      assert(!output, "Database should not exists");
+      }, Error);
     });
 
     it("#createDatabase", async () => {
       try {
-        const conn = await DatabaseConnection.connect(defaultConfig);
-        await conn.createDatabase("odm-created-database");
-        await conn.closeConnection();
+        const connectionPool =
+          await DatabaseConnectionPool.createConnectionPoll(defaultConfig);
+        await connectionPool.createDatabase("odm-created-database");
+        await connectionPool.end();
       } catch (error) {
         console.log(error);
         assert(false, "Database dropping failed");
       }
     });
 
-    it("#isDatabaseExist - with database", async () => {
-      const conn = await DatabaseConnection.connect(defaultConfig);
-      assert(
-        await conn.isDatabaseExist("odm-created-database"),
-        "Database should exists",
-      );
-      await conn.closeConnection();
-    });
-
-    it("#multi database connections", async () => {
+    it("#multi database connection pools", async () => {
       const config = {
         ...defaultConfig,
         database: "odm-created-database",
       };
-      const conn1 = await DatabaseConnection.connect(config);
-      const conn2 = await DatabaseConnection.connect(config);
-      const conn3 = await DatabaseConnection.connect(config);
-      const conn4 = await DatabaseConnection.connect(config);
-      const conn5 = await DatabaseConnection.connect(config);
+      const conn1 = await DatabaseConnectionPool.createConnectionPoll(config);
+      const conn2 = await DatabaseConnectionPool.createConnectionPoll(config);
+      const conn3 = await DatabaseConnectionPool.createConnectionPoll(config);
+      const conn4 = await DatabaseConnectionPool.createConnectionPoll(config);
+      const conn5 = await DatabaseConnectionPool.createConnectionPoll(config);
 
-      await conn1.closeConnection();
-      await conn2.closeConnection();
-      await conn3.closeConnection();
-      await conn4.closeConnection();
-      await conn5.closeConnection();
+      await conn1.end();
+      await conn2.end();
+      await conn3.end();
+      await conn4.end();
+      await conn5.end();
     });
 
     it("#dropDatabase", async () => {
       try {
-        const dbConnection = await DatabaseConnection.connect({
+        const dbConnection = await DatabaseConnectionPool.createConnectionPoll({
           ...defaultConfig,
           database: "",
         });
         await dbConnection.dropDatabase("odm-created-database");
-        await dbConnection.closeConnection();
+        await dbConnection.end();
       } catch (error) {
         console.log(error);
         assert(false, "Database dropping failed");
       }
     });
 
-    it("#closeConnection", async () => {
-      const dbConnection = await DatabaseConnection.connect(defaultConfig);
+    it("#end pool connections", async () => {
+      const dbConnection = await DatabaseConnectionPool.createConnectionPoll(
+        defaultConfig,
+      );
       try {
-        await dbConnection.closeConnection();
+        await dbConnection.end();
       } catch (error) {
         console.log(error);
-        assert(false, "close connection failed");
+        assert(false, "ending pool connections failed");
       }
     });
   },

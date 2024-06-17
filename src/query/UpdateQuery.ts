@@ -1,7 +1,7 @@
 import QueryUtils from "./QueryUtils.ts";
 import WhereClause from "./WhereClause.ts";
 import { getFullFormTableName } from "../utils.ts";
-import { ORMError } from "../errors/ORMError.ts";
+import ORMError from "../errors/ORMError.ts";
 
 export default class UpdateQuery extends WhereClause {
   #tableName?: string;

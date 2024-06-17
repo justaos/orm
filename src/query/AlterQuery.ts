@@ -1,10 +1,10 @@
 import { getFullFormTableName } from "../utils.ts";
-import type { ColumnDefinitionInternal } from "../types.ts";
+import type { ColumnDefinitionNative } from "../types.ts";
 
 export class AlterQuery {
   readonly #tableName: string;
 
-  #addColumns: ColumnDefinitionInternal[] = [];
+  #addColumns: ColumnDefinitionNative[] = [];
 
   #inherits?: string;
 
@@ -12,7 +12,7 @@ export class AlterQuery {
     this.#tableName = getFullFormTableName(tableName);
   }
 
-  addColumn(column: ColumnDefinitionInternal): AlterQuery {
+  addColumn(column: ColumnDefinitionNative): AlterQuery {
     column = { ...column };
     this.#addColumns.push(column);
     return this;
@@ -25,8 +25,8 @@ export class AlterQuery {
     return query;
   }
 
-  #prepareColumn(column: ColumnDefinitionInternal): string {
-    let query = `ADD COLUMN "${column.name}" ${column.data_type}`;
+  #prepareColumn(column: ColumnDefinitionNative): string {
+    let query = `ADD COLUMN "${column.name}" ${column.native_type}`;
     if (column.foreign_key) {
       const onDelete = column.foreign_key.on_delete
         ? ` ON DELETE ${column.foreign_key.on_delete}`

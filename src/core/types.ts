@@ -9,7 +9,7 @@
  * @property {number} [max_connections] - The maximum number of connections allowed to the database.
  * @property {number} [connect_timeout] - The maximum time to wait for a connection to the database before timing out.
  */
-export type DatabaseConfiguration = {
+export type TDatabaseConfiguration = {
   hostname?: string;
   port?: number;
   database?: string;
