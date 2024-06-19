@@ -15,11 +15,9 @@
       "jsr:@std/uuid@^0.218.2": "jsr:@std/uuid@0.218.2",
       "jsr:@utility/types@0.4.0": "jsr:@utility/types@0.4.0",
       "npm:bcryptjs@2.4.3": "npm:bcryptjs@2.4.3",
-      "npm:pg": "npm:pg@8.11.5",
       "npm:pg-cursor@2.10.5": "npm:pg-cursor@2.10.5_pg@8.11.5",
       "npm:pg-format@^1.0.4": "npm:pg-format@1.0.4",
       "npm:pg-minify@1.6.4": "npm:pg-minify@1.6.4",
-      "npm:pg-query": "npm:pg-query@0.11.0",
       "npm:pg@8.11.5": "npm:pg@8.11.5"
     },
     "jsr": {
@@ -83,12 +81,6 @@
         "integrity": "sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==",
         "dependencies": {}
       },
-      "okay@0.3.0": {
-        "integrity": "sha512-9Jtrbe/gncY/uRSRYD+VbaTiLuDX+Zm6uRg06itpkU82ZDcuOv+sWgRRvQXU3n7ZSHgltWHUw9EFkLsN4nEOeQ==",
-        "dependencies": {
-          "sliced": "sliced@0.0.5"
-        }
-      },
       "pg-cloudflare@1.1.1": {
         "integrity": "sha512-xWPagP/4B6BgFO+EKz3JONXv3YDgvkbVrGw2mTo3D6tVDQRh1e7cqVGvyR3BE+eQgAvx1XhW/iEASj4/jCWl3Q==",
         "dependencies": {}
@@ -124,13 +116,6 @@
       "pg-protocol@1.6.1": {
         "integrity": "sha512-jPIlvgoD63hrEuihvIg+tJhoGjUsLPn6poJY9N5CnlPd91c2T18T/9zBtLxZSb1EhYxBRoZJtzScCaWlYLtktg==",
         "dependencies": {}
-      },
-      "pg-query@0.11.0": {
-        "integrity": "sha512-0fhDWmy2PaxFz656F/mQsXwG5ICjnVsLRVEz3Ps02UsQK2vQyMwD3N2xJLIOhd0Kz2/uwwtuhZCOEpOQ/D02bg==",
-        "dependencies": {
-          "okay": "okay@0.3.0",
-          "when": "when@3.1.0"
-        }
       },
       "pg-types@2.2.0": {
         "integrity": "sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==",
@@ -177,16 +162,8 @@
           "xtend": "xtend@4.0.2"
         }
       },
-      "sliced@0.0.5": {
-        "integrity": "sha512-9bYT917D6H3+q8GlQBJmLVz3bc4OeVGfZ2BB12wvLnluTGfG6/8UdOUbKJDW1EEx9SZMDbjnatkau5/XcUeyOw==",
-        "dependencies": {}
-      },
       "split2@4.2.0": {
         "integrity": "sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==",
-        "dependencies": {}
-      },
-      "when@3.1.0": {
-        "integrity": "sha512-dAzT69pMCz+s4iTjMNQH+j2x83waW2swg/cD4GEHQWvC5cT4dSUJI8+Xe4PMx8uoE7kTcP05SlP5RPwdLI28zw==",
         "dependencies": {}
       },
       "xtend@4.0.2": {
