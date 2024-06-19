@@ -1,16 +1,17 @@
 import SelectQuery from "../core/query-builder/DQL/SelectQuery.ts";
-import DeleteQuery from "./DeleteQuery.ts";
 import { CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
-import UpdateQuery from "./UpdateQuery.ts";
+
 import { AlterQuery } from "./AlterQuery.ts";
 import type { TOrderBy, TOrderByDirection } from "../core/types.ts";
+import { TWhereClauseOperator } from "../core/types.ts";
 import { runSQLQuery } from "../utils.ts";
 import ORMError from "../errors/ORMError.ts";
 import { __TColumnDefinitionNative } from "../types.ts";
 import DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
-import ExpressionBuilder from "../core/query-builder/EXPRESSIONS/ExpressionBuilder.ts";
-import { TWhereClauseOperator } from "../core/types.ts";
+import WhereClause from "../core/query-builder/CLAUSES/WhereClause.ts";
+import UpdateQuery from "../core/query-builder/DML/UpdateQuery.ts";
+import DeleteQuery from "../core/query-builder/DML/DeleteQuery.ts";
 
 type QueryType =
   | SelectQuery
@@ -110,9 +111,9 @@ export default class Query {
     return this;
   }
 
-  value(row: any): Query {
+  set(columnOrRecord: string | { [key: string]: any }, value?: any): Query {
     const query = <UpdateQuery>this.#getQuery();
-    query.value(row);
+    query.set(columnOrRecord, value);
     return this;
   }
 
@@ -153,7 +154,7 @@ export default class Query {
 
   /**
    * This method is used to set the where clause for the select query.
-   * @param {string | number | boolean | ((where: ExpressionBuilder) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {string | number | boolean | ((where: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
    * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
    * @param {any} value - The value.
    * @returns {SelectQuery} The SelectQuery instance.
@@ -163,7 +164,7 @@ export default class Query {
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ) {
@@ -177,7 +178,7 @@ export default class Query {
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ) {
@@ -191,7 +192,7 @@ export default class Query {
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ) {

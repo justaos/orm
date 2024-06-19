@@ -11,7 +11,7 @@ export default class CompoundExpression {
 
   addExpression(
     expression: SimpleExpression | CompoundExpression,
-    operator: TLogicalOperator = "AND",
+    operator: TLogicalOperator,
   ) {
     if (typeof this.firstExpression === "undefined") {
       this.firstExpression = expression;
@@ -41,12 +41,21 @@ export default class CompoundExpression {
       sql += firstExp.sql;
       values = values.concat(firstExp.values);
 
+      /**
+       * Merge all remaining expressions to the main statement
+       * by joining them with the logical operator
+       * Eg: `id > 1 AND id < 10`
+       */
       for (const exp of this.remainingExpressions) {
         const { operator, expression } = exp;
         const expStatement = expression.prepareStatement();
         sql += ` ${operator} ${expStatement.sql}`;
         values = values.concat(expStatement.values);
       }
+
+      /**
+       * If there are more than one expression, wrap them in parentheses
+       */
       if (this.remainingExpressions.length > 0) {
         sql = `(${sql})`;
       }

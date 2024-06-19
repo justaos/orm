@@ -1,4 +1,5 @@
 import SelectQuery from "./DQL/SelectQuery.ts";
+import UpdateQuery from "./DML/UpdateQuery.ts";
 
 export default class PostgresQueryBuilder {
   static select(
@@ -15,8 +16,8 @@ export default class PostgresQueryBuilder {
     throw new Error("Method not implemented.");
   }
 
-  static update(): void {
-    throw new Error("Method not implemented.");
+  static update(): UpdateQuery {
+    return new UpdateQuery();
   }
 
   static delete(): void {

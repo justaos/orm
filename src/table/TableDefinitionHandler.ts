@@ -60,7 +60,7 @@ export default class TableDefinitionHandler {
       }
     }
 
-    return <TTableDefinitionStrict> tableDefinition;
+    return <TTableDefinitionStrict>tableDefinition;
   }
 
   /**
@@ -75,6 +75,10 @@ export default class TableDefinitionHandler {
     return getShortFormTableName(
       `${this.#tableDefinition.schema}.${this.#tableDefinition.name}`,
     );
+  }
+
+  getFullName(): string {
+    return `${this.#tableDefinition.schema}.${this.#tableDefinition.name}`;
   }
 
   getTableName(): string {
@@ -122,9 +126,8 @@ export default class TableDefinitionHandler {
     let hostName = this.getName();
     const extendsTableName = this.getInherits();
     if (extendsTableName) {
-      const extendedTableDefinition = this.#getTableDefinitionHandler(
-        extendsTableName,
-      );
+      const extendedTableDefinition =
+        this.#getTableDefinitionHandler(extendsTableName);
       hostName = extendedTableDefinition.getBaseName();
     }
     return hostName;
@@ -216,14 +219,12 @@ export default class TableDefinitionHandler {
     const extendsTableName = this.getInherits();
     if (typeof extendsTableName === "string") {
       if (!this.#registriesHandler.hasTableDefinition(extendsTableName)) {
-        tableDefinitionError.inherits =
-          `${this.getName()} cannot inherit '${extendsTableName}'. '${this.getInherits()}' does not exists.`;
+        tableDefinitionError.inherits = `${this.getName()} cannot inherit '${extendsTableName}'. '${this.getInherits()}' does not exists.`;
       } else {
-        const extendsCol: TableDefinitionHandler = this
-          .#getTableDefinitionHandler(extendsTableName);
+        const extendsCol: TableDefinitionHandler =
+          this.#getTableDefinitionHandler(extendsTableName);
         if (extendsCol.isFinal()) {
-          tableDefinitionError.inherits =
-            `${this.getName()} cannot inherit '${extendsTableName}'. '${this.getInherits()}' is final table schema.`;
+          tableDefinitionError.inherits = `${this.getName()} cannot inherit '${extendsTableName}'. '${this.getInherits()}' is final table schema.`;
         }
       }
     }
@@ -243,11 +244,9 @@ export default class TableDefinitionHandler {
     const allColumnNames: string[] = this.getColumns().map((f) => f.getName());
     const duplicates = CommonUtils.findDuplicates(allColumnNames);
     if (duplicates.length) {
-      tableDefinitionError.duplicateFields = `Duplicate fields -> ${
-        duplicates.join(
-          ",",
-        )
-      }`;
+      tableDefinitionError.duplicateFields = `Duplicate fields -> ${duplicates.join(
+        ",",
+      )}`;
     }
 
     if (

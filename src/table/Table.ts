@@ -16,7 +16,7 @@ import TableDefinitionHandler from "./TableDefinitionHandler.ts";
 import type RegistriesHandler from "../RegistriesHandler.ts";
 import { ORMError } from "../../mod.ts";
 import DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
-import ExpressionBuilder from "../core/query-builder/EXPRESSIONS/ExpressionBuilder.ts";
+import WhereClause from "../core/query-builder/CLAUSES/WhereClause.ts";
 import {
   TOrderBy,
   TOrderByDirection,
@@ -79,16 +79,24 @@ export default class Table extends TableDefinitionHandler {
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): Table {
-    if (!this.#query) {
-      this.#query = new Query(this.#pool);
-      this.#query.select();
-      this.#query.from(this.getName());
+    if (this.#query) {
+      throw ORMError.generalError("Query is already initialized");
     }
+    this.#query = new Query(this.#pool);
+    this.#query.select();
+    this.#query.from(this.getName());
     this.#query.where(columnOrCompoundFunction, operatorOrValue, value);
+    return this;
+  }
+
+  resetWhere(): Table {
+    this.#query = new Query(this.#pool);
+    this.#query.select();
+    this.#query.from(this.getName());
     return this;
   }
 
@@ -97,7 +105,7 @@ export default class Table extends TableDefinitionHandler {
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): Table {
@@ -115,7 +123,7 @@ export default class Table extends TableDefinitionHandler {
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): Table {

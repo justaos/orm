@@ -5,10 +5,10 @@ import Table from "./src/table/Table.ts";
 import Column from "./src/table/Column.ts";
 
 import RecordInterceptor from "./src/operation-interceptor/RecordInterceptor.ts";
-import SelectQuery from "./src/query/SelectQuery.ts";
 import Query from "./src/query/Query.ts";
 import IDataType from "./src/data-types/IDataType.ts";
 import ORMError from "./src/errors/ORMError.ts";
+import WhereClause from "./src/core/query-builder/CLAUSES/WhereClause.ts";
 
 export {
   Column,
@@ -19,12 +19,11 @@ export {
   Query,
   Record,
   RecordInterceptor,
-  SelectQuery,
   Table,
+  WhereClause,
 };
 
 export { RecordSaveError } from "./src/errors/RecordSaveError.ts";
-export { CompoundQuery } from "./src/query/CompoundQuery.ts";
 
 export type {
   JSONArray,

@@ -43,17 +43,6 @@ export default class Record {
     }
   }
 
-  #initialize() {
-    this.#record = {};
-    this.#columnsModified = {};
-    this.#table.getColumns().map((field: ColumnDefinitionHandler) => {
-      this.set(field.getName(), field.getDefaultValue());
-    });
-    this.#record["id"] = <UUID4> CommonUtils.generateUUID();
-    this.#record["_table"] = this.#table.getName();
-    this.#isNew = true;
-  }
-
   isNew(): boolean {
     return this.#isNew;
   }
@@ -89,7 +78,7 @@ export default class Record {
     const record = this.#getRawRecord();
     const dataType = this.#table.getColumnSchema(key)?.getColumnType();
     if (dataType && typeof record[key] !== "undefined") {
-      const jsonValue = <JSONValue> dataType.toJSONValue(record[key]);
+      const jsonValue = <JSONValue>dataType.toJSONValue(record[key]);
       if (typeof jsonValue === "undefined") return null;
       return jsonValue;
     }
@@ -137,14 +126,13 @@ export default class Record {
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.update();
-    this.#queryBuilder.into(this.#table.getName());
-    this.#queryBuilder.columns(
-      Object.keys(this.#columnsModified).filter((col) => {
-        return col !== "id";
-      }),
-    );
+    this.#queryBuilder.into(this.#table.getFullName());
     this.#queryBuilder.where("id", record.getID());
-    this.#queryBuilder.value(recordJson);
+    Object.keys(this.#columnsModified).forEach((col) => {
+      if (col !== "id") {
+        this.#queryBuilder.set(col, recordJson[col]);
+      }
+    });
     this.#queryBuilder.returning("*");
 
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
@@ -177,7 +165,7 @@ export default class Record {
     const [record] = await this.#table.intercept("BEFORE_DELETE", [this]);
 
     this.#queryBuilder.delete();
-    this.#queryBuilder.from(this.#table.getName());
+    this.#queryBuilder.from(this.#table.getFullName());
     this.#queryBuilder.where("id", record.getID());
 
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
@@ -215,6 +203,17 @@ export default class Record {
 
   toString(): string {
     return JSON.stringify(this.toJSON());
+  }
+
+  #initialize() {
+    this.#record = {};
+    this.#columnsModified = {};
+    this.#table.getColumns().map((field: ColumnDefinitionHandler) => {
+      this.set(field.getName(), field.getDefaultValue());
+    });
+    this.#record["id"] = <UUID4>CommonUtils.generateUUID();
+    this.#record["_table"] = this.#table.getName();
+    this.#isNew = true;
   }
 
   #getRawRecord(): TRecord {

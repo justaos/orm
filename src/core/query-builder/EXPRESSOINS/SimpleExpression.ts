@@ -3,7 +3,6 @@ import {
   TWhereClauseOperator,
   WHERE_CLAUSE_OPERATORS,
   WHERE_CLAUSE_OPERATORS_ARRAY_VALUES,
-  WHERE_CLAUSE_OPERATORS_CONFIG,
   WHERE_CLAUSE_OPERATORS_NO_VALUES,
 } from "../../types.ts";
 import ORMError from "../../../errors/ORMError.ts";
@@ -50,6 +49,12 @@ export default class SimpleExpression {
         values: [this.#column, this.#value],
       };
     }
+    if (typeof this.#column === "number" || typeof this.#column === "boolean") {
+      return {
+        sql: `%L ${this.#operator} %L`,
+        values: [this.#column, this.#value],
+      };
+    }
     return {
       sql: `%I ${this.#operator} %L`,
       values: [this.#column, this.#value],
@@ -62,6 +67,15 @@ export default class SimpleExpression {
     value: any,
   ) {
     const operatorStrict = <TWhereClauseOperator>operator.toUpperCase();
+
+    if (operator === "=" && value === null) {
+      this.#populate(column, "IS NULL", null);
+      return;
+    }
+    if ((operator === "!=" || operator === "<>") && value === null) {
+      this.#populate(column, "IS NOT NULL", null);
+      return;
+    }
 
     if (WHERE_CLAUSE_OPERATORS.includes(operatorStrict) === false) {
       throw ORMError.queryError(
@@ -81,10 +95,6 @@ export default class SimpleExpression {
     this.#column = column;
     this.#operator = operatorStrict;
     this.#value = value;
-
-    this.#column = column;
-    this.#operator = operator;
-    this.#value = value;
   }
 
   #initialize(
@@ -94,7 +104,7 @@ export default class SimpleExpression {
   ) {
     // Support "where true || where false"
     if (column === false || column === true) {
-      this.#initialize(1, "=", column ? 1 : 0);
+      this.#populate(1, "=", column ? 1 : 0);
       return;
     }
     if (typeof value === "undefined") {
@@ -102,24 +112,16 @@ export default class SimpleExpression {
         this.#initialize(column, "IN", operator);
         return;
       }
-      if (WHERE_CLAUSE_OPERATORS_NO_VALUES.includes(operator)) {
-        this.#initialize(column, operator, null);
-        return;
-      }
-      if (WHERE_CLAUSE_OPERATORS.includes(operator)) {
+      if (
+        typeof operator == "string" &&
+        WHERE_CLAUSE_OPERATORS.includes(
+          <TWhereClauseOperator>operator.toUpperCase(),
+        )
+      ) {
         this.#initialize(column, operator, null);
         return;
       }
       this.#initialize(column, "=", operator);
-      return;
-    }
-
-    if (operator === "=" && value === null) {
-      this.#populate(column, "IS NULL", null);
-      return;
-    }
-    if ((operator === "!=" || operator === "<>") && value === null) {
-      this.#populate(column, "IS NOT NULL", null);
       return;
     }
 

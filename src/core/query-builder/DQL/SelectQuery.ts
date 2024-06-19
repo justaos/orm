@@ -1,6 +1,6 @@
 import IQuery from "../IQuery.ts";
 import { pgFormat } from "../../../../deps.ts";
-import ExpressionBuilder from "../EXPRESSIONS/ExpressionBuilder.ts";
+import WhereClause from "../CLAUSES/WhereClause.ts";
 import {
   TOrderBy,
   TOrderByDirection,
@@ -8,25 +8,29 @@ import {
   TWhereClauseOperator,
 } from "../../types.ts";
 import ORMError from "../../../errors/ORMError.ts";
+import IClause from "../CLAUSES/IClause.ts";
+import LimitClause from "../CLAUSES/LimitClause.ts";
+import OffsetClause from "../CLAUSES/OffsetClause.ts";
+import GroupByClause from "../CLAUSES/GroupByClause.ts";
+import OrderByClause from "../CLAUSES/OrderByClause.ts";
+import ColumnsListClause from "../CLAUSES/ColumnsListClause.ts";
 
-export default class SelectQuery extends IQuery {
-  #columns: string[] = ["*"];
+export default class SelectQuery implements IQuery {
+  #columnsClause?: ColumnsListClause;
 
   #tables?: string[];
 
-  #where?: ExpressionBuilder;
+  #whereClause: WhereClause = new WhereClause();
 
-  #orderByList: TOrderBy[] = [];
+  #orderByClause?: OrderByClause;
 
-  #offset?: number;
+  #offsetClause?: OffsetClause;
 
-  #groupBy?: string[];
+  #groupByClause?: GroupByClause;
 
-  #limit?: number;
+  #limitClause?: LimitClause;
 
-  constructor() {
-    super();
-  }
+  constructor() {}
 
   /**
    * This method is used to set the columns for the select query.
@@ -38,31 +42,10 @@ export default class SelectQuery extends IQuery {
     columnNameOrObjectOrArray?: string | string[] | { [key: string]: boolean },
     ...otherColumns: string[]
   ): SelectQuery {
-    if (
-      typeof columnNameOrObjectOrArray === "undefined" ||
-      columnNameOrObjectOrArray === null
-    ) {
-      this.#columns = ["*"];
-    }
-    if (typeof columnNameOrObjectOrArray === "string") {
-      if (otherColumns.length > 0) {
-        this.#columns = [columnNameOrObjectOrArray, ...otherColumns];
-      } else {
-        this.#columns = [columnNameOrObjectOrArray];
-      }
-    } else if (Array.isArray(columnNameOrObjectOrArray)) {
-      this.#columns = columnNameOrObjectOrArray;
-    } else if (typeof columnNameOrObjectOrArray === "object") {
-      this.#columns = Object.keys(columnNameOrObjectOrArray);
-    }
-    this.#columns.map((arg) => {
-      if (typeof arg === "object") {
-        throw ORMError.queryError(
-          "The columns parameter provided for SelectQuery is incorrect. Please check and try again.",
-        );
-      }
-      return arg;
-    });
+    this.#columnsClause = new ColumnsListClause(
+      columnNameOrObjectOrArray,
+      ...otherColumns,
+    );
     return this;
   }
 
@@ -96,7 +79,8 @@ export default class SelectQuery extends IQuery {
 
   /**
    * This method is used to set the where clause for the select query.
-   * @param {string | number | boolean | ((where: ExpressionBuilder) => void)} columnOrCompoundFunction - The column or compound function.
+   *
+   * @param {string | number | boolean | ((where: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
    * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
    * @param {any} value - The value.
    * @returns {SelectQuery} The SelectQuery instance.
@@ -106,46 +90,46 @@ export default class SelectQuery extends IQuery {
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): SelectQuery {
-    this.#where = new ExpressionBuilder();
-    this.#where.where(columnOrCompoundFunction, operatorOrValue, value);
+    this.#whereClause.where(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
+  /**
+   * This method is same as where method.
+   */
   andWhere(
     columnOrCompoundFunction:
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): SelectQuery {
-    if (!this.#where) {
-      this.where(columnOrCompoundFunction, operatorOrValue, value);
-    } else {
-      this.#where.andWhere(columnOrCompoundFunction, operatorOrValue, value);
-    }
-    return this;
+    return this.where(columnOrCompoundFunction, operatorOrValue, value);
   }
 
+  /**
+   * This method is used to set the or where clause for the select query.
+   *
+   * @param columnOrCompoundFunction
+   * @param operatorOrValue
+   * @param value
+   */
   orWhere(
     columnOrCompoundFunction:
       | string
       | number
       | boolean
-      | ((where: ExpressionBuilder) => void),
+      | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): SelectQuery {
-    if (!this.#where) {
-      this.where(columnOrCompoundFunction, operatorOrValue, value);
-    } else {
-      this.#where.orWhere(columnOrCompoundFunction, operatorOrValue, value);
-    }
+    this.#whereClause.orWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
@@ -159,20 +143,7 @@ export default class SelectQuery extends IQuery {
     columnNameOrOrderList?: string | TOrderBy[],
     direction?: TOrderByDirection,
   ): SelectQuery {
-    if (typeof columnNameOrOrderList === "undefined") {
-      return this;
-    }
-    if (typeof columnNameOrOrderList === "string") {
-      this.#orderByList.push({
-        column: columnNameOrOrderList,
-        order: direction || "ASC",
-      });
-      return this;
-    }
-    if (Array.isArray(columnNameOrOrderList)) {
-      this.#orderByList.push(...columnNameOrOrderList);
-      return this;
-    }
+    this.#orderByClause = new OrderByClause(columnNameOrOrderList, direction);
     return this;
   }
 
@@ -186,33 +157,10 @@ export default class SelectQuery extends IQuery {
     columnNameOrObjectOrArray?: string | string[] | { [key: string]: boolean },
     ...otherColumns: string[]
   ): SelectQuery {
-    if (
-      typeof columnNameOrObjectOrArray === "undefined" ||
-      columnNameOrObjectOrArray === null
-    ) {
-      throw ORMError.queryError(
-        "The columns parameter provided for SelectQuery is incorrect. Please check and try again.",
-      );
-    }
-    if (typeof columnNameOrObjectOrArray === "string") {
-      if (otherColumns.length > 0) {
-        this.#groupBy = [columnNameOrObjectOrArray, ...otherColumns];
-      } else {
-        this.#groupBy = [columnNameOrObjectOrArray];
-      }
-    } else if (Array.isArray(columnNameOrObjectOrArray)) {
-      this.#groupBy = columnNameOrObjectOrArray;
-    } else if (typeof columnNameOrObjectOrArray === "object") {
-      this.#groupBy = Object.keys(columnNameOrObjectOrArray);
-    }
-    this.#groupBy?.map((arg) => {
-      if (typeof arg === "object") {
-        throw ORMError.queryError(
-          "The groupBy parameter provided for SelectQuery is incorrect. Please check and try again.",
-        );
-      }
-      return arg;
-    });
+    this.#groupByClause = new GroupByClause(
+      columnNameOrObjectOrArray,
+      ...otherColumns,
+    );
     return this;
   }
 
@@ -222,12 +170,7 @@ export default class SelectQuery extends IQuery {
    * @returns {SelectQuery} The SelectQuery instance.
    */
   limit(limit: number): SelectQuery {
-    if (limit < 0 || isNaN(limit)) {
-      throw ORMError.queryError(
-        "The limit provided for SelectQuery is incorrect. Please check and try again.",
-      );
-    }
-    this.#limit = limit;
+    this.#limitClause = new LimitClause(limit);
     return this;
   }
 
@@ -237,12 +180,7 @@ export default class SelectQuery extends IQuery {
    * @returns {SelectQuery} The SelectQuery instance.
    */
   offset(offset: number): SelectQuery {
-    if (offset < 0 || isNaN(offset)) {
-      throw ORMError.queryError(
-        "The offset provided for SelectQuery is incorrect. Please check and try again.",
-      );
-    }
-    this.#offset = offset;
+    this.#offsetClause = new OffsetClause(offset);
     return this;
   }
 
@@ -251,82 +189,50 @@ export default class SelectQuery extends IQuery {
       sql: "",
       values: [],
     };
-    if (this.#columns) {
-      preparedStatement.sql += "SELECT ";
-      this.#columns.forEach((column, index) => {
-        if (column === "*" || column.toUpperCase().includes("COUNT")) {
-          preparedStatement.sql += `%s`;
-          preparedStatement.values.push(column);
-        } else {
-          preparedStatement.sql += `%I`;
-          preparedStatement.values.push(column);
-        }
-        if (index < this.#columns.length - 1) {
-          preparedStatement.sql += ",";
-        }
-      });
+
+    /**
+     * SELECT column1, column2, ...
+     */
+    preparedStatement.sql += "SELECT ";
+    if (this.#columnsClause) {
+      const columnsPreparedStatement = this.#columnsClause.prepareStatement();
+      preparedStatement.sql += columnsPreparedStatement.sql;
+      preparedStatement.values.push(...columnsPreparedStatement.values);
     }
 
-    if (this.#tables) {
-      preparedStatement.sql += " FROM %I";
-      preparedStatement.values.push(this.#tables);
+    /**
+     * FROM table_name1, table_name2, ...
+     */
+    if (!this.#tables) {
+      throw ORMError.queryError(
+        "The table name is required for the SELECT Query. Please check and try again.",
+      );
+    }
+    preparedStatement.sql += " FROM %I";
+    preparedStatement.values.push(this.#tables);
+
+    const clauses: (IClause | undefined)[] = [
+      this.#whereClause,
+      this.#groupByClause,
+      this.#orderByClause,
+      this.#limitClause,
+      this.#offsetClause,
+    ];
+
+    for (const clause of clauses) {
+      if (clause) {
+        const compoundStatement = clause.prepareStatement();
+        if (compoundStatement.sql) {
+          preparedStatement.sql += compoundStatement.sql;
+          preparedStatement.values.push(...compoundStatement.values);
+        }
+      }
     }
 
-    if (this.#where) {
-      const whereStatement = this.#where.prepareStatement();
-      preparedStatement.sql += ` WHERE ${whereStatement.sql}`;
-      preparedStatement.values.push(...whereStatement.values);
-    }
-    if (this.#groupBy) {
-      preparedStatement.sql += " GROUP BY %I";
-      preparedStatement.values.push(this.#groupBy);
-    }
-    if (this.#orderByList.length > 0) {
-      preparedStatement.sql += " ORDER BY";
-      this.#orderByList.forEach((orderBy, index) => {
-        preparedStatement.sql += ` %I ${orderBy.order}`;
-        preparedStatement.values.push(orderBy.column);
-        if (index < this.#orderByList.length - 1) {
-          preparedStatement.sql += ",";
-        }
-      });
-    }
-    if (this.#limit) {
-      preparedStatement.sql += " LIMIT %s";
-      preparedStatement.values.push(this.#limit);
-    }
-    if (this.#offset) {
-      preparedStatement.sql += " OFFSET %s";
-      preparedStatement.values.push(this.#offset);
-    }
     return pgFormat(preparedStatement.sql, ...preparedStatement.values);
   }
 
   buildCountQuery(): string {
-    const preparedStatement: TPreparedStatement = {
-      sql: "",
-      values: [],
-    };
-    preparedStatement.sql = "SELECT COUNT(*) as count FROM (SELECT * FROM %I";
-    preparedStatement.values = [this.#tables];
-    if (this.#where) {
-      const whereStatement = this.#where.prepareStatement();
-      preparedStatement.sql += ` WHERE ${whereStatement.sql}`;
-      preparedStatement.values.push(...whereStatement.values);
-    }
-    if (this.#groupBy) {
-      preparedStatement.sql += " GROUP BY %I";
-      preparedStatement.values.push(this.#groupBy);
-    }
-    if (this.#limit) {
-      preparedStatement.sql += " LIMIT %s";
-      preparedStatement.values.push(this.#limit);
-    }
-    if (this.#offset) {
-      preparedStatement.sql += " OFFSET %s";
-      preparedStatement.values.push(this.#offset);
-    }
-    preparedStatement.sql += ") as t";
-    return pgFormat(preparedStatement.sql, ...preparedStatement.values);
+    return `SELECT COUNT(*) as count FROM (${this.buildQuery()}) as t`;
   }
 }

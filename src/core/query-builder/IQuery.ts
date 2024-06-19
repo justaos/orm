@@ -1,3 +1,3 @@
-export default abstract class IQuery {
-  abstract buildQuery(): string;
+export default interface IQuery {
+  buildQuery(): string;
 }
