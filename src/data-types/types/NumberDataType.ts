@@ -1,12 +1,16 @@
-import DataType from "../DataType.ts";
-import type { ColumnDefinitionInternal } from "../../types.ts";
+import IDataType from "../IDataType.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../../types.ts";
 
-export default class NumberDataType extends DataType {
+export default class NumberDataType extends IDataType {
   constructor() {
-    super("number", "DECIMAL");
+    super("number");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal) {}
+  getNativeType(_definition: TColumnDefinitionStrict): TColumnDataType {
+    return "DECIMAL";
+  }
+
+  validateDefinition(_definition: TColumnDefinitionStrict) {}
 
   toJSONValue(value: number | null): number | null {
     return value;

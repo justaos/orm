@@ -1,29 +1,25 @@
-import type { ColumnDefinitionInternal, NativeDataType } from "../types.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../types.ts";
 import type { JSONValue } from "../../deps.ts";
 
-abstract class DataType {
-  readonly #nativeDataType: NativeDataType;
+abstract class IDataType {
   readonly #name: string;
 
-  protected constructor(name: string, primitiveDataType: NativeDataType) {
+  protected constructor(name: string) {
     this.#name = name;
-    this.#nativeDataType = primitiveDataType;
   }
 
   getName(): string {
     return this.#name;
   }
 
-  getNativeType(): NativeDataType {
-    return this.#nativeDataType;
-  }
+  abstract getNativeType(definition: TColumnDefinitionStrict): TColumnDataType;
 
   /**
    * Validate the column definition
    * @param definition
    * @throws {Error} if the definition is invalid
    */
-  abstract validateDefinition(definition: ColumnDefinitionInternal): void;
+  abstract validateDefinition(definition: TColumnDefinitionStrict): void;
 
   abstract toJSONValue(value: unknown): JSONValue;
 
@@ -32,4 +28,4 @@ abstract class DataType {
   abstract validateValue(value: unknown): Promise<void>;
 }
 
-export default DataType;
+export default IDataType;

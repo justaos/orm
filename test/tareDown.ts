@@ -1,4 +1,4 @@
 import { Session } from "./test.utils.ts";
 
-const conn = await Session.getConnection();
-await conn.dropDatabase();
+const client = await Session.getClient();
+await client.dropDatabase();

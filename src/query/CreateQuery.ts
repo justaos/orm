@@ -1,10 +1,10 @@
 import { getFullFormTableName } from "../utils.ts";
-import { ColumnDefinitionNative } from "../types.ts";
+import { __TColumnDefinitionNative } from "../types.ts";
 
 export class CreateQuery {
   readonly #tableName: string;
 
-  #columns: ColumnDefinitionNative[] = [];
+  #columns: __TColumnDefinitionNative[] = [];
 
   #inherits?: string;
 
@@ -12,7 +12,7 @@ export class CreateQuery {
     this.#tableName = getFullFormTableName(tableName);
   }
 
-  addColumn(column: ColumnDefinitionNative): CreateQuery {
+  addColumn(column: __TColumnDefinitionNative): CreateQuery {
     column = { ...column };
     this.#columns.push(column);
     return this;
@@ -33,7 +33,7 @@ export class CreateQuery {
     return query;
   }
 
-  #prepareColumn(column: ColumnDefinitionNative): string {
+  #prepareColumn(column: __TColumnDefinitionNative): string {
     let query = `"${column.name}" ${column.native_type}`;
     if (column.foreign_key) {
       const onDelete = column.foreign_key.on_delete

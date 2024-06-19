@@ -1,13 +1,17 @@
-import DataType from "../DataType.ts";
-import type { ColumnDefinitionInternal } from "../../types.ts";
+import IDataType from "../IDataType.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../../types.ts";
 import type { JSONValue } from "../../../deps.ts";
 
-export default class JSONDataType extends DataType {
+export default class JSONDataType extends IDataType {
   constructor() {
-    super("json", "JSON");
+    super("json");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal) {}
+  getNativeType(_definition: TColumnDefinitionStrict): TColumnDataType {
+    return "JSON";
+  }
+
+  validateDefinition(_definition: TColumnDefinitionStrict) {}
 
   toJSONValue(value: JSONValue): JSONValue {
     return value;

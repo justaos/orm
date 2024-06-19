@@ -11,5 +11,5 @@ Session.setORM(
   }),
 );
 
-const conn = await Session.getConnection(true);
-conn.closeConnection();
+const client = await Session.getClient(true);
+await client.closeConnection();

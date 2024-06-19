@@ -1,12 +1,16 @@
-import DataType from "../DataType.ts";
-import type { ColumnDefinitionInternal } from "../../types.ts";
+import IDataType from "../IDataType.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../../types.ts";
 
-export default class DateTimeDataType extends DataType {
+export default class DateTimeDataType extends IDataType {
   constructor() {
-    super("datetime", "TIMESTAMP");
+    super("datetime");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal) {}
+  getNativeType(_definition: TColumnDefinitionStrict): TColumnDataType {
+    return "TIMESTAMP";
+  }
+
+  validateDefinition(_definition: TColumnDefinitionStrict) {}
 
   toJSONValue(value: Temporal.PlainDateTime | null): string | null {
     if (value instanceof Temporal.PlainDateTime) {

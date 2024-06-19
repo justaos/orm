@@ -1,5 +1,6 @@
 import pg from "pg";
-import Cursor from "pg-cursor";
+import PgCursor from "pg-cursor";
+import pgFormat from "pg-format";
 
 export { CommonUtils } from "@justaos/utils/common-utils";
 
@@ -12,4 +13,4 @@ export type {
   UUID4,
 } from "@utility/types";
 
-export { Cursor as PgCursor, pg };
+export { pg, PgCursor, pgFormat };

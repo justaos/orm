@@ -1,12 +1,16 @@
-import DataType from "../DataType.ts";
-import type { ColumnDefinitionInternal } from "../../types.ts";
+import IDataType from "../IDataType.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../../types.ts";
 
-export default class DateDataType extends DataType {
+export default class DateDataType extends IDataType {
   constructor() {
-    super("date", "DATE");
+    super("date");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal) {}
+  getNativeType(_definition: TColumnDefinitionStrict): TColumnDataType {
+    return "DATE";
+  }
+
+  validateDefinition(_definition: TColumnDefinitionStrict) {}
 
   toJSONValue(value: Temporal.PlainDate | null): string | null {
     if (value instanceof Temporal.PlainDate) {

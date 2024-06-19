@@ -1,9 +1,9 @@
-import type { ColumnDefinitionInternal } from "../types.ts";
+import type { TColumnDefinitionStrict } from "../types.ts";
 import type { JSONValue } from "../../deps.ts";
 
 type FieldValidationErrorObject = {
   code: string;
-  columnDefinition: ColumnDefinitionInternal;
+  columnDefinition: TColumnDefinitionStrict;
   value: JSONValue;
 };
 
@@ -12,12 +12,12 @@ export type { FieldValidationErrorObject };
 export class FieldValidationError extends Error {
   readonly #code: string;
 
-  readonly #columnDefinition: ColumnDefinitionInternal;
+  readonly #columnDefinition: TColumnDefinitionStrict;
 
   readonly #value: JSONValue;
 
   constructor(
-    fieldDefinition: ColumnDefinitionInternal,
+    fieldDefinition: TColumnDefinitionStrict,
     value: any,
     code: string,
   ) {

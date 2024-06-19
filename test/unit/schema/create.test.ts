@@ -9,32 +9,32 @@ import {
 } from "../../../test_deps.ts";
 
 import { Session } from "../../test.utils.ts";
-import type { ORM, ORMConnection, ORMError } from "../../../mod.ts";
+import type { ORM, ORMClient } from "../../../mod.ts";
 
 describe({
   name: "CREATE Query",
   fn: () => {
-    let conn: ORMConnection;
+    let client: ORMClient;
     let odm: ORM;
     const logger = Session.getLogger();
     const cleanTableList: string[] = [];
 
     beforeAll(async () => {
-      conn = await Session.getConnection();
+      client = await Session.getClient();
       odm = Session.getORM();
     });
 
     afterAll(async () => {
-      const conn = await Session.getConnection();
+      const client = await Session.getClient();
       for (const table of cleanTableList) {
-        await conn.dropTable(table);
+        await client.dropTable(table);
       }
-      await conn.closeConnection();
+      await client.closeConnection();
     });
 
     it("#table - negative check", function () {
       try {
-        conn.table("unknown_table");
+        client.table("unknown_table");
         assert(false, "Table should not exists");
       } catch (error) {
         assertStrictEquals(
@@ -47,7 +47,7 @@ describe({
 
     it("#defineTable - simple", async () => {
       try {
-        await conn.defineTable({
+        await client.defineTable({
           name: "person",
           columns: [
             {
@@ -73,8 +73,8 @@ describe({
 
     it("#defineTable - alter", async () => {
       try {
-        conn.deregisterTable("person");
-        await conn.defineTable({
+        client.deregisterTable("person");
+        await client.defineTable({
           name: "person",
           columns: [
             {
@@ -107,7 +107,7 @@ describe({
 
     it("#ORM::defineTable - unknown field type", async () => {
       try {
-        await conn.defineTable({
+        await client.defineTable({
           name: "unknown",
           columns: [
             {
@@ -128,7 +128,7 @@ describe({
 
     it("#ORM::defineTable - invalid name", async () => {
       try {
-        await conn.defineTable({
+        await client.defineTable({
           name: "unknown",
           columns: [
             {
@@ -150,7 +150,7 @@ describe({
     it("#defineTable - extends negative check", async () => {
       let assertValue = false;
       try {
-        await conn.defineTable({
+        await client.defineTable({
           schema: "company",
           name: "employee",
           inherits: "person",
@@ -176,7 +176,7 @@ describe({
     });
 
     it("#defineTable - extends positive check", async () => {
-      await conn.defineTable({
+      await client.defineTable({
         schema: "company",
         name: "employee",
         inherits: "person",
@@ -194,7 +194,7 @@ describe({
     it("#defineTable - extends final negative check", async () => {
       let assertValue = false;
       try {
-        await conn.defineTable({
+        await client.defineTable({
           name: "EXTEND_FINAL",
           inherits: "company.employee",
           columns: [
@@ -213,7 +213,7 @@ describe({
     it("#table - normal schema record", async () => {
       let assertValue = false;
       try {
-        const personTable = conn.table("person");
+        const personTable = client.table("person");
         const personRecord = personTable.createNewRecord();
         await personRecord.insert();
         assertValue = true;
@@ -226,7 +226,7 @@ describe({
     it("#table - extends schema record", async () => {
       let assertValue = false;
       try {
-        const employeeTable = conn.table("company.employee");
+        const employeeTable = client.table("company.employee");
         const employeeRecord = employeeTable.createNewRecord();
         await employeeRecord.insert();
         assertValue = true;

@@ -1,5 +1,5 @@
 import { assert, assertRejects, describe, it } from "../../../test_deps.ts";
-import DatabaseConnectionPool from "../../../src/core/DatabaseConnectionPool.ts";
+import DatabaseConnectionPool from "../../../src/core/connection/DatabaseConnectionPool.ts";
 import type { TDatabaseConfiguration } from "../../../mod.ts";
 
 const defaultConfig: TDatabaseConfiguration = {
@@ -40,8 +40,8 @@ describe({
 
     it("#createDatabase", async () => {
       try {
-        const connectionPool =
-          await DatabaseConnectionPool.createConnectionPoll(defaultConfig);
+        const connectionPool = await DatabaseConnectionPool
+          .createConnectionPoll(defaultConfig);
         await connectionPool.createDatabase("odm-created-database");
         await connectionPool.end();
       } catch (error) {

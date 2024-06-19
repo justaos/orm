@@ -1,24 +1,24 @@
 import ORM from "./src/ORM.ts";
-import ORMConnection from "./src/ORMConnection.ts";
+import ORMClient from "./src/ORMClient.ts";
 import Record from "./src/record/Record.ts";
 import Table from "./src/table/Table.ts";
 import Column from "./src/table/Column.ts";
 
-import DatabaseOperationInterceptor from "./src/operation-interceptor/DatabaseOperationInterceptor.ts";
+import RecordInterceptor from "./src/operation-interceptor/RecordInterceptor.ts";
 import SelectQuery from "./src/query/SelectQuery.ts";
 import Query from "./src/query/Query.ts";
-import DataType from "./src/data-types/DataType.ts";
+import IDataType from "./src/data-types/IDataType.ts";
 import ORMError from "./src/errors/ORMError.ts";
 
 export {
   Column,
-  DatabaseOperationInterceptor,
-  DataType,
+  IDataType,
   ORM,
-  ORMConnection,
+  ORMClient,
   ORMError,
   Query,
   Record,
+  RecordInterceptor,
   SelectQuery,
   Table,
 };
@@ -34,17 +34,26 @@ export type {
   UUID4,
 } from "./deps.ts";
 
-export type { TDatabaseConfiguration } from "./src/core/types.ts";
+export type {
+  SimpleCondition,
+  TColumnDataType,
+  TColumnDefinition,
+  TForeignKey,
+  TRecord,
+  /**
+   * Types
+   */
+  TRecordInterceptorContext,
+  TRecordInterceptorType,
+  /**
+   * Definitions
+   */
+  TTableDefinition,
+} from "./src/types.ts";
 
 export type {
-  ColumnDefinition,
-  DatabaseOperationContext,
-  DatabaseOperationType,
-  DatabaseOperationWhen,
-  NativeDataType,
-  OrderByDirectionType,
-  OrderByType,
-  SimpleCondition,
-  TableDefinition,
-  TRecord,
-} from "./src/types.ts";
+  TDatabaseConfiguration,
+  TOrderBy,
+  TOrderByDirection,
+  TWhereClauseOperator,
+} from "./src/core/types.ts";

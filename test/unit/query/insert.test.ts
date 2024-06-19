@@ -8,21 +8,21 @@ import {
   it,
 } from "../../../test_deps.ts";
 
-import { ORM, type ORMConnection, type Record } from "../../../mod.ts";
+import { ORM, type ORMClient, type Record } from "../../../mod.ts";
 import { Session } from "../../test.utils.ts";
 
 describe({
   name: "INSERT Query",
   fn: () => {
-    let conn: ORMConnection;
+    let client: ORMClient;
     const cleanTableList: string[] = [];
     let johnRecord: Record;
 
     let itDepartment: Record, hrDepartment: Record;
 
     beforeAll(async () => {
-      conn = await Session.getConnection();
-      await conn.defineTable({
+      client = await Session.getClient();
+      await client.defineTable({
         name: "department",
         columns: [
           {
@@ -36,7 +36,7 @@ describe({
           },
         ],
       });
-      const departmentTable = conn.table("department");
+      const departmentTable = client.table("department");
       itDepartment = departmentTable.createNewRecord();
       itDepartment.set("name", "IT");
       await itDepartment.insert();
@@ -49,15 +49,15 @@ describe({
     });
 
     afterAll(async () => {
-      const conn = await Session.getConnection();
+      const client = await Session.getClient();
       for (const table of cleanTableList) {
-        await conn.dropTable(table);
+        await client.dropTable(table);
       }
-      await conn.closeConnection();
+      await client.closeConnection();
     });
 
     it("#defineCollection with different field types", async () => {
-      await conn.defineTable({
+      await client.defineTable({
         name: "employee",
         columns: [
           {
@@ -108,7 +108,7 @@ describe({
     });
 
     it("#Table::getName", function () {
-      const employeeTable = conn.table("employee");
+      const employeeTable = client.table("employee");
       assertEquals(employeeTable.getName(), "employee", "Invalid table name");
     });
 
@@ -116,7 +116,7 @@ describe({
      * CREATE
      */
     it("#insert", async () => {
-      const employeeTable = conn.table("employee");
+      const employeeTable = client.table("employee");
       const employee = employeeTable.createNewRecord();
       const empId = employee.getID();
       employee.set("name", "John");
@@ -151,7 +151,7 @@ describe({
     });
 
     it("#::insert not null error", async () => {
-      const employeeTable = conn.table("employee");
+      const employeeTable = client.table("employee");
       const employee = employeeTable.createNewRecord();
       employee.set("name", "Unique Name");
       try {
@@ -163,7 +163,7 @@ describe({
     });
 
     it("#insert unique error", async () => {
-      const employeeTable = conn.table("employee");
+      const employeeTable = client.table("employee");
       const employee = employeeTable.createNewRecord();
       employee.set("name", "John");
       employee.set("salary", 500);
@@ -189,7 +189,7 @@ describe({
     });
 
     it("#getRecordById", async () => {
-      const employeeTable = conn.table("employee");
+      const employeeTable = client.table("employee");
       const newEmp = employeeTable.createNewRecord();
       newEmp.set("name", "John 3");
       newEmp.set("salary", 500);
@@ -209,7 +209,7 @@ describe({
     });
 
     it("#Record::delete", async () => {
-      const employeeTable = conn.table("employee");
+      const employeeTable = client.table("employee");
       const newEmp = employeeTable.createNewRecord();
       newEmp.set("name", "John 2");
       newEmp.set("salary", 500);

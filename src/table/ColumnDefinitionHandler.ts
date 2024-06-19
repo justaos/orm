@@ -1,27 +1,26 @@
-import type DataType from "../data-types/DataType.ts";
-import type { ColumnDefinition, ColumnDefinitionInternal } from "../types.ts";
+import type IDataType from "../data-types/IDataType.ts";
+import type { TColumnDefinition, TColumnDefinitionStrict } from "../types.ts";
+import ORMError from "../errors/ORMError.ts";
 
 export default class ColumnDefinitionHandler {
-  readonly #columnDefinition: ColumnDefinitionInternal;
+  readonly #columnDefinition: TColumnDefinitionStrict;
 
-  readonly #dataType?: DataType;
+  readonly #dataType?: IDataType;
 
-  constructor(columnDefinition: ColumnDefinition, dataType?: DataType) {
+  constructor(columnDefinition: TColumnDefinition, dataType?: IDataType) {
     this.#dataType = dataType;
     this.#columnDefinition = ColumnDefinitionHandler.setDefaults(
       columnDefinition,
-      dataType,
     );
   }
 
   static setDefaults(
-    columnDefinition: ColumnDefinition,
-    dataType?: DataType,
-  ): ColumnDefinitionInternal {
+    columnDefinition: TColumnDefinition,
+  ): TColumnDefinitionStrict {
     return {
       not_null: false,
       unique: false,
-      data_type: dataType?.getName(),
+      default: null,
       ...columnDefinition,
     };
   }
@@ -42,21 +41,31 @@ export default class ColumnDefinitionHandler {
     return this.#columnDefinition.type;
   }
 
-  getDefinitionClone(): ColumnDefinitionInternal {
+  getDefinitionClone(): TColumnDefinitionStrict {
     return {
       ...this.#columnDefinition,
     };
   }
 
   getDefaultValue(): any {
+    if (typeof this.#columnDefinition.default === "undefined") {
+      return null;
+    }
     return this.#columnDefinition.default;
   }
 
-  getColumnType(): DataType {
+  getColumnType(): IDataType {
     if (!this.#dataType) {
-      throw Error("No such field type");
+      throw ORMError.generalError("No such field type");
     }
     return this.#dataType;
+  }
+
+  getNativeType(): string {
+    if (!this.#dataType) {
+      throw ORMError.generalError("No such field type");
+    }
+    return this.#dataType.getNativeType(this.getDefinitionClone());
   }
 
   validate(): void {

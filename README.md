@@ -10,42 +10,40 @@ JUSTAOS's ORM (Object Relational Mapping) tool is built for Deno and provides
 transparent persistence for JavaScript objects to Postgres database.
 
 - Supports all primitive data types (string, integer, float, boolean, date,
-  object, array, etc).
+  object, array, etc.).
 - Supports custom data types.
 - Supports table with multi-level inheritance.
 - Also supports interception on operations (create, read, update and delete).
 
-```shell
-deno add @justaos/orm
-```
-
 ```ts
-import { ORM } from "@justaos/orm";
+import { ORM } from "jsr:@justaos/orm";
 ```
 
 ## Database connection
 
 ```ts
 const odm = new ORM({
-  database: "employee-database",
+  database: "school-database",
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
   port: 5432,
 });
 
-let conn: ORMConnection | undefined;
 try {
-  conn = await odm.connect(true /* create database if not exists */);
-  console.log("Connection established successfully");
+  const client: ORMClient = await odm.connect(
+    true, /* create database if not exists */
+  );
+  console.log("Client connected successfully");
+  await client.closeConnection(); // terminate all connections in the pool
 } catch (error) {
   console.log("Error while establishing connection", error);
 }
-
-if (conn) await conn.closeConnection();
 ```
 
 ## Defining tables
+
+Definition automatically includes `id` and `_table` fields on every table.
 
 ```ts
 await orm.defineTable({
@@ -67,7 +65,12 @@ await orm.defineTable({
   columns: [
     {
       name: "blog_post",
-      type: "reference",
+      type: "uuid",
+      foreign_key: {
+        table: "department",
+        column: "id",
+        on_delete: "CASCADE",
+      },
     },
     {
       name: "message",
@@ -80,7 +83,7 @@ await orm.defineTable({
 ## Querying
 
 ```ts
-await conn.defineTable({
+await client.defineTable({
   name: "teacher",
   columns: [
     {
@@ -98,7 +101,7 @@ await conn.defineTable({
   ],
 });
 
-const teacherTable = conn.table("teacher");
+const teacherTable = client.table("teacher");
 for (let i = 0; i < 10; i++) {
   const teacher = teacherTable.createNewRecord();
   teacher.set("name", "a" + (i + 1));
@@ -118,7 +121,7 @@ for (const record of records) {
 
 console.log("Count :: " + (await teacherTable.count()));
 
-await conn.closeConnection();
+await client.closeConnection();
 ```
 
 ## Querying with compound 'OR' and 'AND' conditions
@@ -160,7 +163,7 @@ after
 ```ts
 const conn = await odm.connect(true);
 
-await conn.defineTable({
+await client.defineTable({
   name: "student",
   columns: [
     {
@@ -178,40 +181,33 @@ await conn.defineTable({
   ],
 });
 
-class FullNameIntercept extends DatabaseOperationInterceptor {
+class FullNameIntercept extends RecordInterceptor {
   getName() {
     return "full-name-intercept";
   }
 
   async intercept(
     tableName: string,
-    operation: DatabaseOperationType,
-    when: DatabaseOperationWhen,
+    interceptType: TRecordInterceptorType,
     records: Record[],
     _context: DatabaseOperationContext,
   ) {
     if (tableName === "student") {
-      console.log(
-        `[collectionName=${tableName}, operation=${operation}, when=${when}]`,
-      );
-      if (operation === "INSERT") {
-        if (when === "BEFORE") {
-          for (const record of records) {
-            console.log(
-              `Full name field updated for :: ${record.get("first_name")}`,
-            );
-            record.set(
-              "full_name",
-              `${record.get("first_name")} ${record.get("last_name")}`,
-            );
-          }
+      console.log(`[collectionName=${tableName}, when=${interceptType}]`);
+      if (interceptType === "BEFORE_INSERT") {
+        for (const record of records) {
+          console.log(
+            `Full name field updated for :: ${record.get("first_name")}`,
+          );
+          record.set(
+            "full_name",
+            `${record.get("first_name")} ${record.get("last_name")}`,
+          );
         }
       }
-      if (operation === "SELECT") {
-        if (when === "AFTER") {
-          for (const record of records) {
-            console.log(JSON.stringify(record.toJSON(), null, 4));
-          }
+      if (interceptType === "AFTER_SELECT") {
+        for (const record of records) {
+          console.log(JSON.stringify(record.toJSON(), null, 4));
         }
       }
     }
@@ -221,7 +217,7 @@ class FullNameIntercept extends DatabaseOperationInterceptor {
 
 odm.addInterceptor(new FullNameIntercept());
 
-const studentTable = conn.table("student");
+const studentTable = client.table("student");
 const studentRecord = studentTable.createNewRecord();
 studentRecord.set("first_name", "John");
 studentRecord.set("last_name", "Doe");
@@ -242,7 +238,7 @@ Full name field updated for :: John
 }
 */
 
-await conn.closeConnection();
+await client.closeConnection();
 ```
 
 ## Define custom field type
@@ -281,7 +277,7 @@ odm.addDataType(
   })(),
 );
 
-await conn.defineTable({
+await client.defineTable({
   name: "student",
   columns: [
     {
@@ -311,7 +307,7 @@ await conn.defineTable({
   ],
 });
 
-const studentTable = conn.table("student");
+const studentTable = client.table("student");
 const student = studentTable.createNewRecord();
 student.set("personal_contact", "test");
 student.set("birth_date", new Date());
@@ -326,7 +322,7 @@ try {
 ## Inheritance
 
 ```ts
-await conn.defineTable({
+await client.defineTable({
   name: "animal",
   columns: [
     {
@@ -336,12 +332,12 @@ await conn.defineTable({
   ],
 });
 
-const animalTable = conn.table("animal");
+const animalTable = client.table("animal");
 const animal = animalTable.createNewRecord();
 animal.set("name", "Puppy");
 await animal.insert();
 
-await conn.defineTable({
+await client.defineTable({
   name: "dog",
   inherits: "animal",
   final: true,
@@ -353,7 +349,7 @@ await conn.defineTable({
   ],
 });
 
-const dogTable = conn.table("dog");
+const dogTable = client.table("dog");
 const husky = dogTable.createNewRecord();
 husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
@@ -365,7 +361,7 @@ for await (const animal of animalCursor()) {
   console.log(animal.toJSON());
 }
 
-await conn.closeConnection();
+await client.closeConnection();
 ```
 
 | Data type    | Record.get             | Record.getJSONValue |

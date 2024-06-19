@@ -1,12 +1,16 @@
-import DataType from "../DataType.ts";
-import type { ColumnDefinitionInternal } from "../../types.ts";
+import IDataType from "../IDataType.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../../types.ts";
 
-export default class CharDataType extends DataType {
+export default class CharDataType extends IDataType {
   constructor() {
-    super("string", "CHAR");
+    super("string");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal) {}
+  getNativeType(_definition: TColumnDefinitionStrict): TColumnDataType {
+    return "CHAR";
+  }
+
+  validateDefinition(_definition: TColumnDefinitionStrict) {}
 
   toJSONValue(value: string | null): string | null {
     return value;

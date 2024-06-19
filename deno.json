@@ -34,6 +34,7 @@
     "@utility/types": "jsr:@utility/types@0.4.0",
     "pg": "npm:pg@8.11.5",
     "pg-cursor": "npm:pg-cursor@2.10.5",
+    "pg-format": "npm:pg-format@^1.0.4",
     "pg-minify": "npm:pg-minify@1.6.4"
   }
 }

@@ -1,10 +1,11 @@
 import { afterAll, assert, beforeAll, describe, it } from "../../test_deps.ts";
 
 import {
-  type ColumnDefinition,
-  DataType,
+  IDataType,
   type ORM,
-  type ORMConnection,
+  type ORMClient,
+  TColumnDataType,
+  type TColumnDefinition,
 } from "../../mod.ts";
 import { Session } from "../test.utils.ts";
 
@@ -12,39 +13,42 @@ describe({
   name: "Custom FieldType",
   fn: () => {
     let odm: ORM;
-    let conn: ORMConnection;
+    let client: ORMClient;
     const cleanTableList: string[] = [];
     const logger = Session.getLogger();
 
-    const MODEL_NAME = "field_definition_test";
     const EMAIL_TYPE = "email";
     const EMAIL_FIELD = "email";
     const EMAIL_VALUE = "test@example.com";
 
     beforeAll(async () => {
-      conn = await Session.getConnection();
+      client = await Session.getClient();
       odm = Session.getORM();
     });
 
     afterAll(async () => {
-      const conn = await Session.getConnection();
+      const client = await Session.getClient();
       for (const table of cleanTableList) {
-        await conn.dropTable(table);
+        await client.dropTable(table);
       }
-      await conn.closeConnection();
+      await client.closeConnection();
     });
 
     it("#addDataType - Registering Custom data type", async function () {
-      class EmailType extends DataType {
+      class EmailType extends IDataType {
         constructor() {
-          super("email", "VARCHAR");
+          super("email");
+        }
+
+        getNativeType(_definition: TColumnDefinition): TColumnDataType {
+          return "VARCHAR";
         }
 
         toJSONValue(value: string | null): string | null {
           return value;
         }
 
-        validateDefinition(fieldDefinition: ColumnDefinition) {
+        validateDefinition(fieldDefinition: TColumnDefinition) {
           return true;
         }
 
@@ -67,8 +71,8 @@ describe({
       odm.addDataType(new EmailType());
 
       try {
-        await conn.defineTable({
-          name: MODEL_NAME,
+        await client.defineTable({
+          name: "field_definition_test",
           columns: [
             {
               name: "name",
@@ -80,7 +84,7 @@ describe({
             },
           ],
         });
-        cleanTableList.push(MODEL_NAME);
+        cleanTableList.push("field_definition_test");
         assert(true, "Custom field defined as expected");
       } catch (err) {
         console.error(err);
@@ -89,14 +93,13 @@ describe({
     });
 
     it("#registerFieldType -  creating record with custom field type", async () => {
-      const collection = conn.table(MODEL_NAME);
+      const collection = client.table("field_definition_test");
       const rec = collection.createNewRecord();
       rec.set("name", "RAM");
       rec.set(EMAIL_FIELD, EMAIL_VALUE);
       await rec.insert();
 
       const records = await collection
-        .select()
         .where(EMAIL_FIELD, "=", EMAIL_VALUE)
         .toArray();
 
@@ -109,7 +112,7 @@ describe({
     it("#registerFieldType -  creating record with invalid value", async () => {
       let error = false;
       try {
-        const collection = conn.table(MODEL_NAME);
+        const collection = client.table("field_definition_test");
         const rec = collection.createNewRecord();
         rec.set("name", "RAM");
         rec.set(EMAIL_FIELD, "TEST");
@@ -124,7 +127,7 @@ describe({
     it("#registerFieldType - trying create invalid field", async function () {
       let error = false;
       try {
-        await conn.defineTable({
+        await client.defineTable({
           name: "field_definition_invalid_test",
           columns: [
             {

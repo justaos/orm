@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Deno: eg-2-define-table-and-query.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/examples/eg-2-define-table-and-query.ts" programParameters="run -A" workingDirectory="$PROJECT_DIR$/examples">
+  <configuration default="false" name="Deno: eg-2-define-table-and-query.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/examples/eg-2-define-table-and-query.ts" programParameters="run -A --unstable-temporal" workingDirectory="$PROJECT_DIR$/examples">
     <method v="2" />
   </configuration>
 </component>

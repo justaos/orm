@@ -47,9 +47,7 @@ export default class Record {
     this.#record = {};
     this.#columnsModified = {};
     this.#table.getColumns().map((field: ColumnDefinitionHandler) => {
-      if (typeof field.getDefaultValue() === "undefined") {
-        this.set(field.getName(), null);
-      } else this.set(field.getName(), field.getDefaultValue());
+      this.set(field.getName(), field.getDefaultValue());
     });
     this.#record["id"] = <UUID4> CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
@@ -99,7 +97,7 @@ export default class Record {
   }
 
   async insert(): Promise<Record> {
-    let [record] = await this.#table.intercept("INSERT", "BEFORE", [this]);
+    let [record] = await this.#table.intercept("BEFORE_INSERT", [this]);
 
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
@@ -124,7 +122,7 @@ export default class Record {
       );
     }
 
-    [record] = await this.#table.intercept("INSERT", "AFTER", [
+    [record] = await this.#table.intercept("AFTER_INSERT", [
       new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord),
     ]);
     this.#record = record.toJSON();
@@ -134,7 +132,7 @@ export default class Record {
   }
 
   async update(): Promise<Record> {
-    let [record] = await this.#table.intercept("UPDATE", "BEFORE", [this]);
+    let [record] = await this.#table.intercept("BEFORE_UPDATE", [this]);
 
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
@@ -164,7 +162,7 @@ export default class Record {
       );
     }
 
-    [record] = await this.#table.intercept("UPDATE", "AFTER", [
+    [record] = await this.#table.intercept("AFTER_UPDATE", [
       new Record(this.#queryBuilder, this.#table, this.#logger, savedRawRecord),
     ]);
     this.#record = record.toJSON();
@@ -176,7 +174,7 @@ export default class Record {
     if (this.#isNew) {
       throw ORMError.generalError("Cannot remove unsaved record");
     }
-    const [record] = await this.#table.intercept("DELETE", "BEFORE", [this]);
+    const [record] = await this.#table.intercept("BEFORE_DELETE", [this]);
 
     this.#queryBuilder.delete();
     this.#queryBuilder.from(this.#table.getName());
@@ -196,7 +194,7 @@ export default class Record {
       );
     }
 
-    await this.#table.intercept("DELETE", "AFTER", [record]);
+    await this.#table.intercept("AFTER_DELETE", [record]);
     return this;
   }
 

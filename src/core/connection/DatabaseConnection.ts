@@ -1,4 +1,4 @@
-import { pg, PgCursor } from "../../deps.ts";
+import { pg, PgCursor } from "../../../deps.ts";
 
 export class DatabaseConnection {
   readonly #pgClient: pg.Client;
@@ -8,7 +8,8 @@ export class DatabaseConnection {
   }
 
   async doesSchemaExist(schemaName: string): Promise<boolean> {
-    const query = `SELECT schema_name FROM information_schema.schemata WHERE schema_name = '${schemaName}'`;
+    const query =
+      `SELECT schema_name FROM information_schema.schemata WHERE schema_name = '${schemaName}'`;
     const result = await this.runQuery(query);
     return result.rowCount > 0;
   }

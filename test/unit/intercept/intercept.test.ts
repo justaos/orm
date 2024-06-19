@@ -7,60 +7,57 @@ import {
 } from "../../../test_deps.ts";
 
 import type {
-  DatabaseOperationType,
-  DatabaseOperationWhen,
   ORM,
-  ORMConnection,
+  ORMClient,
   Record,
+  Table,
+  TRecordInterceptorType,
 } from "../../../mod.ts";
 import { logger, Session } from "../../test.utils.ts";
-import DatabaseOperationInterceptor from "../../../src/operation-interceptor/DatabaseOperationInterceptor.ts";
+import RecordInterceptor from "../../../src/operation-interceptor/RecordInterceptor.ts";
 
 describe({
   name: "Operations Intercept",
   fn: () => {
     let odm: ORM;
-    let conn: ORMConnection;
+    let client: ORMClient;
     const cleanTableList: string[] = [];
 
     beforeAll(async () => {
-      conn = await Session.getConnection();
+      client = await Session.getClient();
       odm = Session.getORM();
     });
 
     afterAll(async () => {
-      const conn = await Session.getConnection();
+      const client = await Session.getClient();
       for (const table of cleanTableList) {
-        await conn.dropTable(table);
+        await client.dropTable(table);
       }
-      await (await Session.getConnection()).closeConnection();
+      await (await Session.getClient()).closeConnection();
     });
 
     it("#ORM::addInterceptor", async () => {
       const INTERCEPT_TEST_MODEL = "intercept_test";
       odm.addInterceptor(
-        new (class extends DatabaseOperationInterceptor {
+        new (class extends RecordInterceptor {
           getName() {
             return "my-intercept";
           }
 
           async intercept(
-            tableName: string,
-            operation: DatabaseOperationType,
-            when: DatabaseOperationWhen,
+            table: Table,
+            operation: TRecordInterceptorType,
             records: Record[],
           ) {
-            if (tableName === INTERCEPT_TEST_MODEL) {
-              if (operation === "INSERT") {
-                logger.info(
-                  `[tableName=${tableName}] [operation=${operation}] [when=${when}]`,
-                );
-                if (when === "BEFORE") {
-                  logger.info("before");
-                  for (const record of records) {
-                    record.set("computed", "this is computed");
-                  }
-                }
+            if (
+              table.getName() === INTERCEPT_TEST_MODEL &&
+              operation === "BEFORE_INSERT"
+            ) {
+              logger.info(
+                `[tableName=${table.getName()}] [operation=${operation}]`,
+              );
+              for (const record of records) {
+                record.set("computed", "this is computed");
               }
             }
             return records;
@@ -68,7 +65,7 @@ describe({
         })(),
       );
 
-      await conn.defineTable({
+      await client.defineTable({
         name: INTERCEPT_TEST_MODEL,
         columns: [
           {
@@ -83,7 +80,7 @@ describe({
       });
       cleanTableList.push(INTERCEPT_TEST_MODEL);
 
-      const interceptTestTable = conn.table(INTERCEPT_TEST_MODEL);
+      const interceptTestTable = client.table(INTERCEPT_TEST_MODEL);
       const s = interceptTestTable.createNewRecord();
       s.set("name", "John");
       try {

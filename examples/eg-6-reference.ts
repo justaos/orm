@@ -3,7 +3,7 @@ import getORM from "./getORM.ts";
 const odm = getORM();
 const conn = await odm.connect(true);
 
-await conn.defineTable({
+await client.defineTable({
   name: "department",
   columns: [
     {
@@ -18,7 +18,7 @@ await conn.defineTable({
   ],
 });
 
-await conn.defineTable({
+await client.defineTable({
   name: "employee",
   columns: [
     {
@@ -65,4 +65,4 @@ await conn.defineTable({
   ],
 });
 
-await conn.closeConnection();
+await client.closeConnection();

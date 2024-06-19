@@ -1,10 +1,10 @@
 import { getFullFormTableName } from "../utils.ts";
-import type { ColumnDefinitionNative } from "../types.ts";
+import type { __TColumnDefinitionNative } from "../types.ts";
 
 export class AlterQuery {
   readonly #tableName: string;
 
-  #addColumns: ColumnDefinitionNative[] = [];
+  #addColumns: __TColumnDefinitionNative[] = [];
 
   #inherits?: string;
 
@@ -12,7 +12,7 @@ export class AlterQuery {
     this.#tableName = getFullFormTableName(tableName);
   }
 
-  addColumn(column: ColumnDefinitionNative): AlterQuery {
+  addColumn(column: __TColumnDefinitionNative): AlterQuery {
     column = { ...column };
     this.#addColumns.push(column);
     return this;
@@ -25,7 +25,7 @@ export class AlterQuery {
     return query;
   }
 
-  #prepareColumn(column: ColumnDefinitionNative): string {
+  #prepareColumn(column: __TColumnDefinitionNative): string {
     let query = `ADD COLUMN "${column.name}" ${column.native_type}`;
     if (column.foreign_key) {
       const onDelete = column.foreign_key.on_delete

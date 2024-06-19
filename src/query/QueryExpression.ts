@@ -1,12 +1,12 @@
 import type { SimpleCondition } from "../types.ts";
 import ORMError from "../errors/ORMError.ts";
-import { CompoundOperator } from "../types.ts";
+import { TLogicalOperator } from "../core/types.ts";
 
 export class QueryExpression {
   type: "SIMPLE" | "COMPOUND";
   condition?: SimpleCondition;
 
-  compoundOperator?: CompoundOperator;
+  compoundOperator?: TLogicalOperator;
 
   expressions: QueryExpression[] = [];
 
@@ -20,7 +20,7 @@ export class QueryExpression {
   ) {
     this.type = type;
     if (type == "SIMPLE" && condition) {
-      this.condition = <SimpleCondition> (
+      this.condition = <SimpleCondition>(
         this.#buildSimpleCondition(
           condition.column,
           condition.operator,
@@ -46,7 +46,7 @@ export class QueryExpression {
       if (!this.condition) {
         throw ORMError.queryError("condition should be present on simple");
       }
-      const expression = new QueryExpression("SIMPLE", <any> this.condition);
+      const expression = new QueryExpression("SIMPLE", <any>this.condition);
       this.expressions.push(expression);
       this.condition = undefined;
     }

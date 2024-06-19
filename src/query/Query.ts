@@ -1,15 +1,16 @@
-import SelectQuery from "./SelectQuery.ts";
+import SelectQuery from "../core/query-builder/DQL/SelectQuery.ts";
 import DeleteQuery from "./DeleteQuery.ts";
 import { CreateQuery } from "./CreateQuery.ts";
 import InsertQuery from "./InsertQuery.ts";
 import UpdateQuery from "./UpdateQuery.ts";
 import { AlterQuery } from "./AlterQuery.ts";
-import type { OrderByDirectionType, OrderByType } from "../types.ts";
+import type { TOrderBy, TOrderByDirection } from "../core/types.ts";
 import { runSQLQuery } from "../utils.ts";
 import ORMError from "../errors/ORMError.ts";
-import { CompoundQuery } from "./CompoundQuery.ts";
-import { ColumnDefinitionNative } from "../types.ts";
-import DatabaseConnectionPool from "../core/DatabaseConnectionPool.ts";
+import { __TColumnDefinitionNative } from "../types.ts";
+import DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
+import ExpressionBuilder from "../core/query-builder/EXPRESSIONS/ExpressionBuilder.ts";
+import { TWhereClauseOperator } from "../core/types.ts";
 
 type QueryType =
   | SelectQuery
@@ -60,7 +61,7 @@ export default class Query {
     return this;
   }
 
-  addColumn(column: ColumnDefinitionNative): Query {
+  addColumn(column: __TColumnDefinitionNative): Query {
     const query = <CreateQuery>this.#getQuery();
     query.addColumn(column);
     return this;
@@ -126,10 +127,6 @@ export default class Query {
     return this;
   }
 
-  getSelectedColumns(): string[] {
-    return (<SelectQuery>this.#query).getColumns();
-  }
-
   delete(): Query {
     this.#query = new DeleteQuery();
     return this;
@@ -154,20 +151,53 @@ export default class Query {
     return this;
   }
 
-  where(column: string | number | boolean, operator: any, value?: any): Query {
+  /**
+   * This method is used to set the where clause for the select query.
+   * @param {string | number | boolean | ((where: ExpressionBuilder) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {SelectQuery} The SelectQuery instance.
+   */
+  where(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: ExpressionBuilder) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ) {
     const query = <SelectQuery>this.#getQuery();
-    query.where(column, operator, value);
+    query.where(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
-  compoundOr(): CompoundQuery {
+  orWhere(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: ExpressionBuilder) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ) {
     const query = <SelectQuery>this.#getQuery();
-    return query.compoundOr();
+    query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
+    return this;
   }
 
-  compoundAnd(): CompoundQuery {
+  andWhere(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: ExpressionBuilder) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ) {
     const query = <SelectQuery>this.#getQuery();
-    return query.compoundOr();
+    query.andWhere(columnOrCompoundFunction, operatorOrValue, value);
+    return this;
   }
 
   limit(limit: number): Query {
@@ -183,8 +213,8 @@ export default class Query {
   }
 
   orderBy(
-    columnNameOrOrderList?: string | OrderByType[],
-    direction?: OrderByDirectionType,
+    columnNameOrOrderList?: string | TOrderBy[],
+    direction?: TOrderByDirection,
   ): Query {
     const query = <SelectQuery>this.#getQuery();
     query.orderBy(columnNameOrOrderList, direction);

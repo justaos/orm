@@ -1,6 +1,6 @@
-import { type Logger, LoggerUtils, pg } from "../../deps.ts";
-import type { TDatabaseConfiguration } from "./types.ts";
-import ORMError from "../errors/ORMError.ts";
+import { type Logger, LoggerUtils, pg } from "../../../deps.ts";
+import type { TDatabaseConfiguration } from "../types.ts";
+import ORMError from "../../errors/ORMError.ts";
 import { DatabaseConnection } from "./DatabaseConnection.ts";
 
 /**
@@ -52,9 +52,9 @@ export default class DatabaseConnectionPool {
   static async createConnectionPoll(
     configuration: TDatabaseConfiguration,
   ): Promise<DatabaseConnectionPool> {
-    const conn = new DatabaseConnectionPool(configuration);
-    await conn.testConnection();
-    return conn;
+    const pool = new DatabaseConnectionPool(configuration);
+    await pool.testConnection();
+    return pool;
   }
 
   /**
@@ -151,6 +151,6 @@ export default class DatabaseConnectionPool {
    * @returns {Promise<void>} A promise that resolves when the connection is successfully ended.
    */
   async end(): Promise<void> {
-    return await this.#pgPool.end();
+    this.#pgPool.end();
   }
 }

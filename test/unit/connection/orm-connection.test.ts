@@ -17,13 +17,13 @@ describe({
         ...defaultConfig,
         port: undefined,
       });
-      let conn;
+      let client;
       try {
-        conn = await orm.connect(true);
+        client = await orm.connect(true);
       } catch (_error) {
         assert(false, "connection failed");
       } finally {
-        if (conn) await conn.closeConnection();
+        if (client) await client.closeConnection();
       }
     });
   },

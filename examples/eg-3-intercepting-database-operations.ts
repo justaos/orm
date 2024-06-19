@@ -1,17 +1,16 @@
 import getORM from "./getORM.ts";
 import {
-  type DatabaseOperationContext,
-  DatabaseOperationInterceptor,
-  type DatabaseOperationType,
-  type DatabaseOperationWhen,
   type Record,
+  RecordInterceptor,
+  type TRecordInterceptorContext,
+  type TRecordInterceptorType,
 } from "../mod.ts";
 
 const odm = getORM();
 
 const conn = await odm.connect(true);
 
-await conn.defineTable({
+await client.defineTable({
   name: "student",
   columns: [
     {
@@ -29,40 +28,33 @@ await conn.defineTable({
   ],
 });
 
-class FullNameIntercept extends DatabaseOperationInterceptor {
+class FullNameIntercept extends RecordInterceptor {
   getName() {
     return "full-name-intercept";
   }
 
   async intercept(
     tableName: string,
-    operation: DatabaseOperationType,
-    when: DatabaseOperationWhen,
+    interceptType: TRecordInterceptorType,
     records: Record[],
-    _context: DatabaseOperationContext,
+    _context: TRecordInterceptorContext,
   ) {
     if (tableName === "student") {
-      console.log(
-        `[collectionName=${tableName}, operation=${operation}, when=${when}]`,
-      );
-      if (operation === "INSERT") {
-        if (when === "BEFORE") {
-          for (const record of records) {
-            console.log(
-              `Full name field updated for :: ${record.get("first_name")}`,
-            );
-            record.set(
-              "full_name",
-              `${record.get("first_name")} ${record.get("last_name")}`,
-            );
-          }
+      console.log(`[collectionName=${tableName}, when=${interceptType}]`);
+      if (interceptType === "BEFORE_INSERT") {
+        for (const record of records) {
+          console.log(
+            `Full name field updated for :: ${record.get("first_name")}`,
+          );
+          record.set(
+            "full_name",
+            `${record.get("first_name")} ${record.get("last_name")}`,
+          );
         }
       }
-      if (operation === "SELECT") {
-        if (when === "AFTER") {
-          for (const record of records) {
-            console.log(JSON.stringify(record.toJSON(), null, 4));
-          }
+      if (interceptType === "AFTER_SELECT") {
+        for (const record of records) {
+          console.log(JSON.stringify(record.toJSON(), null, 4));
         }
       }
     }
@@ -72,7 +64,7 @@ class FullNameIntercept extends DatabaseOperationInterceptor {
 
 odm.addInterceptor(new FullNameIntercept());
 
-const studentTable = conn.table("student");
+const studentTable = client.table("student");
 const studentRecord = studentTable.createNewRecord();
 studentRecord.set("first_name", "John");
 studentRecord.set("last_name", "Doe");
@@ -93,4 +85,4 @@ Full name field updated for :: John
 }
 */
 
-await conn.closeConnection();
+await client.closeConnection();

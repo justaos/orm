@@ -1,6 +1,6 @@
 import { ORM } from "../mod.ts";
 
-const conn = await new ORM({
+const client = await new ORM({
   hostname: "127.0.0.1",
   port: 5432,
   username: "postgres",
@@ -9,7 +9,7 @@ const conn = await new ORM({
 }).connect(true);
 
 const start = performance.now();
-await conn.defineTable({
+await client.defineTable({
   name: "department",
   columns: [
     {
@@ -23,7 +23,7 @@ await conn.defineTable({
     },
   ],
 });
-const departmentTable = conn.table("department");
+const departmentTable = client.table("department");
 const itDepartment = departmentTable.createNewRecord();
 itDepartment.set("name", "IT");
 await itDepartment.insert();
@@ -36,4 +36,4 @@ await departmentTable.select().toArray();
 
 console.log(performance.now() - start);
 
-await conn.dropDatabase();
+await client.dropDatabase();

@@ -1,11 +1,11 @@
 import { LoggerUtils } from "../deps.ts";
 import { ORM } from "../mod.ts";
-import type ORMConnection from "../src/ORMConnection.ts";
+import type ORMClient from "../src/ORMClient.ts";
 
 class Session {
   static #odm: ORM;
 
-  static #odmConnection: ORMConnection;
+  static #odmConnection: ORMClient;
 
   static setORM(odm: ORM) {
     Session.#odm = odm;
@@ -15,9 +15,9 @@ class Session {
     return Session.#odm;
   }
 
-  static async getConnection(
+  static async getClient(
     forceNewConnection: boolean = false,
-  ): Promise<ORMConnection> {
+  ): Promise<ORMClient> {
     if (!this.#odm) {
       this.#odm = new ORM(
         {

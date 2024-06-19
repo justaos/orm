@@ -1,19 +1,23 @@
-import { type ColumnDefinition, DataType } from "../mod.ts";
+import { IDataType, TColumnDataType, type TColumnDefinition } from "../mod.ts";
 import getORM from "./getORM.ts";
 
 const odm = getORM();
 const conn = await odm.connect(true);
 
-class EmailType extends DataType {
+class EmailType extends IDataType {
   constructor() {
-    super("email", "VARCHAR");
+    super("email");
+  }
+
+  getNativeType(_definition: TColumnDefinition): TColumnDataType {
+    return "VARCHAR";
   }
 
   toJSONValue(value: string | null): string | null {
     return value;
   }
 
-  validateDefinition(_columnDefinition: ColumnDefinition) {
+  validateDefinition(_columnDefinition: TColumnDefinition) {
     return true;
   }
 
@@ -35,7 +39,7 @@ class EmailType extends DataType {
 
 odm.addDataType(new EmailType());
 
-await conn.defineTable({
+await client.defineTable({
   name: "employee",
   columns: [
     {
@@ -65,15 +69,15 @@ await conn.defineTable({
   ],
 });
 
-const studentTable = conn.table("employee");
+const studentTable = client.table("employee");
 const student = studentTable.createNewRecord();
 student.set("personal_contact", "NOT_EMAIL_VALUE");
 student.set("birth_date", new Date());
 try {
-  await student.insert();
+  await student.insert(); // this will throw an error, because email is not valid
   console.log("Student created");
 } catch (error) {
   console.log(error);
 }
 
-await conn.closeConnection();
+await client.closeConnection();

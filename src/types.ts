@@ -1,72 +1,54 @@
 import type { JSONPrimitive, UUID4 } from "../deps.ts";
 
-/**
- * Database operation type
- * @type {string}
- * @enum {"INSERT" | "SELECT" | "UPDATE" | "DELETE"}
- */
-export type DatabaseOperationType = "INSERT" | "SELECT" | "UPDATE" | "DELETE";
-export type DatabaseOperationWhen = "BEFORE" | "AFTER";
+export type TForeignKey = {
+  table: string;
+  column: string;
+  on_delete?: "NO ACTION" | "CASCADE" | "SET NULL" | "SET DEFAULT";
+};
 
-export type CompoundOperator = "OR" | "AND";
-
-export type ColumnDefinition = {
+export type TColumnDefinition = {
   name: string;
   type: string;
   not_null?: boolean;
   default?: unknown;
   unique?: boolean;
-  foreign_key?: {
-    table: string;
-    column: string;
-    on_delete?: "NO ACTION" | "CASCADE" | "SET NULL" | "SET DEFAULT";
-  };
+  foreign_key?: TForeignKey;
 };
 
-export type ColumnDefinitionInternal = {
+export type TColumnDefinitionStrict = {
   name: string;
   type: string;
-  data_type?: string;
   not_null: boolean;
-  default?: unknown;
+  default: any;
   unique: boolean;
-  foreign_key?: {
-    table: string;
-    column: string;
-    on_delete?: "NO ACTION" | "CASCADE" | "SET NULL" | "SET DEFAULT";
-  };
+  foreign_key?: TForeignKey;
 };
 
-export type ColumnDefinitionNative = {
+export type __TColumnDefinitionNative = {
   name: string;
   native_type?: string;
   not_null: boolean;
-  default?: unknown;
   unique: boolean;
-  foreign_key?: {
-    table: string;
-    column: string;
-    on_delete?: "NO ACTION" | "CASCADE" | "SET NULL" | "SET DEFAULT";
-  };
+  foreign_key?: TForeignKey;
 };
 
-export type TableDefinition = {
+export type TTableDefinition = {
   schema?: string;
   name: string;
   inherits?: string;
   final?: boolean;
-  columns?: ColumnDefinition[];
+  columns?: TColumnDefinition[];
 };
 
-export type TableDefinitionInternal = {
+export type TTableDefinitionStrict = {
   schema: string;
   name: string;
   inherits?: string;
   final: boolean;
-  columns: ColumnDefinitionInternal[];
+  columns: TColumnDefinitionStrict[];
 };
 
-export type NativeDataType =
+export type TColumnDataType =
   | "VARCHAR"
   | "UUID"
   | "CHAR"
@@ -85,19 +67,20 @@ export type TRecord = {
   [key: string]: unknown;
 };
 
-export type DatabaseOperationContext = {
-  [key: string]: unknown;
-};
+export type TRecordInterceptorType =
+  | "BEFORE_INSERT"
+  | "AFTER_INSERT"
+  | "BEFORE_UPDATE"
+  | "AFTER_UPDATE"
+  | "BEFORE_DELETE"
+  | "AFTER_DELETE"
+  | "BEFORE_SELECT"
+  | "AFTER_SELECT";
+
+export type TRecordInterceptorContext = any;
 
 export type SimpleCondition = {
   column: string | number;
   operator: string;
   value: JSONPrimitive | JSONPrimitive[];
-};
-
-export type OrderByDirectionType = "ASC" | "DESC";
-
-export type OrderByType = {
-  column: string;
-  order: OrderByDirectionType;
 };

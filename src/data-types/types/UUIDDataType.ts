@@ -1,13 +1,17 @@
-import DataType from "../DataType.ts";
-import type { ColumnDefinitionInternal } from "../../types.ts";
+import IDataType from "../IDataType.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../../types.ts";
 import { CommonUtils, type UUID4 } from "../../../deps.ts";
 
-export default class UUIDDataType extends DataType {
+export default class UUIDDataType extends IDataType {
   constructor() {
-    super("uuid", "UUID");
+    super("uuid");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal) {}
+  getNativeType(_definition: TColumnDefinitionStrict): TColumnDataType {
+    return "UUID";
+  }
+
+  validateDefinition(_definition: TColumnDefinitionStrict) {}
 
   toJSONValue(value: UUID4 | null): string | null {
     return value;

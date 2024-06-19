@@ -1,5 +1,5 @@
 import { ORM } from "../mod.ts";
-import type ORMConnection from "../src/ORMConnection.ts";
+import type ORMClient from "../src/ORMClient.ts";
 
 const odm = new ORM({
   database: "school-database",
@@ -9,12 +9,12 @@ const odm = new ORM({
   port: 5432,
 });
 
-let conn: ORMConnection | undefined;
 try {
-  conn = await odm.connect(true /* create database if not exists */);
-  console.log("Connection established successfully");
+  const client: ORMClient = await odm.connect(
+    true, /* create database if not exists */
+  );
+  console.log("Client connected successfully");
+  await client.closeConnection();
 } catch (error) {
   console.log("Error while establishing connection", error);
 }
-
-if (conn) await conn.closeConnection();

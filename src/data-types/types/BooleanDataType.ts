@@ -1,12 +1,16 @@
-import DataType from "../DataType.ts";
-import type { ColumnDefinitionInternal } from "../../types.ts";
+import IDataType from "../IDataType.ts";
+import type { TColumnDataType, TColumnDefinitionStrict } from "../../types.ts";
 
-export default class BooleanDataType extends DataType {
+export default class BooleanDataType extends IDataType {
   constructor() {
-    super("boolean", "BOOLEAN");
+    super("boolean");
   }
 
-  validateDefinition(_definition: ColumnDefinitionInternal) {}
+  getNativeType(_definition: TColumnDefinitionStrict): TColumnDataType {
+    return "BOOLEAN";
+  }
+
+  validateDefinition(_definition: TColumnDefinitionStrict) {}
 
   toJSONValue(value: boolean | null): boolean | null {
     return value;

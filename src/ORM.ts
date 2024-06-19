@@ -1,9 +1,9 @@
-import DatabaseConnectionPool from "./core/DatabaseConnectionPool.ts";
+import DatabaseConnectionPool from "./core/connection/DatabaseConnectionPool.ts";
 import type { TDatabaseConfiguration } from "./core/types.ts";
-import type DataType from "./data-types/DataType.ts";
+import type IDataType from "./data-types/IDataType.ts";
 
 import StringDataType from "./data-types/types/StringDataType.ts";
-import ORMConnection from "./ORMConnection.ts";
+import ORMClient from "./ORMClient.ts";
 import IntegerDataType from "./data-types/types/IntegerDataType.ts";
 import NumberDataType from "./data-types/types/NumberDataType.ts";
 import JSONDataType from "./data-types/types/JSONDataType.ts";
@@ -11,7 +11,7 @@ import BooleanDataType from "./data-types/types/BooleanDataType.ts";
 import DateDataType from "./data-types/types/DateDataType.ts";
 import DateTimeDataType from "./data-types/types/DateTimeDataType.ts";
 import UUIDDataType from "./data-types/types/UUIDDataType.ts";
-import type DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
+import type RecordInterceptor from "./operation-interceptor/RecordInterceptor.ts";
 import TimeDataType from "./data-types/types/TimeDataType.ts";
 import CharDataType from "./data-types/types/CharDataType.ts";
 import { CommonUtils, type Logger, LoggerUtils, type UUID4 } from "../deps.ts";
@@ -80,28 +80,28 @@ export default class ORM {
    * Establishes a connection to the database.
    * @param createDatabaseIfNotExists If true, creates the database if it does not exist.
    */
-  async connect(createDatabaseIfNotExists?: boolean): Promise<ORMConnection> {
+  async connect(createDatabaseIfNotExists?: boolean): Promise<ORMClient> {
     try {
-      const conn = new ORMConnection(
+      const client = new ORMClient(
         this.#logger,
         this.#config,
         this.#registryHandler,
       );
-      await conn.testConnection();
-      return conn;
+      await client.testConnection();
+      return client;
     } catch (error) {
       if (
         error.code === "DATABASE_DOES_NOT_EXISTS" &&
         this.#config.database &&
         createDatabaseIfNotExists
       ) {
-        const tempConn = new DatabaseConnectionPool({
+        const tempClient = new DatabaseConnectionPool({
           ...this.#config,
           database: "postgres",
         });
-        await tempConn.testConnection();
-        await tempConn.createDatabase(this.#config.database);
-        await tempConn.end();
+        await tempClient.testConnection();
+        await tempClient.createDatabase(this.#config.database);
+        await tempClient.end();
         return await this.connect(false);
       } else {
         throw error;
@@ -121,7 +121,7 @@ export default class ORM {
    * Adds a new data type to the registry.
    * @param dataType
    */
-  addDataType(dataType: DataType): void {
+  addDataType(dataType: IDataType): void {
     this.#registryHandler.addDataType(dataType);
   }
 
@@ -129,7 +129,7 @@ export default class ORM {
    * Adds a new operation interceptor to the service.
    * @param operationInterceptor
    */
-  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
+  addInterceptor(operationInterceptor: RecordInterceptor): void {
     this.#registryHandler.addInterceptor(operationInterceptor);
   }
 

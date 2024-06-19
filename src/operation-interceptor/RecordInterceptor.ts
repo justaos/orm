@@ -1,11 +1,11 @@
 import type Record from "../record/Record.ts";
 import type {
-  DatabaseOperationContext,
-  DatabaseOperationType,
-  DatabaseOperationWhen,
+  TRecordInterceptorContext,
+  TRecordInterceptorType,
 } from "../types.ts";
+import Table from "../table/Table.ts";
 
-abstract class DatabaseOperationInterceptor {
+export default abstract class RecordInterceptor {
   #order = 100;
 
   abstract getName(): string;
@@ -19,12 +19,9 @@ abstract class DatabaseOperationInterceptor {
   }
 
   abstract intercept(
-    tableName: string,
-    operation: DatabaseOperationType,
-    when: DatabaseOperationWhen,
+    table: Table,
+    operation: TRecordInterceptorType,
     records: Record[],
-    context?: DatabaseOperationContext,
+    context?: TRecordInterceptorContext,
   ): Promise<Record[]>;
 }
-
-export default DatabaseOperationInterceptor;

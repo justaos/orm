@@ -23,9 +23,9 @@ class TestingTable {
   test;
 }*/
 
-//await conn.defineTable(TestingTable);
+//await client.defineTable(TestingTable);
 
-await conn.defineTable({
+await client.defineTable({
   name: "testing_table",
   columns: [
     {
@@ -39,12 +39,12 @@ await conn.defineTable({
   ],
 });
 
-await conn.closeConnection();
+await client.closeConnection();
 
 self.onmessage = async (e) => {
   console.log(`WORKER ${e.data.post}========================================`);
   const conn = await odm.connect();
-  const table = conn.table("testing_table");
+  const table = client.table("testing_table");
   for (let i = 0; i < 1000; i++) {
     console.log(
       `WORKER ${e.data.post} INDEX : ${i} ========================================`,
@@ -62,6 +62,6 @@ self.onmessage = async (e) => {
     `WORKER ${e.data.post} COUNTs : ${count} ========================================`,
   );
 
-  await conn.closeConnection();
+  await client.closeConnection();
   self.close();
 };

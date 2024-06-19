@@ -7,7 +7,7 @@ import {
 } from "../../../test_deps.ts";
 
 import { Session } from "../../test.utils.ts";
-import type { ORMConnection } from "../../../mod.ts";
+import type { ORMClient } from "../../../mod.ts";
 
 describe(
   "SELECT Query",
@@ -16,11 +16,11 @@ describe(
     sanitizeOps: false,
   },
   () => {
-    let conn: ORMConnection;
+    let client: ORMClient;
 
     beforeAll(async () => {
-      conn = await Session.getConnection();
-      await conn.defineTable({
+      client = await Session.getClient();
+      await client.defineTable({
         name: "task",
         columns: [
           {
@@ -49,7 +49,7 @@ describe(
           },
         ],
       });
-      const taskTable = conn.table("task");
+      const taskTable = client.table("task");
       for (let i = 0; i < 10; i++) {
         const taskRecord = taskTable.createNewRecord();
         taskRecord.set("description", `Task [priority 1] ${i}`);
@@ -74,37 +74,36 @@ describe(
     });
 
     afterAll(async () => {
-      const conn = await Session.getConnection();
-      await conn.dropTable("task");
-      await (await Session.getConnection()).closeConnection();
+      const client = await Session.getClient();
+      await client.dropTable("task");
+      await (await Session.getClient()).closeConnection();
     });
 
     it("#simple select query", async () => {
-      const taskTable = conn.table("task");
+      const taskTable = client.table("task");
       let count = await taskTable.count();
       assertStrictEquals(count, 60, "Should be 60 records");
 
-      taskTable.select().where("priority", 1);
+      taskTable.where("priority", 1);
       count = await taskTable.count();
       assertStrictEquals(count, 10, "Should be 10 records");
 
-      const compoundOr = taskTable.select().where("priority", 1).compoundOr();
-      compoundOr.where("description", "ILIKE", "Task [priority 3]%");
+      taskTable.where("priority", 1);
+      taskTable.orWhere("description", "ILIKE", "Task [priority 3]%");
 
       count = await taskTable.count();
       assertStrictEquals(count, 30, "Should be 30 records");
     });
 
     it("#simple in select query", async () => {
-      const taskTable = conn.table("task");
-      taskTable.select().where("priority", [1, 2]);
+      const taskTable = client.table("task");
+      taskTable.where("priority", [1, 2]);
       const count = await taskTable.count();
       assertStrictEquals(count, 40, "Should be 40 records");
     });
 
     it("#select - filter and sort", async () => {
-      const taskTable = conn.table("task");
-      taskTable.select();
+      const taskTable = client.table("task");
       taskTable.where("priority", 1);
       taskTable.offset(5);
       taskTable.orderBy("order", "ASC");
@@ -116,8 +115,7 @@ describe(
     });
 
     it("#select - sort DESC", async () => {
-      const taskTable = conn.table("task");
-      taskTable.select();
+      const taskTable = client.table("task");
       taskTable.orderBy("order", "DESC");
       const taskCursor = await taskTable.execute();
       let prevOrder;
@@ -134,8 +132,8 @@ describe(
       }
     });
 
-    it("#select - conn.query", async () => {
-      const taskQuery = conn.query();
+    it("#select - client.query", async () => {
+      const taskQuery = client.query();
       taskQuery.select(["priority"]);
       taskQuery.from("task");
       taskQuery.where("priority", 2);
@@ -162,7 +160,7 @@ describe(
     });
 
     it("#select - group by", async () => {
-      const taskQuery = conn.query();
+      const taskQuery = client.query();
       taskQuery.select("priority", "count(*)::int as count");
       taskQuery.from("task");
       taskQuery.groupBy("priority");
@@ -186,7 +184,7 @@ describe(
     });
 
     it("#select - getRecord", async () => {
-      const taskTable = conn.table("task");
+      const taskTable = client.table("task");
       const taskRecord = taskTable.createNewRecord();
       const createdTaskId = taskRecord.getID();
       taskRecord.set("description", "getRecord test");

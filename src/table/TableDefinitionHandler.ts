@@ -1,8 +1,8 @@
 import { CommonUtils } from "../../deps.ts";
 import type {
-  ColumnDefinitionInternal,
-  TableDefinition,
-  TableDefinitionInternal,
+  TColumnDefinitionStrict,
+  TTableDefinition,
+  TTableDefinitionStrict,
 } from "../types.ts";
 import type ColumnDefinitionHandler from "./ColumnDefinitionHandler.ts";
 
@@ -12,14 +12,14 @@ import Column from "./Column.ts";
 import type RegistriesHandler from "../RegistriesHandler.ts";
 
 export default class TableDefinitionHandler {
-  readonly #tableDefinition: TableDefinitionInternal;
+  readonly #tableDefinition: TTableDefinitionStrict;
 
   readonly #registriesHandler: RegistriesHandler;
 
   readonly #columnsMap: { [key: string]: Column } = {};
 
   constructor(
-    tableDefinition: TableDefinition,
+    tableDefinition: TTableDefinition,
     registriesHandler: RegistriesHandler,
   ) {
     this.#registriesHandler = registriesHandler;
@@ -35,7 +35,7 @@ export default class TableDefinitionHandler {
     return tableName;
   }
 
-  setDefaults(tableDefinition: TableDefinition): TableDefinitionInternal {
+  setDefaults(tableDefinition: TTableDefinition): TTableDefinitionStrict {
     tableDefinition = {
       final: false,
       columns: [],
@@ -60,7 +60,7 @@ export default class TableDefinitionHandler {
       }
     }
 
-    return <TableDefinitionInternal> tableDefinition;
+    return <TTableDefinitionStrict> tableDefinition;
   }
 
   /**
@@ -94,11 +94,11 @@ export default class TableDefinitionHandler {
     return this.#tableDefinition.final;
   }
 
-  getDefinitionClone(): TableDefinitionInternal {
+  getDefinitionClone(): TTableDefinitionStrict {
     return {
       ...this.#tableDefinition,
       columns: this.#tableDefinition.columns?.map(
-        (column: ColumnDefinitionInternal) => {
+        (column: TColumnDefinitionStrict) => {
           return {
             ...column,
           };
@@ -157,7 +157,7 @@ export default class TableDefinitionHandler {
     }
     columns.push(
       ...this.#tableDefinition.columns.map(
-        (column: ColumnDefinitionInternal) => {
+        (column: TColumnDefinitionStrict) => {
           return new Column(column, this.#registriesHandler);
         },
       ),

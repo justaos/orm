@@ -1,24 +1,23 @@
 import Registry from "./Registry.ts";
-import type DataType from "./data-types/DataType.ts";
+import type IDataType from "./data-types/IDataType.ts";
 import type {
-  DatabaseOperationContext,
-  DatabaseOperationType,
-  DatabaseOperationWhen,
-  TableDefinitionInternal,
+  TRecordInterceptorContext,
+  TRecordInterceptorType,
+  TTableDefinitionStrict,
 } from "./types.ts";
 import Table from "./table/Table.ts";
 import DatabaseOperationInterceptorService from "./operation-interceptor/DatabaseOperationInterceptorService.ts";
-import type DatabaseOperationInterceptor from "./operation-interceptor/DatabaseOperationInterceptor.ts";
+import type RecordInterceptor from "./operation-interceptor/RecordInterceptor.ts";
 import type Record from "./record/Record.ts";
 
 export default class RegistriesHandler {
-  readonly #tableDefinitionRegistry: Registry<TableDefinitionInternal> =
-    new Registry<TableDefinitionInternal>(function (tableDefinition) {
+  readonly #tableDefinitionRegistry: Registry<TTableDefinitionStrict> =
+    new Registry<TTableDefinitionStrict>(function (tableDefinition) {
       return Table.getShortFormTableName(
         `${tableDefinition.schema}.${tableDefinition.name}`,
       );
     });
-  readonly #dataTypeRegistry: Registry<DataType> = new Registry<DataType>(
+  readonly #dataTypeRegistry: Registry<IDataType> = new Registry<IDataType>(
     function (dataType): string {
       return dataType.getName();
     },
@@ -26,7 +25,7 @@ export default class RegistriesHandler {
   readonly #operationInterceptorService: DatabaseOperationInterceptorService =
     new DatabaseOperationInterceptorService();
 
-  addDataType(dataType: DataType): void {
+  addDataType(dataType: IDataType): void {
     this.#dataTypeRegistry.add(dataType);
   }
 
@@ -34,15 +33,15 @@ export default class RegistriesHandler {
     return this.#dataTypeRegistry.has(name);
   }
 
-  getDataType(name: string): DataType | undefined {
+  getDataType(name: string): IDataType | undefined {
     return this.#dataTypeRegistry.get(name);
   }
 
-  addTableDefinition(tableDefinition: TableDefinitionInternal): void {
+  addTableDefinition(tableDefinition: TTableDefinitionStrict): void {
     this.#tableDefinitionRegistry.add(tableDefinition);
   }
 
-  getTableDefinition(tableName: string): TableDefinitionInternal | undefined {
+  getTableDefinition(tableName: string): TTableDefinitionStrict | undefined {
     return this.#tableDefinitionRegistry.get(tableName);
   }
 
@@ -54,7 +53,7 @@ export default class RegistriesHandler {
     this.#tableDefinitionRegistry.delete(tableName);
   }
 
-  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
+  addInterceptor(operationInterceptor: RecordInterceptor): void {
     this.#operationInterceptorService.addInterceptor(operationInterceptor);
   }
 
@@ -63,17 +62,15 @@ export default class RegistriesHandler {
   }
 
   async intercept(
-    tableName: string,
-    operation: DatabaseOperationType,
-    when: DatabaseOperationWhen,
+    table: Table,
+    operation: TRecordInterceptorType,
     records: Record[],
-    context?: DatabaseOperationContext,
+    context?: TRecordInterceptorContext,
     disabledIntercepts?: boolean | string[],
   ): Promise<Record[]> {
     return await this.#operationInterceptorService.intercept(
-      tableName,
+      table,
       operation,
-      when,
       records,
       context,
       disabledIntercepts,

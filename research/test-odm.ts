@@ -21,9 +21,9 @@ class TestingTable {
   test;
 }*/
 
-//await conn.defineTable(TestingTable);
+//await client.defineTable(TestingTable);
 
-await conn.defineTable({
+await client.defineTable({
   name: "testing_table",
   columns: [
     {
@@ -37,7 +37,7 @@ await conn.defineTable({
   ],
 });
 
-const table = conn.table("testing_table");
+const table = client.table("testing_table");
 
 for (let i = 0; i < 1000; i++) {
   const record = table.createNewRecord();
@@ -53,4 +53,4 @@ const records = await selectQuery.getCount();
 
 console.log(records);
 
-await conn.closeConnection();
+await client.closeConnection();

@@ -3,7 +3,7 @@ import getORM from "./getORM.ts";
 const odm = getORM();
 const conn = await odm.connect(true);
 
-await conn.defineTable({
+await client.defineTable({
   name: "animal",
   columns: [
     {
@@ -13,12 +13,12 @@ await conn.defineTable({
   ],
 });
 
-const animalTable = conn.table("animal");
+const animalTable = client.table("animal");
 const animal = animalTable.createNewRecord();
 animal.set("name", "Puppy");
 await animal.insert();
 
-await conn.defineTable({
+await client.defineTable({
   name: "dog",
   inherits: "animal",
   final: true,
@@ -30,7 +30,7 @@ await conn.defineTable({
   ],
 });
 
-const dogTable = conn.table("dog");
+const dogTable = client.table("dog");
 const husky = dogTable.createNewRecord();
 husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
@@ -42,4 +42,4 @@ for await (const animal of animalCursor()) {
   console.log(animal.toJSON());
 }
 
-await conn.closeConnection();
+await client.closeConnection();

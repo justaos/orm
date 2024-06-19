@@ -1,19 +1,19 @@
-import type DatabaseOperationInterceptor from "./DatabaseOperationInterceptor.ts";
+import type RecordInterceptor from "./RecordInterceptor.ts";
 import type {
-  DatabaseOperationContext,
-  DatabaseOperationType,
-  DatabaseOperationWhen,
+  TRecordInterceptorContext,
+  TRecordInterceptorType,
 } from "../types.ts";
 import type Record from "../record/Record.ts";
+import Table from "../table/Table.ts";
 
 export default class DatabaseOperationInterceptorService {
-  #interceptors: Map<string, DatabaseOperationInterceptor>;
+  #interceptors: Map<string, RecordInterceptor>;
 
   constructor() {
-    this.#interceptors = new Map<string, DatabaseOperationInterceptor>();
+    this.#interceptors = new Map<string, RecordInterceptor>();
   }
 
-  addInterceptor(operationInterceptor: DatabaseOperationInterceptor): void {
+  addInterceptor(operationInterceptor: RecordInterceptor): void {
     this.#interceptors.set(
       operationInterceptor.getName(),
       operationInterceptor,
@@ -29,11 +29,10 @@ export default class DatabaseOperationInterceptorService {
   }
 
   async intercept(
-    tableName: string,
-    operation: DatabaseOperationType,
-    when: DatabaseOperationWhen,
+    table: Table,
+    operation: TRecordInterceptorType,
     records: Record[],
-    context?: DatabaseOperationContext,
+    context?: TRecordInterceptorContext,
     disabledIntercepts?: boolean | string[],
   ): Promise<Record[]> {
     if (disabledIntercepts === true) {
@@ -46,9 +45,8 @@ export default class DatabaseOperationInterceptorService {
           !disabledIntercepts.includes(interceptor.getName())
         ) {
           records = await interceptor.intercept(
-            tableName,
+            table,
             operation,
-            when,
             records,
             context,
           );
@@ -59,7 +57,7 @@ export default class DatabaseOperationInterceptorService {
     return records;
   }
 
-  #getSortedIntercepts(): DatabaseOperationInterceptor[] {
+  #getSortedIntercepts(): RecordInterceptor[] {
     const intercepts = [];
     for (const interceptor of this.#interceptors.values()) {
       intercepts.push(interceptor);

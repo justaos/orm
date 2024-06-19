@@ -1,15 +1,12 @@
-import type { Logger, pg, UUID4 } from "../../deps.ts";
+import type { Logger, UUID4 } from "../../deps.ts";
 import type {
-  DatabaseOperationContext,
-  DatabaseOperationType,
-  DatabaseOperationWhen,
-  OrderByDirectionType,
-  OrderByType,
-  TableDefinition,
   TRecord,
+  TRecordInterceptorContext,
+  TRecordInterceptorType,
+  TTableDefinition,
 } from "../types.ts";
 import Record from "../record/Record.ts";
-import type Query from "../query/Query.ts";
+import Query from "../query/Query.ts";
 import {
   getFullFormTableName,
   getShortFormTableName,
@@ -17,30 +14,35 @@ import {
 } from "../utils.ts";
 import TableDefinitionHandler from "./TableDefinitionHandler.ts";
 import type RegistriesHandler from "../RegistriesHandler.ts";
-import { CompoundQuery } from "../query/CompoundQuery.ts";
 import { ORMError } from "../../mod.ts";
+import DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
+import ExpressionBuilder from "../core/query-builder/EXPRESSIONS/ExpressionBuilder.ts";
+import {
+  TOrderBy,
+  TOrderByDirection,
+  TWhereClauseOperator,
+} from "../core/types.ts";
 
 export default class Table extends TableDefinitionHandler {
-  readonly #context?: DatabaseOperationContext;
+  readonly #context?: TRecordInterceptorContext;
   readonly #logger: Logger;
   readonly #registriesHandler: RegistriesHandler;
-  #queryBuilder: Query;
+
+  #query: Query | null = null;
 
   #disableIntercepts: boolean | string[] = false;
 
-  readonly #pool: pg.Pool;
+  readonly #pool: DatabaseConnectionPool;
 
   constructor(
-    queryBuilder: Query,
-    tableDefinition: TableDefinition,
+    pool: DatabaseConnectionPool,
+    tableDefinition: TTableDefinition,
     registriesHandler: RegistriesHandler,
     logger: Logger,
-    pool: pg.Pool,
-    context?: DatabaseOperationContext,
+    context?: TRecordInterceptorContext,
   ) {
     super(tableDefinition, registriesHandler);
     this.#registriesHandler = registriesHandler;
-    this.#queryBuilder = queryBuilder;
     this.#logger = logger;
     this.#pool = pool;
     this.#context = context;
@@ -54,70 +56,120 @@ export default class Table extends TableDefinitionHandler {
     return getShortFormTableName(name);
   }
 
-  getContext(): DatabaseOperationContext | undefined {
+  getContext(): TRecordInterceptorContext | undefined {
     return this.#context;
   }
 
   createNewRecord(): Record {
-    return new Record(this.#queryBuilder, this, this.#logger);
+    const query = new Query(this.#pool);
+    query.select();
+    query.from(this.getName());
+    return new Record(query, this, this.#logger);
   }
 
-  select(): Table {
-    this.#queryBuilder = this.#queryBuilder.getInstance();
-    this.#queryBuilder.select.apply(this.#queryBuilder);
-    this.#queryBuilder.from(this.getName());
+  convertRawRecordToRecord(rawRecord: TRecord): Record {
+    const query = new Query(this.#pool);
+    query.select();
+    query.from(this.getName());
+    return new Record(query, this, this.#logger, rawRecord);
+  }
+
+  where(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: ExpressionBuilder) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ): Table {
+    if (!this.#query) {
+      this.#query = new Query(this.#pool);
+      this.#query.select();
+      this.#query.from(this.getName());
+    }
+    this.#query.where(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
-  getSelectedColumns(): string[] {
-    return this.#queryBuilder.getSelectedColumns();
-  }
-
-  where(column: string | number | boolean, operator: any, value?: any): Table {
-    this.#queryBuilder.where(column, operator, value);
+  orWhere(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: ExpressionBuilder) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ): Table {
+    if (!this.#query) {
+      this.#query = new Query(this.#pool);
+      this.#query.select();
+      this.#query.from(this.getName());
+    }
+    this.#query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
-  compoundOr(): CompoundQuery {
-    return this.#queryBuilder.compoundOr();
-  }
-
-  compoundAnd(): CompoundQuery {
-    return this.#queryBuilder.compoundAnd();
+  andWhere(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: ExpressionBuilder) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ): Table {
+    this.#query = new Query(this.#pool);
+    this.#query.select();
+    this.#query.from(this.getName());
+    this.#query.andWhere(columnOrCompoundFunction, operatorOrValue, value);
+    return this;
   }
 
   limit(limit: number): Table {
-    this.#queryBuilder.limit(limit);
+    if (!this.#query) {
+      this.#query = new Query(this.#pool);
+      this.#query.select();
+      this.#query.from(this.getName());
+    }
+    this.#query.limit(limit);
     return this;
   }
 
   offset(offset: number): Table {
-    this.#queryBuilder.offset(offset);
+    if (!this.#query) {
+      this.#query = new Query(this.#pool);
+      this.#query.select();
+      this.#query.from(this.getName());
+    }
+    this.#query.offset(offset);
     return this;
   }
 
   orderBy(
-    columnNameOrOrderList?: string | OrderByType[],
-    direction?: OrderByDirectionType,
+    columnNameOrOrderList?: string | TOrderBy[],
+    direction?: TOrderByDirection,
   ): Table {
-    this.#queryBuilder.orderBy(columnNameOrOrderList, direction);
+    if (!this.#query) {
+      this.#query = new Query(this.#pool);
+      this.#query.select();
+      this.#query.from(this.getName());
+    }
+    this.#query.orderBy(columnNameOrOrderList, direction);
     return this;
   }
 
   async count(): Promise<number> {
-    if (!this.#queryBuilder.getType()) {
-      this.#queryBuilder = this.#queryBuilder.getInstance();
-      this.#queryBuilder.select();
-      this.#queryBuilder.from(this.getName());
+    let query = this.#query;
+    if (!query) {
+      query = new Query(this.#pool);
+      query.select();
+      query.from(this.getName());
     }
-    if (this.#queryBuilder.getType() !== "select") {
-      throw ORMError.generalError("Count can only be called on select query");
-    }
-
-    logSQLQuery(this.#logger, this.#queryBuilder.getCountSQLQuery());
-    const [row] = await this.#queryBuilder.execute(
-      this.#queryBuilder.getCountSQLQuery(),
-    );
+    this.#query = null;
+    const sqlQuery = query.getCountSQLQuery();
+    logSQLQuery(this.#logger, sqlQuery);
+    const [row] = await query.execute(sqlQuery);
     return parseInt(row.count, 10);
   }
 
@@ -133,31 +185,34 @@ export default class Table extends TableDefinitionHandler {
    * ```
    */
   async execute(): Promise<() => AsyncGenerator<Record, void, unknown>> {
-    // deno-lint-ignore no-this-alias
-    const table = this;
+    const query = this.#getQuery();
 
-    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
+    await this.intercept("BEFORE_SELECT", []);
 
-    await this.intercept("SELECT", "BEFORE", []);
+    logSQLQuery(this.#logger, query.getSQLQuery());
 
-    const { cursor, reserve } = await this.#queryBuilder.cursor();
+    const { cursor, reserve } = await query.cursor();
+
+    this.#query = null; // Reset query
 
     reserve.on("error", () => console.log("Error in event."));
 
-    return async function* () {
-      try {
-        let rows = await cursor.read(1);
-        while (rows.length > 0) {
-          const [record] = await table.intercept("SELECT", "AFTER", [
-            table.convertRawRecordToRecord(rows[0]),
-          ]);
-          yield record;
-          rows = await cursor.read(1);
+    return ((table: Table) => {
+      return async function* () {
+        try {
+          let rows = await cursor.read(1);
+          while (rows.length > 0) {
+            const [record] = await table.intercept("AFTER_SELECT", [
+              table.convertRawRecordToRecord(rows[0]),
+            ]);
+            yield record;
+            rows = await cursor.read(1);
+          }
+        } finally {
+          reserve.release();
         }
-      } finally {
-        reserve.release();
-      }
-    };
+      };
+    })(this);
   }
 
   /**
@@ -172,25 +227,25 @@ export default class Table extends TableDefinitionHandler {
    * ```
    */
   async toArray(): Promise<Record[]> {
-    logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
+    const query = this.#getQuery();
 
-    await this.intercept("SELECT", "BEFORE", []);
+    await this.intercept("BEFORE_SELECT", []);
 
-    const rawRecords = await this.#queryBuilder.execute();
+    logSQLQuery(this.#logger, query.getSQLQuery());
+
+    const rawRecords = await query.execute();
+
+    this.#query = null; // Reset query
 
     const records: Record[] = [];
 
     for (const row of rawRecords) {
-      const [record] = await this.intercept("SELECT", "AFTER", [
+      const [record] = await this.intercept("AFTER_SELECT", [
         this.convertRawRecordToRecord(row),
       ]);
       records.push(record);
     }
     return records;
-  }
-
-  convertRawRecordToRecord(rawRecord: TRecord): Record {
-    return new Record(this.#queryBuilder, this, this.#logger, rawRecord);
   }
 
   /**
@@ -212,8 +267,8 @@ export default class Table extends TableDefinitionHandler {
       | UUID4
       | string
       | {
-        [key: string]: any;
-      },
+          [key: string]: any;
+        },
     value?: any,
   ): Promise<Record | undefined> {
     if (
@@ -222,20 +277,22 @@ export default class Table extends TableDefinitionHandler {
     ) {
       throw ORMError.generalError("ID or column name must be provided");
     }
-    this.select();
+    this.#query = new Query(this.#pool);
+    this.#query.select();
+    this.#query.from(this.getName());
     if (
       typeof idOrColumnNameOrFilter == "string" &&
       typeof value === "undefined"
     ) {
-      this.#queryBuilder.where("id", idOrColumnNameOrFilter);
+      this.#query.where("id", idOrColumnNameOrFilter);
     } else if (typeof idOrColumnNameOrFilter == "object") {
-      Object.keys(idOrColumnNameOrFilter).forEach((key) => {
-        this.#queryBuilder.where(key, idOrColumnNameOrFilter[key]);
-      });
+      for (const key in idOrColumnNameOrFilter) {
+        this.#query.where(key, idOrColumnNameOrFilter[key]);
+      }
     } else {
-      this.#queryBuilder.where(idOrColumnNameOrFilter, value);
+      this.#query.where(idOrColumnNameOrFilter, value);
     }
-    this.#queryBuilder.limit(1);
+    this.#query.limit(1);
     const [record] = await this.toArray();
     return record;
   }
@@ -254,6 +311,19 @@ export default class Table extends TableDefinitionHandler {
       this.#disableIntercepts = [];
     }
     this.#disableIntercepts.push(interceptName);
+  }
+
+  /**
+   * Disable all triggers on the table
+   */
+  async disableAllTriggers() {
+    const client = await this.#pool.connect();
+    await client.runQuery(
+      `ALTER TABLE ${Table.getFullFormTableName(
+        this.getName(),
+      )} DISABLE TRIGGER ALL`,
+    );
+    client.release();
   }
 
   /*async bulkInsert(records: Record[]): Promise<Record[]> {
@@ -342,31 +412,14 @@ export default class Table extends TableDefinitionHandler {
   }*/
 
   /**
-   * Disable all triggers on the table
-   */
-  async disableAllTriggers() {
-    const client = await this.#pool.connect();
-    await client.query({
-      text: `ALTER TABLE ${
-        Table.getFullFormTableName(
-          this.getName(),
-        )
-      } DISABLE TRIGGER ALL`,
-    });
-    client.release();
-  }
-
-  /**
    * Enable all triggers on the table
    */
   async enableAllTriggers() {
     const client = await this.#pool.connect();
-    await client.query(
-      `ALTER TABLE ${
-        Table.getFullFormTableName(
-          this.getName(),
-        )
-      } ENABLE TRIGGER ALL`,
+    await client.runQuery(
+      `ALTER TABLE ${Table.getFullFormTableName(
+        this.getName(),
+      )} ENABLE TRIGGER ALL`,
     );
     client.release();
   }
@@ -374,23 +427,27 @@ export default class Table extends TableDefinitionHandler {
   /**
    * Intercepts table operation
    * @param operation - The operation type
-   * @param when - The operation when
    * @param records - The records
    * @returns The records
    */
   async intercept(
-    operation: DatabaseOperationType,
-    when: DatabaseOperationWhen,
+    operation: TRecordInterceptorType,
     records: Record[],
   ): Promise<Record[]> {
     records = await this.#registriesHandler.intercept(
-      this.getName(),
+      this,
       operation,
-      when,
       records,
       this.#context,
       this.#disableIntercepts,
     );
     return records;
+  }
+
+  #getQuery() {
+    if (!this.#query) {
+      throw ORMError.generalError("Query is not initialized");
+    }
+    return this.#query;
   }
 }

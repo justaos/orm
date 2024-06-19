@@ -1,13 +1,13 @@
-import { CompoundOperator } from "../types.ts";
+import { TLogicalOperator } from "../core/types.ts";
 import { QueryExpression } from "./QueryExpression.ts";
 
 export class CompoundQuery {
-  compoundOperator: CompoundOperator;
+  compoundOperator: TLogicalOperator;
   queryExpression: QueryExpression;
   #currentExpression?: QueryExpression;
 
   constructor(
-    compoundOperator: CompoundOperator,
+    compoundOperator: TLogicalOperator,
     queryExpression: QueryExpression,
   ) {
     this.compoundOperator = compoundOperator;
@@ -15,11 +15,11 @@ export class CompoundQuery {
   }
 
   compoundOr(): CompoundQuery {
-    return new CompoundQuery("OR", <QueryExpression> this.#currentExpression);
+    return new CompoundQuery("OR", <QueryExpression>this.#currentExpression);
   }
 
   compoundAnd(): CompoundQuery {
-    return new CompoundQuery("AND", <QueryExpression> this.#currentExpression);
+    return new CompoundQuery("AND", <QueryExpression>this.#currentExpression);
   }
 
   where(

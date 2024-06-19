@@ -1,10 +1,10 @@
 import type { Logger } from "../deps.ts";
 import type {
-  DatabaseOperationContext,
-  TableDefinition,
-  TableDefinitionInternal,
+  TRecordInterceptorContext,
+  TTableDefinition,
+  TTableDefinitionStrict,
 } from "./types.ts";
-import DatabaseConnectionPool from "./core/DatabaseConnectionPool.ts";
+import DatabaseConnectionPool from "./core/connection/DatabaseConnectionPool.ts";
 import type { TDatabaseConfiguration } from "./core/types.ts";
 import TableDefinitionHandler from "./table/TableDefinitionHandler.ts";
 
@@ -21,7 +21,7 @@ import ORMError from "./errors/ORMError.ts";
  * It also provides methods for creating and executing queries.
  * It is the main entry point for the ORM.
  *
- * @module ORMConnection
+ * @module ORMClient
  * @see {@link DatabaseConfiguration} for the configuration options
  * @see {@link DataType} for the data types supported
  * @see {@link TableDefinition} for the table definitions
@@ -38,12 +38,12 @@ import ORMError from "./errors/ORMError.ts";
  *
  * @example
  * ```typescript
- * import { ORMConnection } from "@justaos/orm";
- * const connection: ORMConnection = odm.connect();
+ * import { ORMClient } from "@justaos/orm";
+ * const connection: ORMClient = odm.connect();
  * const table = connection.table("users");
  * ```
  */
-export default class ORMConnection {
+export default class ORMClient {
   readonly #config: TDatabaseConfiguration;
   readonly #pool: DatabaseConnectionPool;
   readonly #registriesHandler: RegistriesHandler;
@@ -64,8 +64,8 @@ export default class ORMConnection {
     return await this.#pool.testConnection();
   }
 
-  closeConnection(): Promise<void> {
-    return this.#getConnection().end();
+  async closeConnection(): Promise<void> {
+    return await this.#getConnection().end();
   }
 
   async dropDatabase(): Promise<any> {
@@ -74,24 +74,29 @@ export default class ORMConnection {
       throw ORMError.generalError("Database name is not defined");
     }
     await this.closeConnection();
-    const tempConn = new DatabaseConnectionPool(
+    const tempClient = new DatabaseConnectionPool(
       {
         ...this.#config,
         database: "postgres",
       },
       this.#logger,
     );
-    await tempConn.testConnection();
-    const result = await tempConn.dropDatabase(databaseName);
-    await tempConn.end();
-    return result;
+    await tempClient.testConnection();
+    try {
+      const result = await tempClient.dropDatabase(databaseName);
+      await tempClient.end();
+      return result;
+    } catch (error) {
+      await tempClient.end();
+      throw error;
+    }
   }
 
   deregisterTable(tableName: string) {
     this.#registriesHandler.deleteTableDefinition(tableName);
   }
 
-  async defineTable(tableDefinitionRaw: TableDefinition | Function) {
+  async defineTable(tableDefinitionRaw: TTableDefinition | Function) {
     if (typeof tableDefinitionRaw === "function") {
       // @ts-ignore
       tableDefinitionRaw = tableDefinitionRaw.__tableDefinition;
@@ -143,7 +148,7 @@ export default class ORMConnection {
           const columnDefinition = column.getDefinitionClone();
           createQuery.addColumn({
             name: column.getName(),
-            native_type: column.getColumnType().getNativeType(),
+            native_type: column.getNativeType(),
             not_null: column.isNotNull(),
             unique: column.isUnique(),
             foreign_key: columnDefinition.foreign_key,
@@ -176,7 +181,7 @@ export default class ORMConnection {
             if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
                 name: column.getName(),
-                native_type: column.getColumnType().getNativeType(),
+                native_type: column.getNativeType(),
                 not_null: column.isNotNull(),
                 unique: column.isUnique(),
                 foreign_key: columnDefinition.foreign_key,
@@ -210,22 +215,20 @@ export default class ORMConnection {
    * @param name Table name
    * @param context Context object
    */
-  table(name: string, context?: DatabaseOperationContext): Table {
-    const tableDefinition: TableDefinitionInternal | undefined = this
-      .#registriesHandler.getTableDefinition(name);
+  table(name: string, context?: TRecordInterceptorContext): Table {
+    const tableDefinition: TTableDefinitionStrict | undefined =
+      this.#registriesHandler.getTableDefinition(name);
     if (typeof tableDefinition === "undefined") {
       throw new ORMError(
         "TABLE_DEFINITION_VALIDATION",
         `Table with name '${name}' is not defined`,
       );
     }
-    const queryBuilder = new Query(this.#pool);
     return new Table(
-      queryBuilder,
+      this.#pool,
       tableDefinition,
       this.#registriesHandler,
       this.#logger,
-      this.#pool,
       context,
     );
   }
