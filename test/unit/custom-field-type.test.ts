@@ -4,7 +4,7 @@ import {
   IDataType,
   type ORM,
   type ORMClient,
-  TColumnDataType,
+  type TColumnDataType,
   type TColumnDefinition,
 } from "../../mod.ts";
 import { Session } from "../test.utils.ts";

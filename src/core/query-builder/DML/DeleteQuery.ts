@@ -1,6 +1,6 @@
-import IQuery from "../IQuery.ts";
+import type IQuery from "../IQuery.ts";
 import ORMError from "../../../errors/ORMError.ts";
-import { TPreparedStatement, TWhereClauseOperator } from "../../types.ts";
+import type { TPreparedStatement, TWhereClauseOperator } from "../../types.ts";
 import WhereClause from "../CLAUSES/WhereClause.ts";
 import { pgFormat } from "../../../../deps.ts";
 import { getFullFormTableName } from "../../../utils.ts";

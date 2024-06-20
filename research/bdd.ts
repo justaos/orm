@@ -1,7 +1,7 @@
-import { describe, it } from "https://deno.land/x/test_suite@0.16.1/mod.ts";
-import { assertEquals } from "https://deno.land/std@0.135.0/testing/asserts.ts";
+import { describe, type it } from "https://deno.land/x/test_suite@0.16.1/mod.ts";
+import type { assertEquals } from "https://deno.land/std@0.135.0/testing/asserts.ts";
 import {
-  getUser,
+  type getUser,
   resetUsers,
   User,
 } from "https://deno.land/x/test_suite@0.16.1/examples/user.ts";

@@ -4,12 +4,12 @@ import InsertQuery from "./../core/query-builder/DML/InsertQuery.ts";
 
 import { AlterQuery } from "./AlterQuery.ts";
 import type { TOrderBy, TOrderByDirection } from "../core/types.ts";
-import { TWhereClauseOperator } from "../core/types.ts";
+import type { TWhereClauseOperator } from "../core/types.ts";
 import { runSQLQuery } from "../utils.ts";
 import ORMError from "../errors/ORMError.ts";
-import { __TColumnDefinitionNative } from "../types.ts";
-import DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
-import WhereClause from "../core/query-builder/CLAUSES/WhereClause.ts";
+import type { __TColumnDefinitionNative } from "../types.ts";
+import type DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
+import type WhereClause from "../core/query-builder/CLAUSES/WhereClause.ts";
 import UpdateQuery from "../core/query-builder/DML/UpdateQuery.ts";
 import DeleteQuery from "../core/query-builder/DML/DeleteQuery.ts";
 
@@ -167,7 +167,7 @@ export default class Query {
       | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
-  ) {
+  ): Query {
     const query = <SelectQuery> this.#getQuery();
     query.where(columnOrCompoundFunction, operatorOrValue, value);
     return this;
@@ -181,7 +181,7 @@ export default class Query {
       | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
-  ) {
+  ): Query {
     const query = <SelectQuery> this.#getQuery();
     query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;
@@ -195,7 +195,7 @@ export default class Query {
       | ((where: WhereClause) => void),
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
-  ) {
+  ): Query {
     const query = <SelectQuery> this.#getQuery();
     query.andWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;

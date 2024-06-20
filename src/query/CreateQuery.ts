@@ -1,5 +1,5 @@
 import { getFullFormTableName } from "../utils.ts";
-import { __TColumnDefinitionNative } from "../types.ts";
+import type { __TColumnDefinitionNative } from "../types.ts";
 
 export class CreateQuery {
   readonly #tableName: string;

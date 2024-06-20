@@ -1,7 +1,7 @@
 /// <reference lib="WebWorker"/>
 
 import { ORM } from "../../mod.ts";
-import { LoggerUtils } from "../../deps.ts";
+import type { LoggerUtils } from "../../deps.ts";
 
 const orm = new ORM({
   hostname: "127.0.0.1",

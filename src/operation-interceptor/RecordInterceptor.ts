@@ -3,9 +3,9 @@ import type {
   TRecordInterceptorContext,
   TRecordInterceptorType,
 } from "../types.ts";
-import Table from "../table/Table.ts";
+import type Table from "../table/Table.ts";
 
-export default abstract class RecordInterceptor {
+abstract class RecordInterceptor {
   #order = 100;
 
   abstract getName(): string;
@@ -25,3 +25,5 @@ export default abstract class RecordInterceptor {
     context?: TRecordInterceptorContext,
   ): Promise<Record[]>;
 }
+
+export default RecordInterceptor;

@@ -1,5 +1,5 @@
 import PostgresQueryBuilder from "../src/core/query-builder/PostgresQueryBuilder.ts";
-import WhereClause from "../src/core/query-builder/CLAUSES/WhereClause.ts";
+import type WhereClause from "../src/core/query-builder/CLAUSES/WhereClause.ts";
 
 console.log(
   PostgresQueryBuilder.select("count(*)")

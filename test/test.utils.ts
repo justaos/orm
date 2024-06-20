@@ -1,5 +1,5 @@
 import { LoggerUtils } from "../deps.ts";
-import { ORM, TDatabaseConfiguration } from "../mod.ts";
+import { ORM, type TDatabaseConfiguration } from "../mod.ts";
 import type ORMClient from "../src/ORMClient.ts";
 
 export const defaultConfig: TDatabaseConfiguration = {

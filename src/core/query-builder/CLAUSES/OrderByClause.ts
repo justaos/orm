@@ -1,6 +1,6 @@
-import { TOrderBy, TOrderByDirection } from "../../types.ts";
+import type { TOrderBy, TOrderByDirection } from "../../types.ts";
 import ORMError from "../../../errors/ORMError.ts";
-import IClause from "./IClause.ts";
+import type IClause from "./IClause.ts";
 
 export default class OrderByClause implements IClause {
   #orderByList: TOrderBy[] = [];

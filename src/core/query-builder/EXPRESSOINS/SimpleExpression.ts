@@ -1,6 +1,6 @@
 import {
-  TPreparedStatement,
-  TWhereClauseOperator,
+  type TPreparedStatement,
+  type TWhereClauseOperator,
   WHERE_CLAUSE_OPERATORS,
   WHERE_CLAUSE_OPERATORS_ARRAY_VALUES,
   WHERE_CLAUSE_OPERATORS_NO_VALUES,
@@ -23,7 +23,7 @@ export default class SimpleExpression {
     this.#initialize(column, operator, value);
   }
 
-  toJSON() {
+  toJSON(): any {
     return {
       column: this.#column,
       operator: this.#operator,

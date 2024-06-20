@@ -4,7 +4,7 @@ import type {
   TRecordInterceptorType,
 } from "../types.ts";
 import type Record from "../record/Record.ts";
-import Table from "../table/Table.ts";
+import type Table from "../table/Table.ts";
 
 export default class DatabaseOperationInterceptorService {
   #interceptors: Map<string, RecordInterceptor>;

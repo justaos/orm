@@ -1,6 +1,6 @@
 import { ORM } from "../../mod.ts";
 import { msToTime } from "./utils.ts";
-import { LoggerUtils } from "../../deps.ts";
+import type { LoggerUtils } from "../../deps.ts";
 
 const start = performance.now();
 const client = await new ORM({

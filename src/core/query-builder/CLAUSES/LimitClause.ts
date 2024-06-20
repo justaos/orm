@@ -1,4 +1,4 @@
-import IClause from "./IClause.ts";
+import type IClause from "./IClause.ts";
 
 export default class LimitClause implements IClause {
   #limit: number;

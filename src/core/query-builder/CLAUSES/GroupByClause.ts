@@ -1,5 +1,5 @@
 import ORMError from "../../../errors/ORMError.ts";
-import IClause from "./IClause.ts";
+import type IClause from "./IClause.ts";
 
 export default class GroupByClause implements IClause {
   #groupBy: string[] = [];

@@ -1,5 +1,5 @@
-import { TLogicalOperator, TPreparedStatement } from "../../types.ts";
-import SimpleExpression from "./SimpleExpression.ts";
+import type { TLogicalOperator, TPreparedStatement } from "../../types.ts";
+import type SimpleExpression from "./SimpleExpression.ts";
 
 export default class CompoundExpression {
   firstExpression?: SimpleExpression | CompoundExpression;

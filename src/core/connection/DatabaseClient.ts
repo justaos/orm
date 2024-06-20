@@ -1,4 +1,4 @@
-import { pg, PgCursor } from "../../../deps.ts";
+import { type pg, PgCursor } from "../../../deps.ts";
 
 export class DatabaseClient {
   readonly #pgClient: pg.Client;

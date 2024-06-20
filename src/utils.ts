@@ -1,6 +1,6 @@
 import type { Logger } from "../deps.ts";
 import * as minify from "npm:pg-minify@1.6.4";
-import { DatabaseClient } from "./core/connection/DatabaseClient.ts";
+import type { DatabaseClient } from "./core/connection/DatabaseClient.ts";
 
 export function logSQLQuery(logger: Logger, query: string): void {
   try {

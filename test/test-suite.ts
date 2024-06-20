@@ -1,5 +1,5 @@
 import { describe } from "../test_deps.ts";
-import { ORM, TDatabaseConfiguration } from "../mod.ts";
+import { ORM, type TDatabaseConfiguration } from "../mod.ts";
 import { defaultConfig } from "./test.utils.ts";
 
 export interface TestContext {

@@ -1,18 +1,18 @@
 import CompoundExpression from "../EXPRESSOINS/CompoundExpression.ts";
 import SimpleExpression from "../EXPRESSOINS/SimpleExpression.ts";
-import {
+import type {
   TLogicalOperator,
   TPreparedStatement,
   TWhereClauseOperator,
 } from "../../types.ts";
-import IClause from "./IClause.ts";
+import type IClause from "./IClause.ts";
 
 export default class WhereClause implements IClause {
   #expression?: CompoundExpression;
 
   constructor() {}
 
-  getCompoundExpression() {
+  getCompoundExpression(): CompoundExpression | undefined {
     return this.#expression;
   }
 
@@ -79,7 +79,7 @@ export default class WhereClause implements IClause {
     return this;
   }
 
-  toJSON() {
+  toJSON(): any {
     return this.#expression?.toJSON();
   }
 

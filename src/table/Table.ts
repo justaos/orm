@@ -15,9 +15,9 @@ import {
 import TableDefinitionHandler from "./TableDefinitionHandler.ts";
 import type RegistriesHandler from "../RegistriesHandler.ts";
 import { ORMError } from "../../mod.ts";
-import DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
-import WhereClause from "../core/query-builder/CLAUSES/WhereClause.ts";
-import {
+import type DatabaseConnectionPool from "../core/connection/DatabaseConnectionPool.ts";
+import type WhereClause from "../core/query-builder/CLAUSES/WhereClause.ts";
+import type {
   TOrderBy,
   TOrderByDirection,
   TWhereClauseOperator,

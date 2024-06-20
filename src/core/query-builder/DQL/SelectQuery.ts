@@ -1,14 +1,14 @@
-import IQuery from "../IQuery.ts";
+import type IQuery from "../IQuery.ts";
 import { pgFormat } from "../../../../deps.ts";
 import WhereClause from "../CLAUSES/WhereClause.ts";
-import {
+import type {
   TOrderBy,
   TOrderByDirection,
   TPreparedStatement,
   TWhereClauseOperator,
 } from "../../types.ts";
 import ORMError from "../../../errors/ORMError.ts";
-import IClause from "../CLAUSES/IClause.ts";
+import type IClause from "../CLAUSES/IClause.ts";
 import LimitClause from "../CLAUSES/LimitClause.ts";
 import OffsetClause from "../CLAUSES/OffsetClause.ts";
 import GroupByClause from "../CLAUSES/GroupByClause.ts";

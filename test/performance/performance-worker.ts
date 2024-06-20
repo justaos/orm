@@ -1,6 +1,6 @@
 import { msToTime } from "./utils.ts";
 import { ORM } from "../../mod.ts";
-import { LoggerUtils } from "../../deps.ts";
+import type { LoggerUtils } from "../../deps.ts";
 
 const start = performance.now();
 
