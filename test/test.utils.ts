@@ -1,8 +1,16 @@
 import { LoggerUtils } from "../deps.ts";
-import { ORM } from "../mod.ts";
+import { ORM, TDatabaseConfiguration } from "../mod.ts";
 import type ORMClient from "../src/ORMClient.ts";
 
-class Session {
+export const defaultConfig: TDatabaseConfiguration = {
+  hostname: "127.0.0.1",
+  port: 5432,
+  username: "postgres",
+  password: "postgres",
+  database: "orm-test-automation",
+};
+
+export class Session {
   static #odm: ORM;
 
   static #odmConnection: ORMClient;
@@ -21,11 +29,8 @@ class Session {
     if (!this.#odm) {
       this.#odm = new ORM(
         {
+          ...defaultConfig,
           hostname: Deno.env.get("POSTGRES_HOST") || "127.0.0.1",
-          port: 5432,
-          username: "postgres",
-          password: "postgres",
-          database: "odm-test-db",
         },
         logger,
       );
@@ -42,7 +47,4 @@ class Session {
   }
 }
 
-const MAX_TIMEOUT = 10000;
-const logger = LoggerUtils.defineLogger("ORMTest", "DEBUG");
-
-export { logger, MAX_TIMEOUT, Session };
+export const logger = LoggerUtils.defineLogger("ORMTest", "CRITICAL");

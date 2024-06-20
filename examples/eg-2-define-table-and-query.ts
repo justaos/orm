@@ -72,7 +72,7 @@ selectQuery.where("name", "a1").orWhere("badge_number", 5);
 records = await selectQuery.toArray();
 console.log(records.map((t) => t.toJSON()));
 
-await client.closeConnection();
+client.closeConnection();
 
 function randomNames() {
   const names = [

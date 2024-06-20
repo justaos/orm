@@ -14,6 +14,7 @@ import OffsetClause from "../CLAUSES/OffsetClause.ts";
 import GroupByClause from "../CLAUSES/GroupByClause.ts";
 import OrderByClause from "../CLAUSES/OrderByClause.ts";
 import ColumnsListClause from "../CLAUSES/ColumnsListClause.ts";
+import { getFullFormTableName } from "../../../utils.ts";
 
 export default class SelectQuery implements IQuery {
   #columnsClause?: ColumnsListClause;
@@ -74,6 +75,18 @@ export default class SelectQuery implements IQuery {
     } else if (Array.isArray(tableOrTablesArray)) {
       this.#tables = tableOrTablesArray;
     }
+
+    if (this.#tables) {
+      for (const tableName of this.#tables) {
+        if (typeof tableName !== "string" || tableName.length <= 0) {
+          throw ORMError.queryError("Table name is required");
+        }
+      }
+      this.#tables = this.#tables.map((tableName) => {
+        return getFullFormTableName(tableName);
+      });
+    }
+
     return this;
   }
 
@@ -208,7 +221,7 @@ export default class SelectQuery implements IQuery {
         "The table name is required for the SELECT Query. Please check and try again.",
       );
     }
-    preparedStatement.sql += " FROM %I";
+    preparedStatement.sql += " FROM %s";
     preparedStatement.values.push(this.#tables);
 
     const clauses: (IClause | undefined)[] = [

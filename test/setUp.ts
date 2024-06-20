@@ -12,4 +12,4 @@ Session.setORM(
 );
 
 const client = await Session.getClient(true);
-await client.closeConnection();
+client.closeConnection();

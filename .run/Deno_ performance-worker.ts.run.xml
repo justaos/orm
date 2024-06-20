@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Deno: performance-worker.ts" type="DenoConfigurationType" nameIsGenerated="true" inputPath="$PROJECT_DIR$/test/performance/performance-worker.ts" programParameters="run -A --unstable-worker-options" workingDirectory="$PROJECT_DIR$/test/performance">
+    <method v="2" />
+  </configuration>
+</component>

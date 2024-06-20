@@ -1,21 +1,15 @@
-import { assert, describe, it } from "../../../test_deps.ts";
-import { ORM, type TDatabaseConfiguration } from "../../../mod.ts";
-
-const defaultConfig: TDatabaseConfiguration = {
-  hostname: "127.0.0.1",
-  port: 5432,
-  username: "postgres",
-  password: "postgres",
-  database: "orm-test",
-};
+import { assert, assertRejects, describe, it } from "../../../test_deps.ts";
+import { ORM, TDatabaseConfiguration } from "../../../mod.ts";
+import { defaultConfig } from "../../test.utils.ts";
+import DatabaseConnectionPool from "../../../src/core/connection/DatabaseConnectionPool.ts";
 
 describe({
-  name: "ORMConnection",
+  name: "ORM Connection",
   fn: () => {
-    it("#connect(): success case", async () => {
+    it("should establish a connection", async () => {
       const orm = new ORM({
         ...defaultConfig,
-        port: undefined,
+        database: "orm-connection-test",
       });
       let client;
       try {
@@ -23,8 +17,18 @@ describe({
       } catch (_error) {
         assert(false, "connection failed");
       } finally {
-        if (client) await client.closeConnection();
+        if (client) client.closeConnection();
       }
+    });
+
+    it("should reject the connection request", async () => {
+      const orm = new ORM({
+        ...defaultConfig,
+        port: 80,
+      });
+      await assertRejects(async () => {
+        await orm.connect();
+      }, Error);
     });
   },
 });

@@ -66,7 +66,7 @@ export default class SimpleExpression {
     operator: TWhereClauseOperator,
     value: any,
   ) {
-    const operatorStrict = <TWhereClauseOperator>operator.toUpperCase();
+    const operatorStrict = <TWhereClauseOperator> operator.toUpperCase();
 
     if (operator === "=" && value === null) {
       this.#populate(column, "IS NULL", null);
@@ -115,7 +115,7 @@ export default class SimpleExpression {
       if (
         typeof operator == "string" &&
         WHERE_CLAUSE_OPERATORS.includes(
-          <TWhereClauseOperator>operator.toUpperCase(),
+          <TWhereClauseOperator> operator.toUpperCase(),
         )
       ) {
         this.#initialize(column, operator, null);

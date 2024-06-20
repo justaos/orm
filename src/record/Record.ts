@@ -78,7 +78,7 @@ export default class Record {
     const record = this.#getRawRecord();
     const dataType = this.#table.getColumnSchema(key)?.getColumnType();
     if (dataType && typeof record[key] !== "undefined") {
-      const jsonValue = <JSONValue>dataType.toJSONValue(record[key]);
+      const jsonValue = <JSONValue> dataType.toJSONValue(record[key]);
       if (typeof jsonValue === "undefined") return null;
       return jsonValue;
     }
@@ -126,7 +126,7 @@ export default class Record {
     const recordJson = record.toJSON();
     await this.#validateRecord(recordJson);
     this.#queryBuilder.update();
-    this.#queryBuilder.into(this.#table.getFullName());
+    this.#queryBuilder.into(this.#table.getName());
     this.#queryBuilder.where("id", record.getID());
     Object.keys(this.#columnsModified).forEach((col) => {
       if (col !== "id") {
@@ -165,7 +165,7 @@ export default class Record {
     const [record] = await this.#table.intercept("BEFORE_DELETE", [this]);
 
     this.#queryBuilder.delete();
-    this.#queryBuilder.from(this.#table.getFullName());
+    this.#queryBuilder.from(this.#table.getName());
     this.#queryBuilder.where("id", record.getID());
 
     logSQLQuery(this.#logger, this.#queryBuilder.getSQLQuery());
@@ -211,7 +211,7 @@ export default class Record {
     this.#table.getColumns().map((field: ColumnDefinitionHandler) => {
       this.set(field.getName(), field.getDefaultValue());
     });
-    this.#record["id"] = <UUID4>CommonUtils.generateUUID();
+    this.#record["id"] = <UUID4> CommonUtils.generateUUID();
     this.#record["_table"] = this.#table.getName();
     this.#isNew = true;
   }

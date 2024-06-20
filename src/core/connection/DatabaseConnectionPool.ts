@@ -1,7 +1,7 @@
 import { type Logger, LoggerUtils, pg } from "../../../deps.ts";
 import type { TDatabaseConfiguration } from "../types.ts";
 import ORMError from "../../errors/ORMError.ts";
-import { DatabaseConnection } from "./DatabaseConnection.ts";
+import { DatabaseClient } from "./DatabaseClient.ts";
 
 /**
  * DatabaseConnectionPool class manage connections to the database.
@@ -36,7 +36,7 @@ export default class DatabaseConnectionPool {
       password: this.#config.password,
       port: this.#config.port || 5432,
       host: this.#config.hostname,
-      max: 20,
+      max: this.#config.max_connections || 20,
       connectionTimeoutMillis: this.#config.connect_timeout,
     });
     this.#logger = logger || LoggerUtils.getLogger(DatabaseConnectionPool.name);
@@ -72,7 +72,7 @@ export default class DatabaseConnectionPool {
         `Connected to ${this.#config.database} database successfully`,
       );
     } catch (err) {
-      if (this.#pgPool) await this.#pgPool.end();
+      if (this.#pgPool) this.#pgPool.end();
       this.#logger.error(err.message);
       if (err.code === "3D000") {
         throw ORMError.databaseDoesNotExistsError(this.#config.database);
@@ -86,14 +86,14 @@ export default class DatabaseConnectionPool {
   /**
    * Returns a connection to the database.
    *
-   * @returns {Promise<DatabaseConnection>} A promise that resolves with a connection to the database.
+   * @returns {Promise<DatabaseClient>} A promise that resolves with a connection to the database.
    * @throws {ORMError} Throws an error if the connection pool is not present.
    */
-  async connect(): Promise<DatabaseConnection> {
+  async connect(): Promise<DatabaseClient> {
     if (!this.#pgPool) {
       throw ORMError.generalError("Connection pool is not present.");
     }
-    return new DatabaseConnection(await this.#pgPool.connect());
+    return new DatabaseClient(await this.#pgPool.connect());
   }
 
   /**
@@ -117,7 +117,9 @@ export default class DatabaseConnectionPool {
       throw ORMError.generalError("No database name provided to create.");
     }
     const client = await this.connect();
-    const result = await client.runQuery(`CREATE DATABASE "${databaseName}"`);
+    const result = await client.executeQuery(
+      `CREATE DATABASE "${databaseName}"`,
+    );
     this.#logger.info(`Database ${databaseName} created successfully`);
     client.release();
     return result;
@@ -135,22 +137,23 @@ export default class DatabaseConnectionPool {
       throw ORMError.generalError("No database name provided to drop.");
     }
     const client = await this.connect();
-    const result = await client.runQuery(`DROP DATABASE "${databaseName}"`);
+    const result = await client.executeQuery(`DROP DATABASE "${databaseName}"`);
     this.#logger.info(`Database ${databaseName} dropped successfully`);
     client.release();
     return result;
+  }
+
+  async executeQuery(query: string): Promise<pg.QueryResult> {
+    return await this.#pgPool.query({
+      text: query,
+    });
   }
 
   on(event: string, callback: any) {
     this.#pgPool.on(event, callback);
   }
 
-  /**
-   * Calling pool.end will drain the pool of all active clients, disconnect them, and shut down any internal timers in the pool. It is common to call this at the end of a script using the pool or when your process is attempting to shut down cleanly.
-   *
-   * @returns {Promise<void>} A promise that resolves when the connection is successfully ended.
-   */
-  async end(): Promise<void> {
+  end(): void {
     this.#pgPool.end();
   }
 }

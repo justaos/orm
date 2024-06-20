@@ -1,32 +1,21 @@
 import { assert, assertRejects, describe, it } from "../../../test_deps.ts";
 import DatabaseConnectionPool from "../../../src/core/connection/DatabaseConnectionPool.ts";
 import type { TDatabaseConfiguration } from "../../../mod.ts";
-
-const defaultConfig: TDatabaseConfiguration = {
-  hostname: "127.0.0.1",
-  port: 5432,
-  username: "postgres",
-  password: "postgres",
-};
+import { defaultConfig } from "../../test.utils.ts";
 
 describe({
   name: "DatabaseConnection",
-  fn: () => {
-    it("#connect(): Success case", async () => {
+  fn() {
+    it("should establish a connection", async () => {
       const connectionPool = new DatabaseConnectionPool({
         ...defaultConfig,
         port: undefined,
       });
-      try {
-        await connectionPool.testConnection();
-      } catch (_error) {
-        assert(false, "Connection failed");
-      } finally {
-        await connectionPool.end();
-      }
+      await connectionPool.testConnection();
+      connectionPool.end();
     });
 
-    it("#connect(): Invalid configuration", async () => {
+    it("should reject the connection request", async () => {
       const config: TDatabaseConfiguration = {
         ...defaultConfig,
         port: 80,
@@ -38,14 +27,13 @@ describe({
       }, Error);
     });
 
-    it("#createDatabase", async () => {
+    it("should create new database", async () => {
       try {
         const connectionPool = await DatabaseConnectionPool
           .createConnectionPoll(defaultConfig);
         await connectionPool.createDatabase("odm-created-database");
-        await connectionPool.end();
+        connectionPool.end();
       } catch (error) {
-        console.log(error);
         assert(false, "Database dropping failed");
       }
     });
@@ -61,11 +49,11 @@ describe({
       const conn4 = await DatabaseConnectionPool.createConnectionPoll(config);
       const conn5 = await DatabaseConnectionPool.createConnectionPoll(config);
 
-      await conn1.end();
-      await conn2.end();
-      await conn3.end();
-      await conn4.end();
-      await conn5.end();
+      conn1.end();
+      conn2.end();
+      conn3.end();
+      conn4.end();
+      conn5.end();
     });
 
     it("#dropDatabase", async () => {
@@ -75,9 +63,8 @@ describe({
           database: "",
         });
         await dbConnection.dropDatabase("odm-created-database");
-        await dbConnection.end();
+        dbConnection.end();
       } catch (error) {
-        console.log(error);
         assert(false, "Database dropping failed");
       }
     });
@@ -87,9 +74,8 @@ describe({
         defaultConfig,
       );
       try {
-        await dbConnection.end();
+        dbConnection.end();
       } catch (error) {
-        console.log(error);
         assert(false, "ending pool connections failed");
       }
     });

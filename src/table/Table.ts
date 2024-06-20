@@ -193,7 +193,13 @@ export default class Table extends TableDefinitionHandler {
    * ```
    */
   async execute(): Promise<() => AsyncGenerator<Record, void, unknown>> {
-    const query = this.#getQuery();
+    let query = this.#query;
+
+    if (!query) {
+      query = new Query(this.#pool);
+      query.select();
+      query.from(this.getName());
+    }
 
     await this.intercept("BEFORE_SELECT", []);
 
@@ -235,7 +241,13 @@ export default class Table extends TableDefinitionHandler {
    * ```
    */
   async toArray(): Promise<Record[]> {
-    const query = this.#getQuery();
+    let query = this.#query;
+
+    if (!query) {
+      query = new Query(this.#pool);
+      query.select();
+      query.from(this.getName());
+    }
 
     await this.intercept("BEFORE_SELECT", []);
 
@@ -275,8 +287,8 @@ export default class Table extends TableDefinitionHandler {
       | UUID4
       | string
       | {
-          [key: string]: any;
-        },
+        [key: string]: any;
+      },
     value?: any,
   ): Promise<Record | undefined> {
     if (
@@ -326,10 +338,12 @@ export default class Table extends TableDefinitionHandler {
    */
   async disableAllTriggers() {
     const client = await this.#pool.connect();
-    await client.runQuery(
-      `ALTER TABLE ${Table.getFullFormTableName(
-        this.getName(),
-      )} DISABLE TRIGGER ALL`,
+    await client.executeQuery(
+      `ALTER TABLE ${
+        Table.getFullFormTableName(
+          this.getName(),
+        )
+      } DISABLE TRIGGER ALL`,
     );
     client.release();
   }
@@ -424,10 +438,12 @@ export default class Table extends TableDefinitionHandler {
    */
   async enableAllTriggers() {
     const client = await this.#pool.connect();
-    await client.runQuery(
-      `ALTER TABLE ${Table.getFullFormTableName(
-        this.getName(),
-      )} ENABLE TRIGGER ALL`,
+    await client.executeQuery(
+      `ALTER TABLE ${
+        Table.getFullFormTableName(
+          this.getName(),
+        )
+      } ENABLE TRIGGER ALL`,
     );
     client.release();
   }

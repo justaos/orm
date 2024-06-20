@@ -35,7 +35,7 @@ try {
     true, /* create database if not exists */
   );
   console.log("Client connected successfully");
-  await client.closeConnection(); // terminate all connections in the pool
+  client.closeConnection(); // terminate all connections in the pool
 } catch (error) {
   console.log("Error while establishing connection", error);
 }
@@ -121,7 +121,7 @@ for (const record of records) {
 
 console.log("Count :: " + (await teacherTable.count()));
 
-await client.closeConnection();
+client.closeConnection();
 ```
 
 ## Querying with compound 'OR' and 'AND' conditions
@@ -238,7 +238,7 @@ Full name field updated for :: John
 }
 */
 
-await client.closeConnection();
+client.closeConnection();
 ```
 
 ## Define custom field type
@@ -361,7 +361,7 @@ for await (const animal of animalCursor()) {
   console.log(animal.toJSON());
 }
 
-await client.closeConnection();
+client.closeConnection();
 ```
 
 | Data type    | Record.get             | Record.getJSONValue |

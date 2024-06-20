@@ -3,6 +3,7 @@ import ORMError from "../../../errors/ORMError.ts";
 import { TPreparedStatement, TWhereClauseOperator } from "../../types.ts";
 import WhereClause from "../CLAUSES/WhereClause.ts";
 import { pgFormat } from "../../../../deps.ts";
+import { getFullFormTableName } from "../../../utils.ts";
 
 export default class DeleteQuery implements IQuery {
   #fromTable?: string;
@@ -12,7 +13,7 @@ export default class DeleteQuery implements IQuery {
   constructor() {}
 
   from(tableName: string): DeleteQuery {
-    this.#fromTable = tableName;
+    this.#fromTable = getFullFormTableName(tableName);
     return this;
   }
 

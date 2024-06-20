@@ -29,7 +29,7 @@ describe({
       for (const table of cleanTableList) {
         await client.dropTable(table);
       }
-      await client.closeConnection();
+      client.closeConnection();
     });
 
     it("#table - negative check", function () {
@@ -117,7 +117,6 @@ describe({
           ],
         });
       } catch (error) {
-        console.log(error, JSON.stringify(error.cause, null, 4));
         assertStrictEquals(
           error.cause.columns[0].name,
           "unknown",
@@ -138,7 +137,6 @@ describe({
           ],
         });
       } catch (error) {
-        console.log(error, JSON.stringify(error.cause, null, 4));
         assertStrictEquals(
           error.cause.columns[0].name,
           "invalid name",

@@ -4,6 +4,7 @@ import { TPreparedStatement, TWhereClauseOperator } from "../../types.ts";
 import WhereClause from "../CLAUSES/WhereClause.ts";
 import { pgFormat } from "../../../../deps.ts";
 import ColumnsListClause from "../CLAUSES/ColumnsListClause.ts";
+import { getFullFormTableName } from "../../../utils.ts";
 
 export default class UpdateQuery implements IQuery {
   #intoTable?: string;
@@ -17,7 +18,7 @@ export default class UpdateQuery implements IQuery {
   constructor() {}
 
   into(tableName: string): UpdateQuery {
-    this.#intoTable = tableName;
+    this.#intoTable = getFullFormTableName(tableName);
     return this;
   }
 
@@ -138,11 +139,13 @@ export default class UpdateQuery implements IQuery {
         "The set values are required for the update query. Please check and try again.",
       );
     }
-    preparedStatement.sql += ` SET ${Object.keys(this.#setDetails)
-      .map((item) => {
-        return `%I = %L`;
-      })
-      .join(", ")}`;
+    preparedStatement.sql += ` SET ${
+      Object.keys(this.#setDetails)
+        .map((item) => {
+          return `%I = %L`;
+        })
+        .join(", ")
+    }`;
 
     Object.keys(this.#setDetails).forEach((key) => {
       preparedStatement.values.push(key, this.#setDetails[key]);

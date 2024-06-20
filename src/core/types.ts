@@ -63,14 +63,14 @@ export const WHERE_CLAUSE_OPERATORS_CONFIG = {
 
 export const WHERE_CLAUSE_OPERATORS: TWhereClauseOperator[] = [];
 for (const obj of Object.values(WHERE_CLAUSE_OPERATORS_CONFIG)) {
-  WHERE_CLAUSE_OPERATORS.push(<TWhereClauseOperator>obj.type);
+  WHERE_CLAUSE_OPERATORS.push(<TWhereClauseOperator> obj.type);
 }
 
 export const WHERE_CLAUSE_OPERATORS_ARRAY_VALUES: TWhereClauseOperator[] = [];
 for (const obj of Object.values(WHERE_CLAUSE_OPERATORS_CONFIG)) {
   //@ts-ignore
   if (obj.arrayValues) {
-    WHERE_CLAUSE_OPERATORS_ARRAY_VALUES.push(<TWhereClauseOperator>obj.type);
+    WHERE_CLAUSE_OPERATORS_ARRAY_VALUES.push(<TWhereClauseOperator> obj.type);
   }
 }
 
@@ -78,7 +78,7 @@ export const WHERE_CLAUSE_OPERATORS_NO_VALUES: TWhereClauseOperator[] = [];
 for (const obj of Object.values(WHERE_CLAUSE_OPERATORS_CONFIG)) {
   //@ts-ignore
   if (obj.noValue) {
-    WHERE_CLAUSE_OPERATORS_NO_VALUES.push(<TWhereClauseOperator>obj.type);
+    WHERE_CLAUSE_OPERATORS_NO_VALUES.push(<TWhereClauseOperator> obj.type);
   }
 }
 

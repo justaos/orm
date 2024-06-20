@@ -14,7 +14,7 @@ try {
     true, /* create database if not exists */
   );
   console.log("Client connected successfully");
-  await client.closeConnection();
+  client.closeConnection();
 } catch (error) {
   console.log("Error while establishing connection", error);
 }

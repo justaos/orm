@@ -1,29 +1,35 @@
-const worker = new Worker(new URL("./worker.ts", import.meta.url).href, {
+const worker = new Worker(new URL("./worker-db.ts", import.meta.url).href, {
   type: "module",
   deno: {
     permissions: "inherit",
   },
 });
 
-setTimeout(() => {
+const interval = setInterval(() => {
+  worker.postMessage("status");
+}, 100);
+
+function startThreads() {
+  console.log(worker);
   worker.postMessage({ post: "FIRST LOOP", delay: 100 });
-  console.log("posted message");
-}, 1);
+  console.log("posted message first");
 
-setTimeout(() => {
   worker.postMessage({ post: "SECOND LOOP", delay: 200 });
-  console.log("posted message");
-}, 1000);
+  console.log("posted message second");
 
-setTimeout(() => {
   worker.postMessage({ post: "THIRD LOOP", delay: 300 });
-  console.log("posted message");
-}, 2000);
+  console.log("posted message third");
+}
 
 let i = 0;
 
-worker.addEventListener("message", function () {
-  console.log("done");
-  i++;
-  if (i == 3) worker.terminate();
+worker.addEventListener("message", function (e) {
+  if (e.data === "online") {
+    clearInterval(interval);
+    startThreads();
+  } else if (e.data === "complete") {
+    console.log("done");
+    i++;
+    if (i == 3) worker.terminate();
+  }
 });

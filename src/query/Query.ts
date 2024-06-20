@@ -35,7 +35,7 @@ export default class Query {
   }
 
   getSelectQuery(): SelectQuery {
-    return <SelectQuery>this.#query;
+    return <SelectQuery> this.#query;
   }
 
   setQuery(query: QueryType) {
@@ -63,14 +63,14 @@ export default class Query {
   }
 
   addColumn(column: __TColumnDefinitionNative): Query {
-    const query = <CreateQuery>this.#getQuery();
+    const query = <CreateQuery> this.#getQuery();
     query.addColumn(column);
     return this;
   }
 
   inherits(nameWithSchema: string | undefined): Query {
     if (typeof nameWithSchema === "undefined") return this;
-    const query = <CreateQuery>this.#getQuery();
+    const query = <CreateQuery> this.#getQuery();
     query.inherits(nameWithSchema);
     return this;
   }
@@ -82,25 +82,25 @@ export default class Query {
   }
 
   into(nameWithSchema: string): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.into(nameWithSchema);
     return this;
   }
 
   columns(...args: any[]): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.columns(...args);
     return this;
   }
 
   values(rows: any[]): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.values(rows);
     return this;
   }
 
   returning(...args: any[]): Query {
-    const query = <InsertQuery>this.#getQuery();
+    const query = <InsertQuery> this.#getQuery();
     query.returning(...args);
     return this;
   }
@@ -112,7 +112,7 @@ export default class Query {
   }
 
   set(columnOrRecord: string | { [key: string]: any }, value?: any): Query {
-    const query = <UpdateQuery>this.#getQuery();
+    const query = <UpdateQuery> this.#getQuery();
     query.set(columnOrRecord, value);
     return this;
   }
@@ -133,21 +133,21 @@ export default class Query {
     return this;
   }
 
-  from(nameWithSchema: string): Query {
+  from(name: string): Query {
     if (!this.#query) {
       throw new ORMError("QUERY", "Query not initialized");
     }
-    if (!nameWithSchema) {
+    if (!name) {
       throw new ORMError("QUERY", "Table name not provided");
     }
 
-    const query = <SelectQuery | DeleteQuery>this.#query;
-    query.from(nameWithSchema);
+    const query = <SelectQuery | DeleteQuery> this.#query;
+    query.from(name);
     return this;
   }
 
   groupBy(columnName: string): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.groupBy(columnName);
     return this;
   }
@@ -168,7 +168,7 @@ export default class Query {
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ) {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.where(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
@@ -182,7 +182,7 @@ export default class Query {
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ) {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
@@ -196,19 +196,19 @@ export default class Query {
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ) {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.andWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
   limit(limit: number): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.limit(limit);
     return this;
   }
 
   offset(offset: number): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.offset(offset);
     return this;
   }
@@ -217,7 +217,7 @@ export default class Query {
     columnNameOrOrderList?: string | TOrderBy[],
     direction?: TOrderByDirection,
   ): Query {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     query.orderBy(columnNameOrOrderList, direction);
     return this;
   }
@@ -228,7 +228,7 @@ export default class Query {
   }
 
   getCountSQLQuery(): string {
-    const query = <SelectQuery>this.#getQuery();
+    const query = <SelectQuery> this.#getQuery();
     return query.buildCountQuery();
   }
 

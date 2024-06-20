@@ -1,6 +1,5 @@
 import PostgresQueryBuilder from "../src/core/query-builder/PostgresQueryBuilder.ts";
 import WhereClause from "../src/core/query-builder/CLAUSES/WhereClause.ts";
-/*
 
 console.log(
   PostgresQueryBuilder.select("count(*)")
@@ -10,7 +9,7 @@ console.log(
       builder
         .where("column2", "=", "value2")
         .andWhere("column3", "=", "value3")
-        .andWhere("column4", "!=", undefined),
+        .andWhere("column4", "!=", undefined)
     )
     .orWhere("column3", null)
     .orWhere("column4", "IS true")
@@ -19,7 +18,6 @@ console.log(
     .groupBy("column1")
     .buildQuery(),
 );
-*/
 
 console.log(
   PostgresQueryBuilder.update()

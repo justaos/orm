@@ -85,4 +85,4 @@ Full name field updated for :: John
 }
 */
 
-await client.closeConnection();
+client.closeConnection();

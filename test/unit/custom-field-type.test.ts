@@ -31,7 +31,7 @@ describe({
       for (const table of cleanTableList) {
         await client.dropTable(table);
       }
-      await client.closeConnection();
+      client.closeConnection();
     });
 
     it("#addDataType - Registering Custom data type", async function () {

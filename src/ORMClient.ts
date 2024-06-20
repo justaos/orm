@@ -29,7 +29,6 @@ import ORMError from "./errors/ORMError.ts";
  *
  * @method connect Establishes a connection to the database
  * @method closeConnection Closes the connection to the database
- * @method dropDatabase Drops the database
  * @method deregisterTable Deregisters a table from the registry
  * @method defineTable Defines a new table
  * @method dropTable Drops a table
@@ -64,12 +63,12 @@ export default class ORMClient {
     return await this.#pool.testConnection();
   }
 
-  async closeConnection(): Promise<void> {
-    return await this.#getConnection().end();
+  closeConnection(): void {
+    this.#pool.end();
   }
 
   async dropDatabase(): Promise<any> {
-    const databaseName = this.#getConnection().getDatabaseName();
+    const databaseName = this.#pool.getDatabaseName();
     if (!databaseName) {
       throw ORMError.generalError("Database name is not defined");
     }
@@ -216,8 +215,8 @@ export default class ORMClient {
    * @param context Context object
    */
   table(name: string, context?: TRecordInterceptorContext): Table {
-    const tableDefinition: TTableDefinitionStrict | undefined =
-      this.#registriesHandler.getTableDefinition(name);
+    const tableDefinition: TTableDefinitionStrict | undefined = this
+      .#registriesHandler.getTableDefinition(name);
     if (typeof tableDefinition === "undefined") {
       throw new ORMError(
         "TABLE_DEFINITION_VALIDATION",
@@ -235,12 +234,5 @@ export default class ORMClient {
 
   query(): Query {
     return new Query(this.#pool);
-  }
-
-  #getConnection(): DatabaseConnectionPool {
-    if (!this.#pool) {
-      throw ORMError.generalError("There is no active connection");
-    }
-    return this.#pool;
   }
 }

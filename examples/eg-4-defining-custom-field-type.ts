@@ -80,4 +80,4 @@ try {
   console.log(error);
 }
 
-await client.closeConnection();
+client.closeConnection();

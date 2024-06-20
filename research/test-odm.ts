@@ -53,4 +53,4 @@ const records = await selectQuery.getCount();
 
 console.log(records);
 
-await client.closeConnection();
+client.closeConnection();

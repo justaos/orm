@@ -1,6 +1,6 @@
 import { pg, PgCursor } from "../../../deps.ts";
 
-export class DatabaseConnection {
+export class DatabaseClient {
   readonly #pgClient: pg.Client;
 
   constructor(client: pg.Client) {
@@ -10,16 +10,16 @@ export class DatabaseConnection {
   async doesSchemaExist(schemaName: string): Promise<boolean> {
     const query =
       `SELECT schema_name FROM information_schema.schemata WHERE schema_name = '${schemaName}'`;
-    const result = await this.runQuery(query);
+    const result = await this.executeQuery(query);
     return result.rowCount > 0;
   }
 
   async createSchema(schemaName: string): Promise<void> {
     const query = `CREATE SCHEMA IF NOT EXISTS "${schemaName}"`;
-    await this.runQuery(query);
+    await this.executeQuery(query);
   }
 
-  async runQuery(query: string): Promise<pg.QueryResult> {
+  async executeQuery(query: string): Promise<pg.QueryResult> {
     return await this.#pgClient.query({
       text: query,
     });

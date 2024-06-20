@@ -76,7 +76,7 @@ describe(
     afterAll(async () => {
       const client = await Session.getClient();
       await client.dropTable("task");
-      await (await Session.getClient()).closeConnection();
+      (await Session.getClient()).closeConnection();
     });
 
     it("#simple select query", async () => {
@@ -143,7 +143,7 @@ describe(
           order: "ASC",
         },
       ]);
-      console.log(taskQuery.getSQLQuery());
+
       const taskGroupedRecords = await taskQuery.execute();
       for (const taskGroupedRecord of taskGroupedRecords) {
         assertStrictEquals(
@@ -165,9 +165,9 @@ describe(
       taskQuery.from("task");
       taskQuery.groupBy("priority");
       taskQuery.orderBy("count", "ASC");
-      console.log(taskQuery.getSQLQuery());
+
       const taskGroupedRecords = await taskQuery.execute();
-      console.log(taskGroupedRecords);
+
       assertStrictEquals(taskGroupedRecords.length, 3, "Expected 3 records");
       assertStrictEquals(
         taskGroupedRecords[0].priority,

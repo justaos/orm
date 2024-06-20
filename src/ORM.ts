@@ -31,7 +31,8 @@ import RegistriesHandler from "./RegistriesHandler.ts";
  *  hostname: "localhost",
  *  port: 5432,
  *  username: "postgres",
- *  password: "postgres"
+ *  password: "postgres",
+ *  max_connections: 20
  * });
  * odm.connect();
  * ```
@@ -43,7 +44,6 @@ import RegistriesHandler from "./RegistriesHandler.ts";
  * @see {@link DatabaseOperationInterceptor} for the operation interceptors
  *
  * @method connect Establishes a connection to the database
- * @method isDatabaseExist Checks if the database exists
  * @method isTableDefined Checks if a table is defined in the registry
  * @method addDataType Adds a new data type to the registry
  * @method addInterceptor Adds a new operation interceptor to the service
@@ -101,7 +101,7 @@ export default class ORM {
         });
         await tempClient.testConnection();
         await tempClient.createDatabase(this.#config.database);
-        await tempClient.end();
+        tempClient.end();
         return await this.connect(false);
       } else {
         throw error;

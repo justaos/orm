@@ -33,7 +33,7 @@ describe({
       for (const table of cleanTableList) {
         await client.dropTable(table);
       }
-      await (await Session.getClient()).closeConnection();
+      (await Session.getClient()).closeConnection();
     });
 
     it("#ORM::addInterceptor", async () => {

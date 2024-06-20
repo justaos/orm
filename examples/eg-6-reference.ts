@@ -65,4 +65,4 @@ await client.defineTable({
   ],
 });
 
-await client.closeConnection();
+client.closeConnection();

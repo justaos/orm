@@ -42,4 +42,4 @@ for await (const animal of animalCursor()) {
   console.log(animal.toJSON());
 }
 
-await client.closeConnection();
+client.closeConnection();

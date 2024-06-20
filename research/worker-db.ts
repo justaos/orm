@@ -10,22 +10,7 @@ const odm = new ORM({
 
 const conn = await odm.connect(true);
 
-/*@Table()
-class TestingTable {
-
-  @DataTypeString()
-  name;
-
-  @DataTypeInteger()
-  age;
-
-  @DataTypeInteger()
-  test;
-}*/
-
-//await client.defineTable(TestingTable);
-
-await client.defineTable({
+await conn.defineTable({
   name: "testing_table",
   columns: [
     {
@@ -39,12 +24,17 @@ await client.defineTable({
   ],
 });
 
-await client.closeConnection();
+await conn.closeConnection();
 
 self.onmessage = async (e) => {
+  if (e.data == "status") {
+    self.postMessage("online");
+    return;
+  }
+
   console.log(`WORKER ${e.data.post}========================================`);
-  const conn = await odm.connect();
-  const table = client.table("testing_table");
+  const ormClient = await odm.connect();
+  const table = ormClient.table("testing_table");
   for (let i = 0; i < 1000; i++) {
     console.log(
       `WORKER ${e.data.post} INDEX : ${i} ========================================`,
@@ -54,14 +44,14 @@ self.onmessage = async (e) => {
     record.set("age", "199201");
     await record.insert();
   }
-  const selectQuery = table.select();
-  selectQuery.where("name", "=", "1992");
-  const count = await selectQuery.count();
+  // const selectQuery = table;
+  // selectQuery.where("name", "=", "1992");
+  // const count = await selectQuery.count();
 
   console.log(
-    `WORKER ${e.data.post} COUNTs : ${count} ========================================`,
+    `WORKER ${e.data.post} COUNTs : -- ========================================`,
   );
 
-  await client.closeConnection();
-  self.close();
+  ormClient.closeConnection();
+  self.postMessage("complete");
 };
