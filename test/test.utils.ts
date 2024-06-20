@@ -7,6 +7,11 @@ export const defaultConfig: TDatabaseConfiguration = {
   port: 5432,
   username: "postgres",
   password: "postgres",
+  database: "postgres",
+};
+
+export const testConfig: TDatabaseConfiguration = {
+  ...defaultConfig,
   database: "orm-test-automation",
 };
 
@@ -29,7 +34,7 @@ export class Session {
     if (!this.#odm) {
       this.#odm = new ORM(
         {
-          ...defaultConfig,
+          ...testConfig,
           hostname: Deno.env.get("POSTGRES_HOST") || "127.0.0.1",
         },
         logger,

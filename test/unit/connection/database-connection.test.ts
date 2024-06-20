@@ -7,10 +7,7 @@ describe({
   name: "DatabaseConnection",
   fn() {
     it("should establish a connection", async () => {
-      const connectionPool = new DatabaseConnectionPool({
-        ...defaultConfig,
-        database: "postgres",
-      });
+      const connectionPool = new DatabaseConnectionPool(defaultConfig);
       await connectionPool.testConnection();
       connectionPool.end();
     });
@@ -58,10 +55,9 @@ describe({
 
     it("#dropDatabase", async () => {
       try {
-        const dbConnection = await DatabaseConnectionPool.createConnectionPoll({
-          ...defaultConfig,
-          database: "",
-        });
+        const dbConnection = await DatabaseConnectionPool.createConnectionPoll(
+          defaultConfig,
+        );
         await dbConnection.dropDatabase("odm-created-database");
         dbConnection.end();
       } catch (error) {
