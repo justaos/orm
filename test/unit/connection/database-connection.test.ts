@@ -9,7 +9,7 @@ describe({
     it("should establish a connection", async () => {
       const connectionPool = new DatabaseConnectionPool({
         ...defaultConfig,
-        port: undefined,
+        database: "postgres",
       });
       await connectionPool.testConnection();
       connectionPool.end();
@@ -71,7 +71,10 @@ describe({
 
     it("#end pool connections", async () => {
       const dbConnection = await DatabaseConnectionPool.createConnectionPoll(
-        defaultConfig,
+        {
+          ...defaultConfig,
+          database: "postgres",
+        },
       );
       try {
         dbConnection.end();

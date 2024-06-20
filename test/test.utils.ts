@@ -47,4 +47,4 @@ export class Session {
   }
 }
 
-export const logger = LoggerUtils.defineLogger("ORMTest", "CRITICAL");
+export const logger = LoggerUtils.defineLogger("ORMTest", "DEBUG");

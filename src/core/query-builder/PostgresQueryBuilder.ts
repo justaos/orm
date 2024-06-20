@@ -1,5 +1,7 @@
 import SelectQuery from "./DQL/SelectQuery.ts";
 import UpdateQuery from "./DML/UpdateQuery.ts";
+import InsertQuery from "./DML/InsertQuery.ts";
+import DeleteQuery from "./DML/DeleteQuery.ts";
 
 export default class PostgresQueryBuilder {
   static select(
@@ -12,16 +14,16 @@ export default class PostgresQueryBuilder {
     );
   }
 
-  static insert(): void {
-    throw new Error("Method not implemented.");
+  static insert(): InsertQuery {
+    return new InsertQuery();
   }
 
   static update(): UpdateQuery {
     return new UpdateQuery();
   }
 
-  static delete(): void {
-    throw new Error("Method not implemented.");
+  static delete(): DeleteQuery {
+    return new DeleteQuery();
   }
 
   static createTable(): void {

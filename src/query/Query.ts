@@ -1,6 +1,6 @@
 import SelectQuery from "../core/query-builder/DQL/SelectQuery.ts";
 import { CreateQuery } from "./CreateQuery.ts";
-import InsertQuery from "./InsertQuery.ts";
+import InsertQuery from "./../core/query-builder/DML/InsertQuery.ts";
 
 import { AlterQuery } from "./AlterQuery.ts";
 import type { TOrderBy, TOrderByDirection } from "../core/types.ts";

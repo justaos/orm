@@ -107,7 +107,7 @@ export type TWhereClauseOperator =
 
 export type TPreparedStatement = {
   sql: string;
-  values: unknown[];
+  values: any[];
 };
 
 export type TOrderByDirection = "ASC" | "DESC";
