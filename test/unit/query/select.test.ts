@@ -84,13 +84,14 @@ describe(
       let count = await taskTable.count();
       assertStrictEquals(count, 60, "Should be 60 records");
 
+      taskTable.initializeQuery();
       taskTable.where("priority", 1);
       count = await taskTable.count();
       assertStrictEquals(count, 10, "Should be 10 records");
 
+      taskTable.initializeQuery();
       taskTable.where("priority", 1);
       taskTable.orWhere("description", "ILIKE", "Task [priority 3]%");
-
       count = await taskTable.count();
       assertStrictEquals(count, 30, "Should be 30 records");
     });

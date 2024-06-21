@@ -112,7 +112,12 @@ export default class SelectQuery implements IQuery {
   }
 
   /**
-   * This method is same as where method.
+   * This method is used to set the AND where clause. (same as where)
+   *
+   * @param {string | number | boolean | ((subClause: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {SelectQuery} The SelectQuery instance.
    */
   andWhere(
     columnOrCompoundFunction:
@@ -129,9 +134,10 @@ export default class SelectQuery implements IQuery {
   /**
    * This method is used to set the or where clause for the select query.
    *
-   * @param columnOrCompoundFunction
-   * @param operatorOrValue
-   * @param value
+   * @param {string | number | boolean | ((subClause: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {SelectQuery} The SelectQuery instance.
    */
   orWhere(
     columnOrCompoundFunction:

@@ -28,7 +28,7 @@ export default class Table extends TableDefinitionHandler {
   readonly #logger: Logger;
   readonly #registriesHandler: RegistriesHandler;
 
-  #query: Query | null = null;
+  #query: Query;
 
   #disableIntercepts: boolean | string[] = false;
 
@@ -46,6 +46,7 @@ export default class Table extends TableDefinitionHandler {
     this.#logger = logger;
     this.#pool = pool;
     this.#context = context;
+    this.#query = this.#initializeQuery();
   }
 
   static getFullFormTableName(name: string): string {
@@ -74,6 +75,13 @@ export default class Table extends TableDefinitionHandler {
     return new Record(query, this, this.#logger, rawRecord);
   }
 
+  /**
+   * This method is used to set the where clause for the table query.
+   * @param {string | number | boolean | ((where: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {Query} The Table instance.
+   */
   where(
     columnOrCompoundFunction:
       | string
@@ -83,41 +91,18 @@ export default class Table extends TableDefinitionHandler {
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): Table {
-    if (this.#query) {
-      throw ORMError.generalError("Query is already initialized");
-    }
-    this.#query = new Query(this.#pool);
-    this.#query.select();
-    this.#query.from(this.getName());
     this.#query.where(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
-  resetWhere(): Table {
-    this.#query = new Query(this.#pool);
-    this.#query.select();
-    this.#query.from(this.getName());
-    return this;
-  }
-
-  orWhere(
-    columnOrCompoundFunction:
-      | string
-      | number
-      | boolean
-      | ((where: WhereClause) => void),
-    operatorOrValue?: TWhereClauseOperator | any,
-    value?: any,
-  ): Table {
-    if (!this.#query) {
-      this.#query = new Query(this.#pool);
-      this.#query.select();
-      this.#query.from(this.getName());
-    }
-    this.#query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
-    return this;
-  }
-
+  /**
+   * This method is used to set the AND where clause. (same as where)
+   *
+   * @param {string | number | boolean | ((subClause: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {Table} The Table instance.
+   */
   andWhere(
     columnOrCompoundFunction:
       | string
@@ -127,29 +112,37 @@ export default class Table extends TableDefinitionHandler {
     operatorOrValue?: TWhereClauseOperator | any,
     value?: any,
   ): Table {
-    this.#query = new Query(this.#pool);
-    this.#query.select();
-    this.#query.from(this.getName());
     this.#query.andWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
+  /**
+   * This method is used to set the or where clause for the table query.
+   *
+   * @param {string | number | boolean | ((subClause: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {Query} The Query instance.
+   */
+  orWhere(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: WhereClause) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ): Table {
+    this.#query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
+    return this;
+  }
+
   limit(limit: number): Table {
-    if (!this.#query) {
-      this.#query = new Query(this.#pool);
-      this.#query.select();
-      this.#query.from(this.getName());
-    }
     this.#query.limit(limit);
     return this;
   }
 
   offset(offset: number): Table {
-    if (!this.#query) {
-      this.#query = new Query(this.#pool);
-      this.#query.select();
-      this.#query.from(this.getName());
-    }
     this.#query.offset(offset);
     return this;
   }
@@ -158,26 +151,14 @@ export default class Table extends TableDefinitionHandler {
     columnNameOrOrderList?: string | TOrderBy[],
     direction?: TOrderByDirection,
   ): Table {
-    if (!this.#query) {
-      this.#query = new Query(this.#pool);
-      this.#query.select();
-      this.#query.from(this.getName());
-    }
     this.#query.orderBy(columnNameOrOrderList, direction);
     return this;
   }
 
   async count(): Promise<number> {
-    let query = this.#query;
-    if (!query) {
-      query = new Query(this.#pool);
-      query.select();
-      query.from(this.getName());
-    }
-    this.#query = null;
-    const sqlQuery = query.getCountSQLQuery();
+    const sqlQuery = this.#query.getCountSQLQuery();
     logSQLQuery(this.#logger, sqlQuery);
-    const [row] = await query.execute(sqlQuery);
+    const [row] = await this.#query.execute(sqlQuery);
     return parseInt(row.count, 10);
   }
 
@@ -193,21 +174,11 @@ export default class Table extends TableDefinitionHandler {
    * ```
    */
   async execute(): Promise<() => AsyncGenerator<Record, void, unknown>> {
-    let query = this.#query;
-
-    if (!query) {
-      query = new Query(this.#pool);
-      query.select();
-      query.from(this.getName());
-    }
-
     await this.intercept("BEFORE_SELECT", []);
 
-    logSQLQuery(this.#logger, query.getSQLQuery());
+    logSQLQuery(this.#logger, this.#query.getSQLQuery());
 
-    const { cursor, reserve } = await query.cursor();
-
-    this.#query = null; // Reset query
+    const { cursor, reserve } = await this.#query.cursor();
 
     reserve.on("error", () => console.log("Error in event."));
 
@@ -241,21 +212,11 @@ export default class Table extends TableDefinitionHandler {
    * ```
    */
   async toArray(): Promise<Record[]> {
-    let query = this.#query;
-
-    if (!query) {
-      query = new Query(this.#pool);
-      query.select();
-      query.from(this.getName());
-    }
-
     await this.intercept("BEFORE_SELECT", []);
 
-    logSQLQuery(this.#logger, query.getSQLQuery());
+    logSQLQuery(this.#logger, this.#query.getSQLQuery());
 
-    const rawRecords = await query.execute();
-
-    this.#query = null; // Reset query
+    const rawRecords = await this.#query.execute();
 
     const records: Record[] = [];
 
@@ -297,9 +258,7 @@ export default class Table extends TableDefinitionHandler {
     ) {
       throw ORMError.generalError("ID or column name must be provided");
     }
-    this.#query = new Query(this.#pool);
-    this.#query.select();
-    this.#query.from(this.getName());
+    this.#query = this.#initializeQuery();
     if (
       typeof idOrColumnNameOrFilter == "string" &&
       typeof value === "undefined"
@@ -344,6 +303,21 @@ export default class Table extends TableDefinitionHandler {
           this.getName(),
         )
       } DISABLE TRIGGER ALL`,
+    );
+    client.release();
+  }
+
+  /**
+   * Enable all triggers on the table
+   */
+  async enableAllTriggers() {
+    const client = await this.#pool.connect();
+    await client.executeQuery(
+      `ALTER TABLE ${
+        Table.getFullFormTableName(
+          this.getName(),
+        )
+      } ENABLE TRIGGER ALL`,
     );
     client.release();
   }
@@ -434,21 +408,6 @@ export default class Table extends TableDefinitionHandler {
   }*/
 
   /**
-   * Enable all triggers on the table
-   */
-  async enableAllTriggers() {
-    const client = await this.#pool.connect();
-    await client.executeQuery(
-      `ALTER TABLE ${
-        Table.getFullFormTableName(
-          this.getName(),
-        )
-      } ENABLE TRIGGER ALL`,
-    );
-    client.release();
-  }
-
-  /**
    * Intercepts table operation
    * @param operation - The operation type
    * @param records - The records
@@ -466,6 +425,17 @@ export default class Table extends TableDefinitionHandler {
       this.#disableIntercepts,
     );
     return records;
+  }
+
+  initializeQuery(): void {
+    this.#query = this.#initializeQuery();
+  }
+
+  #initializeQuery(): Query {
+    const query = new Query(this.#pool);
+    query.select();
+    query.from(this.getName());
+    return query;
   }
 
   #getQuery() {

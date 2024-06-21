@@ -12,6 +12,7 @@ import type DatabaseConnectionPool from "../core/connection/DatabaseConnectionPo
 import type WhereClause from "../core/query-builder/CLAUSES/WhereClause.ts";
 import UpdateQuery from "../core/query-builder/DML/UpdateQuery.ts";
 import DeleteQuery from "../core/query-builder/DML/DeleteQuery.ts";
+import { DatabaseClient } from "../core/connection/DatabaseClient.ts";
 
 type QueryType =
   | SelectQuery
@@ -118,13 +119,17 @@ export default class Query {
   }
 
   /**
-   * Select query
-   * @param args
+   * This method is used to set the columns for the select query.
+   * @param {string | string[] | { [key: string]: boolean }} columnNameOrObjectOrArray - The column name or object or array.
+   * @param {...string[]} otherColumns - The other columns.
+   * @returns {SelectQuery} The SelectQuery instance.
    */
-  select(...args: any[]): Query {
+  select(
+    columnNameOrObjectOrArray?: string | string[] | { [key: string]: boolean },
+    ...otherColumns: string[]
+  ): Query {
     this.#query = new SelectQuery();
-    // @ts-ignore
-    this.#query.columns(...args);
+    this.#query.columns(columnNameOrObjectOrArray, ...otherColumns);
     return this;
   }
 
@@ -153,11 +158,11 @@ export default class Query {
   }
 
   /**
-   * This method is used to set the where clause for the select query.
+   * This method is used to set the where clause for the query.
    * @param {string | number | boolean | ((where: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
    * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
    * @param {any} value - The value.
-   * @returns {SelectQuery} The SelectQuery instance.
+   * @returns {Query} The Query instance.
    */
   where(
     columnOrCompoundFunction:
@@ -173,20 +178,14 @@ export default class Query {
     return this;
   }
 
-  orWhere(
-    columnOrCompoundFunction:
-      | string
-      | number
-      | boolean
-      | ((where: WhereClause) => void),
-    operatorOrValue?: TWhereClauseOperator | any,
-    value?: any,
-  ): Query {
-    const query = <SelectQuery> this.#getQuery();
-    query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
-    return this;
-  }
-
+  /**
+   * This method is used to set the AND where clause. (same as where)
+   *
+   * @param {string | number | boolean | ((subClause: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {Query} The Query instance.
+   */
   andWhere(
     columnOrCompoundFunction:
       | string
@@ -198,6 +197,28 @@ export default class Query {
   ): Query {
     const query = <SelectQuery> this.#getQuery();
     query.andWhere(columnOrCompoundFunction, operatorOrValue, value);
+    return this;
+  }
+
+  /**
+   * This method is used to set the or where clause for the query.
+   *
+   * @param {string | number | boolean | ((subClause: WhereClause) => void)} columnOrCompoundFunction - The column or compound function.
+   * @param {TWhereClauseOperator | any} operatorOrValue - The operator or value.
+   * @param {any} value - The value.
+   * @returns {Query} The Query instance.
+   */
+  orWhere(
+    columnOrCompoundFunction:
+      | string
+      | number
+      | boolean
+      | ((where: WhereClause) => void),
+    operatorOrValue?: TWhereClauseOperator | any,
+    value?: any,
+  ): Query {
+    const query = <SelectQuery> this.#getQuery();
+    query.orWhere(columnOrCompoundFunction, operatorOrValue, value);
     return this;
   }
 
@@ -246,7 +267,7 @@ export default class Query {
     return result;
   }
 
-  async cursor(): Promise<any> {
+  async cursor(): Promise<{ cursor: any; reserve: DatabaseClient }> {
     if (this.getType() !== "select") {
       throw new ORMError("QUERY", "Query type not supported");
     }
