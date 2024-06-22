@@ -72,7 +72,7 @@ export default class ORMClient {
     if (!databaseName) {
       throw ORMError.generalError("Database name is not defined");
     }
-    await this.closeConnection();
+    this.closeConnection();
     const tempClient = new DatabaseConnectionPool(
       {
         ...this.#config,
@@ -83,10 +83,10 @@ export default class ORMClient {
     await tempClient.testConnection();
     try {
       const result = await tempClient.dropDatabase(databaseName);
-      await tempClient.end();
+      tempClient.end();
       return result;
     } catch (error) {
-      await tempClient.end();
+      tempClient.end();
       throw error;
     }
   }
@@ -143,9 +143,10 @@ export default class ORMClient {
       if (!tableExists) {
         const createQuery = new Query(this.#pool);
         createQuery.create(tableDefinitionHandler.getName());
-        for (const column of tableDefinitionHandler.getOwnColumns()) {
+        for (const column of tableDefinitionHandler.getColumns()) {
           const columnDefinition = column.getDefinitionClone();
           createQuery.addColumn({
+            table: column.getTableName(),
             name: column.getName(),
             native_type: column.getNativeType(),
             not_null: column.isNotNull(),
@@ -175,10 +176,11 @@ export default class ORMClient {
         if (columnSchemas.length > existingColumnNames.length) {
           const alterQuery = new Query(this.#pool);
           alterQuery.alter(tableDefinitionHandler.getName());
-          for (const column of tableDefinitionHandler.getOwnColumns()) {
+          for (const column of tableDefinitionHandler.getColumns()) {
             const columnDefinition = column.getDefinitionClone();
             if (!existingColumnNames.includes(column.getName())) {
               alterQuery.addColumn({
+                table: column.getTableName(),
                 name: column.getName(),
                 native_type: column.getNativeType(),
                 not_null: column.isNotNull(),

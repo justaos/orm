@@ -1,7 +1,7 @@
 import getORM from "./getORM.ts";
 
 const odm = getORM();
-const conn = await odm.connect(true);
+const client = await odm.connect(true);
 
 await client.defineTable({
   name: "animal",
@@ -36,7 +36,7 @@ husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
 await husky.insert();
 
-const animalCursor = await animalTable.select().execute();
+const animalCursor = await animalTable.execute();
 
 for await (const animal of animalCursor()) {
   console.log(animal.toJSON());

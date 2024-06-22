@@ -1,8 +1,12 @@
-import { IDataType, type TColumnDataType, type TColumnDefinition } from "../mod.ts";
+import {
+  IDataType,
+  type TColumnDataType,
+  type TColumnDefinition,
+} from "../mod.ts";
 import getORM from "./getORM.ts";
 
 const odm = getORM();
-const conn = await odm.connect(true);
+const client = await odm.connect(true);
 
 class EmailType extends IDataType {
   constructor() {
@@ -18,7 +22,7 @@ class EmailType extends IDataType {
   }
 
   validateDefinition(_columnDefinition: TColumnDefinition) {
-    return true;
+    // Throw an error if something in definition is not meeting your expectation.
   }
 
   setValueIntercept(newValue: any): any {

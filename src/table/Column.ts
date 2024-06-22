@@ -4,10 +4,11 @@ import type RegistriesHandler from "../RegistriesHandler.ts";
 
 export default class Column extends ColumnDefinitionHandler {
   constructor(
+    tableName: string,
     columnDefinition: TColumnDefinition,
     registriesHandler: RegistriesHandler,
   ) {
     const dataType = registriesHandler.getDataType(columnDefinition.type);
-    super(columnDefinition, dataType);
+    super(tableName, columnDefinition, dataType);
   }
 }

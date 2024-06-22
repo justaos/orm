@@ -98,7 +98,7 @@ export default class ORM {
         const tempClient = new DatabaseConnectionPool({
           ...this.#config,
           database: "postgres",
-        });
+        }, this.#logger);
         await tempClient.testConnection();
         await tempClient.createDatabase(this.#config.database);
         tempClient.end();

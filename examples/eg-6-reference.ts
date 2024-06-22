@@ -1,16 +1,26 @@
 import getORM from "./getORM.ts";
+import ORMClient from "../src/ORMClient.ts";
 
 const odm = getORM();
-const conn = await odm.connect(true);
-
+let client: ORMClient = await odm.connect(true);
+await client.dropDatabase();
+client = await odm.connect(true);
 await client.defineTable({
   name: "department",
+  schema: "system",
   columns: [
     {
       name: "name",
       type: "string",
       unique: true,
     },
+  ],
+});
+
+await client.defineTable({
+  name: "department",
+  inherits: "system.department",
+  columns: [
     {
       name: "description",
       type: "string",
@@ -24,7 +34,6 @@ await client.defineTable({
     {
       name: "name",
       type: "string",
-      unique: true,
     },
     {
       name: "department",
@@ -32,7 +41,6 @@ await client.defineTable({
       foreign_key: {
         table: "department",
         column: "name",
-        on_delete: "CASCADE",
       },
     },
     {
@@ -64,5 +72,22 @@ await client.defineTable({
     },
   ],
 });
+
+const departmentTable = client.table("department");
+
+const department = departmentTable.createNewRecord();
+department.set("name", "HR2");
+department.set("description", "Human Resources");
+await department.insert();
+
+client = await odm.connect();
+const employeeTable = client.table("employee");
+const employee = employeeTable.createNewRecord();
+employee.set("name", "John Doe");
+employee.set("department", "HR2");
+employee.set("salary", 5000);
+employee.set("birth_date", new Date());
+employee.set("created_on", new Date());
+await employee.insert();
 
 client.closeConnection();

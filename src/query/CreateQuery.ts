@@ -27,6 +27,7 @@ export class CreateQuery {
     let query = `CREATE TABLE ${this.#tableName}`;
     query += ` (`;
     query += this.#prepareColumns();
+    query += this.#prepareUnique();
     query += this.#preparePrimaryKey();
     query += `)`;
     query += this.#prepareInherits();
@@ -53,6 +54,9 @@ export class CreateQuery {
 
   #prepareColumns(): string {
     return this.#columns
+      .filter((column) =>
+        getFullFormTableName(column.table) === this.#tableName
+      )
       .map((column) => {
         return this.#prepareColumn(column);
       })
@@ -64,8 +68,18 @@ export class CreateQuery {
     return ` INHERITS (${this.#inherits})`;
   }
 
+  #prepareUnique(): string {
+    const uniqueColumns = this.#columns.filter((column) =>
+      column.name != "id" && column.unique &&
+      getFullFormTableName(column.table) !== this.#tableName
+    );
+    if (uniqueColumns.length === 0) return "";
+    return uniqueColumns.map((column) => {
+      return `,  UNIQUE ("${column.name}")`;
+    }).join("");
+  }
+
   #preparePrimaryKey(): string {
-    if (this.#inherits) return "";
     return `, PRIMARY KEY (id)`;
   }
 }

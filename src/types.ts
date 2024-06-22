@@ -25,6 +25,7 @@ export type TColumnDefinitionStrict = {
 };
 
 export type __TColumnDefinitionNative = {
+  table: string;
   name: string;
   native_type?: string;
   not_null: boolean;

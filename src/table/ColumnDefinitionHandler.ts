@@ -6,8 +6,14 @@ export default class ColumnDefinitionHandler {
   readonly #columnDefinition: TColumnDefinitionStrict;
 
   readonly #dataType?: IDataType;
+  readonly #tableName: string;
 
-  constructor(columnDefinition: TColumnDefinition, dataType?: IDataType) {
+  constructor(
+    tableName: string,
+    columnDefinition: TColumnDefinition,
+    dataType?: IDataType,
+  ) {
+    this.#tableName = tableName;
     this.#dataType = dataType;
     this.#columnDefinition = ColumnDefinitionHandler.setDefaults(
       columnDefinition,
@@ -23,6 +29,10 @@ export default class ColumnDefinitionHandler {
       default: null,
       ...columnDefinition,
     };
+  }
+
+  getTableName(): string {
+    return this.#tableName;
   }
 
   isUnique(): boolean {

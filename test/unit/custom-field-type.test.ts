@@ -48,9 +48,7 @@ describe({
           return value;
         }
 
-        validateDefinition(fieldDefinition: TColumnDefinition) {
-          return true;
-        }
+        validateDefinition(_fieldDefinition: TColumnDefinition) {}
 
         setValueIntercept(newValue: any): any {
           return newValue;

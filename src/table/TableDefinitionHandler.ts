@@ -52,6 +52,7 @@ export default class TableDefinitionHandler {
     if (tableDefinition.columns) {
       for (let i = 0; i < tableDefinition.columns.length; i++) {
         const column = new Column(
+          `${tableDefinition.schema}.${tableDefinition.name}`,
           tableDefinition.columns[i],
           this.#registriesHandler,
         );
@@ -136,6 +137,7 @@ export default class TableDefinitionHandler {
     if (!extendsTableName) {
       columns.push(
         new Column(
+          this.getName(),
           {
             name: "id",
             type: "uuid",
@@ -145,6 +147,7 @@ export default class TableDefinitionHandler {
           this.#registriesHandler,
         ),
         new Column(
+          this.getName(),
           {
             name: "_table",
             type: "string",
@@ -158,7 +161,7 @@ export default class TableDefinitionHandler {
     columns.push(
       ...this.#tableDefinition.columns.map(
         (column: TColumnDefinitionStrict) => {
-          return new Column(column, this.#registriesHandler);
+          return new Column(this.getName(), column, this.#registriesHandler);
         },
       ),
     );
