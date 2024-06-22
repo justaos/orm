@@ -361,14 +361,20 @@ for await (const animal of animalCursor()) {
 client.closeConnection();
 ```
 
+## Known limitations:
+
+## Data types
+
 | Data type    | Record.get             | Record.getJSONValue |
 |--------------|------------------------|---------------------|
+| **boolean**  | boolean                | boolean             |
 | **date**     | Temporal.PlainDate     | string              |
 | **datetime** | Temporal.PlainDateTime | string              |
 | **integer**  | number                 | number              |
 | **json**     | {}                     | {}                  |
 | **number**   | number                 | number              |
 | **string**   | string                 | string              |
+| **uuid**     | string                 | string              |
 
 Check the examples >> [here](./examples) <<
 
