@@ -91,3 +91,5 @@ employee.set("created_on", new Date());
 await employee.insert();
 
 client.closeConnection();
+
+// https://www.the-art-of-web.com/sql/inheritance-foreign-key/

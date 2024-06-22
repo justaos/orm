@@ -2,13 +2,14 @@ import getORM from "./getORM.ts";
 import {
   type Record,
   RecordInterceptor,
+  Table,
   type TRecordInterceptorContext,
   type TRecordInterceptorType,
 } from "../mod.ts";
 
 const odm = getORM();
 
-const conn = await odm.connect(true);
+const client = await odm.connect(true);
 
 await client.defineTable({
   name: "student",
@@ -34,13 +35,13 @@ class FullNameIntercept extends RecordInterceptor {
   }
 
   async intercept(
-    tableName: string,
+    table: Table,
     interceptType: TRecordInterceptorType,
     records: Record[],
     _context: TRecordInterceptorContext,
   ) {
-    if (tableName === "student") {
-      console.log(`[collectionName=${tableName}, when=${interceptType}]`);
+    if (table.getName() === "student") {
+      console.log(`[collectionName=${table.getName()}, when=${interceptType}]`);
       if (interceptType === "BEFORE_INSERT") {
         for (const record of records) {
           console.log(
@@ -69,7 +70,7 @@ const studentRecord = studentTable.createNewRecord();
 studentRecord.set("first_name", "John");
 studentRecord.set("last_name", "Doe");
 await studentRecord.insert();
-await studentTable.select().toArray();
+await studentTable.toArray();
 /* This will print the following:
 [collectionName=student, operation=INSERT, when=BEFORE]
 Full name field updated for :: John

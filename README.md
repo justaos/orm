@@ -35,7 +35,7 @@ try {
     true, /* create database if not exists */
   );
   console.log("Client connected successfully");
-  client.closeConnection(); // terminate all connections in the pool
+  client.closeConnection();
 } catch (error) {
   console.log("Error while establishing connection", error);
 }
@@ -46,43 +46,20 @@ try {
 Definition automatically includes `id` and `_table` fields on every table.
 
 ```ts
-await orm.defineTable({
-  name: "blog_post",
+await client.defineTable({
+  name: "department",
   columns: [
     {
-      name: "title",
+      name: "name",
       type: "string",
     },
     {
-      name: "content",
+      name: "code",
       type: "string",
     },
   ],
 });
 
-await orm.defineTable({
-  name: "comment",
-  columns: [
-    {
-      name: "blog_post",
-      type: "uuid",
-      foreign_key: {
-        table: "department",
-        column: "id",
-        on_delete: "CASCADE",
-      },
-    },
-    {
-      name: "message",
-      type: "string",
-    },
-  ],
-});
-```
-
-## Querying
-
-```ts
 await client.defineTable({
   name: "teacher",
   columns: [
@@ -91,37 +68,47 @@ await client.defineTable({
       type: "string",
     },
     {
-      name: "roll_no",
+      name: "badge_number",
       type: "integer",
     },
     {
       name: "age",
       type: "integer",
     },
+    {
+      name: "date_of_joining",
+      type: "date",
+    },
+    {
+      name: "department",
+      type: "uuid",
+      foreign_key: {
+        table: "department",
+        column: "id",
+      },
+    },
   ],
 });
+```
 
+## Querying
+
+```ts
 const teacherTable = client.table("teacher");
 for (let i = 0; i < 10; i++) {
   const teacher = teacherTable.createNewRecord();
-  teacher.set("name", "a" + (i + 1));
-  teacher.set("roll_no", i + 1);
+  teacher.set("name", randomNames());
+  teacher.set("badge_number", i + 1);
   teacher.set("age", 10 * ((i + 1) % 2));
   await teacher.insert();
 }
 
-const records = await teacherTable
-  .select()
-  .orderBy("roll_no", "DESC")
-  .toArray();
+let records = await teacherTable.orderBy("badge_number", "DESC").toArray();
 
 for (const record of records) {
-  console.log(record.get("name") + " :: " + record.get("roll_no"));
+  console.log(record.get("name") + " :: " + record.get("badge_number"));
 }
-
 console.log("Count :: " + (await teacherTable.count()));
-
-client.closeConnection();
 ```
 
 ## Querying with compound 'OR' and 'AND' conditions
@@ -130,15 +117,15 @@ client.closeConnection();
 // Where 'age' is 10  and (name is 'a1' or 'roll_no' is 5)
 // SELECT * FROM public.teacher WHERE "age" = 10 AND ("name" = 'a1' OR "roll_no" = 5)
 
-const selectQuery = teacherTable.select();
-selectQuery.where("name", "a1");
-
-const compoundOrQuery = selectQuery.compoundOr();
-compoundOrQuery.where("roll_no", 4);
-compoundOrQuery.where("roll_no", 2);
+const selectQuery = teacherTable
+  .where("age", 10)
+  .andWhere((compoundQuery) => {
+    compoundQuery
+      .where("name", "a1")
+      .orWhere("badge_number", "5");
+  });
 
 records = await selectQuery.toArray();
-
 console.log(records.map((t) => t.toJSON()));
 ```
 
@@ -161,7 +148,7 @@ Intercept and compute student full name before insert and print all records
 after
 
 ```ts
-const conn = await odm.connect(true);
+const client = await odm.connect(true);
 
 await client.defineTable({
   name: "student",
@@ -187,13 +174,13 @@ class FullNameIntercept extends RecordInterceptor {
   }
 
   async intercept(
-    tableName: string,
+    table: Table,
     interceptType: TRecordInterceptorType,
     records: Record[],
-    _context: DatabaseOperationContext,
+    _context: TRecordInterceptorContext,
   ) {
-    if (tableName === "student") {
-      console.log(`[collectionName=${tableName}, when=${interceptType}]`);
+    if (table.getName() === "student") {
+      console.log(`[collectionName=${table.getName()}, when=${interceptType}]`);
       if (interceptType === "BEFORE_INSERT") {
         for (const record of records) {
           console.log(
@@ -222,7 +209,7 @@ const studentRecord = studentTable.createNewRecord();
 studentRecord.set("first_name", "John");
 studentRecord.set("last_name", "Doe");
 await studentRecord.insert();
-await studentTable.select().toArray();
+await studentTable.toArray();
 /* This will print the following:
 [collectionName=student, operation=INSERT, when=BEFORE]
 Full name field updated for :: John
@@ -246,39 +233,45 @@ client.closeConnection();
 After connection established, you can define custom field type.
 
 ```ts
-odm.addDataType(
-  new (class extends DataType {
-    constructor() {
-      super("email", "VARCHAR");
-    }
+const client = await odm.connect(true);
 
-    toJSONValue(value: string | null): string | null {
-      return value;
-    }
+class EmailType extends IDataType {
+  constructor() {
+    super("email");
+  }
 
-    validateDefinition(_columnDefinition: ColumnDefinition) {
-      return true;
-    }
+  getNativeType(_definition: TColumnDefinition): TColumnDataType {
+    return "VARCHAR";
+  }
 
-    setValueIntercept(newValue: any): any {
-      return newValue;
-    }
+  toJSONValue(value: string | null): string | null {
+    return value;
+  }
 
-    async validateValue(value: unknown): Promise<void> {
-      const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
-      if (
-        value &&
-        typeof value === "string" &&
-        !new RegExp(pattern).test(value)
-      ) {
-        throw new Error("Not a valid email");
-      }
+  validateDefinition(_columnDefinition: TColumnDefinition) {
+    // Throw an error if something in definition is not meeting your expectation.
+  }
+
+  setValueIntercept(newValue: any): any {
+    return newValue;
+  }
+
+  async validateValue(value: unknown): Promise<void> {
+    const pattern = "(.+)@(.+){2,}\\.(.+){2,}";
+    if (
+      value &&
+      typeof value === "string" &&
+      !new RegExp(pattern).test(value)
+    ) {
+      throw new Error("Not a valid email");
     }
-  })(),
-);
+  }
+}
+
+odm.addDataType(new EmailType());
 
 await client.defineTable({
-  name: "student",
+  name: "employee",
   columns: [
     {
       name: "name",
@@ -307,21 +300,25 @@ await client.defineTable({
   ],
 });
 
-const studentTable = client.table("student");
+const studentTable = client.table("employee");
 const student = studentTable.createNewRecord();
-student.set("personal_contact", "test");
+student.set("personal_contact", "NOT_EMAIL_VALUE");
 student.set("birth_date", new Date());
 try {
-  await student.insert();
+  await student.insert(); // this will throw an error, because email is not valid
   console.log("Student created");
 } catch (error) {
-  console.log(error.toJSON());
+  console.log(error);
 }
+
+client.closeConnection();
 ```
 
 ## Inheritance
 
 ```ts
+const client = await odm.connect(true);
+
 await client.defineTable({
   name: "animal",
   columns: [
@@ -355,7 +352,7 @@ husky.set("name", "Jimmy");
 husky.set("breed", "Husky");
 await husky.insert();
 
-const animalCursor = await animalTable.select().execute();
+const animalCursor = await animalTable.execute();
 
 for await (const animal of animalCursor()) {
   console.log(animal.toJSON());
@@ -365,7 +362,7 @@ client.closeConnection();
 ```
 
 | Data type    | Record.get             | Record.getJSONValue |
-| ------------ | ---------------------- | ------------------- |
+|--------------|------------------------|---------------------|
 | **date**     | Temporal.PlainDate     | string              |
 | **datetime** | Temporal.PlainDateTime | string              |
 | **integer**  | number                 | number              |

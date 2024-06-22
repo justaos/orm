@@ -65,9 +65,13 @@ for (const record of records) {
 console.log("Count :: " + (await teacherTable.count()));
 
 // Where 'age' is 10  and (name is 'a1' or 'badge_number' is 5)
-const selectQuery = teacherTable.where("age", 10);
-
-selectQuery.where("name", "a1").orWhere("badge_number", 5);
+const selectQuery = teacherTable
+  .where("age", 10)
+  .andWhere((compoundQuery) => {
+    compoundQuery
+      .where("name", "a1")
+      .orWhere("badge_number", "5");
+  });
 
 records = await selectQuery.toArray();
 console.log(records.map((t) => t.toJSON()));
