@@ -25,8 +25,9 @@ import RegistriesHandler from "./RegistriesHandler.ts";
  * - Also supports interception on operations (create, read, update and delete).
  *
  * @example
- * ```typescript
+ * ```ts
  * import { ORM } from "@justaos/orm";
+ *
  * const odm = new ORM({
  *  hostname: "localhost",
  *  port: 5432,
@@ -34,20 +35,9 @@ import RegistriesHandler from "./RegistriesHandler.ts";
  *  password: "postgres",
  *  max_connections: 20
  * });
+ *
  * odm.connect();
  * ```
- *
- * @module ORM
- * @see {@link DatabaseConfiguration} for the configuration options
- * @see {@link DataType} for the data types supported
- * @see {@link TableDefinition} for the table definitions
- * @see {@link DatabaseOperationInterceptor} for the operation interceptors
- *
- * @method connect Establishes a connection to the database
- * @method isTableDefined Checks if a table is defined in the registry
- * @method addDataType Adds a new data type to the registry
- * @method addInterceptor Adds a new operation interceptor to the service
- * @method deleteInterceptor Deletes an operation interceptor from the service
  */
 export default class ORM {
   readonly #logger: Logger;

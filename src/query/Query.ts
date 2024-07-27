@@ -69,6 +69,12 @@ export default class Query {
     return this;
   }
 
+  addUnique(columns: string[]): Query {
+    const query = <CreateQuery> this.#getQuery();
+    query.addUnique(columns);
+    return this;
+  }
+
   inherits(nameWithSchema: string | undefined): Query {
     if (typeof nameWithSchema === "undefined") return this;
     const query = <CreateQuery> this.#getQuery();

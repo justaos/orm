@@ -39,6 +39,7 @@ export type TTableDefinition = {
   inherits?: string;
   final?: boolean;
   columns?: TColumnDefinition[];
+  unique?: string[][];
 };
 
 export type TTableDefinitionStrict = {
@@ -47,6 +48,7 @@ export type TTableDefinitionStrict = {
   inherits?: string;
   final: boolean;
   columns: TColumnDefinitionStrict[];
+  unique: string[][];
 };
 
 export type TColumnDataType =

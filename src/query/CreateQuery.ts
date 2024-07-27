@@ -6,6 +6,8 @@ export class CreateQuery {
 
   #columns: __TColumnDefinitionNative[] = [];
 
+  #unique: string[][] = [];
+
   #inherits?: string;
 
   constructor(tableName: string) {
@@ -18,17 +20,24 @@ export class CreateQuery {
     return this;
   }
 
+  addUnique(columns: string[]): CreateQuery {
+    this.#unique.push(columns);
+    return this;
+  }
+
   inherits(tableName: string): CreateQuery {
     this.#inherits = getFullFormTableName(tableName);
     return this;
   }
 
   buildQuery(): string {
+    const statements = this.#prepareColumns();
+    statements.push(...this.#prepareUnique());
+    statements.push(this.#preparePrimaryKey());
+
     let query = `CREATE TABLE ${this.#tableName}`;
     query += ` (`;
-    query += this.#prepareColumns();
-    query += this.#prepareUnique();
-    query += this.#preparePrimaryKey();
+    query += statements.join(", ");
     query += `)`;
     query += this.#prepareInherits();
     return query;
@@ -47,20 +56,16 @@ export class CreateQuery {
       } ("${column.foreign_key.column}") ${onDelete}`;
     } else {
       if (column.not_null) query += ` NOT NULL`;
-      if (column.unique) query += ` UNIQUE`;
     }
     return query;
   }
 
-  #prepareColumns(): string {
+  #prepareColumns(): string[] {
     return this.#columns
       .filter((column) =>
         getFullFormTableName(column.table) === this.#tableName
       )
-      .map((column) => {
-        return this.#prepareColumn(column);
-      })
-      .join(",\n\t");
+      .map(this.#prepareColumn);
   }
 
   #prepareInherits(): string {
@@ -68,18 +73,21 @@ export class CreateQuery {
     return ` INHERITS (${this.#inherits})`;
   }
 
-  #prepareUnique(): string {
+  #prepareUnique(): string[] {
+    const uniqueConstraints = [...this.#unique];
     const uniqueColumns = this.#columns.filter((column) =>
       column.name != "id" && column.unique &&
-      getFullFormTableName(column.table) !== this.#tableName
+      getFullFormTableName(column.table) === this.#tableName
     );
-    if (uniqueColumns.length === 0) return "";
-    return uniqueColumns.map((column) => {
-      return `,  UNIQUE ("${column.name}")`;
-    }).join("");
+    for (const column of uniqueColumns) {
+      uniqueConstraints.push([column.name]);
+    }
+    return uniqueConstraints.map((columns) => {
+      return `UNIQUE (${columns.map((column) => `"${column}"`).join(", ")})`;
+    });
   }
 
   #preparePrimaryKey(): string {
-    return `, PRIMARY KEY (id)`;
+    return `PRIMARY KEY (id)`;
   }
 }

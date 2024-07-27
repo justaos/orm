@@ -11,7 +11,7 @@ import TableDefinitionHandler from "./table/TableDefinitionHandler.ts";
 import Table from "./table/Table.ts";
 
 import Query from "./query/Query.ts";
-import { logSQLQuery, runSQLQuery } from "./utils.ts";
+import { isEqualArray, logSQLQuery, runSQLQuery } from "./utils.ts";
 import type RegistriesHandler from "./RegistriesHandler.ts";
 import ORMError from "./errors/ORMError.ts";
 
@@ -20,20 +20,6 @@ import ORMError from "./errors/ORMError.ts";
  * It provides methods for creating, dropping, and interacting with tables.
  * It also provides methods for creating and executing queries.
  * It is the main entry point for the ORM.
- *
- * @module ORMClient
- * @see {@link DatabaseConfiguration} for the configuration options
- * @see {@link DataType} for the data types supported
- * @see {@link TableDefinition} for the table definitions
- * @see {@link DatabaseOperationInterceptorService} for the operation interceptors\
- *
- * @method connect Establishes a connection to the database
- * @method closeConnection Closes the connection to the database
- * @method deregisterTable Deregisters a table from the registry
- * @method defineTable Defines a new table
- * @method dropTable Drops a table
- * @method table Gets a table object
- * @method query Creates a new query object
  *
  * @example
  * ```typescript
@@ -154,6 +140,10 @@ export default class ORMClient {
             foreign_key: columnDefinition.foreign_key,
           });
         }
+        for (const unique of tableDefinitionHandler.getUniqueConstraints()) {
+          createQuery.addUnique(unique);
+        }
+
         const inherits = tableDefinitionHandler.getInherits();
         if (inherits) {
           createQuery.inherits(inherits);
@@ -172,13 +162,17 @@ export default class ORMClient {
           (column: { column_name: string }) => column.column_name,
         );
         const columnSchemas = tableDefinitionHandler.getOwnColumns();
+
+        const alterQuery = new Query(this.#pool);
+        alterQuery.alter(tableDefinitionHandler.getName());
+
+        let runAlterQuery = false;
         // Create new columns
         if (columnSchemas.length > existingColumnNames.length) {
-          const alterQuery = new Query(this.#pool);
-          alterQuery.alter(tableDefinitionHandler.getName());
           for (const column of tableDefinitionHandler.getColumns()) {
             const columnDefinition = column.getDefinitionClone();
             if (!existingColumnNames.includes(column.getName())) {
+              runAlterQuery = true;
               alterQuery.addColumn({
                 table: column.getTableName(),
                 name: column.getName(),
@@ -189,7 +183,50 @@ export default class ORMClient {
               });
             }
           }
+        }
 
+        const existingUniqueConstraintColumns = await runSQLQuery(
+          reserved,
+          `SELECT constraint_name, column_name FROM information_schema.constraint_column_usage
+          WHERE constraint_name IN (
+            SELECT constraint_name FROM information_schema.table_constraints
+          WHERE table_schema='public' AND table_name='department' AND constraint_type='UNIQUE'
+        );`,
+        );
+
+        let existingUniqueConstraints: any = {};
+
+        existingUniqueConstraintColumns.forEach((constraint: any) => {
+          existingUniqueConstraints[constraint.constraint_name] =
+            existingUniqueConstraints[constraint.constraint_name] || [];
+
+          existingUniqueConstraints[constraint.constraint_name].push(
+            constraint.column_name,
+          );
+        });
+
+        existingUniqueConstraints = Object.values(existingUniqueConstraints);
+
+        if (existingUniqueConstraints.length) {
+          const uniqueConstraints = tableDefinitionHandler
+            .getUniqueConstraints();
+
+          for (const unique of uniqueConstraints) {
+            let exists = false;
+            for (const existingUniqueConstraint of existingUniqueConstraints) {
+              if (isEqualArray(existingUniqueConstraint, unique)) {
+                exists = true;
+                break;
+              }
+            }
+            if (!exists) {
+              runAlterQuery = true;
+              alterQuery.addUnique(unique);
+            }
+          }
+        }
+
+        if (runAlterQuery) {
           logSQLQuery(this.#logger, alterQuery.getSQLQuery());
           await alterQuery.execute();
         }

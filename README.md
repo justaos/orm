@@ -91,6 +91,30 @@ await client.defineTable({
 });
 ```
 
+### Unique constraint
+
+```ts
+await client.defineTable({
+  name: "student",
+  columns: [
+    {
+      name: "name",
+      type: "string",
+    },
+    {
+      name: "roll_no",
+      type: "integer",
+      unique: true,
+    },
+    {
+      name: "age",
+      type: "integer",
+    },
+  ],
+  unique: [["name", "age"]],
+});
+```
+
 ## Querying
 
 ```ts

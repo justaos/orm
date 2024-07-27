@@ -40,6 +40,7 @@ export default class TableDefinitionHandler {
       final: false,
       columns: [],
       schema: "public",
+      unique: [],
       ...tableDefinition,
     };
 
@@ -180,6 +181,10 @@ export default class TableDefinitionHandler {
       columns.push(...extendedSchema.getColumns());
     }
     return columns;
+  }
+
+  getUniqueConstraints(): string[][] {
+    return this.#tableDefinition.unique;
   }
 
   getColumnNames(): string[] {

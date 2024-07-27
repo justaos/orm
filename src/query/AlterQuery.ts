@@ -6,7 +6,7 @@ export class AlterQuery {
 
   #addColumns: __TColumnDefinitionNative[] = [];
 
-  #inherits?: string;
+  #unique: string[][] = [];
 
   constructor(tableName: string) {
     this.#tableName = getFullFormTableName(tableName);
@@ -18,10 +18,17 @@ export class AlterQuery {
     return this;
   }
 
+  addUnique(columns: string[]): AlterQuery {
+    this.#unique.push(columns);
+    return this;
+  }
+
   buildQuery(): string {
+    const statements = this.#prepareColumns();
+    statements.push(...this.#prepareUnique());
+
     let query = `ALTER TABLE ${this.#tableName} \n\t`;
-    query += this.#prepareColumns();
-    query += this.#prepareInherits();
+    query += statements.join(", ");
     return query;
   }
 
@@ -38,29 +45,37 @@ export class AlterQuery {
       } ("${column.foreign_key.column}") ${onDelete}`;
     } else {
       if (column.not_null) query += ` NOT NULL`;
-      if (column.unique) query += ` UNIQUE`;
     }
     return query;
   }
 
-  #prepareColumns(): string {
+  #prepareColumns(): string[] {
     return this.#addColumns
-      .map((column, index) => {
-        if (index !== this.#addColumns.length - 1) {
-          return this.#prepareColumn(column) + ",";
-        }
-        return this.#prepareColumn(column);
-      })
-      .join("\n\t");
+      .filter(
+        (column) => getFullFormTableName(column.table) === this.#tableName,
+      )
+      .map(this.#prepareColumn);
   }
 
-  #prepareInherits(): string {
-    if (!this.#inherits) return "";
-    return ` INHERITS (${this.#inherits})`;
-  }
+  #prepareUnique(): string[] {
+    const uniqueConstraints = [...this.#unique];
+    const uniqueColumns = this.#addColumns.filter(
+      (column) =>
+        column.name != "id" &&
+        column.unique &&
+        getFullFormTableName(column.table) === this.#tableName,
+    );
 
-  #preparePrimaryKey(): string {
-    if (this.#inherits) return "";
-    return `, PRIMARY KEY (id)`;
+    for (const column of uniqueColumns) {
+      uniqueConstraints.push([column.name]);
+    }
+
+    return uniqueConstraints.map((columns) => {
+      return `ADD UNIQUE (${
+        columns
+          .map((column) => `"${column}"`)
+          .join(", ")
+      })`;
+    });
   }
 }

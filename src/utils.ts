@@ -61,3 +61,6 @@ export function getTableNameWithoutSchema(name: string): string {
   }
   return name;
 }
+
+export const isEqualArray = (a: string[], b: string[]) =>
+  JSON.stringify(a.sort()) === JSON.stringify(b.sort());
